@@ -1,0 +1,10 @@
+//- CTA button from Figma (Contact CTA 1523:3282).
+//- Idle shows the label only; hover/focus reveals the frame, arrow and caption.
+mixin ctaButton(label, href, caption)
+  .cta
+    a.cta__button(href=href)
+      span.cta__label.text-18= label
+      span.cta__icon
+        img(src="assets/icons/arrow-circle.svg" width="32" height="32" alt="")
+    if caption
+      p.cta__caption.text-14.text-medium= caption

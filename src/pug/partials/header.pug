@@ -1,0 +1,21 @@
+//- Work dropdown is a placeholder: there is no dropdown design in Figma yet.
+- var workCategories = ["Branding", "UI/UX", "Illustration", "2D/3D", "Graphic Design"]
+- var navLinks = ["About", "Team", "Services", "Career"]
+
+header.site-header
+  .container.site-header__inner
+    a.site-header__logo(href="index.html" aria-label="One Week Wonders — Home")
+      img(src="assets/images/logo.svg" width="50.25" height="24" alt="")
+    nav(aria-label="Main")
+      ul.site-nav
+        li.site-nav__item.site-nav__item--dropdown
+          a.site-nav__link(href="#" aria-haspopup="true")
+            | Work
+            img(src="assets/icons/chevron-down.svg" width="16" height="16" alt="")
+          ul.site-nav__dropdown
+            each category in workCategories
+              li
+                a.site-nav__dropdown-link(href="#")= category
+        each label in navLinks
+          li.site-nav__item
+            a.site-nav__link(href="#")= label

@@ -1,0 +1,83 @@
+// Figma: Contact CTA 1523:3282 (final) and Button Interaction Idle/Hover
+// 1516:2442 / 1516:2468. Transition timing is not in Figma (0.3s proposed).
+@use "../abstracts/functions" as *;
+
+.cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-16);
+}
+
+.cta__button {
+  display: flex;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  transition: border-color 0.3s ease-out;
+}
+
+// .button is the same dark label used on its own ("More Work", Figma 1523:3389).
+.cta__label,
+.button {
+  padding: fluid(10) fluid(20);
+  // Figma text box is 22px ("normal" renders ~1px shorter in browsers).
+  line-height: fluid(22);
+  color: var(--color-white);
+  background: var(--color-ink);
+  border-radius: var(--radius-sm);
+}
+
+.button {
+  display: inline-block;
+}
+
+// Collapsed in idle; opens to 8px gap + 32px icon + 8px right padding.
+.cta__icon {
+  display: flex;
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    width 0.3s ease-out,
+    opacity 0.3s ease-out;
+
+  img {
+    flex-shrink: 0;
+    width: fluid(32);
+    height: fluid(32);
+    margin-left: var(--space-8);
+    // Figma flips the "down-right" arrow vertically, so it points up-right.
+    transform: scaleY(-1);
+  }
+}
+
+// Space is always reserved so the layout does not shift on hover.
+.cta__caption {
+  line-height: 1.7;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+.cta__button:hover,
+.cta__button:focus-visible {
+  border-color: var(--color-ink);
+
+  .cta__icon {
+    width: fluid(48);
+    opacity: 1;
+  }
+}
+
+.cta__button:hover + .cta__caption,
+.cta__button:focus-visible + .cta__caption {
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta__button,
+  .cta__icon,
+  .cta__caption {
+    transition: none;
+  }
+}

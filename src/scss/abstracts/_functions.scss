@@ -1,0 +1,5 @@
+// Converts a Figma pixel value (1440px frame) into a size that scales
+// with the viewport. --px is defined in base/_tokens.scss.
+@function fluid($value) {
+  @return calc(#{$value} * var(--px));
+}

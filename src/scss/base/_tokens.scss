@@ -1,0 +1,60 @@
+// Design tokens from Figma (WEBSITE-2026, Homepage 1523:3214).
+// See docs/design-system.md for sources and confirmation status.
+@use "../abstracts/functions" as *;
+
+:root {
+  // One Figma pixel. Scales with the viewport from 1280px (0.889x)
+  // to 1920px (1.333x); exactly 1px at the 1440px design width.
+  --px: clamp(calc(1280px / 1440), calc(100vw / 1440), calc(1920px / 1440));
+
+  // Colors
+  --color-ink: #111111;
+  --color-ink-2: #1f1f1f;
+  --color-white: #ffffff;
+  --color-surface-muted: #f6f6f6;
+  --color-surface-soft: #eeeeee;
+  --color-divider: #e7e7e7;
+  --color-border: #ededed;
+  --color-border-row: #f0f0f0;
+  --color-border-strong: #d9d9d9;
+  --color-border-dark: #3d3d3d;
+  --color-link: #3e78ff;
+  --color-glass: rgba(255, 255, 255, 0.04);
+  --color-glass-button: rgba(255, 255, 255, 0.1);
+  --color-divider-dark: rgba(255, 255, 255, 0.1);
+
+  // Brand gradient stops; the angle is set per element.
+  --gradient-brand-stops: #033dc5 18.901%, #ffdc7b 52.394%, #fd1d1d 80.933%;
+  --gradient-brand-stops-dark: #457bf9 18.901%, #ffdc7b 52.394%, #fd1d1d 80.933%;
+
+  // Fonts
+  --font-display: "General Sans", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  // Spacing
+  --space-4: #{fluid(4)};
+  --space-8: #{fluid(8)};
+  --space-16: #{fluid(16)};
+  --space-20: #{fluid(20)};
+  --space-24: #{fluid(24)};
+  --space-32: #{fluid(32)};
+  --space-40: #{fluid(40)};
+  --space-60: #{fluid(60)};
+  --space-80: #{fluid(80)};
+
+  // Layout
+  --page-gutter: #{fluid(40)};
+  --container: #{fluid(1360)};
+  --container-narrow: #{fluid(1050)};
+  --container-clients: #{fluid(1130)};
+  --grid-gutter: #{fluid(20)};
+
+  // Radius
+  --radius-sm: #{fluid(4)};
+  --radius-md: #{fluid(8)};
+  --radius-pill: 1000px;
+
+  // Effects
+  --blur-glass: #{fluid(100)};
+  --shadow-coin: 0 #{fluid(4)} #{fluid(4)} rgba(0, 0, 0, 0.25);
+}

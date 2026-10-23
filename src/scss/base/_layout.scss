@@ -1,0 +1,7 @@
+// 1360px content + 40px gutters = 1440px Figma frame. Wider screens center it.
+.container {
+  width: 100%;
+  max-width: calc(var(--container) + 2 * var(--page-gutter));
+  margin-inline: auto;
+  padding-inline: var(--page-gutter);
+}

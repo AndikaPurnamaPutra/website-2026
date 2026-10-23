@@ -1,0 +1,59 @@
+//- Temporary page for checking design tokens in the browser. Not linked from other pages.
+extends ../layouts/default
+
+block title
+  | Styleguide — OWW
+
+block content
+  div(style="padding: var(--page-gutter); display: grid; gap: var(--space-60);")
+    section
+      p.text-16.text-muted ( Fonts )
+      p.text-heading-42(style="margin-top: var(--space-16);") General Sans 400 — Aa Bb Cc 0123
+      p.text-heading-42(style="font-weight: 500;") General Sans 500 — Aa Bb Cc 0123
+      p.text-20.text-regular(style="margin-top: var(--space-16);") Inter 400 — Aa Bb Cc 0123
+      p.text-20 Inter 500 — Aa Bb Cc 0123
+
+    section
+      p.text-16.text-muted ( Type scale )
+      div(style="display: grid; gap: var(--space-24); margin-top: var(--space-16);")
+        p.text-display-80
+          span.text-gradient Elite digital
+          |  products designed at venture speed
+        p.text-display-48 $139M+ / display-48
+        p.text-heading-42 Thoughtful Design, Real Impact / heading-42
+        p.text-heading-28 Recently Added / heading-28
+        p.text-title-22 Brand Strategy / title-22
+        p.text-title-20 Instagram / title-20
+        p.text-20 Visual trends evolve, but solid systems don’t age. / text-20
+        p.text-18 Schedule a call / text-18
+        p.text-16 ( Our Work ) / text-16
+        p.text-14 We delve into your brand's core values, mission, and vision. / text-14
+        p.text-14.text-medium Work · About · Team · Services · Career / text-14 medium
+        p.text-13 HealthTech Website Design — WELLMO / text-13
+        p.text-12 Co-founder / text-12
+
+    section
+      p.text-16.text-muted ( Colors )
+      - var colors = ["ink", "ink-2", "white", "surface-muted", "surface-soft", "divider", "border", "border-row", "border-strong", "border-dark", "link"]
+      div(style="display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--grid-gutter); margin-top: var(--space-16);")
+        each color in colors
+          div
+            div(style=`height: 80px; border-radius: var(--radius-sm); border: 1px solid var(--color-divider); background: var(--color-${color});`)
+            p.text-13(style="margin-top: var(--space-8);")= `--color-${color}`
+
+    section(style="background: var(--color-ink); color: var(--color-white); padding: var(--space-40); border-radius: var(--radius-sm);")
+      p.text-16.text-muted ( Dark surface )
+      p.text-heading-42(style="margin-top: var(--space-16);")
+        | Design to advocates and investors into
+        |
+        span.text-gradient(style="background-image: linear-gradient(185deg, var(--gradient-brand-stops-dark));") believers.
+      div(style="margin-top: var(--space-24); width: 345px; padding: var(--space-20); background: var(--color-glass); backdrop-filter: blur(var(--blur-glass)); border-radius: var(--radius-sm);")
+        p.text-heading-28 Branding
+        p.text-14.text-muted(style="margin-top: var(--space-32);") Glass card: --color-glass + --blur-glass
+
+    section
+      p.text-16.text-muted ( Radius )
+      div(style="display: flex; gap: var(--space-20); margin-top: var(--space-16);")
+        div(style="width: 120px; height: 60px; background: var(--color-surface-soft); border-radius: var(--radius-sm);")
+        div(style="width: 120px; height: 60px; background: var(--color-surface-soft); border-radius: var(--radius-md);")
+        div(style="width: 120px; height: 60px; background: var(--color-surface-soft); border-radius: var(--radius-pill);")

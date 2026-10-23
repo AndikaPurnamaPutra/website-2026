@@ -1,0 +1,129 @@
+// Figma: Section-2 1523:3259
+@use "../abstracts/functions" as *;
+
+.statement__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-40);
+  max-width: var(--container-narrow);
+  margin-inline: auto;
+  padding-block: fluid(220);
+}
+
+.statement__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+  width: 100%;
+}
+
+.statement__eyebrow {
+  line-height: 1.7;
+  text-align: center;
+}
+
+.statement__text {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: fluid(42);
+  line-height: 1.6;
+  letter-spacing: -0.04em;
+}
+
+// Each line is 77px tall (67px text + 10px), centered, with the small
+// horizontal offsets measured in Figma.
+.statement__line {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  height: fluid(77);
+  white-space: nowrap;
+}
+
+.statement__line--1 {
+  gap: var(--space-20);
+  transform: translateX(#{fluid(-10)});
+}
+
+.statement__line--2 {
+  transform: translateX(#{fluid(-4.5)});
+}
+
+.statement__line--3 {
+  transform: translateX(#{fluid(2.5)});
+
+  > :first-child {
+    margin-right: fluid(49);
+  }
+
+  > :last-child {
+    margin-left: fluid(44);
+  }
+}
+
+.statement__line--4 {
+  transform: translateX(#{fluid(-5)});
+}
+
+.statement__icon {
+  width: fluid(66);
+  height: fluid(52);
+  margin-top: fluid(7.5);
+}
+
+// Folder "in a pocket": three layers rebuilt from Figma (Folder Illustration
+// 1523:3275). Both crops show the same image at the same offset.
+.statement__folder {
+  position: relative;
+  flex-shrink: 0;
+  width: fluid(120);
+  height: fluid(78);
+  margin-top: fluid(-6);
+}
+
+.statement__folder-pocket {
+  position: absolute;
+  top: fluid(56);
+  left: 0;
+  width: fluid(120);
+  height: fluid(22);
+  overflow: hidden;
+  background: var(--color-border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.statement__folder-shadow {
+  position: absolute;
+  top: fluid(-2);
+  left: fluid(3);
+  width: fluid(115);
+  height: fluid(44);
+  max-width: none;
+}
+
+.statement__folder-crop {
+  position: absolute;
+  left: fluid(11);
+  width: fluid(98);
+  overflow: hidden;
+
+  img {
+    position: absolute;
+    top: fluid(-6);
+    left: fluid(-11.17);
+    width: fluid(120.35);
+    height: fluid(120);
+    max-width: none;
+  }
+}
+
+.statement__folder-crop--inside {
+  top: fluid(-56);
+  height: fluid(108);
+}
+
+.statement__folder-crop--top {
+  top: 0;
+  height: fluid(70);
+}

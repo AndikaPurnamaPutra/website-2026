@@ -1,0 +1,35 @@
+section.hero
+  .container.hero__inner
+    img.hero__coin(src="assets/images/hero/coin.png" width="448" height="420" alt="")
+
+    .hero__content
+      .hero__intro
+        h1.hero__title.text-display-80
+          span.hero__title-accent.text-gradient Elite digital
+          |  products
+          br
+          | designed at venture speed
+        ul.hero__social
+          li
+            a.hero__social-link(href="https://www.behance.net" target="_blank" rel="noopener" aria-label="Behance")
+              img.hero__social-icon--behance(src="assets/icons/behance.png" width="32" height="21" alt="")
+          li
+            a.hero__social-link(href="https://dribbble.com" target="_blank" rel="noopener" aria-label="Dribbble")
+              img.hero__social-icon--dribbble(src="assets/icons/dribbble.svg" width="24" height="24" alt="")
+
+      .hero__info
+        p.hero__description.text-14.text-medium
+          | Strategy, visual systems, branding,
+          br
+          | and high-end web design. We define your identity and support your growth at every touchpoint.
+        .hero__datetime
+          p.hero__date.text-14.text-medium(data-hero-date) Wednesday, October 14
+          .hero__timezone
+            span.hero__timezone-label.text-14.text-medium #{'IDN  /  GMT +7'}
+            span.hero__time(data-hero-time) 03:38PM
+
+    .hero__showreel
+      img.hero__showreel-image(src="assets/images/hero/showreel.jpg" width="1360" height="781" alt="Care.com campaign on a display screen")
+      button.hero__showreel-button(type="button")
+        span.text-14.text-medium Play Showreel
+        img(src="assets/icons/play.svg" width="16" height="16" alt="")

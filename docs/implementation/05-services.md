@@ -1,0 +1,171 @@
+# 05 — Section What we do (Services)
+
+Status: **Selesai (23 Okt 2026), menunggu review**
+Figma:
+- Tampilan di homepage: Section-03 `1523:3292` (1440 × 1024).
+- Storyboard animasi: "Section-3 (Details)" `1516:2229`, berisi 7 frame:
+
+| # | Frame | Isi |
+|---|---|---|
+| 0 | Concept `1516:2230` | Daftar akordeon (semua layanan terlihat). **Berbeda dari homepage final** |
+| 1 | Branding `1516:2261` | Sama dengan homepage final |
+| 2 | Brand Strategy `1516:2285` | Kartu Branding naik ke atas, Brand Strategy aktif |
+| 3 | UI/UX Design `1516:2323` | (nama layer: "Brand Strategy") |
+| 4 | AI/Web Development `1516:2365` | |
+| 5 | Illustration `1516:2405` | Kartu terakhir, tidak ada tumpukan di belakang |
+| 6 | Fullscreen `1516:2439` | Gambar melebar penuh |
+
+**Data animasi Figma kosong** (`get_motion_context`): tidak ada durasi, easing, atau jarak scroll. Semua gerakan di antara frame adalah **usulan** (bagian 5).
+
+Label: **[T]** dari layer Figma · **[D]** diturunkan · **[U]** usulan.
+
+---
+
+## 1. Tujuan dan ruang lingkup
+
+**Tujuan:** section gelap yang **tertahan (pinned) saat di-scroll**. Setiap langkah scroll mengganti layanan aktif (kartu dan gambar), sesuai storyboard.
+
+**Termasuk:** layout statis (frame 1), 5 layanan, animasi scroll dengan GSAP + ScrollTrigger, dan pembersihan animasi (untuk Barba nanti).
+**Tidak termasuk:** frame "Concept" (lihat pertanyaan 1), mobile, dan section lain.
+
+---
+
+## 2. Requirement dari desain
+
+### 2.1 Layout (frame 1 / homepage) [T]
+- Latar `#111`, tinggi 1024px.
+- Label "(What we do)": Inter Medium 16px, line-height 1.7, putih, opacity 0.5, posisi (40, 39).
+- **Gambar** 1015 × 944, posisi (385, 40), radius 4px, `object-fit: cover`.
+- **Kartu aktif** 345px, posisi (20, 98):
+  - Latar `--color-glass`, blur 100px, radius 4px, padding 20px. Isi tersusun vertikal dengan gap 32px:
+  - Judul: General Sans 28px, line-height 1, putih (`.text-heading-28`).
+  - Garis pemisah 0.5px, `--color-divider-dark`.
+  - Tag: border 1px `--color-border-dark`, radius 4px, padding 6px 10px, Inter 14px putih, gap 8px, bisa turun baris.
+  - Deskripsi: Inter 14px, line-height 1.5, putih, opacity 0.5.
+- **Tumpukan di belakang** (2 kartu berikutnya, hanya judulnya yang terlihat):
+  - Kartu 1: lebar 317 (0,919×), judul 22px, menonjol 16px di bawah kartu aktif.
+  - Kartu 2: lebar 285 (0,826×), judul 20px, menonjol 32px.
+  - Nilai blur dan radiusnya juga ikut mengecil, jadi ini **kartu yang sama yang diperkecil**. [D] Dibuat dengan `transform: scale()`.
+- Paragraf bawah: "Visual trends evolve…", Inter 14px, line-height 1.5, putih, opacity 0.5, lebar 305px, di kiri bawah (40, ±900).
+
+### 2.2 Konten 5 layanan [T]
+| Layanan | Tag | Deskripsi |
+|---|---|---|
+| Branding | Logo, Brand Identity, Motion Design, Packaging | We delve into your brand's core values, mission, and vision to create a cohesive identity that resonates with your target audience. |
+| Brand Strategy | Social Media, Strategic Design, Market Research, Brand Development | We turn your vision into a focused brand strategy that gives your business clarity, direction, and room to grow. |
+| UI/UX Design | Mobile, Website, UX, Prototyping, Design System, Dashboard | We create intuitive digital experiences that make complex ideas feel simple, useful, and unmistakably yours. |
+| AI/Web Development | CMS Development, AI Integration, Framer, Webflow, Custom Code | We transform thoughtful designs into fast, intelligent digital products—combining clean code and AI capabilities to perform beautifully across every screen. |
+| Illustration | Custom Illustration, Iconography, 2D/3D Art, Mascot, Brand Asset | We craft custom illustrations and visual assets that bring personality, emotion, and a memorable identity to your brand. |
+
+Teks tag layanan 3–5 akan dicek ulang dari layer Figma saat implementasi. Saat ini teks tersebut dibaca dari screenshot.
+
+### 2.3 Perubahan antar frame (storyboard) [T]
+- Kartu aktif **sebelumnya** naik ke y = −207 (hampir keluar dari atas), dengan judul mengecil dari 28 ke 24px. Bagian yang masih terlihat tertutup gradient gelap (lebar 373, tinggi 66–72px, dari `#111` ke transparan, blur 2px).
+- Kartu aktif **baru** berpindah dari tumpukan ke posisi (20, 88). Mulai frame 2 posisinya 88, bukan 98. Label "(What we do)" tertutup gradient.
+- Tumpukan di belakang selalu menampilkan 2 kartu berikutnya. Di frame 5 (Illustration), tumpukan kosong.
+- Gambar berganti sesuai layanan (5 gambar berbeda).
+- Frame 6: gambar Illustration melebar melebihi lebar layar (1472 × 571, rata bawah).
+
+### 2.4 Inkonsistensi di Figma
+- Tag di setiap kartu: 2 tag pertama Inter **Regular**, 2 tag berikutnya **Medium**. Lihat pertanyaan 4.
+- Deskripsi di storyboard memakai General Sans, sedangkan homepage final memakai Inter. **Dipakai: Inter** (homepage final).
+- Teks kartu tumpukan di storyboard tidak selalu sesuai urutan (misalnya di frame 3 masih tertulis "UI/UX Design" dan "Brand Strategy"). Di website, tumpukan akan selalu menampilkan 2 layanan berikutnya yang benar.
+
+### 2.5 Aset
+| Aset | Tujuan |
+|---|---|
+| 5 gambar layanan (perfume, storefront, aplikasi HiHi, Rowfest, ilustrasi kereta) | `src/assets/images/services/*.jpg` |
+
+---
+
+## 3. File yang akan dibuat atau diubah
+
+| File | Aksi | Isi |
+|---|---|---|
+| `src/pug/partials/services.pug` | Baru | Data 5 layanan dan markup |
+| `src/scss/sections/_services.scss` | Baru | Layout statis, kartu, tag, tumpukan, gradient |
+| `src/js/services-scroll.js` | Baru | Timeline GSAP + ScrollTrigger (pin + scrub). Mengembalikan fungsi cleanup |
+| `src/js/main.js` | Ubah | Memanggil `services-scroll.js` dan cleanup-nya |
+| `src/scss/main.scss` | Ubah | `@use "sections/services"` |
+| `src/pug/pages/index.pug` | Ubah | Memanggil partial setelah Statement |
+| `src/assets/images/services/` | Baru | 5 gambar |
+
+---
+
+## 4. Urutan implementasi
+1. Unduh 5 gambar dan cek isinya. Teks tag layanan 3–5 dicek dari layer Figma.
+2. Markup dan CSS **statis**, yaitu frame 1. Tanpa JS, halaman tetap terlihat benar.
+3. Bandingkan tampilan statis dengan Figma (posisi ≤ 2px).
+4. Timeline animasi: pin, 4 langkah pergantian layanan, lalu langkah fullscreen.
+5. Uji setiap langkah dengan menghentikan scroll di posisinya, lalu bandingkan dengan frame storyboard.
+6. Uji cleanup, resize, dan reduce motion.
+7. Perbarui checklist.
+
+---
+
+## 5. Usulan untuk bagian yang tidak ada di Figma [U]
+
+1. **Jarak scroll:** satu langkah = satu tinggi layar (100vh). Total sekitar 5–6 layar scroll selama section tertahan.
+2. **Cara bergerak:** mengikuti scroll (`scrub`), dengan **snap** ke setiap langkah, supaya tidak berhenti di tengah transisi.
+3. **Pergantian gambar:** gambar baru muncul dengan crossfade (opacity), sambil sedikit membesar dari 1,05× ke 1×.
+4. **Tinggi section saat tertahan:** desain berukuran 1440 × 1024, tetapi tinggi layar pengguna berbeda-beda (misalnya laptop 800px). Usulan: saat tertahan, tinggi section = tinggi layar, dan tinggi gambar = tinggi layar − 80px (margin 40px atas dan bawah, sama seperti Figma). Kartu tetap di posisinya dan paragraf bawah tetap menempel di kiri bawah.
+5. **Langkah fullscreen:** gambar Illustration membesar hingga memenuhi layar (radius 0), lalu section dilepas dan halaman lanjut ke section Our Work.
+6. **Reduce motion:** jika pengguna memilih "reduce motion", section tetap tertahan dan berganti per langkah, tetapi tanpa animasi gerak (perpindahan instan).
+
+---
+
+## 6. Keputusan (dijawab pengguna, 23 Okt 2026)
+1. Frame "Concept" diabaikan.
+2. Semua usulan di bagian 5 disetujui.
+3. Langkah terakhir: gambar memenuhi layar.
+4. Semua tag memakai Inter **Regular**.
+5. Gambar layanan dikonversi ke JPG.
+
+---
+
+## 7. Verifikasi dan acceptance criteria
+- [ ] `npm run build` tanpa error.
+- [x] Tampilan awal (tanpa scroll) sama dengan `1523:3292` di 1440 × 1024: label, gambar, kartu (20, 98, 345 × 283), tumpukan (34, 335) dan (50, 353), paragraf bawah. Selisih ≤ 1px.
+- [x] Setiap langkah, diuji dengan scroll roda mouse sungguhan, sesuai frame storyboard:
+
+  | Langkah | Kartu sebelumnya | Kartu aktif | Tumpukan | Gambar |
+  |---|---|---|---|---|
+  | 0 Branding | – | 98 | 335, 353 | perfume |
+  | 1 Brand Strategy | −207 | 88 | 325, 343 | storefront |
+  | 2 UI/UX Design | −207 | 88 | 325, 343 | HiHi |
+  | 3 AI/Web Development | −207 | 88 | 346 (sama dengan Figma, karena kartu ini lebih tinggi) | Rowfest |
+  | 4 Illustration | −207 | 88 | – | ilustrasi |
+  | 5 Fullscreen | | | | memenuhi section |
+- [~] Kartu dan gambar hanya memakai `transform`, `opacity`, dan `clip-path`. **Pengecualian:** langkah fullscreen mengubah `inset` satu elemen gambar (posisi absolut, tidak menggeser elemen lain).
+- [x] Di 1920px semua ukuran mengikuti skala 1,333× (kartu 26.7/117.3/460px, gambar 513/53).
+- [x] Resize di tengah animasi (1440 → 1920): posisi dihitung ulang, progress tetap di langkah yang sama. Ditemukan dan diperbaiki: inline style gambar yang tertinggal.
+- [ ] Fungsi cleanup **belum diuji langsung**, karena Barba belum dipasang. Akan diuji saat Barba ditambahkan.
+- [x] Tanpa JS, tampilan frame 1 tetap utuh (diukur dengan JS dimatikan).
+- [x] Hero dan Statement tidak diubah.
+- [x] Reduce motion: di tengah langkah, tampilan tetap utuh di satu langkah (tanpa posisi setengah jalan).
+
+**Perbaikan selama pengujian:**
+1. Snap awalnya meloncat ke langkah terakhir saat scroll cepat. Diganti `labelsDirectional` + `inertia: false`: setiap gerakan scroll maju atau mundur tepat satu langkah.
+2. Kartu tumpukan sempat tergambar di atas kartu aktif saat halaman dimuat (z-index di detik 0). Diperbaiki.
+3. Kartu lama sempat menutupi kartu baru di tengah transisi. Sekarang kartu baru langsung di depan.
+
+**Perbedaan kecil dari storyboard (disengaja):**
+- Jumlah tumpukan mengikuti layanan yang benar-benar tersisa (di langkah 3 hanya 1).
+- Judul kartu sebelumnya tidak mengecil dari 28 ke 24px, karena berada di luar layar.
+- Di layar lebih lebar dari 1920px, gambar fullscreen memenuhi area isi selebar 1920px. Sisi kiri dan kanan tetap berwarna `#111`.
+
+**Gambar:** 5 PNG (total ±18 MB) dikonversi ke JPG dan dibatasi 2400px (ilustrasi tetap 2732px untuk fullscreen). Total ±3 MB.
+
+**Untuk diuji ulang nanti:** perpindahan keluar dari section ini ke section Our Work, setelah section itu dibuat. Saat ini halaman berakhir tepat di akhir section ini.
+
+---
+
+## 8. Checklist progres
+- [x] Analisis Figma (homepage, storyboard 7 frame, data animasi)
+- [x] Rencana ini ditulis
+- [x] Persetujuan dan jawaban klarifikasi
+- [x] Langkah 1: Aset dan teks
+- [x] Langkah 2–3: Layout statis dan verifikasi
+- [x] Langkah 4: Timeline animasi
+- [x] Langkah 5–6: Uji per langkah, resize, reduce motion (cleanup menunggu Barba)
+- [x] Langkah 7: Dokumentasi

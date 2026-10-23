@@ -1,0 +1,28 @@
+section.statement
+  .statement__inner
+    .statement__content
+      p.statement__eyebrow.text-16.text-muted ( End-to-end identity for digital leaders )
+
+      //- Fixed line breaks and per-line offsets follow the Figma layout.
+      p.statement__text
+        span.statement__line.statement__line--1
+          span We specialize
+          img.statement__icon(src="assets/images/statement/decorative-icon.svg" width="66" height="52" alt="")
+          span in a diverse range of cutting-edge
+        = " "
+        span.statement__line.statement__line--2 technologies, ensuring that we can tailor the
+        = " "
+        span.statement__line.statement__line--3
+          span perfect solution to meet
+          span.statement__folder(aria-hidden="true")
+            span.statement__folder-pocket
+              img.statement__folder-shadow(src="assets/images/statement/folder-shadow.svg" alt="")
+              span.statement__folder-crop.statement__folder-crop--inside
+                img(src="assets/images/statement/folder.png" alt="")
+            span.statement__folder-crop.statement__folder-crop--top
+              img(src="assets/images/statement/folder.png" alt="")
+          span your project's unique
+        = " "
+        span.statement__line.statement__line--4 requirements, innovation, and high-quality results.
+
+    +ctaButton("Schedule a call", "#", "Free 15min call")

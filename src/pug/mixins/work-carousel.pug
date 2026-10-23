@@ -1,0 +1,22 @@
+//- Project carousel from Figma (Our Work 1523:3330 / 1523:3359).
+//- Each item: { title, image, crop: { w, h, x, y }, inner? }
+//- crop is the image box in Figma px, centered in the 325x244 frame and
+//- shifted by x/y; inner is an extra crop inside that box (Figma "fill" offsets).
+mixin workCarousel(title, items)
+  .work-carousel(data-work-carousel)
+    .container.work-carousel__header
+      h3.work-carousel__title.text-heading-28= title
+      .work-carousel__nav
+        button.work-carousel__arrow.work-carousel__arrow--prev(type="button" aria-label=`Previous ${title}` data-work-prev)
+          img(src="assets/icons/caret-right.svg" width="24" height="24" alt="")
+        button.work-carousel__arrow(type="button" aria-label=`Next ${title}` data-work-next)
+          img(src="assets/icons/caret-right.svg" width="24" height="24" alt="")
+    .work-carousel__viewport(data-work-viewport)
+      ul.work-carousel__track
+        each item in items
+          li.work-card
+            a.work-card__link(href="#")
+              span.work-card__media
+                span.work-card__crop(style=`--w: ${item.crop.w}; --h: ${item.crop.h}; --x: ${item.crop.x}; --y: ${item.crop.y};` class=item.crop.round ? "work-card__crop--round" : null)
+                  img.work-card__image(src=item.image alt="" style=item.inner || null class=item.inner ? "work-card__image--inner" : null)
+              span.work-card__title.text-13= item.title

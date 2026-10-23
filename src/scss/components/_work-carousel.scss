@@ -1,0 +1,120 @@
+// Figma: carousel rows in Our Work (1523:3330 / 1523:3359).
+@use "../abstracts/functions" as *;
+
+// container-type lets the track compute the page edge with cqw.
+.work-carousel {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+}
+
+.work-carousel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.work-carousel__nav {
+  display: flex;
+  gap: var(--space-8);
+}
+
+.work-carousel__arrow {
+  display: flex;
+  transition: opacity 0.2s ease-out;
+
+  img {
+    width: fluid(24);
+    height: fluid(24);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+}
+
+.work-carousel__arrow--prev img {
+  transform: scaleX(-1);
+}
+
+// Full-width scroller: the first card lines up with the container, and cards
+// run out to the page edges (Figma shows the 5th card cut at the right edge).
+.work-carousel__viewport {
+  --edge: max(var(--page-gutter), (100cqw - var(--container)) / 2);
+
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--edge);
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.work-carousel__track {
+  display: flex;
+  gap: var(--space-20);
+  width: max-content;
+  padding-inline: var(--edge);
+}
+
+.work-card {
+  flex: 0 0 fluid(325);
+  scroll-snap-align: start;
+}
+
+.work-card__link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+.work-card__media {
+  position: relative;
+  display: block;
+  height: fluid(244);
+  overflow: hidden;
+  background: var(--color-white);
+}
+
+// Image box size and offset come from Figma per card (inline --w/--h/--x/--y).
+.work-card__crop {
+  position: absolute;
+  top: calc(50% + var(--y) * var(--px));
+  left: calc(50% + var(--x) * var(--px));
+  width: calc(var(--w) * var(--px));
+  height: calc(var(--h) * var(--px));
+  overflow: hidden;
+  transform: translate(-50%, -50%);
+}
+
+.work-card__crop--round {
+  border-radius: var(--radius-sm);
+}
+
+.work-card__image {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+
+// Extra crop inside the box (inline width/height/left/top from Figma).
+.work-card__image--inner {
+  position: absolute;
+  object-fit: fill;
+}
+
+.work-card__title {
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-carousel__arrow {
+    transition: none;
+  }
+}
