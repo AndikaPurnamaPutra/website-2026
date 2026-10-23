@@ -128,6 +128,7 @@ Latar `#111`, radius 4px, padding 10px 20px, teks `.text-18` putih. **Sama persi
 1. Kartu menempel di tepi kiri: aturan reset `ul[class]` menimpa padding carousel. Reset diubah ke `:where()` (prioritas nol). Ini berlaku untuk semua komponen ke depannya.
 2. Judul 2px lebih pendek: Figma menghitung line-height "normal" General Sans 42px sebagai 57px. `.text-heading-42` sekarang memakai nilai itu.
 3. Garis pemisah tidak terlihat: `<hr>` bawaan Chrome memakai `overflow: hidden`.
+4. **(Setelah review pengguna)** Carousel bisa bergerak naik-turun 1px saat di-scroll vertikal. `overflow-x: auto` otomatis membuat sumbu y juga bisa di-scroll, dan isinya 1px lebih tinggi karena huruf caption menjorok ke bawah. Diperbaiki dengan `overflow-y: hidden`. Diuji: scroll vertikal di atas carousel sekarang menggerakkan halaman, sementara geser horizontal tetap bekerja.
 
 **Aset:** 9 thumbnail (±21 MB PNG) dikonversi ke JPG, maksimal 1280px (±1,9 MB). Gambar "Train Tricket" identik dengan ilustrasi di What we do, jadi file itu dipakai ulang. Ikon panah: dua file Figma identik, jadi dipakai satu file dan dibalik dengan CSS.
 

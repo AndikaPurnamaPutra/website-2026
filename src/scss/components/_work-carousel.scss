@@ -45,6 +45,9 @@
   --edge: max(var(--page-gutter), (100cqw - var(--container)) / 2);
 
   overflow-x: auto;
+  // overflow-x alone makes the y axis scrollable too; lock it so the row
+  // never moves up and down (content is 1px taller from caption descenders).
+  overflow-y: hidden;
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
   scroll-padding-inline: var(--edge);
