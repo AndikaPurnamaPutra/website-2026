@@ -1,11 +1,11 @@
 import gsap from "gsap";
+import { designPx } from "./design-px.js";
 
 // Trusted Clients testimonials: endless marquee to the left (approved proposal,
 // not in Figma). ~40 Figma px per second, keeps moving on hover (user
 // decision), and stays static (Figma layout) with reduced motion.
 const SPEED = 40; // Figma px per second
 
-const designPx = () => Math.min(Math.max(window.innerWidth, 1280), 1920) / 1440;
 
 export function initTestimonialsMarquee() {
   const marquee = document.querySelector("[data-marquee]");

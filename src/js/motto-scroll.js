@@ -1,5 +1,6 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { designPx } from "./design-px.js";
 
 // Pinned Motto + CTA section (Figma storyboard 1527:4259, flow from the user):
 // entry: the Milestone + Motto wrapper turns from light to dark across the whole
@@ -11,8 +12,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 // step 5: the whole motto turns gradient, the light turns and glides to the center.
 // Timing and easing are not in Figma (approved proposal).
 
-// Same clamp as --px in _tokens.scss.
-const designPx = () => Math.min(Math.max(window.innerWidth, 1280), 1920) / 1440;
 
 export function initMottoScroll() {
   const section = document.querySelector("[data-motto]");

@@ -98,3 +98,12 @@ Dengan cara ini, angka di kode **tetap angka dari Figma**, jadi mudah dicocokkan
 - [x] Langkah 3: Header dan hero
 - [x] Langkah 4: Verifikasi
 - [x] Langkah 5: Dokumentasi
+
+---
+
+### Revisi (27 Okt 2026): batas skala dinaikkan ke 2560px
+Keputusan pengguna (opsi A). Lebar CSS layar besar umumnya 2560px (2K di 100%, 4K di 150%). 4K di 200% = 1920px.
+- `--px` dibatasi `2560px / 1440` (1,778×). Di atas 2560px (mis. 4K di 100%), isi tetap 2560px di tengah.
+- Tiga salinan `designPx()` di JS disatukan menjadi `src/js/design-px.js`, supaya batas di CSS dan JS tidak bisa berbeda.
+- Gambar diperiksa terhadap ukuran tampil di 2560px. Hanya tekstur Motto yang kurang (1600px), jadi diekspor ulang ke 2560px. Gambar lain sudah cukup (showreel 2400px untuk tampil 2418px, ilustrasi layar penuh 2732px).
+- **Verifikasi:** 16 elemen kunci dari semua section di 2560px = nilai 1440px × 1,778 (selisih ≤ 0,1px; teks nowrap kolom footer 0,8% lebih lebar karena rendering huruf besar, baris motto 1,6px karena pembulatan). Di 3840px identik dengan 2560px, digeser ke tengah. Tidak ada scroll horizontal. Section tertahan What we do dan Motto diuji per langkah di 2560px, posisi kartu = × 1,778. Marquee 71 px/detik (= 40 × 1,778).

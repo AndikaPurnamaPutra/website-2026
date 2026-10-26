@@ -10,13 +10,14 @@ The Figma file has no variables, no local styles, and no linked libraries. All v
 ## Scaling
 All sizes in this document are **Figma pixels** at the 1440px frame. In code they scale with the viewport:
 
-- `--px` (in `_tokens.scss`) = one Figma pixel: `clamp(1280px/1440, 100vw/1440, 1920px/1440)`.
+- `--px` (in `_tokens.scss`) = one Figma pixel: `clamp(1280px/1440, 100vw/1440, 2560px/1440)`.
   - 1440px viewport → 1×, exactly as in Figma.
-  - 1920px and wider → 1.333× (capped). Content is 1920px wide and centered; section backgrounds stay full width.
+  - 2560px and wider → 1.778× (capped; covers 2K at 100% and 4K at 150% display scaling). Content is 2560px wide and centered; section backgrounds stay full width.
   - 1280px and narrower → 0.889× (floor). Below 1280px the layout flexes to the viewport until tablet/mobile designs exist.
 - Write sizes with `fluid(<figma px>)` from `src/scss/abstracts/_functions.scss`, e.g. `font-size: fluid(80)`. Tokens already include it.
 - Not scaled: 1px borders, unitless line-heights (follow font-size), `em` letter-spacing (follows font-size), `--radius-pill`.
-- Decision: user, 23 Oct 2026 (Option B, cap 1920px, floor 1280px). Plan: `docs/implementation/03-fluid-scale.md`.
+- JS uses the same clamp from `src/js/design-px.js` (`designPx()`); keep both in sync.
+- Decision: user, 23 Oct 2026 (Option B, cap 1920px, floor 1280px); cap raised to 2560px on 27 Oct 2026. Plan: `docs/implementation/03-fluid-scale.md`.
 
 ## Fonts
 | Family | Weights | Role | Source |

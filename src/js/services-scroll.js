@@ -1,5 +1,6 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { designPx } from "./design-px.js";
 
 // Pinned "What we do" section (Figma storyboard 1516:2229).
 // Each scroll step makes the next service card active and swaps the image;
@@ -15,8 +16,6 @@ const DECK = [
   { scale: 285 / 345, top: -28, clip: 72.6 },
 ];
 
-// Same clamp as --px in _tokens.scss.
-const designPx = () => Math.min(Math.max(window.innerWidth, 1280), 1920) / 1440;
 
 export function initServicesScroll() {
   const section = document.querySelector("[data-services]");

@@ -4,8 +4,8 @@
 
 :root {
   // One Figma pixel. Scales with the viewport from 1280px (0.889x)
-  // to 1920px (1.333x); exactly 1px at the 1440px design width.
-  --px: clamp(calc(1280px / 1440), calc(100vw / 1440), calc(1920px / 1440));
+  // to 2560px (1.778x); exactly 1px at the 1440px design width.
+  --px: clamp(calc(1280px / 1440), calc(100vw / 1440), calc(2560px / 1440));
 
   // Colors
   --color-ink: #111111;
