@@ -108,3 +108,9 @@ Permintaan pengguna: hitungan dan munculnya gradient dibuat lebih elegan, dan ka
 - **Gradient [U]:** menyapu dari kiri ke kanan dengan tepi lembut selebar 30% (mask pada salinan gradient dan kebalikannya pada angka solid, variabel `--sweep`), 1 detik `power2.inOut`, dimulai di detik ke-2.
 - **Kalimat aksen [U]:** awalnya `rgba(0,0,0,0.4)` seperti teks lain, lalu menjadi `#111` kata demi kata (0,5 detik per kata, jeda 0,06 detik), dimulai di detik ke-2,4.
 - **Verifikasi:** urutan di-sampling dengan JS aktif (angka, opacity, blur, posisi sapuan, warna per kata). Screenshot di tengah sapuan, di tengah perubahan kata, dan di akhir. Tampilan akhir sama dengan desain. Reduce motion: langsung final, tanpa pemecahan kata.
+
+### Revisi kedua (27 Okt 2026)
+Sapuan kiri→kanan dan perubahan per kata dinilai aneh, kasar, dan terlalu cepat. Diganti sesuai saran yang disetujui:
+- **Gradient:** crossfade dari hitam ke gradient selama 2 detik (`sine.inOut`). Di saat yang sama, gradient di dalam huruf bergeser pelan dari ukuran 220% ke 100% (2,6 detik, `power3.out`) lalu berhenti tepat di posisi Figma. Dimulai di detik ke-1,8.
+- **Kalimat aksen:** seluruh kalimat berubah bersamaan dari abu-abu ke hitam, 1,2 detik `sine.inOut`, dimulai di detik ke-3,2. Tidak lagi dipecah per kata.
+- **Verifikasi:** sampling opacity, ukuran gradient, dan warna kalimat sepanjang animasi. Screenshot di tengah crossfade dan di akhir. Tampilan akhir sama dengan desain.
