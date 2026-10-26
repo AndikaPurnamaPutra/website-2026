@@ -117,3 +117,6 @@ Sapuan kiri→kanan dan perubahan per kata dinilai aneh, kasar, dan terlalu cepa
 
 ### Revisi ketiga (27 Okt 2026): dipercepat ±35%
 Dinilai terlalu lambat. Angka muncul 1 detik dan menghitung 1,6 detik (jeda per baris 0,12). Gradient mulai di detik ke-1,2: crossfade 1,2 detik, pergeseran 1,6 detik. Kalimat aksen mulai di detik ke-2, durasi 0,8 detik. Total sekitar 2,8 detik (sebelumnya sekitar 4,4 detik).
+
+### Revisi keempat (27 Okt 2026): sedikit lebih cepat (±20%)
+Angka muncul 0,8 detik dan menghitung 1,3 detik (jeda per baris 0,1). Gradient mulai di detik ke-1: crossfade 1 detik, pergeseran 1,3 detik. Kalimat aksen mulai di detik ke-1,6, durasi 0,7 detik. Total sekitar 2,3 detik.

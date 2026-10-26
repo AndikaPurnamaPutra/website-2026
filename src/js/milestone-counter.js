@@ -38,25 +38,25 @@ export function initMilestoneCounter() {
       autoAlpha: 1,
       y: 0,
       filter: "blur(0px)",
-      duration: 1,
+      duration: 0.8,
       ease: "expo.out",
-      stagger: 0.12,
+      stagger: 0.1,
     })
     .to(
       counters,
       {
         n: (i) => Number(values[i].dataset.count),
-        duration: 1.6,
+        duration: 1.3,
         ease: "expo.out",
-        stagger: 0.12,
+        stagger: 0.1,
         onUpdate: () => counters.forEach(({ el, n }) => setNumber(el, Math.round(n))),
       },
       0,
     )
-    .to(gradient, { autoAlpha: 1, duration: 1.2, ease: "sine.inOut" }, 1.2)
-    .to(solid, { opacity: 0, duration: 1.2, ease: "sine.inOut" }, 1.2)
-    .to(gradient, { backgroundSize: "100% 100%", backgroundPosition: "0% 50%", duration: 1.6, ease: "power3.out" }, 1.2)
-    .to(lead, { color: "#111", duration: 0.8, ease: "sine.inOut" }, 2)
+    .to(gradient, { autoAlpha: 1, duration: 1, ease: "sine.inOut" }, 1)
+    .to(solid, { opacity: 0, duration: 1, ease: "sine.inOut" }, 1)
+    .to(gradient, { backgroundSize: "100% 100%", backgroundPosition: "0% 50%", duration: 1.3, ease: "power3.out" }, 1)
+    .to(lead, { color: "#111", duration: 0.7, ease: "sine.inOut" }, 1.6)
     .add(() => {
       values.forEach((el) => el.classList.remove("is-counting"));
       gsap.set(solid, { clearProps: "opacity" });
