@@ -1,6 +1,6 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { designPx } from "./design-px.js";
+import { designPx, typePx } from "./design-px.js";
 
 // Pinned "What we do" section (Figma storyboard 1516:2229).
 // Each scroll step makes the next service card active and swaps the image;
@@ -56,9 +56,11 @@ export function initServicesScroll() {
     const deck = DECK[Math.min(offset, DECK.length) - 1];
     const activeBottom = activeTop(active) * px + cards[active].offsetHeight;
     return {
-      y: activeBottom + deck.top * px - FIRST_TOP * px,
+      // The deck peeks out by a text-sized strip, so its offset follows the type scale.
+      y: activeBottom + deck.top * typePx() - FIRST_TOP * px,
       scale: deck.scale,
-      clipPath: `inset(0px 0px ${height - deck.clip * px}px 0px)`,
+      // The visible strip shows the card title, so it follows the type scale.
+      clipPath: `inset(0px 0px ${height - deck.clip * typePx()}px 0px)`,
       autoAlpha: offset <= DECK.length ? 1 : 0,
       zIndex: offset <= DECK.length ? 3 - offset : 0,
     };

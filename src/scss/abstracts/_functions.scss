@@ -3,3 +3,9 @@
 @function fluid($value) {
   @return calc(#{$value} * var(--px));
 }
+
+// fs = "font scale": same as fluid(), for type and for sizes that wrap text (buttons, text boxes). Grows
+// slower than the layout on wide screens; see --type-px in base/_tokens.scss.
+@function fs($value) {
+  @return calc(#{$value} * var(--type-px));
+}

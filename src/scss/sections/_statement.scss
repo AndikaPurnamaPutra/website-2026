@@ -26,7 +26,7 @@
 .statement__text {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: fluid(42);
+  font-size: fs(42);
   line-height: 1.6;
   letter-spacing: -0.04em;
 }
@@ -37,39 +37,39 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  height: fluid(77);
+  height: fs(77);
   white-space: nowrap;
 }
 
 .statement__line--1 {
-  gap: var(--space-20);
-  transform: translateX(#{fluid(-10)});
+  gap: fs(20);
+  transform: translateX(#{fs(-10)});
 }
 
 .statement__line--2 {
-  transform: translateX(#{fluid(-4.5)});
+  transform: translateX(#{fs(-4.5)});
 }
 
 .statement__line--3 {
-  transform: translateX(#{fluid(2.5)});
+  transform: translateX(#{fs(2.5)});
 
   > :first-child {
-    margin-right: fluid(49);
+    margin-right: fs(49);
   }
 
   > :last-child {
-    margin-left: fluid(44);
+    margin-left: fs(44);
   }
 }
 
 .statement__line--4 {
-  transform: translateX(#{fluid(-5)});
+  transform: translateX(#{fs(-5)});
 }
 
 .statement__icon {
-  width: fluid(66);
-  height: fluid(52);
-  margin-top: fluid(7.5);
+  width: fs(66);
+  height: fs(52);
+  margin-top: fs(7.5);
 }
 
 // Folder "in a pocket": three layers rebuilt from Figma (Folder Illustration
@@ -77,17 +77,17 @@
 .statement__folder {
   position: relative;
   flex-shrink: 0;
-  width: fluid(120);
-  height: fluid(78);
-  margin-top: fluid(-6);
+  width: fs(120);
+  height: fs(78);
+  margin-top: fs(-6);
 }
 
 .statement__folder-pocket {
   position: absolute;
-  top: fluid(56);
+  top: fs(56);
   left: 0;
-  width: fluid(120);
-  height: fluid(22);
+  width: fs(120);
+  height: fs(22);
   overflow: hidden;
   background: var(--color-border-strong);
   border-radius: var(--radius-sm);
@@ -95,35 +95,35 @@
 
 .statement__folder-shadow {
   position: absolute;
-  top: fluid(-2);
-  left: fluid(3);
-  width: fluid(115);
-  height: fluid(44);
+  top: fs(-2);
+  left: fs(3);
+  width: fs(115);
+  height: fs(44);
   max-width: none;
 }
 
 .statement__folder-crop {
   position: absolute;
-  left: fluid(11);
-  width: fluid(98);
+  left: fs(11);
+  width: fs(98);
   overflow: hidden;
 
   img {
     position: absolute;
-    top: fluid(-6);
-    left: fluid(-11.17);
-    width: fluid(120.35);
-    height: fluid(120);
+    top: fs(-6);
+    left: fs(-11.17);
+    width: fs(120.35);
+    height: fs(120);
     max-width: none;
   }
 }
 
 .statement__folder-crop--inside {
-  top: fluid(-56);
-  height: fluid(108);
+  top: fs(-56);
+  height: fs(108);
 }
 
 .statement__folder-crop--top {
   top: 0;
-  height: fluid(70);
+  height: fs(70);
 }

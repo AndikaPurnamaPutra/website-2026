@@ -7,6 +7,16 @@
   // to 2560px (1.778x); exactly 1px at the 1440px design width.
   --px: clamp(calc(1280px / 1440), calc(100vw / 1440), calc(2560px / 1440));
 
+  // One Figma pixel for type (and sizes that wrap text). Same as --px up to
+  // 1440px; above it grows slower: 1x at 1440px → 1.2x at 2560px and wider.
+  // rem-based, so the visitor's browser font size is respected.
+  // Below 1440px: 0.0625rem + (100vw - 1440px) / 1440 (= 100vw / 1440 at 16px).
+  --type-px: clamp(
+    calc(0.0625rem * 1280 / 1440),
+    min(calc(0.0625rem + (100vw - 1440px) / 1440), calc(0.0625rem + (100vw - 1440px) * 0.2 / 1120)),
+    0.075rem
+  );
+
   // Colors
   --color-ink: #111111;
   --color-ink-2: #1f1f1f;

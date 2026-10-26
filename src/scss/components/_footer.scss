@@ -53,7 +53,7 @@
 
 .site-footer__label,
 .site-footer__title {
-  font-size: fluid(14);
+  font-size: fs(14);
   line-height: 1;
   opacity: 0.5;
 }
@@ -61,11 +61,11 @@
 // 16px text + 12px space + 0.5px line = the 28px field in Figma.
 .site-footer__input {
   width: 100%;
-  height: fluid(28);
-  margin-top: var(--space-16);
-  padding: 0 0 fluid(12);
+  height: fs(28);
+  margin-top: fs(16);
+  padding: 0 0 fs(12);
   font-family: var(--font-display);
-  font-size: fluid(16);
+  font-size: fs(16);
   line-height: 1;
   letter-spacing: -0.04em;
   color: var(--color-ink);
@@ -89,11 +89,13 @@
   margin-top: var(--space-20);
 }
 
-// Three columns starting 75px right of the center, 110px apart.
+// Three columns, 110px apart. Figma places them from x 795 to 1384, i.e. they
+// end 56px from the right edge; anchoring that edge lets larger text (wide
+// screens, bigger browser font size) grow to the left instead of off-screen.
 .site-footer__columns {
   position: absolute;
   top: fluid(40);
-  left: calc(50% + #{fluid(75)});
+  right: fluid(56);
   display: flex;
   align-items: flex-start;
   gap: fluid(110);
@@ -102,15 +104,15 @@
 .site-footer__column {
   display: flex;
   flex-direction: column;
-  gap: fluid(4);
+  gap: fs(4);
 }
 
 .site-footer__links {
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
+  gap: fs(8);
   font-family: var(--font-display);
-  font-size: fluid(20);
+  font-size: fs(20);
   // Figma "normal" = 27px for 20px General Sans.
   line-height: calc(27 / 20);
   white-space: nowrap;
@@ -132,7 +134,7 @@
   left: var(--page-gutter);
   width: fluid(548);
   font-family: var(--font-display);
-  font-size: fluid(20);
+  font-size: fs(20);
   line-height: calc(27 / 20);
 }
 
@@ -146,7 +148,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-16);
-  font-size: fluid(14);
+  font-size: fs(14);
   line-height: 1;
   white-space: nowrap;
 }

@@ -17,6 +17,7 @@ All sizes in this document are **Figma pixels** at the 1440px frame. In code the
 - Write sizes with `fluid(<figma px>)` from `src/scss/abstracts/_functions.scss`, e.g. `font-size: fluid(80)`. Tokens already include it.
 - Not scaled: 1px borders, unitless line-heights (follow font-size), `em` letter-spacing (follows font-size), `--radius-pill`.
 - JS uses the same clamp from `src/js/design-px.js` (`designPx()`); keep both in sync.
+- **Type scale** `--type-px` (rem-based, 27 Oct 2026): same as `--px` up to 1440px, then grows slower: 1× at 1440px → 1.2× at 2560px and wider. Write font sizes, and sizes that wrap or hug text (button padding, text boxes, Statement icons/folder, What we do card insides and deck strip), with `fs(<figma px>)`. Layout (sections, columns, images, cards) keeps `fluid()`. JS: `typePx()` in `design-px.js`. Because it is rem-based, the visitor's browser font size is respected at every width. Header text is `0.875rem` (14px).
 - Decision: user, 23 Oct 2026 (Option B, cap 1920px, floor 1280px); cap raised to 2560px on 27 Oct 2026. Plan: `docs/implementation/03-fluid-scale.md`.
 
 ## Fonts

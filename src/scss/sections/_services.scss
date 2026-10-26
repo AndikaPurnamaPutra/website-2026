@@ -56,9 +56,9 @@
   z-index: 4;
   display: flex;
   flex-direction: column;
-  gap: var(--space-32);
+  gap: fs(32);
   width: fluid(345);
-  padding: var(--space-20);
+  padding: fs(20);
   background: var(--color-glass);
   border-radius: var(--radius-sm);
   -webkit-backdrop-filter: blur(var(--blur-glass));
@@ -69,14 +69,15 @@
   // peeking 16px and 32px below the active card (Figma frame 1).
   &:nth-child(2) {
     z-index: 2;
-    transform: translateY(#{fluid(237)}) scale(0.9188);
-    clip-path: inset(0 0 calc(100% - #{fluid(67.5)}) 0);
+    // Card height minus the deck offset, both text-sized (type scale).
+    transform: translateY(calc(#{fs(283)} + #{fs(-46)})) scale(0.9188);
+    clip-path: inset(0 0 calc(100% - #{fs(67.5)}) 0);
   }
 
   &:nth-child(3) {
     z-index: 1;
-    transform: translateY(#{fluid(255)}) scale(0.8261);
-    clip-path: inset(0 0 calc(100% - #{fluid(72.6)}) 0);
+    transform: translateY(calc(#{fs(283)} + #{fs(-28)})) scale(0.8261);
+    clip-path: inset(0 0 calc(100% - #{fs(72.6)}) 0);
   }
 
   &:nth-child(n + 4) {
@@ -102,19 +103,19 @@
 .services__tags {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-8);
+  gap: fs(8);
 }
 
 // Fixed 24px height replaces Figma's text-box-trim (not supported everywhere).
 .services__tag {
   display: inline-flex;
   align-items: center;
-  height: fluid(24);
-  padding-inline: fluid(10);
+  height: fs(24);
+  padding-inline: fs(10);
   border: 1px solid var(--color-border-dark);
   border-radius: var(--radius-sm);
   font-family: var(--font-body);
-  font-size: fluid(14);
+  font-size: fs(14);
   line-height: 1;
   letter-spacing: -0.02em;
 }
@@ -139,5 +140,5 @@
   bottom: fluid(40);
   left: var(--page-gutter);
   z-index: 1;
-  width: fluid(305);
+  width: fs(305);
 }

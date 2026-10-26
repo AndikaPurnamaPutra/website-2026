@@ -20,9 +20,9 @@
 // .button is the same dark label used on its own ("More Work", Figma 1523:3389).
 .cta__label,
 .button {
-  padding: fluid(10) fluid(20);
+  padding: fs(10) fs(20);
   // Figma text box is 22px ("normal" renders ~1px shorter in browsers).
-  line-height: fluid(22);
+  line-height: fs(22);
   color: var(--color-white);
   background: var(--color-ink);
   border-radius: var(--radius-sm);
@@ -37,8 +37,8 @@
 .button--small {
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fluid(12);
-  line-height: fluid(15);
+  font-size: fs(12);
+  line-height: fs(15);
   letter-spacing: -0.02em;
   border: 0;
   cursor: pointer;
@@ -56,9 +56,9 @@
 
   img {
     flex-shrink: 0;
-    width: fluid(32);
-    height: fluid(32);
-    margin-left: var(--space-8);
+    width: fs(32);
+    height: fs(32);
+    margin-left: fs(8);
     // Figma flips the "down-right" arrow vertically, so it points up-right.
     transform: scaleY(-1);
   }
@@ -76,7 +76,7 @@
   border-color: var(--color-ink);
 
   .cta__icon {
-    width: fluid(48);
+    width: fs(48);
     opacity: 1;
   }
 }
@@ -98,7 +98,7 @@
   }
 
   .cta__icon {
-    width: fluid(48);
+    width: fs(48);
     opacity: 1;
   }
 
