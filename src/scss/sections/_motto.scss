@@ -19,6 +19,13 @@
   height: 100vh;
 }
 
+// Section background; JS fades it in at the end of the light → dark change of
+// the Milestone + Motto wrapper (.tone-shift).
+.motto__backdrop {
+  position: absolute;
+  inset: 0;
+}
+
 .motto__bg {
   position: absolute;
   inset: 0;
@@ -30,28 +37,20 @@
   background: linear-gradient(227.53deg, #111 13.428%, #1f1f1f 69.715%);
 }
 
+// One light shape (Vector 3209 of 1527:4219, box 1885 × 1518 at -12, -65; the
+// SVG adds the blur margin). It turns around its tip (top-left corner of the
+// triangle, 128.9px into the SVG) and moves to the center-light position of
+// 1527:4241 (tip at 704.5, -430.5, beam pointing down). Default = final state.
 .motto__light {
   position: absolute;
-  max-width: none;
-  pointer-events: none;
-}
-
-// Vector 3209 in 1527:4219 (box 1885 × 1518 at -12, -65; SVG adds the blur margin).
-.motto__light--left {
   top: fluid(-193.9);
   left: fluid(-140.9);
   width: fluid(2142.8);
   height: fluid(1775.8);
-  opacity: 0;
-}
-
-// Vector 3209 in 1527:4241, rotated 43.05deg around its center (741.7, 653.2).
-.motto__light--center {
-  top: fluid(-242.2);
-  left: fluid(-154.2);
-  width: fluid(1791.8);
-  height: fluid(1790.73);
-  transform: rotate(43.05deg);
+  max-width: none;
+  transform-origin: 6.015% 7.259%;
+  transform: translate(#{fluid(716.5)}, #{fluid(-365.5)}) rotate(47.3deg) scale(0.83);
+  pointer-events: none;
 }
 
 .motto__texture {
@@ -65,15 +64,6 @@
   opacity: 0.1;
   mix-blend-mode: screen;
   transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
-// White cover that fades out while the section scrolls in (light → dark).
-.motto__veil {
-  position: absolute;
-  inset: 0;
-  background: var(--color-white);
-  opacity: 0;
   pointer-events: none;
 }
 
@@ -103,6 +93,7 @@
 }
 
 .motto__line {
+  position: relative;
   grid-area: 1 / 1;
   font-family: var(--font-display);
   font-size: fluid(42);
@@ -119,27 +110,37 @@
   visibility: visible;
 }
 
-.motto__word {
-  position: relative;
-  display: inline-block;
-  backface-visibility: hidden;
-}
-
-// Gradient copy of an accent word. JS sets --pw (motto line width) and --wx
-// (word offset in the line) so the words share one line-wide gradient, as in Figma.
-.motto__word-gradient {
-  position: absolute;
-  inset: 0;
+// Accent text. Without JS it carries the gradient itself (last frame).
+.motto__accent {
   background-image: var(--motto-gradient);
-  background-size: var(--pw, 100%) 100%;
-  background-position: calc(var(--wx, 0px) * -1) 0;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
-.motto__word.is-accent .motto__word-text {
-  opacity: 0;
+// With JS the accent text only keeps the layout; per-letter copies placed at
+// the measured letter positions (--x, in em) do the drawing.
+.motto.is-enhanced .motto__accent {
+  background: none;
+}
+
+.motto__glyph {
+  position: absolute;
+  top: 0;
+  left: var(--x);
+}
+
+.motto__glyph-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  // One gradient box for the whole line (--pw, in em), as in Figma.
+  background-image: var(--motto-gradient);
+  background-size: var(--pw) 100%;
+  background-position: calc(var(--x) * -1) 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .motto__ellipse {

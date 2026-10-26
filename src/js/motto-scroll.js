@@ -2,11 +2,12 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 // Pinned Motto + CTA section (Figma storyboard 1527:4259, flow from the user):
-// entry: background fades from light to dark and motto 1 blurs in;
-// step 1: "Trendsetting Design" turns gradient, the ellipse rises from below;
-// step 2: flip (per word) to motto 2;   step 3: "believers." turns gradient;
-// step 4: flip to motto 3, ellipse → left light, Get a Quote appears;
-// step 5: the whole motto turns gradient, the light moves to the center.
+// entry: the Milestone + Motto wrapper turns from light to dark across the whole
+//        screen, Milestone fades out, motto 1 blurs in;
+// step 1: "Trendsetting Design" turns gradient letter by letter, the ellipse rises;
+// step 2: the line flips to motto 2;   step 3: "believers." turns gradient;
+// step 4: flip to motto 3, the ellipse gives way to the light, Get a Quote appears;
+// step 5: the whole motto turns gradient, the light turns and glides to the center.
 // Timing and easing are not in Figma (approved proposal).
 
 // Same clamp as --px in _tokens.scss.
@@ -17,36 +18,63 @@ export function initMottoScroll() {
   if (!section) return () => {};
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const wrapper = section.closest("[data-tone-shift]");
+  const milestone = wrapper?.querySelector(".milestone__inner");
+  const backdrop = section.querySelector(".motto__backdrop");
   const lines = [...section.querySelectorAll(".motto__line")];
-  const words = lines.map((line) => [...line.querySelectorAll(".motto__word")]);
-  const accentText = lines.map((line) => line.querySelectorAll(".is-accent .motto__word-text"));
-  const accentGradient = lines.map((line) => line.querySelectorAll(".motto__word-gradient"));
-  const veil = section.querySelector(".motto__veil");
   const ellipse = section.querySelector(".motto__ellipse");
-  const lightLeft = section.querySelector(".motto__light--left");
-  const lightCenter = section.querySelector(".motto__light--center");
+  const light = section.querySelector(".motto__light");
   const diagonal = section.querySelector(".motto__bg--diagonal");
   const cta = section.querySelector(".cta");
   const steps = 5;
+  const smooth = reduceMotion ? "steps(1)" : "sine.inOut";
 
-  // Like Figma, the gradient box is the whole motto line: each accent word
-  // shows its slice of a gradient sized to the line.
-  const alignGradients = () => {
-    lines.forEach((line) => {
-      const all = [...line.querySelectorAll(".motto__word")];
-      const left = all[0].offsetLeft;
-      const last = all[all.length - 1];
-      const width = last.offsetLeft + last.offsetWidth - left;
-      line.querySelectorAll(".motto__word.is-accent").forEach((word) => {
-        word.style.setProperty("--pw", `${width}px`);
-        word.style.setProperty("--wx", `${word.offsetLeft - left}px`);
+  // Per-letter copies over the accent text, placed at the measured letter
+  // positions in em so they follow the fluid scale. The gradient box is the
+  // whole line, as in Figma.
+  const glyphs = [];
+  lines.forEach((line) => {
+    line.querySelectorAll(".motto__accent").forEach((accent) => {
+      [...accent.textContent].forEach((char, i) => {
+        if (char === " ") return;
+        const glyph = document.createElement("span");
+        glyph.className = "motto__glyph";
+        glyph.setAttribute("aria-hidden", "true");
+        glyph.innerHTML = `<span class="motto__glyph-text">${char}</span><span class="motto__glyph-gradient">${char}</span>`;
+        glyph.dataset.index = i;
+        glyph.accent = accent;
+        line.append(glyph);
+        glyphs.push(glyph);
       });
     });
-  };
+  });
 
+  // Measured without the line's current transform; repeated once the web font
+  // has loaded (a fallback font would give other letter positions).
+  const measure = () => {
+    const range = document.createRange();
+    lines.forEach((line) => {
+      const transform = line.style.transform;
+      line.style.transform = "none";
+      const lineBox = line.getBoundingClientRect();
+      const em = parseFloat(getComputedStyle(line).fontSize);
+      line.style.setProperty("--pw", `${lineBox.width / em}em`);
+      line.querySelectorAll(".motto__glyph").forEach((glyph) => {
+        const node = glyph.accent.firstChild;
+        const i = Number(glyph.dataset.index);
+        range.setStart(node, i);
+        range.setEnd(node, i + 1);
+        glyph.style.setProperty("--x", `${(range.getBoundingClientRect().left - lineBox.left) / em}em`);
+      });
+      line.style.transform = transform;
+    });
+  };
+  measure();
+  document.fonts?.ready.then(measure);
+
+  const charText = lines.map((line) => line.querySelectorAll(".motto__glyph-text"));
+  const charGradient = lines.map((line) => line.querySelectorAll(".motto__glyph-gradient"));
   section.classList.add("is-enhanced");
-  alignGradients();
-  ScrollTrigger.addEventListener("refresh", alignGradients);
 
   // Ellipse offsets from its CSS position (bottom -602, left -115 in Figma px).
   const ellipseHidden = () => 322 * designPx(); // fully below the frame
@@ -55,40 +83,40 @@ export function initMottoScroll() {
 
   const ctx = gsap.context(() => {
     // Start state (frame 1527:4134).
-    // Each word turns around its own axis (own perspective), like a flip-clock card.
-    gsap.set(words.flat(), { transformOrigin: "50% 50% -20px", transformPerspective: 500 });
-    gsap.set([...words[1], ...words[2]], { autoAlpha: 0, rotationX: -90 });
-    gsap.set(accentText.flatMap((list) => [...list]), { opacity: 1 });
-    gsap.set(accentGradient.flatMap((list) => [...list]), { opacity: 0 });
+    // A long perspective keeps the wide line flat while it turns (no keystone tilt).
+    gsap.set(lines, { transformPerspective: 4000, transformOrigin: "50% 50% -25px" });
+    gsap.set([lines[1], lines[2]], { autoAlpha: 0, rotationX: -90 });
+    gsap.set(charText.flatMap((list) => [...list]), { opacity: 1 });
+    gsap.set(charGradient.flatMap((list) => [...list]), { opacity: 0 });
     gsap.set(ellipse, { autoAlpha: 0, y: ellipseHidden });
-    gsap.set([lightCenter, diagonal], { autoAlpha: 0 });
+    gsap.set(light, { autoAlpha: 0, x: () => -80 * designPx(), y: 0, rotation: 0, scale: 1, transformOrigin: "6.015% 7.259%" });
+    gsap.set(diagonal, { autoAlpha: 0 });
     gsap.set(cta, { autoAlpha: 0, y: () => 12 * designPx() });
 
     const timeline = gsap.timeline({
-      defaults: { duration: 1, ease: reduceMotion ? "steps(1)" : "power2.inOut" },
+      defaults: { duration: 1, ease: smooth },
       scrollTrigger: {
         trigger: section,
         start: "top top",
         end: () => `+=${window.innerHeight * steps}`,
         pin: true,
-        scrub: reduceMotion ? true : 0.6,
-        snap: { snapTo: "labelsDirectional", inertia: false, duration: { min: 0.2, max: 0.6 }, ease: "power1.inOut" },
+        scrub: reduceMotion ? true : 0.8,
+        snap: { snapTo: "labelsDirectional", inertia: false, duration: { min: 0.3, max: 0.8 }, ease: "sine.inOut" },
         invalidateOnRefresh: true,
       },
     });
 
+    // Letters change from white to the gradient one after another, left to right.
     const toGradient = (i, at) => {
-      timeline.to(accentGradient[i], { opacity: 1 }, at);
-      timeline.to(accentText[i], { opacity: 0 }, at);
+      const each = { duration: 0.45, ease: smooth, stagger: { amount: 0.55 } };
+      timeline.to(charGradient[i], { opacity: 1, ...each }, at);
+      timeline.to(charText[i], { opacity: 0, ...each }, at);
     };
 
-    // Flip-clock change, word by word: the old words roll up and away, the new
-    // ones roll in from below.
+    // The whole line turns like one flip-clock card: out to the top, in from below.
     const flip = (from, to, at) => {
-      const outEase = reduceMotion ? "steps(1)" : "power2.in";
-      const inEase = reduceMotion ? "steps(1)" : "power2.out";
-      timeline.to(words[from], { rotationX: 90, autoAlpha: 0, duration: 0.4, ease: outEase, stagger: { amount: 0.12 } }, at);
-      timeline.to(words[to], { rotationX: 0, autoAlpha: 1, duration: 0.45, ease: inEase, stagger: { amount: 0.12 } }, at + 0.43);
+      timeline.to(lines[from], { rotationX: 90, autoAlpha: 0, duration: 0.45, ease: reduceMotion ? "steps(1)" : "power2.in" }, at);
+      timeline.to(lines[to], { rotationX: 0, autoAlpha: 1, duration: 0.5, ease: reduceMotion ? "steps(1)" : "power2.out" }, at + 0.45);
     };
 
     timeline.addLabel("step0", 0);
@@ -106,33 +134,38 @@ export function initMottoScroll() {
 
     flip(1, 2, 3);
     timeline.to(ellipse, { autoAlpha: 0 }, 3);
-    timeline.to([lightLeft, diagonal], { autoAlpha: 1 }, 3);
+    timeline.to(light, { autoAlpha: 1, x: 0 }, 3);
+    timeline.to(diagonal, { autoAlpha: 1 }, 3);
     timeline.to(cta, { autoAlpha: 1, y: 0, duration: 0.6 }, 3.4);
     timeline.addLabel("step4", 4);
 
     toGradient(2, 4);
-    timeline.fromTo(lightLeft, { x: 0 }, { x: () => 60 * designPx(), autoAlpha: 0 }, 4);
-    timeline.fromTo(lightCenter, { x: () => -60 * designPx() }, { x: 0, autoAlpha: 1 }, 4);
+    // Same shape, turned around its tip and glided to the center-light position.
+    timeline.to(light, { x: () => 716.5 * designPx(), y: () => -365.5 * designPx(), rotation: 47.3, scale: 0.83 }, 4);
     timeline.addLabel("step5", 5);
 
-    // Entry (before the pin): the white veil fades out and motto 1 blurs in.
-    if (!reduceMotion) {
+    // Entry (before the pin): full-screen light → dark on the wrapper.
+    // Start values are set here, not with fromTo: ScrollTrigger's refresh
+    // reverts fromTo starts that lie ahead of the playhead.
+    if (!reduceMotion && wrapper) {
+      gsap.set(wrapper, { backgroundColor: "#ffffff" });
+      gsap.set(backdrop, { autoAlpha: 0 });
+      gsap.set(lines[0], { autoAlpha: 0, y: () => 12 * designPx(), filter: "blur(6px)" });
       gsap
         .timeline({
-          scrollTrigger: { trigger: section, start: "top bottom", end: "top top", scrub: 0.6 },
+          defaults: { ease: "sine.inOut" },
+          scrollTrigger: { trigger: section, start: "top bottom", end: "top top", scrub: 0.8 },
         })
-        .fromTo(veil, { autoAlpha: 1 }, { autoAlpha: 0, duration: 1, ease: "none" }, 0)
-        .from(
-          words[0],
-          { autoAlpha: 0, y: () => 12 * designPx(), filter: "blur(6px)", duration: 0.45, ease: "power2.out", stagger: 0.03 },
-          0.55,
-        );
+        .to(milestone, { autoAlpha: 0, y: () => -40 * designPx(), duration: 0.5, ease: "power1.in" }, 0)
+        .to(wrapper, { backgroundColor: "#111111", duration: 0.7 }, 0.1)
+        .to(backdrop, { autoAlpha: 1, duration: 0.4 }, 0.6)
+        .to(lines[0], { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.4, ease: "power2.out" }, 0.6);
     }
   }, section);
 
   return () => {
-    ScrollTrigger.removeEventListener("refresh", alignGradients);
     ctx.revert();
+    glyphs.forEach((glyph) => glyph.remove());
     section.classList.remove("is-enhanced");
   };
 }

@@ -1,33 +1,30 @@
 //- Figma: storyboard "CTA - Darkmode" 1527:4259 (steps 1527:4134 → 4169 → 4185 →
 //- 4201 → 4219 → 4241). Without JS the last frame (4241) is shown;
 //- src/js/motto-scroll.js pins the section and plays the steps on scroll.
+//- JS lays per-letter copies over the accent text so the gradient can arrive
+//- letter by letter while the text itself keeps its kerning.
 -
   var mottos = [
     { gradient: "185.87deg, #0b1550 18.901%, #718bfc 52.394%, #81c4fb 80.933%", segments: [{ text: "Trendsetting Design", accent: true }, { text: ", Grounded in Logic." }] },
     { gradient: "184.89deg, #81c4fb 18.901%, #718bfc 52.394%, #81c4fb 80.933%", segments: [{ text: "Design to advocates and investors into " }, { text: "believers.", accent: true }] },
     { gradient: "188.17deg, #81c4fb 18.901%, #718bfc 52.394%, #81c4fb 80.933%", segments: [{ text: "One Week Wonders Studio™", accent: true }] }
   ]
-  var tokens = (motto) => motto.segments.flatMap((s) => s.text.match(/\S+|\s+/g).map((t) => ({ text: t, accent: !!s.accent, space: /^\s+$/.test(t) })))
 
 section.motto(data-motto data-header-theme="dark")
-  .motto__bg
-  .motto__bg.motto__bg--diagonal
-  img.motto__light.motto__light--left(src="assets/images/motto/light-left.svg" alt="")
-  img.motto__light.motto__light--center(src="assets/images/motto/light-center.svg" alt="")
-  img.motto__texture(src="assets/images/motto/texture.jpg" alt="")
-  .motto__veil
+  .motto__backdrop
+    .motto__bg
+    .motto__bg.motto__bg--diagonal
+    img.motto__texture(src="assets/images/motto/texture.jpg" alt="")
+  img.motto__light(src="assets/images/motto/light.svg" alt="")
   .motto__inner
     p.motto__label.text-16 ( Our Motto’s )
     .motto__lines
       each motto in mottos
         p.motto__line(style=`--motto-gradient: linear-gradient(${motto.gradient});`)
-          each token in tokens(motto)
-            if token.space
-              != " "
+          each segment in motto.segments
+            if segment.accent
+              span.motto__accent= segment.text
             else
-              span.motto__word(class=token.accent ? "is-accent" : null)
-                span.motto__word-text= token.text
-                if token.accent
-                  span.motto__word-gradient(aria-hidden="true")= token.text
+              = segment.text
     +ctaButton("Get a Quote", "#", "Free 15min call", "light")
   img.motto__ellipse(src="assets/images/motto/ellipse.svg" alt="")

@@ -76,3 +76,14 @@ Section **tertahan saat di-scroll** (seperti What we do). Satu langkah scroll = 
 - **Cahaya:** dua Vector di Figma berbeda bentuk, jadi kiri → tengah dibuat crossfade sambil bergeser 60px.
 - **Tekstur:** 4096px / 5,4 MB → 1600px / 0,5 MB (tampil 10% opacity).
 - Varian tombol CTA `light` ditambahkan ke komponen yang sudah ada.
+
+---
+
+### Revisi setelah review (27 Okt 2026)
+1. **Transisi latar satu layar penuh:** Milestone dan Motto dibungkus `.tone-shift`. Latar wrapper berubah `#fff → #111` mengikuti scroll (saat Motto masuk dari bawah sampai tertahan), isi Milestone memudar keluar sambil naik 40px, lalu latar Motto (gradient + tekstur) muncul di akhir. Lapisan putih (veil) lama dihapus.
+   - Bug yang ditemukan: nilai awal `fromTo` yang posisinya belum tercapai dihapus oleh refresh ScrollTrigger, sehingga latar Motto tampil terlalu cepat. Diperbaiki dengan `gsap.set` untuk kondisi awal dan `.to()` di timeline.
+2. **Flip satu baris:** seluruh baris berputar sebagai satu kartu. Perspektif 4000px supaya baris yang lebar tidak terlihat miring.
+3. **Gradient per huruf:** teks aksen tetap utuh (kerning dan lebar sama dengan Figma). JS menaruh salinan per huruf tepat di atas posisi setiap huruf (diukur dalam em, diulang setelah font termuat), lalu huruf berubah ke gradient satu per satu dari kiri ke kanan. Versi pertama yang memecah teks menjadi span per huruf membuat baris 6px lebih lebar karena kerning hilang. Sudah diganti.
+4. **Cahaya:** satu bentuk saja (Vector dari frame Left Light). Bentuk ini muncul dari kiri sambil bergeser masuk, lalu berputar di ujungnya (47,3°, skala 0,83) dan meluncur ke posisi Center Light. Semua gerak cahaya dan ellipse memakai `sine.inOut` dengan scrub 0,8, dan snap lebih lembut. Aset `light-center.svg` dihapus.
+
+**Verifikasi ulang:** setiap langkah dibandingkan dengan Figma (1B, 2B, 3A, 3B). Lebar baris 710 / 854,5 / 508 px (Figma 712 / 856 / 510). Salinan huruf tepat di atas huruf asli (selisih 0px). Transisi masuk diambil di 25 / 50 / 75%, dan seluruh layar berubah serentak. Flip datar. Reduce motion: langkah berganti tanpa gerak. Tanpa JS dan 1920px sesuai.

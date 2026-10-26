@@ -9,5 +9,8 @@ block content
   include ../partials/services
   include ../partials/our-work
   include ../partials/trusted-clients
-  include ../partials/milestone
-  include ../partials/motto
+  //- Milestone and Motto share one wrapper whose background turns from light
+  //- to dark across the whole screen (src/js/motto-scroll.js).
+  .tone-shift(data-tone-shift)
+    include ../partials/milestone
+    include ../partials/motto
