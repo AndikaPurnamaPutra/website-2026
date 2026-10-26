@@ -186,3 +186,6 @@ Link aset dari Figma kedaluwarsa dalam 7 hari. Jika lewat, saya ambil ulang dari
 - [x] Langkah 4: Hero
 - [x] Langkah 5: Jam live
 - [x] Langkah 6: Verifikasi dan perbaikan
+
+### Revisi (27 Okt 2026): showreel menjadi video
+Gambar showreel diganti `hero/showreel.mp4` (H.264, 3000 × 2000, 12 detik, 7,5 MB). File punya audio, tetapi diputar `muted` sebagai latar. Poster `showreel-poster.jpg` = frame pertama (2400 × 1600, 180 KB). Diputar hanya saat terlihat oleh `src/js/inview-videos.js`, tidak diputar dengan reduce motion. Tombol "Play Showreel" tetap dummy. Ukuran dan posisi kotak tidak berubah (40, 618, 1360 × 781).

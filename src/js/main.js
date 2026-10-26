@@ -3,6 +3,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import barba from "@barba/core";
 import { initHeroClock } from "./hero-clock.js";
 import { initServicesScroll } from "./services-scroll.js";
+import { initInviewVideos } from "./inview-videos.js";
 import { initWorkCarousels } from "./work-carousel.js";
 import { initTestimonialsMarquee } from "./testimonials-marquee.js";
 import { initMilestoneCounter } from "./milestone-counter.js";
@@ -22,6 +23,8 @@ function initPage() {
   cleanups.push(initTestimonialsMarquee());
   cleanups.push(initMilestoneCounter());
   cleanups.push(initMottoScroll());
+  // After the pinned sections so their pin spacers exist.
+  cleanups.push(initInviewVideos());
   // After the services pin so its pin spacer can be measured.
   cleanups.push(initHeader());
   cleanups.push(initFooterForm());

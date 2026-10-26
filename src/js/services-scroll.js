@@ -10,10 +10,13 @@ import { designPx, typePx } from "./design-px.js";
 // Card geometry in Figma pixels (1440px frame).
 const FIRST_TOP = 98; // active card top in frame 1
 const LATER_TOP = 88; // active card top from frame 2 on
-const PREVIOUS_TOP = -207; // card that moved up
+const PREVIOUS_GAP = 12; // card that moved up ends 12px above the active card (Figma: 76 → 88)
+// Deck cards are scaled from their top edge and placed so their visible strip
+// (the clipped title area) always ends `peek` px below the active card, as in
+// Figma (16px and 32px), whatever the cards' heights. Text-sized: type scale.
 const DECK = [
-  { scale: 317 / 345, top: -46, clip: 67.5 }, // relative to active card bottom
-  { scale: 285 / 345, top: -28, clip: 72.6 },
+  { scale: 317 / 345, peek: 16, clip: 67.5 },
+  { scale: 285 / 345, peek: 32, clip: 72.6 },
 ];
 
 
@@ -44,23 +47,27 @@ export function initServicesScroll() {
     if (offset === 0) {
       return { y: (activeTop(active) - FIRST_TOP) * px, scale: 1, clipPath: fullClip, autoAlpha: 1, zIndex: 4 };
     }
+    // Cards that moved up stay in front, so the outgoing card slides away over
+    // the incoming one instead of the incoming card popping in front of it.
+    // Placed by its bottom edge so the gap stays 12px whatever its height (type
+    // scale, like the card's text); with Figma's 283px card this is y -207.
     if (offset < 0) {
       return {
-        y: (PREVIOUS_TOP - FIRST_TOP) * px,
+        y: (activeTop(active) - FIRST_TOP) * px - PREVIOUS_GAP * typePx() - height,
         scale: 1,
         clipPath: fullClip,
         autoAlpha: offset === -1 ? 1 : 0,
-        zIndex: 3,
+        zIndex: 5,
       };
     }
     const deck = DECK[Math.min(offset, DECK.length) - 1];
+    const t = typePx();
     const activeBottom = activeTop(active) * px + cards[active].offsetHeight;
     return {
-      // The deck peeks out by a text-sized strip, so its offset follows the type scale.
-      y: activeBottom + deck.top * typePx() - FIRST_TOP * px,
+      y: activeBottom + (deck.peek - deck.clip * deck.scale) * t - FIRST_TOP * px,
       scale: deck.scale,
       // The visible strip shows the card title, so it follows the type scale.
-      clipPath: `inset(0px 0px ${height - deck.clip * typePx()}px 0px)`,
+      clipPath: `inset(0px 0px ${height - deck.clip * t}px 0px)`,
       autoAlpha: offset <= DECK.length ? 1 : 0,
       zIndex: offset <= DECK.length ? 3 - offset : 0,
     };
@@ -75,7 +82,9 @@ export function initServicesScroll() {
   const clearMedia = () => gsap.set(media, { clearProps: "inset,top,right,bottom,left,borderRadius" });
 
   const ctx = gsap.context(() => {
-    cards.forEach((card, i) => gsap.set(card, { ...stateVars(i, 0), zIndex: cardState(i, 0).zIndex }));
+    cards.forEach((card, i) =>
+      gsap.set(card, { ...stateVars(i, 0), zIndex: cardState(i, 0).zIndex, transformOrigin: "50% 0%" }),
+    );
 
     const timeline = gsap.timeline({
       defaults: { duration: 1, ease: reduceMotion ? "steps(1)" : "power2.inOut" },
@@ -84,10 +93,18 @@ export function initServicesScroll() {
         start: "top top",
         end: () => `+=${window.innerHeight * steps}`,
         pin: true,
-        scrub: reduceMotion ? true : 0.6,
+        scrub: reduceMotion ? true : 1,
         // Snap to the next step in the scroll direction. inertia: false keeps a
-        // fast flick from projecting past several steps.
-        snap: { snapTo: "labelsDirectional", inertia: false, duration: { min: 0.2, max: 0.6 }, ease: "power1.inOut" },
+        // fast flick from projecting past several steps. A longer, softer snap
+        // with a short delay avoids the jolt of the earlier 0.2–0.6s snap
+        // (same feel as the Motto section).
+        snap: {
+          snapTo: "labelsDirectional",
+          inertia: false,
+          delay: 0.15,
+          duration: { min: 0.5, max: 1 },
+          ease: "power2.inOut",
+        },
         invalidateOnRefresh: true,
         onRefresh: (self) => {
           if (self.animation.time() < steps - 1) clearMedia();
@@ -95,6 +112,9 @@ export function initServicesScroll() {
       },
     });
 
+    // Step 0 lives in the timeline too, so it is re-measured on refresh (card
+    // heights change once the web fonts have loaded or the type scale changes).
+    cards.forEach((card, i) => timeline.set(card, stateVars(i, 0), 0));
     timeline.addLabel("step0", 0);
 
     for (let active = 1; active < cards.length; active++) {
@@ -105,7 +125,14 @@ export function initServicesScroll() {
         timeline.set(card, { zIndex: cardState(i, active).zIndex }, at + 0.001);
         timeline.to(card, stateVars(i, active), at);
       });
-      timeline.fromTo(images[active], { autoAlpha: 0, scale: 1.05 }, { autoAlpha: 1, scale: 1 }, at);
+      // The new image is revealed from the bottom like a curtain, settling from
+      // a slight zoom, over the previous image (no half-transparent overlap).
+      timeline.fromTo(
+        images[active],
+        { autoAlpha: 1, clipPath: "inset(100% 0% 0% 0%)", scale: 1.08 },
+        { clipPath: "inset(0% 0% 0% 0%)", scale: 1, ease: reduceMotion ? "steps(1)" : "power3.inOut" },
+        at,
+      );
       if (active === 1) {
         timeline.to(fade, { autoAlpha: 1 }, at);
         timeline.to(label, { autoAlpha: 0 }, at);
@@ -126,6 +153,9 @@ export function initServicesScroll() {
 
   const refresh = () => ScrollTrigger.refresh();
   window.addEventListener("load", refresh, { once: true });
+
+  // Card heights depend on the web fonts; re-measure once they are ready.
+  document.fonts?.ready.then(() => ScrollTrigger.refresh());
 
   return () => {
     window.removeEventListener("load", refresh);

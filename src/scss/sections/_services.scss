@@ -69,14 +69,17 @@
   // peeking 16px and 32px below the active card (Figma frame 1).
   &:nth-child(2) {
     z-index: 2;
-    // Card height minus the deck offset, both text-sized (type scale).
-    transform: translateY(calc(#{fs(283)} + #{fs(-46)})) scale(0.9188);
+    // Scaled from the top edge; the visible title strip ends 16px (deck 1) /
+    // 32px (deck 2) below the active card: card height + peek - strip height.
+    transform-origin: 50% 0;
+    transform: translateY(#{fs(283 + 16 - 67.5 * 0.9188)}) scale(0.9188);
     clip-path: inset(0 0 calc(100% - #{fs(67.5)}) 0);
   }
 
   &:nth-child(3) {
     z-index: 1;
-    transform: translateY(calc(#{fs(283)} + #{fs(-28)})) scale(0.8261);
+    transform-origin: 50% 0;
+    transform: translateY(#{fs(283 + 32 - 72.6 * 0.8261)}) scale(0.8261);
     clip-path: inset(0 0 calc(100% - #{fs(72.6)}) 0);
   }
 

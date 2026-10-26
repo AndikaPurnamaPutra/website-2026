@@ -1,7 +1,7 @@
 -
   var services = [
-    { title: "Branding", image: "branding", alt: "Liver Protect health app screens", tags: ["Logo", "Brand Identity", "Motion Design", "Packaging"], text: "We delve into your brand's core values, mission, and vision to create a cohesive identity that resonates with your target audience." },
-    { title: "Brand Strategy", image: "brand-strategy", alt: "Gallery storefront with a photography exhibition", tags: ["Social Media", "Strategic Design", "Market Research", "Brand Development"], text: "We turn your vision into a focused brand strategy that gives your business clarity, direction, and room to grow." },
+    { title: "Branding", video: "branding", alt: "FURSYS Manta campaign on a wall display", tags: ["Logo", "Brand Identity", "Motion Design", "Packaging"], text: "We delve into your brand's core values, mission, and vision to create a cohesive identity that resonates with your target audience." },
+    { title: "Brand Strategy", video: "brand-strategy", alt: "Spotify campaign motion design", tags: ["Social Media", "Strategic Design", "Market Research", "Brand Development"], text: "We turn your vision into a focused brand strategy that gives your business clarity, direction, and room to grow." },
     { title: "UI/UX Design", image: "ui-ux", alt: "HiHi shopping app on a phone", tags: ["Mobile", "Website", "UX", "Prototyping", "Design System", "Dashboard"], text: "We create intuitive digital experiences that make complex ideas feel simple, useful, and unmistakably yours." },
     { title: "AI/Web Development", image: "ai-web", alt: "Rowfest music festival website", tags: ["CMS Development", "AI Integration", "Framer", "Webflow", "Custom Code"], text: "We transform thoughtful designs into fast, intelligent digital products—combining clean code and AI capabilities to perform beautifully across every screen." },
     { title: "Illustration", image: "illustration", alt: "Illustrated train station with a rabbit character", tags: ["Custom Illustration", "Iconography", "2D/3D Art", "Mascot", "Brand Asset"], text: "We craft custom illustrations and visual assets that bring personality, emotion, and a memorable identity to your brand." }
@@ -27,6 +27,12 @@ section.services(data-services data-header-theme="dark")
 
     .services__media
       each service in services
-        img.services__image(src=`assets/images/services/${service.image}.jpg` alt=service.alt)
+        if service.video
+          //- Muted looping video; the poster is its first frame.
+          //- src/js/inview-videos.js plays it only while it is on screen.
+          video.services__image(poster=`assets/images/services/${service.video}-poster.jpg` muted loop playsinline preload="metadata" aria-label=service.alt data-inview-video)
+            source(src=`assets/images/services/${service.video}.mp4` type="video/mp4")
+        else
+          img.services__image(src=`assets/images/services/${service.image}.jpg` alt=service.alt)
 
     p.services__note.text-14.text-muted Visual trends evolve, but solid systems don’t age. We build clean digital products designed to scale with your business for years, not just seasons.
