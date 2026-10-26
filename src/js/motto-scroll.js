@@ -27,7 +27,8 @@ export function initMottoScroll() {
   const diagonal = section.querySelector(".motto__bg--diagonal");
   const cta = section.querySelector(".cta");
   const steps = 5;
-  const smooth = reduceMotion ? "steps(1)" : "sine.inOut";
+  const smooth = reduceMotion ? "steps(1)" : "power2.inOut";
+  const linesBox = section.querySelector(".motto__lines");
 
   // Per-letter copies over the accent text, placed at the measured letter
   // positions in em so they follow the fluid scale. The gradient box is the
@@ -81,11 +82,16 @@ export function initMottoScroll() {
   const ellipseHigh = () => -155 * designPx(); // frame 1527:4201: y 802 → 647
   const ellipseShift = () => -9 * designPx(); // x -15 → -24
 
+  let cleanupListeners = () => {};
+  // Last step the reader settled on (see the resize handling below).
+  let settledStep = null;
+  let inside = false;
+  let resizing = false;
   const ctx = gsap.context(() => {
     // Start state (frame 1527:4134).
     // A long perspective keeps the wide line flat while it turns (no keystone tilt).
     gsap.set(lines, { transformPerspective: 4000, transformOrigin: "50% 50% -25px" });
-    gsap.set([lines[1], lines[2]], { autoAlpha: 0, rotationX: -90 });
+    gsap.set([lines[1], lines[2]], { autoAlpha: 0, rotationX: -90, y: () => 10 * designPx() });
     gsap.set(charText.flatMap((list) => [...list]), { opacity: 1 });
     gsap.set(charGradient.flatMap((list) => [...list]), { opacity: 0 });
     gsap.set(ellipse, { autoAlpha: 0, y: ellipseHidden });
@@ -100,23 +106,60 @@ export function initMottoScroll() {
         start: "top top",
         end: () => `+=${window.innerHeight * steps}`,
         pin: true,
-        scrub: reduceMotion ? true : 0.8,
-        snap: { snapTo: "labelsDirectional", inertia: false, duration: { min: 0.3, max: 0.8 }, ease: "sine.inOut" },
+        scrub: reduceMotion ? true : 1,
+        snap: {
+          snapTo: "labelsDirectional",
+          inertia: false,
+          duration: { min: 0.4, max: 1 },
+          ease: "power2.inOut",
+        },
         invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          if (resizing) return;
+          const at = self.progress * steps;
+          inside = self.scroll() >= self.start - 2 && self.scroll() <= self.end + 2;
+          if (Math.abs(at - Math.round(at)) < 0.002) settledStep = Math.round(at);
+        },
       },
     });
 
+    // A resize changes the pin length; keep the reader on the same step instead
+    // of leaving the timeline between two steps. The step is recorded while
+    // scrolling and frozen during a resize (reading the scroll then is
+    // unreliable: the browser may already have clamped it).
+    let keepStep = null;
+    const onResize = () => {
+      resizing = true;
+    };
+    const rememberStep = () => {
+      keepStep = inside ? settledStep : null;
+    };
+    const restoreStep = () => {
+      resizing = false;
+      if (keepStep === null) return;
+      window.scrollTo(0, timeline.scrollTrigger.labelToScroll(`step${keepStep}`));
+      keepStep = null;
+    };
+    window.addEventListener("resize", onResize);
+    ScrollTrigger.addEventListener("refreshInit", rememberStep);
+    ScrollTrigger.addEventListener("refresh", restoreStep);
+    cleanupListeners = () => {
+      window.removeEventListener("resize", onResize);
+      ScrollTrigger.removeEventListener("refreshInit", rememberStep);
+      ScrollTrigger.removeEventListener("refresh", restoreStep);
+    };
+
     // Letters change from white to the gradient one after another, left to right.
     const toGradient = (i, at) => {
-      const each = { duration: 0.45, ease: smooth, stagger: { amount: 0.55 } };
+      const each = { duration: 0.35, ease: reduceMotion ? "steps(1)" : "power1.out", stagger: { amount: 0.65 } };
       timeline.to(charGradient[i], { opacity: 1, ...each }, at);
       timeline.to(charText[i], { opacity: 0, ...each }, at);
     };
 
     // The whole line turns like one flip-clock card: out to the top, in from below.
     const flip = (from, to, at) => {
-      timeline.to(lines[from], { rotationX: 90, autoAlpha: 0, duration: 0.45, ease: reduceMotion ? "steps(1)" : "power2.in" }, at);
-      timeline.to(lines[to], { rotationX: 0, autoAlpha: 1, duration: 0.5, ease: reduceMotion ? "steps(1)" : "power2.out" }, at + 0.45);
+      timeline.to(lines[from], { rotationX: 90, y: () => -10 * designPx(), autoAlpha: 0, duration: 0.45, ease: reduceMotion ? "steps(1)" : "power3.in" }, at);
+      timeline.to(lines[to], { rotationX: 0, y: 0, autoAlpha: 1, duration: 0.55, ease: reduceMotion ? "steps(1)" : "power3.out" }, at + 0.45);
     };
 
     timeline.addLabel("step0", 0);
@@ -146,24 +189,26 @@ export function initMottoScroll() {
 
     // Entry (before the pin): full-screen light → dark on the wrapper.
     // Start values are set here, not with fromTo: ScrollTrigger's refresh
-    // reverts fromTo starts that lie ahead of the playhead.
+    // reverts fromTo starts that lie ahead of the playhead. Motto 1 blurs in on
+    // the lines box, so no line is driven by two timelines (the flips own them).
     if (!reduceMotion && wrapper) {
       gsap.set(wrapper, { backgroundColor: "#ffffff" });
       gsap.set(backdrop, { autoAlpha: 0 });
-      gsap.set(lines[0], { autoAlpha: 0, y: () => 12 * designPx(), filter: "blur(6px)" });
+      gsap.set(linesBox, { autoAlpha: 0, y: () => 12 * designPx(), filter: "blur(6px)" });
       gsap
         .timeline({
           defaults: { ease: "sine.inOut" },
-          scrollTrigger: { trigger: section, start: "top bottom", end: "top top", scrub: 0.8 },
+          scrollTrigger: { trigger: section, start: "top bottom", end: "top top", scrub: 1, invalidateOnRefresh: true },
         })
         .to(milestone, { autoAlpha: 0, y: () => -40 * designPx(), duration: 0.5, ease: "power1.in" }, 0)
         .to(wrapper, { backgroundColor: "#111111", duration: 0.7 }, 0.1)
         .to(backdrop, { autoAlpha: 1, duration: 0.4 }, 0.6)
-        .to(lines[0], { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.4, ease: "power2.out" }, 0.6);
+        .to(linesBox, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.4, ease: "power2.out" }, 0.6);
     }
   }, section);
 
   return () => {
+    cleanupListeners();
     ctx.revert();
     glyphs.forEach((glyph) => glyph.remove());
     section.classList.remove("is-enhanced");

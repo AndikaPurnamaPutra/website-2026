@@ -4,6 +4,12 @@
   box-sizing: border-box;
 }
 
+// Pinned sections (GSAP ScrollTrigger) must not be shifted by the browser's
+// scroll anchoring when the layout changes, e.g. on resize.
+html {
+  overflow-anchor: none;
+}
+
 body {
   margin: 0;
   font-family: var(--font-body);

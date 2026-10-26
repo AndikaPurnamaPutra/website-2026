@@ -87,3 +87,13 @@ Section **tertahan saat di-scroll** (seperti What we do). Satu langkah scroll = 
 4. **Cahaya:** satu bentuk saja (Vector dari frame Left Light). Bentuk ini muncul dari kiri sambil bergeser masuk, lalu berputar di ujungnya (47,3°, skala 0,83) dan meluncur ke posisi Center Light. Semua gerak cahaya dan ellipse memakai `sine.inOut` dengan scrub 0,8, dan snap lebih lembut. Aset `light-center.svg` dihapus.
 
 **Verifikasi ulang:** setiap langkah dibandingkan dengan Figma (1B, 2B, 3A, 3B). Lebar baris 710 / 854,5 / 508 px (Figma 712 / 856 / 510). Salinan huruf tepat di atas huruf asli (selisih 0px). Transisi masuk diambil di 25 / 50 / 75%, dan seluruh layar berubah serentak. Flip datar. Reduce motion: langkah berganti tanpa gerak. Tanpa JS dan 1920px sesuai.
+
+### Revisi kedua setelah review (27 Okt 2026)
+- **Tekstur full width:** sebelumnya berukuran tetap 1550 × 1033 (skala desain), sehingga di layar 2560px atau layar yang lebih tinggi dari desain tepinya terlihat. Sekarang menutupi seluruh section (`inset: 0`, `object-fit: cover`).
+- **Cahaya selalu di tengah:** cahaya dan ellipse sekarang dihitung dari tengah layar (`left: calc(50% + …)`), bukan dari tepi kiri. Pusat berkas cahaya di langkah akhir berada di x ≈ 723 dari 1440 (tengah 720), dan tetap di tengah pada 1920 dan 2560px. Posisi di langkah 4 tetap di kiri sesuai frame 3A.
+- **Lebih dinamis dan halus:** scrub 1, snap `power2.inOut` 0,4–1 detik, gerak ellipse/cahaya `power2.inOut`, flip satu baris `power3` dengan sedikit gerak naik/turun (10px), gradient per huruf lebih cepat per huruf dengan stagger lebih panjang.
+- **Pencegahan bug:**
+  - Efek masuk sekarang dipasang di wadah baris (`.motto__lines`), bukan di baris pertama. Sebelumnya baris pertama dianimasikan oleh dua timeline sekaligus.
+  - Resize di tengah section mempertahankan langkah yang sama. Langkah dicatat saat scroll (dibekukan selama resize), lalu dikembalikan setelah ScrollTrigger refresh.
+  - `overflow-anchor: none` di `html`, supaya scroll anchoring browser tidak menggeser posisi saat layout berubah (disarankan untuk section yang di-pin).
+- **Pengujian:** maju 0 → 5 lalu mundur 5 → 0 dan kembali ke Milestone (semua langkah konsisten dari kedua arah); scroll cepat dan bolak-balik (selalu berakhir di langkah utuh); resize 1440 → 1920 → 1280 di setiap langkah (langkah tetap sama); muat ulang di langkah 3 lalu scroll ke atas (semua langkah dan motto pertama tampil benar); tekstur dan posisi cahaya di 1440×1024, 1440×1200, 1920×1080, dan 2560×1440.
