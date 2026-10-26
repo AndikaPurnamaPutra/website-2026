@@ -96,3 +96,8 @@ Keputusan pengguna: menu bar **selalu terlihat** (tidak sembunyi saat scroll ke 
 - **Saat scroll (>10px):** padding menyusut ke 20px (tinggi 64px), transisi 0,4 detik. Kembali 104px di paling atas. Nilai 20px adalah usulan.
 - Efek kaca dan tema gelap di atas section gelap tetap ada. Logika sembunyi/muncul dihapus dari `header.js`.
 - Diuji dengan scroll roda: 104 → 64px, selalu di `top: 0`, tema gelap di What we do dan Motto, kembali 104px di atas. Langkah What we do dan Motto tetap benar.
+
+### Revisi (27 Okt 2026): Figma 1611:6986, solid putih, tinggi tetap
+- Padding 24px atas-bawah (tinggi 72px), sama di atas dan saat scroll. Latar putih solid dan bayangan `0 4px 10px rgba(0,0,0,.04)` dari Figma. Efek kaca dihapus.
+- Tema gelap (teks putih) dihapus, karena teks putih tidak terbaca di atas latar putih. `header.js` dan atribut `data-header-theme` dihapus.
+- Diuji: tinggi 72px dan logo di (40, 24) di posisi atas, setelah scroll, di What we do, dan di Motto.

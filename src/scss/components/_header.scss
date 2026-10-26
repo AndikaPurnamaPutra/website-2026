@@ -1,60 +1,25 @@
-// Figma: Menu Bar 1574:2063 (full width, 104px, 10% white). Fixed glass bar,
-// always visible; its padding shrinks from Figma's 40px to 20px once the page
-// is scrolled, and it turns light over dark sections (src/js/header.js).
-// Logo, text and paddings keep Figma's pixel size at every viewport width (not
-// fluid); only the side edges follow the page content (.container).
-// Blur, timing, the scrolled padding and the light theme are proposals.
+// Figma: Menu Bar 1611:6986. Fixed solid white bar, always visible, same
+// height at the top and while scrolling (24px padding → 72px). Logo, text and
+// paddings keep Figma's pixel size at every viewport width (not fluid); only
+// the side edges follow the page content (.container).
 @use "../abstracts/functions" as *;
 
 .site-header {
-  --ease: cubic-bezier(0.22, 1, 0.36, 1);
-
   position: fixed;
   top: 0;
   right: 0;
   left: 0;
   z-index: 100;
-  padding-block: 40px;
+  padding-block: 24px;
   color: var(--color-ink);
-  background: rgba(255, 255, 255, 0.1);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  backdrop-filter: blur(20px) saturate(160%);
-  transition:
-    padding 0.4s var(--ease),
-    color 0.3s ease-out;
-
-  &.is-scrolled {
-    padding-block: 20px;
-  }
-
-  // Over sections marked data-header-theme="dark".
-  &.is-dark {
-    color: var(--color-white);
-  }
-
-  &.is-dark .site-header__logo img,
-  &.is-dark .site-nav__link img {
-    filter: brightness(0) invert(1);
-  }
+  background: var(--color-white);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
 }
 
 // The header no longer takes space in the page; this keeps every section where
 // it was (the Figma frame reserves 104px for it, scaled like the rest).
 main {
   padding-top: fluid(104);
-}
-
-.site-header__logo img,
-.site-nav__link img {
-  transition: filter 0.3s ease-out;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .site-header,
-  .site-header__logo img,
-  .site-nav__link img {
-    transition: none;
-  }
 }
 
 .site-header__inner {
