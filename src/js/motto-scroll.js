@@ -4,7 +4,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 // Pinned Motto + CTA section (Figma storyboard 1527:4259, flow from the user):
 // entry: the Milestone + Motto wrapper turns from light to dark across the whole
 //        screen, Milestone fades out, motto 1 blurs in;
-// step 1: "Trendsetting Design" turns gradient letter by letter, the ellipse rises;
+// step 1: "Trendsetting Design" turns gradient letter by letter (on its own
+//         clock once the step is reached), the ellipse rises;
 // step 2: the line flips to motto 2;   step 3: "believers." turns gradient;
 // step 4: flip to motto 3, the ellipse gives way to the light, Get a Quote appears;
 // step 5: the whole motto turns gradient, the light turns and glides to the center.
@@ -21,6 +22,7 @@ export function initMottoScroll() {
   const wrapper = section.closest("[data-tone-shift]");
   const milestone = wrapper?.querySelector(".milestone__inner");
   const backdrop = section.querySelector(".motto__backdrop");
+  const wrapperTexture = wrapper?.querySelector(".tone-shift__texture");
   const lines = [...section.querySelectorAll(".motto__line")];
   const ellipse = section.querySelector(".motto__ellipse");
   const light = section.querySelector(".motto__light");
@@ -136,9 +138,10 @@ export function initMottoScroll() {
     };
     const restoreStep = () => {
       resizing = false;
-      if (keepStep === null) return;
-      window.scrollTo(0, timeline.scrollTrigger.labelToScroll(`step${keepStep}`));
+      if (keepStep !== null) window.scrollTo(0, timeline.scrollTrigger.labelToScroll(`step${keepStep}`));
       keepStep = null;
+      // Re-sync the gradient waves once the timeline shows the right step again.
+      gsap.delayedCall(0.1, syncGradients);
     };
     window.addEventListener("resize", onResize);
     ScrollTrigger.addEventListener("refreshInit", rememberStep);
@@ -149,12 +152,34 @@ export function initMottoScroll() {
       ScrollTrigger.removeEventListener("refresh", restoreStep);
     };
 
-    // Letters change from white to the gradient one after another, left to right.
+    // Letters change from white to the gradient one after another, left to
+    // right. Unlike the flips and the light, this plays on its own clock
+    // (≈0.8s) once the scroll passes the middle of its step, and plays back
+    // when scrolling up, so the wave has the same tempo however one scrolls.
+    const gradients = [];
     const toGradient = (i, at) => {
-      const each = { duration: 0.35, ease: reduceMotion ? "steps(1)" : "power1.out", stagger: { amount: 0.65 } };
-      timeline.to(charGradient[i], { opacity: 1, ...each }, at);
-      timeline.to(charText[i], { opacity: 0, ...each }, at);
+      const each = { duration: 0.35, ease: "power1.out", stagger: { amount: 0.45 } };
+      const wave = gsap
+        .timeline({ paused: true })
+        .to(charGradient[i], { opacity: 1, ...each }, 0)
+        .to(charText[i], { opacity: 0, ...each }, 0);
+      gradients.push({ wave, at: at + 0.5, on: null });
     };
+    const syncGradients = () => {
+      // During a refresh/resize the timeline is briefly reverted; ignore that.
+      if (ScrollTrigger.isRefreshing || resizing) return;
+      const time = timeline.time();
+      gradients.forEach((g) => {
+        const on = time >= g.at;
+        if (on === g.on) return;
+        // First sync (page load, possibly mid-section) and reduced motion jump.
+        if (g.on === null || reduceMotion) g.wave.progress(on ? 1 : 0);
+        else if (on) g.wave.play();
+        else g.wave.reverse();
+        g.on = on;
+      });
+    };
+    timeline.eventCallback("onUpdate", syncGradients);
 
     // The whole line turns like one flip-clock card: out to the top, in from below.
     const flip = (from, to, at) => {
@@ -192,7 +217,9 @@ export function initMottoScroll() {
     // reverts fromTo starts that lie ahead of the playhead. Motto 1 blurs in on
     // the lines box, so no line is driven by two timelines (the flips own them).
     if (!reduceMotion && wrapper) {
+      wrapper.classList.add("is-toned");
       gsap.set(wrapper, { backgroundColor: "#ffffff" });
+      gsap.set(wrapperTexture, { opacity: 0 });
       gsap.set(backdrop, { autoAlpha: 0 });
       gsap.set(linesBox, { autoAlpha: 0, y: () => 12 * designPx(), filter: "blur(6px)" });
       gsap
@@ -202,6 +229,7 @@ export function initMottoScroll() {
         })
         .to(milestone, { autoAlpha: 0, y: () => -40 * designPx(), duration: 0.5, ease: "power1.in" }, 0)
         .to(wrapper, { backgroundColor: "#111111", duration: 0.7 }, 0.1)
+        .to(wrapperTexture, { opacity: 0.1, duration: 0.7 }, 0.1)
         .to(backdrop, { autoAlpha: 1, duration: 0.4 }, 0.6)
         .to(linesBox, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.4, ease: "power2.out" }, 0.6);
     }
@@ -212,5 +240,6 @@ export function initMottoScroll() {
     ctx.revert();
     glyphs.forEach((glyph) => glyph.remove());
     section.classList.remove("is-enhanced");
+    wrapper?.classList.remove("is-toned");
   };
 }
