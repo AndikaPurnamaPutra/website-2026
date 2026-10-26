@@ -89,10 +89,10 @@ Lebar 699px, rata tengah, gap 16px:
 ## 5. Usulan untuk bagian yang tidak ada di Figma [U]
 1. **Gerakan carousel testimoni:** deretan kartu terpotong di kedua sisi dengan fade, tanpa tombol panah. Pola ini biasanya dipakai untuk **marquee**, yaitu kartu bergerak pelan dan terus-menerus ke kiri, lalu berulang tanpa putus.
    - Kecepatan sekitar 40px per detik.
-   - Berhenti saat kursor berada di atas kartu, supaya kutipan bisa dibaca.
+   - ~~Berhenti saat kursor berada di atas kartu.~~ **Dibatalkan (26 Okt 2026):** pengguna ingin marquee tetap bergerak saat hover.
    - Dibuat dengan GSAP, dengan kartu digandakan agar putarannya mulus.
 2. **Reduce motion:** carousel diam di posisi seperti di Figma.
-3. **Logo klien:** tidak bisa diklik dan tanpa efek hover.
+3. **Logo klien:** ~~tidak bisa diklik dan tanpa efek hover~~. Diganti setelah review: efek hover dari Figma dan link `#` (lihat "Tambahan setelah review").
 4. **"medicalnode.ai":** link ke `https://medicalnode.ai`, dibuka di tab baru.
 
 ---
@@ -109,7 +109,7 @@ Lebar 699px, rata tengah, gap 16px:
 - [x] Tinggi section 1474px di 1440px. Header, grid, BenQ, teks, garis, kartu 1/2/5, isi kartu (logo, kutipan, penulis), dan kedua fade **tepat sama** dengan Figma. Selisih terbesar: logo demostack 0,9px.
 - [x] 12 logo grid dan 5 logo testimoni sama secara visual dengan Figma (screenshot berdampingan, ditambah render di latar magenta untuk memastikan transparan).
 - [x] Kartu ke-2, 3, dan 4 terlihat penuh, kartu ke-1 dan 5 terpotong di tepi, dan fade di kedua sisi.
-- [x] Marquee: 39,9 px/detik. Saat hover melambat lalu berhenti (0 px/detik), setelah mouse keluar jalan lagi (39,8 px/detik). Saat reduce motion: diam, tanpa salinan kartu.
+- [x] Marquee: 39,9 px/detik. Saat reduce motion: diam, tanpa salinan kartu. Setelah review: berhenti-saat-hover dihapus, dan marquee terukur tetap 40,0 px/detik saat di-hover.
 - [x] 1920px: semua ukuran 1,333× (tinggi section 1965px, kartu 533px).
 - [x] Section sebelumnya tetap berfungsi (garis Our Work diukur ulang setelah dijadikan komponen bersama `.divider`).
 

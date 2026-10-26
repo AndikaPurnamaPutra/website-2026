@@ -1,8 +1,8 @@
 import gsap from "gsap";
 
 // Trusted Clients testimonials: endless marquee to the left (approved proposal,
-// not in Figma). ~40 Figma px per second, slows to a stop on hover, and stays
-// static (Figma layout) with reduced motion.
+// not in Figma). ~40 Figma px per second, keeps moving on hover (user
+// decision), and stays static (Figma layout) with reduced motion.
 const SPEED = 40; // Figma px per second
 
 const designPx = () => Math.min(Math.max(window.innerWidth, 1280), 1920) / 1440;
@@ -38,17 +38,10 @@ export function initTestimonialsMarquee() {
     tween.progress(progress);
   };
 
-  const slowDown = () => gsap.to(tween, { timeScale: 0, duration: 0.4, overwrite: true });
-  const speedUp = () => gsap.to(tween, { timeScale: 1, duration: 0.4, overwrite: true });
-
   build();
-  marquee.addEventListener("mouseenter", slowDown);
-  marquee.addEventListener("mouseleave", speedUp);
   window.addEventListener("resize", build);
 
   return () => {
-    marquee.removeEventListener("mouseenter", slowDown);
-    marquee.removeEventListener("mouseleave", speedUp);
     window.removeEventListener("resize", build);
     tween?.kill();
     gsap.set(track, { clearProps: "transform" });
