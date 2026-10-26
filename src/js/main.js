@@ -4,6 +4,7 @@ import barba from "@barba/core";
 import { initHeroClock } from "./hero-clock.js";
 import { initServicesScroll } from "./services-scroll.js";
 import { initWorkCarousels } from "./work-carousel.js";
+import { initTestimonialsMarquee } from "./testimonials-marquee.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,6 +15,7 @@ function initPage() {
   cleanups.push(initHeroClock());
   cleanups.push(initServicesScroll());
   cleanups.push(initWorkCarousels());
+  cleanups.push(initTestimonialsMarquee());
 }
 
 function destroyPage() {

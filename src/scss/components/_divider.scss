@@ -1,0 +1,18 @@
+// 1px #E7E7E7 line used between blocks (Our Work, Trusted Clients).
+// Zero height like the Figma vector, so it adds no space to the layout gaps.
+.divider {
+  position: relative;
+  height: 0;
+  margin: 0;
+  // <hr> defaults to overflow: hidden, which would clip the line.
+  overflow: visible;
+  border: 0;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -0.5px 0 auto;
+    height: 1px;
+    background: var(--color-divider);
+  }
+}

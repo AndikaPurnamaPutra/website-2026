@@ -1,0 +1,198 @@
+// Figma: Testimonials 1574:973
+@use "../abstracts/functions" as *;
+
+.trusted {
+  padding-block: fluid(180);
+  background: var(--color-surface-muted);
+}
+
+.trusted__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-80);
+  max-width: var(--container-clients);
+  margin-inline: auto;
+}
+
+.trusted__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  width: fluid(699);
+  text-align: center;
+}
+
+.trusted__eyebrow {
+  line-height: 1;
+}
+
+.trusted__clients {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-40);
+  width: 100%;
+}
+
+.trusted__logos {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-20);
+}
+
+.trusted__logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: fluid(124);
+
+  img {
+    width: calc(var(--w) * var(--px));
+    height: calc(var(--h) * var(--px));
+    max-width: none;
+  }
+}
+
+.trusted__more {
+  line-height: 1;
+  text-align: center;
+}
+
+.trusted__inner .divider {
+  align-self: stretch;
+}
+
+// Full-width row; edge fades from Figma (48px left, 55px right, 300px tall).
+.trusted__marquee {
+  position: relative;
+  margin-top: var(--space-80);
+  overflow: hidden;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: fluid(-11);
+    z-index: 1;
+    height: fluid(300);
+    pointer-events: none;
+  }
+
+  &::before {
+    left: 0;
+    width: fluid(48);
+    background: linear-gradient(to right, var(--color-surface-muted), rgba(246, 246, 246, 0));
+  }
+
+  &::after {
+    right: 0;
+    width: fluid(55);
+    background: linear-gradient(to left, var(--color-surface-muted), rgba(246, 246, 246, 0));
+  }
+}
+
+// Five cards (2128px) centered on the page, as in Figma.
+.trusted__track {
+  display: flex;
+  gap: var(--space-32);
+  width: max-content;
+  margin-left: calc(50% - #{fluid(1064)});
+}
+
+.testimonial-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 0 0 fluid(400);
+  height: fluid(260);
+  padding: var(--space-32);
+  color: var(--color-ink);
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+// Figma "Noise" effect (black 20% grain), only on the BOWT card.
+.testimonial-card--noise {
+  background-image: url("../assets/images/testimonials/noise.svg");
+  background-size: 100% 100%;
+}
+
+.testimonial-card__logo {
+  align-self: flex-start;
+  width: calc(var(--w) * var(--px));
+  height: calc(var(--h) * var(--px));
+  max-width: none;
+}
+
+.testimonial-card__logo--flip {
+  transform: scaleY(-1);
+}
+
+// Good at Numbers: raster mark used as a mask over #111 (as in Figma) + vector text.
+.testimonial-card__logo--gan {
+  display: flex;
+  align-items: flex-start;
+  gap: fluid(5.87);
+  width: auto;
+  height: fluid(24);
+
+  img {
+    width: fluid(112.365);
+    height: fluid(11.272);
+    margin-top: fluid(5.91);
+  }
+}
+
+.testimonial-card__gan-mark {
+  width: fluid(24.723);
+  height: fluid(24);
+  background: var(--color-ink);
+  -webkit-mask: url("../assets/images/testimonials/good-at-numbers-mark.png") center / 100% 100% no-repeat;
+  mask: url("../assets/images/testimonials/good-at-numbers-mark.png") center / 100% 100% no-repeat;
+}
+
+// Fills the space between logo and author, text vertically centered (Figma).
+// Block + align-content (not flex) keeps the inline link in the text flow.
+.testimonial-card__quote {
+  flex: 1 0 0;
+  align-content: center;
+  font-family: var(--font-body);
+  font-size: fluid(14);
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+}
+
+.testimonial-card__link {
+  color: var(--color-link);
+}
+
+.testimonial-card__author {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+}
+
+.testimonial-card__avatar {
+  width: fluid(34);
+  height: fluid(34);
+  border-radius: 50%;
+}
+
+.testimonial-card__person {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-body);
+  font-size: fluid(12);
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.testimonial-card__name {
+  font-weight: 500;
+}
+
+.testimonial-card__role {
+  opacity: 0.5;
+}

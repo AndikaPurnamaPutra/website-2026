@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" viewBox="0 0 400 260">
+  <!--
+    Figma "Noise" effect on the BOWT testimonial card (1574:1114).
+    Turbulence settings come from Figma's SVG export; the two grain layers are
+    tuned so the rendered card matches Figma's own render (mean darkness 3.6,
+    ~38% speckled pixels, darkest grain ~20/255). A single 20% layer, as in the
+    export, renders much coarser in browsers.
+  -->
+  <filter id="noise" x="0" y="0" width="400" height="260" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="2 2" stitchTiles="stitch" numOctaves="3" seed="8496" result="noise"/>
+    <feColorMatrix in="noise" type="luminanceToAlpha" result="alphaNoise"/>
+    <feComponentTransfer in="alphaNoise" result="fine">
+      <feFuncA type="discrete" tableValues="0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
+    </feComponentTransfer>
+    <feComponentTransfer in="alphaNoise" result="coarse">
+      <feFuncA type="discrete" tableValues="0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
+    </feComponentTransfer>
+    <feFlood flood-color="rgba(0, 0, 0, 0.028)"/>
+    <feComposite operator="in" in2="fine" result="fineColor"/>
+    <feFlood flood-color="rgba(0, 0, 0, 0.05)"/>
+    <feComposite operator="in" in2="coarse" result="coarseColor"/>
+    <feMerge>
+      <feMergeNode in="fineColor"/>
+      <feMergeNode in="coarseColor"/>
+    </feMerge>
+  </filter>
+  <rect width="400" height="260" fill="#fff" filter="url(#noise)"/>
+</svg>

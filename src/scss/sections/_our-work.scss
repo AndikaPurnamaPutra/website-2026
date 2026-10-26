@@ -40,24 +40,6 @@
   }
 }
 
-// Zero-height line like Figma, so it adds no space between the 40px gaps.
-.our-work__divider {
-  position: relative;
-  height: 0;
-  margin: 0;
-  // <hr> defaults to overflow: hidden, which would clip the line.
-  overflow: visible;
-  border: 0;
-
-  &::before {
-    content: "";
-    position: absolute;
-    inset: -0.5px 0 auto;
-    height: 1px;
-    background: var(--color-divider);
-  }
-}
-
 .our-work__carousels {
   display: flex;
   flex-direction: column;
