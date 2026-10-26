@@ -1,0 +1,154 @@
+// Figma: storyboard "CTA - Darkmode" 1527:4259. Positions are Figma px in the
+// 1440 × 1024 frame. Default styles show the last frame (1527:4241); JS sets the
+// earlier states and plays the steps.
+@use "../abstracts/functions" as *;
+
+.motto {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: fluid(1024);
+  overflow: hidden;
+  color: var(--color-white);
+  isolation: isolate;
+}
+
+// Pinned by JS: the section fills the viewport height.
+.motto.is-enhanced {
+  height: 100vh;
+}
+
+.motto__bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, #111 0%, #1f1f1f 100%);
+}
+
+// Steps 3A/3B use a diagonal gradient instead of the vertical one.
+.motto__bg--diagonal {
+  background: linear-gradient(227.53deg, #111 13.428%, #1f1f1f 69.715%);
+}
+
+.motto__light {
+  position: absolute;
+  max-width: none;
+  pointer-events: none;
+}
+
+// Vector 3209 in 1527:4219 (box 1885 × 1518 at -12, -65; SVG adds the blur margin).
+.motto__light--left {
+  top: fluid(-193.9);
+  left: fluid(-140.9);
+  width: fluid(2142.8);
+  height: fluid(1775.8);
+  opacity: 0;
+}
+
+// Vector 3209 in 1527:4241, rotated 43.05deg around its center (741.7, 653.2).
+.motto__light--center {
+  top: fluid(-242.2);
+  left: fluid(-154.2);
+  width: fluid(1791.8);
+  height: fluid(1790.73);
+  transform: rotate(43.05deg);
+}
+
+.motto__texture {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: fluid(1550);
+  height: fluid(1033.46);
+  max-width: none;
+  object-fit: cover;
+  opacity: 0.1;
+  mix-blend-mode: screen;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+// White cover that fades out while the section scrolls in (light → dark).
+.motto__veil {
+  position: absolute;
+  inset: 0;
+  background: var(--color-white);
+  opacity: 0;
+  pointer-events: none;
+}
+
+// 1050 × 664 content block: label (fills), 254px gap, motto, 254px gap, CTA.
+.motto__inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: fluid(254);
+  width: fluid(1050);
+  height: fluid(664);
+}
+
+.motto__label {
+  // Fills the space left in the 664px block (26px in Figma, text is 27.2px).
+  flex: 1 0 0;
+  min-height: 0;
+  line-height: 1.7;
+  opacity: 0.5;
+}
+
+// The three mottos share one grid cell; only the last shows without JS.
+.motto__lines {
+  display: grid;
+  justify-items: center;
+}
+
+.motto__line {
+  grid-area: 1 / 1;
+  font-family: var(--font-display);
+  font-size: fluid(42);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+
+  &:not(:last-child) {
+    visibility: hidden;
+  }
+}
+
+.motto.is-enhanced .motto__line {
+  visibility: visible;
+}
+
+.motto__word {
+  position: relative;
+  display: inline-block;
+  backface-visibility: hidden;
+}
+
+// Gradient copy of an accent word. JS sets --pw (motto line width) and --wx
+// (word offset in the line) so the words share one line-wide gradient, as in Figma.
+.motto__word-gradient {
+  position: absolute;
+  inset: 0;
+  background-image: var(--motto-gradient);
+  background-size: var(--pw, 100%) 100%;
+  background-position: calc(var(--wx, 0px) * -1) 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.motto__word.is-accent .motto__word-text {
+  opacity: 0;
+}
+
+.motto__ellipse {
+  position: absolute;
+  bottom: fluid(-602);
+  left: fluid(-115);
+  width: fluid(1640);
+  height: fluid(924);
+  max-width: none;
+  opacity: 0;
+  pointer-events: none;
+}

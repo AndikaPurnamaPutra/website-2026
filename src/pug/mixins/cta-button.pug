@@ -1,10 +1,11 @@
 //- CTA button from Figma (Contact CTA 1523:3282).
 //- Idle shows the label only; hover/focus reveals the frame, arrow and caption.
-mixin ctaButton(label, href, caption)
-  .cta
+//- variant "light" (Motto, Figma 1527:4247) is always open, white on dark.
+mixin ctaButton(label, href, caption, variant)
+  .cta(class=variant ? `cta--${variant}` : null)
     a.cta__button(href=href)
       span.cta__label.text-18= label
       span.cta__icon
-        img(src="assets/icons/arrow-circle.svg" width="32" height="32" alt="")
+        img(src=variant === "light" ? "assets/icons/arrow-circle-white.svg" : "assets/icons/arrow-circle.svg" width="32" height="32" alt="")
     if caption
       p.cta__caption.text-14.text-medium= caption

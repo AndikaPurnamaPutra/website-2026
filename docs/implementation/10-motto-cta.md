@@ -1,0 +1,78 @@
+# 10 — Section Motto + CTA
+
+Status: **Selesai (27 Okt 2026), menunggu review**
+Figma: section storyboard "CTA - Darkmode" `1527:4259`. Urutan dari pengguna (27 Okt 2026):
+
+| Langkah | Frame A (awal) | Frame B (setelah scroll) |
+|---|---|---|
+| 1 | `1527:4134` "Trendsetting Design, Grounded in Logic." putih semua, tanpa ellipse | `1527:4169` "Trendsetting Design" gradient biru, Ellipse 8998 muncul dari bawah (y = 802) |
+| 2 | `1527:4185` "Design to advocates and investors into believers." putih, ellipse y = 802 | `1527:4201` "believers." gradient biru, ellipse naik (x = −24, y = 647) |
+| 3 | `1527:4219` "One Week Wonders Studio™" putih, Vector 3209 "Left Light" menggantikan ellipse, tombol muncul | `1527:4241` seluruh teks gradient biru, cahaya pindah ke tengah ("Center Light") |
+
+Data animasi Figma: kosong. Label: **[T]** dari Figma · **[P]** penjelasan pengguna · **[U]** usulan.
+
+---
+
+## 1. Requirement dari desain [T]
+- Section 1440 × 1024. Padding 180px atas/bawah, isi 1050px di tengah, tersusun vertikal dengan gap 254px: label, motto, CTA.
+- **Latar:** gradient vertikal `#111` → `#1F1F1F`. Di langkah 3, gradient miring 227,5° `#111` 13,4% → `#1F1F1F` 69,7%. Di atasnya tekstur (gambar) `mix-blend-mode: screen`, opacity 10%.
+- **Label** "( Our Motto's )": Inter Medium 16px, line-height 1,7, putih 50%.
+- **Motto:** General Sans 42px, line-height 1,1, −0,03em, putih, satu baris di tengah.
+- **Gradient aksen (versi gelap, berbeda dari gradient brand):** `#81C4FB` 18,9% → `#718BFC` 52,4% → `#81C4FB` 80,9%, sudut ±185–188°. Bagian yang diberi gradient: "Trendsetting Design" (langkah 1), "believers." (langkah 2), dan seluruh "One Week Wonders Studio™" (langkah 3).
+- **Ellipse 8998** (1440 × 724, cahaya lembut dari bawah, SVG dari Figma) dan **Vector 3209** (cahaya diagonal, SVG dari Figma).
+- **CTA "Get a Quote":** versi terang dari komponen tombol CTA yang sudah ada (label putih dengan teks `#111`, bingkai putih, ikon panah putih, "Free 15min call" putih 50%). **Hanya muncul di langkah 3** [P].
+
+## 2. Alur animasi [P] dan detail usulan [U]
+Section **tertahan saat di-scroll** (seperti What we do). Satu langkah scroll = satu perubahan, dengan snap.
+
+0. **Masuk dari Milestone [P]:** latar berubah dari terang ke gelap secara halus saat section mulai menutupi layar. [U] Dibuat dengan scrub: warna latar halaman bergeser dari putih ke `#111` selama ±60% tinggi layar terakhir sebelum section tertahan. Menu bar ikut berubah ke tema gelap.
+1. **Motto 1 muncul [P]:** fade yang elegan. [U] Huruf muncul dari blur halus sambil naik sedikit, bergantian per kata.
+   → scroll → **"Trendsetting Design" menjadi gradient** [P], dengan crossfade halus seperti "$139M+" di Milestone. **Ellipse naik dari bawah** mengikuti scroll [P].
+2. **Pergantian ke motto 2 seperti flip clock [P]:** [U] setiap huruf/kata berputar ke atas (rotateX) seperti kartu jam flip. Motto lama terlipat ke atas, motto baru terbuka dari bawah, bergantian per kata.
+   → scroll → **"believers." menjadi gradient**, dan ellipse naik sedikit (y 802 → 647).
+3. **Pergantian ke motto 3 (flip) [P]**, dengan **ellipse memudar dan digantikan Vector 3209 "Left Light"** secara halus [P]. Tombol **"Get a Quote" muncul** [P].
+   → scroll → **seluruh teks menjadi gradient**, dan **cahaya bergeser dari kiri ke tengah** (posisi dan rotasi Vector sesuai frame Center Light). Latar berubah ke gradient miring.
+4. Setelah langkah terakhir, section dilepas dan halaman lanjut ke footer.
+
+**Reduce motion:** langkah tetap berganti saat scroll, tetapi tanpa gerakan (pergantian instan).
+**Tanpa JS:** tampil langkah 3 final (motto studio dengan gradient, tombol terlihat).
+
+## 3. File
+| File | Aksi |
+|---|---|
+| `src/pug/partials/motto.pug` | Baru: 3 motto, CTA versi terang, ellipse dan vector |
+| `src/scss/sections/_motto.scss` | Baru |
+| `src/scss/components/_cta-button.scss`, `src/pug/mixins/cta-button.pug` | Ubah: varian terang |
+| `src/js/motto-scroll.js` | Baru: timeline pin + scrub + snap, transisi latar. Mengembalikan fungsi cleanup |
+| `src/js/main.js`, `src/scss/main.scss`, `src/pug/pages/index.pug` | Ubah |
+| `src/assets/images/motto/` | Baru: tekstur, Ellipse 8998, Vector 3209 |
+
+## 4. Pertanyaan
+1. **"Fade dari terang ke gelap" saat masuk dari Milestone:** apakah maksudnya warna latar ikut berubah dari putih ke gelap mengikuti scroll (usulan 0)? Di Figma kedua section bersebelahan tanpa transisi.
+2. **Flip clock:** per kata (lebih terbaca, usulan) atau per huruf (lebih mirip jam flip asli, lebih ramai)?
+3. **Tombol "Get a Quote"** mengarah ke mana? Usulan: `#` dulu.
+4. **Jarak scroll:** satu langkah = satu tinggi layar, total 6 langkah (sekitar 6 layar scroll). Disetujui?
+
+## 5. Verifikasi
+- [x] Tampilan di setiap snap sama dengan frame Figma (1B, 2B, 3A, 3B dibandingkan berdampingan): teks, gradient, ellipse/cahaya, latar, tombol. Tanpa JS: posisi motto (466, 460) dan CTA (626, 760) sama dengan Figma.
+- [x] Transisi diuji dengan scroll roda mouse sungguhan: setiap scroll maju tepat satu langkah (0 → 5). Masuk dari Milestone: latar putih memudar ke gelap. Keluar ke halaman berikutnya belum bisa diuji karena footer belum ada.
+- [x] 1920px mengikuti skala 1,333× (selisih ≤ 0,7px).
+- [x] Reduce motion: langkah tetap berganti tanpa gerakan, tanpa efek masuk. Tanpa JS: frame terakhir.
+- [x] Menu bar berubah ke tema gelap di section ini. Build tanpa error.
+
+## 6. Checklist
+- [x] Analisis storyboard (6 frame) dan penjelasan pengguna
+- [x] Rencana ini ditulis
+- [x] Persetujuan dan jawaban pertanyaan (latar ikut scroll: ya; flip per kata; tombol `#`; 6 layar scroll)
+- [x] Layout statis + aset
+- [x] Timeline animasi
+- [x] Verifikasi, dokumentasi, commit, push
+
+---
+
+### Catatan implementasi
+- **Gradient aksen** mengikuti Figma per motto: langkah 1 `#0B1550 → #718BFC → #81C4FB` (185,87°), langkah 2–3 `#81C4FB → #718BFC → #81C4FB` (184,89° / 188,17°). Kotak gradient = **seluruh baris** (seperti Figma), jadi setiap kata aksen menampilkan potongannya (`--pw`/`--wx` dihitung JS). Sempat salah memakai lebar kata aksen saja, sehingga "Design" terlihat lebih gelap dari Figma. Sudah diperbaiki.
+- **Flip per kata:** setiap kata berputar pada porosnya sendiri (`transformPerspective` per kata). Kata lama keluar dulu, kata baru masuk sesudahnya. Versi pertama memakai perspektif baris, sehingga kata miring dan bertumpuk. Sudah diperbaiki.
+- **Cahaya:** dua Vector di Figma berbeda bentuk, jadi kiri → tengah dibuat crossfade sambil bergeser 60px.
+- **Tekstur:** 4096px / 5,4 MB → 1600px / 0,5 MB (tampil 10% opacity).
+- Varian tombol CTA `light` ditambahkan ke komponen yang sudah ada.

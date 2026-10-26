@@ -74,6 +74,28 @@
   opacity: 0.5;
 }
 
+// Light variant on dark sections (Figma 1527:4247): shown open, as in Figma.
+.cta--light {
+  .cta__button {
+    border-color: var(--color-white);
+  }
+
+  .cta__label {
+    color: var(--color-ink);
+    background: var(--color-white);
+  }
+
+  .cta__icon {
+    width: fluid(48);
+    opacity: 1;
+  }
+
+  .cta__caption {
+    color: var(--color-white);
+    opacity: 0.5;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cta__button,
   .cta__icon,

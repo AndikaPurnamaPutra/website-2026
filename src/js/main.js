@@ -6,6 +6,7 @@ import { initServicesScroll } from "./services-scroll.js";
 import { initWorkCarousels } from "./work-carousel.js";
 import { initTestimonialsMarquee } from "./testimonials-marquee.js";
 import { initMilestoneCounter } from "./milestone-counter.js";
+import { initMottoScroll } from "./motto-scroll.js";
 import { initHeader } from "./header.js";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -19,6 +20,7 @@ function initPage() {
   cleanups.push(initWorkCarousels());
   cleanups.push(initTestimonialsMarquee());
   cleanups.push(initMilestoneCounter());
+  cleanups.push(initMottoScroll());
   // After the services pin so its pin spacer can be measured.
   cleanups.push(initHeader());
 }
