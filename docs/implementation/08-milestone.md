@@ -99,3 +99,12 @@ Tanpa JS dan tanpa aset baru.
 - [x] Persetujuan dan jawaban klarifikasi
 - [x] Langkah 1–3: Implementasi dan verifikasi
 - [x] Langkah 4: Dokumentasi, commit, push
+
+---
+
+### Revisi animasi setelah review (27 Okt 2026)
+Permintaan pengguna: hitungan dan munculnya gradient dibuat lebih elegan, dan kalimat aksen ikut beranimasi.
+- **Hitung naik [U]:** angka muncul dari blur halus (6px → 0), naik 12px, dan memudar masuk (1,4 detik). Hitungan memakai `expo.out` selama 2,2 detik, dimulai bergantian per baris (jeda 0,15 detik).
+- **Gradient [U]:** menyapu dari kiri ke kanan dengan tepi lembut selebar 30% (mask pada salinan gradient dan kebalikannya pada angka solid, variabel `--sweep`), 1 detik `power2.inOut`, dimulai di detik ke-2.
+- **Kalimat aksen [U]:** awalnya `rgba(0,0,0,0.4)` seperti teks lain, lalu menjadi `#111` kata demi kata (0,5 detik per kata, jeda 0,06 detik), dimulai di detik ke-2,4.
+- **Verifikasi:** urutan di-sampling dengan JS aktif (angka, opacity, blur, posisi sapuan, warna per kata). Screenshot di tengah sapuan, di tengah perubahan kata, dan di akhir. Tampilan akhir sama dengan desain. Reduce motion: langsung final, tanpa pemecahan kata.

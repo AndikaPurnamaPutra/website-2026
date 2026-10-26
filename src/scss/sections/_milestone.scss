@@ -58,8 +58,17 @@
   color: transparent;
 }
 
-.milestone__value--gradient.is-counting .milestone__number {
-  color: inherit;
+// While animating, --sweep (set by JS) moves a soft 30%-wide edge from left to
+// right: the gradient copy shows left of it, the solid copy right of it.
+.milestone__value--gradient.is-counting {
+  .milestone__number {
+    color: inherit;
+    mask-image: linear-gradient(90deg, transparent calc(var(--sweep) - 15%), #000 calc(var(--sweep) + 15%));
+  }
+
+  .milestone__gradient {
+    mask-image: linear-gradient(90deg, #000 calc(var(--sweep) - 15%), transparent calc(var(--sweep) + 15%));
+  }
 }
 
 .milestone__label {
