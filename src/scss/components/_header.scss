@@ -13,7 +13,19 @@
   padding-block: 24px;
   color: var(--color-ink);
   background: var(--color-white);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0);
+  transition: box-shadow 0.4s ease-out;
+
+  // Figma shadow, only once the page has left the top.
+  &.is-scrolled {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header {
+    transition: none;
+  }
 }
 
 // The header no longer takes space in the page; this keeps every section where
