@@ -24,7 +24,9 @@
   --color-divider-dark: rgba(255, 255, 255, 0.1);
 
   // Brand gradient stops; the angle is set per element.
-  --gradient-brand-stops: #033dc5 18.901%, #ffdc7b 52.394%, #fd1d1d 80.933%;
+  // Revised to blue in Figma 1574:796 (26 Oct 2026).
+  --gradient-brand-stops: #0b1550 18.901%, #496af8 52.394%, #81c4fb 80.933%;
+  // Motto "believers." on dark: not revised in Figma yet (still the old stops).
   --gradient-brand-stops-dark: #457bf9 18.901%, #ffdc7b 52.394%, #fd1d1d 80.933%;
 
   // Fonts

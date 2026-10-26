@@ -43,7 +43,8 @@ All sizes in this document are **Figma pixels** at the 1440px frame. In code the
 | `--color-divider-dark` | `rgba(255,255,255,.1)` | Dividers on dark (0.5px) | [T] |
 
 - Muted text uses `opacity: .5` (`.text-muted`), not a grey color. Exception: Milestone paragraph uses `rgba(0,0,0,.4)`. [T]
-- Brand gradient: `--gradient-brand-stops` (light) and `--gradient-brand-stops-dark` (blue `#457bf9`). The angle differs per element (≈185–207deg), so it is set where used. `.text-gradient` reads `--gradient-angle` (default 201deg). [T]
+- Brand gradient: `--gradient-brand-stops` = `#0B1550` 18.9% → `#496AF8` 52.4% → `#81C4FB` 80.9% (revised to blue in Figma `1574:796`, 26 Oct 2026; was blue → yellow → red). Used by the hero accent, the Statement decorative icon and "$139M+". The angle differs per element (≈185–207deg), so it is set where used. `.text-gradient` reads `--gradient-angle` (default 201deg). [T]
+- `--gradient-brand-stops-dark` (Motto "believers." on dark): still the old `#457BF9` → `#FFDC7B` → `#FD1D1D` in Figma. Not revised yet; pending confirmation. [T]
 
 ## Typography
 Letter-spacing is in `em`: -0.02em in most places, -0.03em for 42px and larger.
