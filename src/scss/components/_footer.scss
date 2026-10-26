@@ -4,8 +4,6 @@
 
 .site-footer {
   position: relative;
-  // Above the Motto section, which the coin overlaps.
-  z-index: 1;
   color: var(--color-ink);
   background: var(--color-white);
 }
@@ -28,8 +26,9 @@
   }
 }
 
-// Same image as the hero coin, stretched into its Figma box; 125px of it
-// sticks out above the footer.
+// Same image as the hero coin, stretched into its Figma box. Its top 125px
+// reach above the footer and sit behind the Motto section (user decision), so
+// the coin seems to come out from under the dark section.
 .site-footer__coin {
   position: absolute;
   top: fluid(-125);

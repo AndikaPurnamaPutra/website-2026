@@ -61,3 +61,8 @@ Aset: logo dan koin sudah ada di project. Garis dibuat dengan CSS.
 - [x] Persetujuan dan jawaban klarifikasi (form mailto; link `#`/mailto/tel; koin menjorok; hover memudar; tanpa animasi)
 - [x] Implementasi
 - [x] Verifikasi, dokumentasi, commit, push
+
+### Revisi (27 Okt 2026): koin di belakang section Motto
+Atas permintaan pengguna, koin berada di **belakang** section Motto: bagian atasnya (125px) tertutup area gelap, sehingga koin seolah muncul dari bawah section itu. Caranya: wrapper `.tone-shift` diberi `z-index: 1` (di atas footer), dan `z-index` footer dihapus.
+- Efek samping yang ditemukan: lapisan tekstur sticky di wrapper (yang memakai margin negatif) melewati batas bawah wrapper dan membuat latar footer abu-abu bertekstur. Diperbaiki dengan `overflow: clip` di wrapper (tidak mengganggu `position: sticky`). Latar footer kembali putih (diukur: 0/255).
+- Diuji ulang: langkah-langkah Motto tetap tertahan dan berganti dengan benar, tekstur tetap menempel di layar, dan transisi masuk tetap tanpa garis pemisah.

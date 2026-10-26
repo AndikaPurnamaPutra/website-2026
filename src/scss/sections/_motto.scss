@@ -59,7 +59,12 @@
 // background and fades in its texture while Motto scrolls in.
 .tone-shift {
   position: relative;
+  // Above the footer, so the footer coin passes behind the Motto section.
+  z-index: 1;
   isolation: isolate;
+  // Keeps the sticky texture (pulled out of the flow with a negative margin)
+  // inside the wrapper; clip, unlike hidden, does not break position: sticky.
+  overflow: clip;
 }
 
 // Sticks to the screen for the whole wrapper (height 100vh, pulled out of the
