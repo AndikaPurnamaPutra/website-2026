@@ -102,3 +102,4 @@ Keputusan pengguna: menu bar **selalu terlihat** (tidak sembunyi saat scroll ke 
 - Tema gelap (teks putih) dihapus, karena teks putih tidak terbaca di atas latar putih. `header.js` dan atribut `data-header-theme` dihapus.
 - Diuji: tinggi 72px dan logo di (40, 24) di posisi atas, setelah scroll, di What we do, dan di Motto.
 - Bayangan Figma hanya tampil setelah halaman discroll (`is-scrolled` dari `header.js`), dengan transisi 0,4 detik. Di posisi paling atas tanpa bayangan.
+- **Versi gelap (usulan, disetujui):** di atas What we do dan Motto, menu bar menjadi latar `#111` dengan logo dan teks putih (transisi 0,4 detik), lalu kembali putih di luar section tersebut. Dropdown tetap putih. Diuji di sepanjang halaman: putih di hero, our work, dan milestone; gelap di what we do dan motto (termasuk saat section tertahan).

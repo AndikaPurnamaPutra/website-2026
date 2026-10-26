@@ -1,4 +1,5 @@
-// Figma: Menu Bar 1611:6986. Fixed solid white bar, always visible, same
+// Figma: Menu Bar 1611:6986. Fixed solid white bar (dark over dark sections,
+// see src/js/header.js), always visible, same
 // height at the top and while scrolling (24px padding → 72px). Logo, text and
 // paddings keep Figma's pixel size at every viewport width (not fluid); only
 // the side edges follow the page content (.container).
@@ -14,16 +15,38 @@
   color: var(--color-ink);
   background: var(--color-white);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0);
-  transition: box-shadow 0.4s ease-out;
+  transition:
+    box-shadow 0.4s ease-out,
+    background-color 0.4s ease-out,
+    color 0.4s ease-out;
 
   // Figma shadow, only once the page has left the top.
   &.is-scrolled {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
   }
+
+  // Dark version over What we do and Motto (not in Figma, approved proposal).
+  &.is-dark {
+    color: var(--color-white);
+    background: var(--color-ink);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0);
+  }
+
+  &.is-dark .site-header__logo img,
+  &.is-dark .site-nav__link img {
+    filter: brightness(0) invert(1);
+  }
+}
+
+.site-header__logo img,
+.site-nav__link img {
+  transition: filter 0.4s ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .site-header {
+  .site-header,
+  .site-header__logo img,
+  .site-nav__link img {
     transition: none;
   }
 }
