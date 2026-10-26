@@ -1,0 +1,174 @@
+// Figma: Footer 1574:1193 (1440 × 563). Positions are Figma px from the frame's
+// top-left; the inner box is the 1440 frame, centered on wider screens.
+@use "../abstracts/functions" as *;
+
+.site-footer {
+  position: relative;
+  // Above the Motto section, which the coin overlaps.
+  z-index: 1;
+  color: var(--color-ink);
+  background: var(--color-white);
+}
+
+.site-footer__inner {
+  position: relative;
+  max-width: calc(var(--container) + 2 * var(--page-gutter));
+  height: fluid(563);
+  margin-inline: auto;
+}
+
+.site-footer__logo {
+  position: absolute;
+  top: fluid(40);
+  left: var(--page-gutter);
+
+  img {
+    width: fluid(50.25);
+    height: fluid(24);
+  }
+}
+
+// Same image as the hero coin, stretched into its Figma box; 125px of it
+// sticks out above the footer.
+.site-footer__coin {
+  position: absolute;
+  top: fluid(-125);
+  left: fluid(354);
+  width: fluid(366);
+  height: fluid(344);
+  max-width: none;
+  object-position: bottom;
+  filter: drop-shadow(var(--shadow-coin));
+  pointer-events: none;
+}
+
+.site-footer__form {
+  position: absolute;
+  top: fluid(135);
+  left: var(--page-gutter);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: fluid(252);
+}
+
+.site-footer__label,
+.site-footer__title {
+  font-size: fluid(14);
+  line-height: 1;
+  opacity: 0.5;
+}
+
+// 16px text + 12px space + 0.5px line = the 28px field in Figma.
+.site-footer__input {
+  width: 100%;
+  height: fluid(28);
+  margin-top: var(--space-16);
+  padding: 0 0 fluid(12);
+  font-family: var(--font-display);
+  font-size: fluid(16);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--color-ink);
+  background: none;
+  border: 0;
+  border-bottom: 0.5px solid var(--color-divider);
+  border-radius: 0;
+  outline: none;
+
+  &::placeholder {
+    color: var(--color-ink);
+    opacity: 0.2;
+  }
+
+  &:focus-visible {
+    border-bottom-color: var(--color-ink);
+  }
+}
+
+.site-footer__form .button {
+  margin-top: var(--space-20);
+}
+
+// Three columns starting 75px right of the center, 110px apart.
+.site-footer__columns {
+  position: absolute;
+  top: fluid(40);
+  left: calc(50% + #{fluid(75)});
+  display: flex;
+  align-items: flex-start;
+  gap: fluid(110);
+}
+
+.site-footer__column {
+  display: flex;
+  flex-direction: column;
+  gap: fluid(4);
+}
+
+.site-footer__links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  font-family: var(--font-display);
+  font-size: fluid(20);
+  // Figma "normal" = 27px for 20px General Sans.
+  line-height: calc(27 / 20);
+  white-space: nowrap;
+}
+
+// Hover is not in Figma (approved proposal): links dim to 50%.
+.site-footer__link {
+  transition: opacity 0.3s ease-out;
+
+  &:hover,
+  &:focus-visible {
+    opacity: 0.5;
+  }
+}
+
+.site-footer__about {
+  position: absolute;
+  top: fluid(415);
+  left: var(--page-gutter);
+  width: fluid(548);
+  font-family: var(--font-display);
+  font-size: fluid(20);
+  line-height: calc(27 / 20);
+}
+
+// 1344px wide in Figma: it ends 56px from the right edge, in line with the
+// Contact column.
+.site-footer__bottom {
+  position: absolute;
+  right: fluid(56);
+  bottom: fluid(40);
+  left: var(--page-gutter);
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
+  font-size: fluid(14);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.site-footer__copy {
+  white-space: pre;
+}
+
+.site-footer__line {
+  flex: 1 0 0;
+  height: 0.5px;
+  background: var(--color-divider);
+}
+
+.site-footer__legal {
+  display: flex;
+  gap: var(--space-16);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-footer__link {
+    transition: none;
+  }
+}

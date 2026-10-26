@@ -32,6 +32,18 @@
   display: inline-block;
 }
 
+// Small variant: "Send email" in the footer (Figma 1574:1234, Inter Medium
+// 12px, text box 15px, button 101 × 35).
+.button--small {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: fluid(12);
+  line-height: fluid(15);
+  letter-spacing: -0.02em;
+  border: 0;
+  cursor: pointer;
+}
+
 // Collapsed in idle; opens to 8px gap + 32px icon + 8px right padding.
 .cta__icon {
   display: flex;

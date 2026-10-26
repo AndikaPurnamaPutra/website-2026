@@ -8,6 +8,7 @@ import { initTestimonialsMarquee } from "./testimonials-marquee.js";
 import { initMilestoneCounter } from "./milestone-counter.js";
 import { initMottoScroll } from "./motto-scroll.js";
 import { initHeader } from "./header.js";
+import { initFooterForm } from "./footer-form.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -23,6 +24,7 @@ function initPage() {
   cleanups.push(initMottoScroll());
   // After the services pin so its pin spacer can be measured.
   cleanups.push(initHeader());
+  cleanups.push(initFooterForm());
 }
 
 function destroyPage() {

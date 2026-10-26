@@ -1,0 +1,44 @@
+//- Figma: Footer 1574:1193 (homepage 1574:796). Shared by all pages via the layout.
+//- Without JS the form opens a mailto: link; src/js/footer-form.js builds a
+//- cleaner subject line.
+-
+  var columns = [
+    { title: "Social media", links: [["Instagram", "#"], ["Linkedin", "#"], ["Dribbble", "https://dribbble.com"], ["Behance", "https://www.behance.net"]] },
+    { title: "Navigation", links: [["Works", "#"], ["About", "#"], ["Team", "#"], ["Services", "#"], ["Career", "#"], ["Blog", "#"]] },
+    { title: "Contact", links: [["owwstudio@gmail.com", "mailto:owwstudio@gmail.com"], ["+62 878 869 785 4", "tel:+628788697854"]] }
+  ]
+  var legal = ["Privacy Policy", "Terms & Conditions", "Legal"]
+
+footer.site-footer
+  .site-footer__inner
+    a.site-footer__logo(href="index.html" aria-label="One Week Wonders — Home")
+      img(src="assets/images/logo.svg" width="50.25" height="24" alt="")
+
+    img.site-footer__coin(src="assets/images/hero/coin.png" width="366" height="344" alt="")
+
+    form.site-footer__form(action="mailto:owwstudio@gmail.com" method="get" data-footer-form)
+      label.site-footer__label(for="footer-company") Get in Touch
+      input#footer-company.site-footer__input(type="text" name="subject" placeholder="Your company name" autocomplete="organization" required)
+      button.button.button--small(type="submit") Send email
+
+    nav.site-footer__columns(aria-label="Footer")
+      each column in columns
+        .site-footer__column
+          p.site-footer__title= column.title
+          ul.site-footer__links
+            each link in column.links
+              li
+                a.site-footer__link(href=link[1])= link[0]
+
+    p.site-footer__about
+      | Agency with incredible design and development expertise.
+      br
+      | Based in Yogyakarta, Indonesia.
+
+    .site-footer__bottom
+      p.site-footer__copy ©2026  /  One Week Wonders Studio
+      span.site-footer__line
+      ul.site-footer__legal
+        each item in legal
+          li
+            a.site-footer__link(href="#")= item
