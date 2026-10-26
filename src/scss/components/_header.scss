@@ -16,9 +16,14 @@
   background: var(--color-white);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0);
   transition:
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.4s ease-out,
     background-color 0.4s ease-out,
     color 0.4s ease-out;
+
+  &.is-hidden {
+    transform: translateY(-100%);
+  }
 
   // Figma shadow, only once the page has left the top.
   &.is-scrolled {

@@ -95,6 +95,7 @@ Not defined yet. The designer will deliver mobile designs, and breakpoints will 
 ## Header
 - Figma `1611:6986`: fixed, solid white, padding 24px 40px (72px tall), shadow `0 4px 10px rgba(0,0,0,.04)`. Same height at the top and while scrolling. [T]
 - Logo, nav text and paddings use Figma px at every width (not fluid); side edges follow `.container`. `main` keeps a `fluid(104)` top offset so section positions match the homepage frame. [T]/[U]
+- Hides on scroll down, shows on scroll up (0.4s slide); always visible at the top. [U, user decision]
 - Shadow fades in (0.4s) once the page leaves the top. [U]
 - Dark version over sections marked `data-header-theme="dark"` (What we do, Motto): `#111` background, white text/logo, no shadow, 0.4s transition. Not in Figma. [U]
 - Any new dark section must get `data-header-theme="dark"`.
