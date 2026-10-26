@@ -120,6 +120,3 @@ Dinilai terlalu lambat. Angka muncul 1 detik dan menghitung 1,6 detik (jeda per 
 
 ### Revisi keempat (27 Okt 2026): sedikit lebih cepat (±20%)
 Angka muncul 0,8 detik dan menghitung 1,3 detik (jeda per baris 0,1). Gradient mulai di detik ke-1: crossfade 1 detik, pergeseran 1,3 detik. Kalimat aksen mulai di detik ke-1,6, durasi 0,7 detik. Total sekitar 2,3 detik.
-
-### Revisi kelima (27 Okt 2026): animasi lebih tertangkap mata
-Pemicu diubah dari `top 80%` (bagian atas blok baru masuk 20% dari bawah layar) menjadi `center 60%` (tengah blok angka berada sedikit di bawah tengah layar). Animasi baru berjalan saat pengguna sedang melihat angkanya.
