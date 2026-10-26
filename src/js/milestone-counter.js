@@ -64,7 +64,8 @@ export function initMilestoneCounter() {
 
   const trigger = ScrollTrigger.create({
     trigger: root,
-    start: "top 80%",
+    // Starts once the stats sit around the middle of the screen, so it is seen.
+    start: "center 60%",
     once: true,
     onEnter: () => timeline.play(),
   });
