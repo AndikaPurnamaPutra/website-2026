@@ -192,3 +192,15 @@ For each section:
 - Update existing plans instead of creating duplicate documents.
 - Report completed work, verification results, and remaining issues.
 - Do not mark a section complete until its agreed acceptance criteria have been checked.
+
+
+## 14. Git: Branches, Commit and Push
+
+- Repository: https://github.com/AndikaPurnamaPutra/website-2026 (`origin`).
+- Branches:
+  - `main`: production. Vercel deploys it to the live site. Only finished, approved work.
+  - `dev`: daily work. Every task is committed and pushed here (Vercel makes a preview deployment).
+- Commit each completed task separately on `dev`, with a clear message.
+- **Always ask the user for confirmation before committing and pushing.** After a task is finished and verified, summarize the changes and the proposed commit message, then wait for explicit approval.
+- **Merge `dev` into `main` only when the user says the work is final**, and ask for confirmation before merging and pushing `main`.
+- Run the build before committing. Never commit `node_modules/` or `dist/`.
