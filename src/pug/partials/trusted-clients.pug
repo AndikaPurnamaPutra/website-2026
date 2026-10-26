@@ -1,9 +1,11 @@
-//- Figma: Testimonials 1574:973. Logo sizes are Figma px (scaled via --w/--h).
+//- Figma: Testimonials 1574:973, hover state 1574:2077. Logo sizes are Figma px
+//- (scaled via --w/--h); BenQ, PayMongo and LABEL use the 34px height from the
+//- hover frame (user decision, 26 Oct 2026).
 //- paymongo, LABEL, demostack and the Good at Numbers mark are raster in Figma;
 //- replace them with designer SVGs when available.
 -
   var clients = [
-    { name: "BenQ", file: "benq", w: 106.894, h: 32 },
+    { name: "BenQ", file: "benq", w: 113.574, h: 34 },
     { name: "YesWeHack", file: "yeswehack", w: 157.717, h: 34 },
     { name: "genasys", file: "genasys", w: 162, h: 32 },
     { name: "bunny.net", file: "bunny", w: 134.734, h: 40 },
@@ -11,9 +13,9 @@
     { name: "Gcore", file: "gcore", w: 136.16, h: 34 },
     { name: "Kolleno", file: "kolleno", w: 135.429, h: 24 },
     { name: "medatus", file: "medatus", w: 141.667, h: 34 },
-    { name: "PayMongo", file: "paymongo", w: 184.615, h: 32 },
+    { name: "PayMongo", file: "paymongo", w: 196.154, h: 34 },
     { name: "Renee", file: "renee", w: 130, h: 32 },
-    { name: "LABEL", file: "label", w: 168, h: 32 },
+    { name: "LABEL", file: "label", w: 178.5, h: 34 },
     { name: "demostack", file: "demostack", w: 173.632, h: 26 }
   ]
   var testimonials = [
@@ -33,8 +35,10 @@ section.trusted
     .trusted__clients
       ul.trusted__logos
         each client in clients
-          li.trusted__logo
-            img(src=`assets/images/clients/${client.file}.svg` alt=client.name style=`--w: ${client.w}; --h: ${client.h};`)
+          li.trusted__logo(style=`--w: ${client.w}; --h: ${client.h};`)
+            a.trusted__logo-link(href="#")
+              img(src=`assets/images/clients/${client.file}.svg` alt=client.name)
+              span.trusted__logo-more See More
       p.trusted__more.text-16.text-muted and hundred more...
 
     hr.divider

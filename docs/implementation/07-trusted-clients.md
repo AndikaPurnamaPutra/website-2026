@@ -120,6 +120,15 @@ Lebar 699px, rata tengah, gap 16px:
 4. **Efek Noise pada kartu BOWT:** tidak muncul di data desain, tapi ditemukan lewat ekspor SVG (filter `feTurbulence`). Versi persis dari ekspor terlihat jauh lebih kasar di browser, jadi intensitasnya disetel sampai angka render-nya cocok dengan render Figma: kegelapan rata-rata 3,59 vs 3,58, cakupan 37,9% vs 38,3%.
 5. **Komponen `.divider`:** garis pemisah Our Work dan Trusted Clients sekarang memakai satu komponen yang sama.
 
+### Tambahan setelah review: hover logo (26 Okt 2026)
+Sumber: Figma "Trusted Clients - Hovered" `1574:2077` (contoh pada Kolleno).
+
+- **Desain [T]:** sel menjadi putih (`#FFF`, radius 4px, memenuhi sel 267,5 × 124). Logo membesar 1,1667× (24 → 28px) dan naik. Teks "See More" (General Sans Medium 13px, hitam, opacity 0,5) muncul 20px di bawah logo. Logo dan teks berada di tengah sel sebagai satu kelompok.
+- **Keputusan pengguna:** berlaku untuk ke-12 logo. Seluruh sel menjadi link `#`. Animasi "elegan", dan reduce motion dihormati.
+- **Animasi [U]:** latar putih memudar sambil membesar (0,96 → 1), logo membesar dan naik, "See More" muncul 60ms lebih lambat sambil naik 6px. Kurva ease-out quint `cubic-bezier(0.22, 1, 0.36, 1)`, 0,5 detik. Efek hover hanya aktif di perangkat yang mendukung hover (`@media (hover: hover)`). Fokus keyboard memunculkan efek yang sama.
+- **Ukuran logo:** frame hover memakai tinggi 34px untuk BenQ (113,6 × 34), PayMongo (196,2 × 34), dan LABEL (178,5 × 34). Proporsinya sama, hanya diperbesar 6,25%. Atas keputusan pengguna ("yang lebih baik"), ukuran ini dipakai juga untuk tampilan normal.
+- **Verifikasi:** diuji dengan hover mouse sungguhan. Posisi Kolleno saat hover sama persis dengan Figma: logo (629,7; 175,5) 158 × 28 vs (629,75; 175,5) 158 × 28, dan teks y = 223,5. Screenshot identik. Untuk bunny.net (40px), Kolleno (24px), dan demostack (26px): jarak logo ke teks 20px, dan ruang atas sama dengan ruang bawah. Setelah mouse keluar, semuanya kembali ke tampilan awal.
+
 **Masih sementara:** logo paymongo, LABEL, demostack, dan ikon "Good at Numbers" masih berbasis gambar dari Figma. Ganti dengan SVG dari desainer jika sudah ada (file di `src/assets/images/clients/` dan `src/assets/images/testimonials/`).
 
 ---

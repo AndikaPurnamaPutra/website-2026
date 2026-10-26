@@ -41,15 +41,100 @@
 }
 
 .trusted__logo {
+  height: fluid(124);
+}
+
+// Hover state from Figma 1574:2077: white cell (radius 4px), logo scaled
+// 24 → 28px (×1.1667) and lifted, "See More" 20px below; the pair is centered.
+// Timing is not in Figma: an ease-out-quint fade/scale chosen with the user.
+.trusted__logo-link {
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --scale: 1.1667;
+
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: fluid(124);
+  height: 100%;
+
+  // White background card, faded and scaled in on hover.
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--color-white);
+    border-radius: var(--radius-sm);
+    opacity: 0;
+    transform: scale(0.96);
+    transition:
+      opacity 0.5s var(--ease),
+      transform 0.5s var(--ease);
+  }
 
   img {
+    position: relative;
     width: calc(var(--w) * var(--px));
     height: calc(var(--h) * var(--px));
     max-width: none;
+    transition: transform 0.5s var(--ease);
+  }
+}
+
+// Text top = center + (scaled logo height / 2) + 3.5px, so logo + 20px gap +
+// 13px text stay centered as a group for every logo height.
+.trusted__logo-more {
+  position: absolute;
+  top: calc(50% + (var(--h) * var(--scale) / 2 + 3.5) * var(--px));
+  right: 0;
+  left: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: fluid(13);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: #000;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(#{fluid(6)});
+  transition:
+    opacity 0.4s var(--ease),
+    transform 0.5s var(--ease);
+}
+
+@mixin logo-hovered {
+  &::before {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  // Group of logo + 20px + 13px text is centered: the logo moves up 16.5px.
+  img {
+    transform: translateY(#{fluid(-16.5)}) scale(var(--scale));
+  }
+
+  .trusted__logo-more {
+    opacity: 0.5;
+    transform: translateY(0);
+    transition-delay: 0.06s;
+  }
+}
+
+// Hover only on devices that can hover, so taps do not leave it stuck.
+@media (hover: hover) {
+  .trusted__logo-link:hover {
+    @include logo-hovered;
+  }
+}
+
+.trusted__logo-link:focus-visible {
+  @include logo-hovered;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trusted__logo-link::before,
+  .trusted__logo-link img,
+  .trusted__logo-more {
+    transition: none;
   }
 }
 
