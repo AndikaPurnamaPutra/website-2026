@@ -1,8 +1,8 @@
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-// Sticky header (option C, approved): hides on scroll down, shows on scroll up,
-// always visible near the top, and switches to the light theme while its
-// middle line is over a section with data-header-theme="dark".
+// Fixed header (user decision, 27 Oct 2026): always visible, slimmer once the
+// page is scrolled, and switches to the light theme while its middle line is
+// over a section with data-header-theme="dark".
 export function initHeader() {
   const header = document.querySelector("[data-header]");
   if (!header) return () => {};
@@ -14,10 +14,8 @@ export function initHeader() {
       start: 0,
       end: "max",
       onUpdate: (self) => {
-        const nearTop = self.scroll() <= header.offsetHeight;
-        // Keep it visible while a header link has keyboard focus (e.g. the Work dropdown).
-        const hide = !nearTop && self.direction === 1 && !header.querySelector(":focus-visible");
-        header.classList.toggle("is-hidden", hide);
+        // Always visible; the bar gets slimmer once the page leaves the top.
+        header.classList.toggle("is-scrolled", self.scroll() > 10);
       },
     }),
   );
@@ -47,6 +45,6 @@ export function initHeader() {
 
   return () => {
     triggers.forEach((trigger) => trigger.kill());
-    header.classList.remove("is-hidden", "is-dark");
+    header.classList.remove("is-scrolled", "is-dark");
   };
 }

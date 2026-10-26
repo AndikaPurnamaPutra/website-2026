@@ -1,25 +1,30 @@
-// Figma: Menu Bar 1574:2063 (full width, 104px, 10% white). Sticky glass bar
-// that hides on scroll down, shows on scroll up and turns light over dark
-// sections (src/js/header.js). Blur, timing and the light theme are proposals.
+// Figma: Menu Bar 1574:2063 (full width, 104px, 10% white). Fixed glass bar,
+// always visible; its padding shrinks from Figma's 40px to 20px once the page
+// is scrolled, and it turns light over dark sections (src/js/header.js).
+// Logo, text and paddings keep Figma's pixel size at every viewport width (not
+// fluid); only the side edges follow the page content (.container).
+// Blur, timing, the scrolled padding and the light theme are proposals.
 @use "../abstracts/functions" as *;
 
 .site-header {
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
-  position: sticky;
+  position: fixed;
   top: 0;
+  right: 0;
+  left: 0;
   z-index: 100;
-  padding-block: var(--page-gutter);
+  padding-block: 40px;
   color: var(--color-ink);
   background: rgba(255, 255, 255, 0.1);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
   backdrop-filter: blur(20px) saturate(160%);
   transition:
-    transform 0.4s var(--ease),
+    padding 0.4s var(--ease),
     color 0.3s ease-out;
 
-  &.is-hidden {
-    transform: translateY(-100%);
+  &.is-scrolled {
+    padding-block: 20px;
   }
 
   // Over sections marked data-header-theme="dark".
@@ -31,6 +36,12 @@
   &.is-dark .site-nav__link img {
     filter: brightness(0) invert(1);
   }
+}
+
+// The header no longer takes space in the page; this keeps every section where
+// it was (the Figma frame reserves 104px for it, scaled like the rest).
+main {
+  padding-top: fluid(104);
 }
 
 .site-header__logo img,
@@ -56,15 +67,15 @@
   display: block;
 
   img {
-    width: fluid(50.25);
-    height: fluid(24);
+    width: 50.25px;
+    height: 24px;
   }
 }
 
 .site-nav {
   display: flex;
   align-items: center;
-  gap: var(--space-40);
+  gap: 40px;
 }
 
 .site-nav__item {
@@ -76,13 +87,13 @@
   align-items: center;
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fluid(14);
+  font-size: 14px;
   line-height: normal;
   letter-spacing: -0.02em;
 
   img {
-    width: fluid(16);
-    height: fluid(16);
+    width: 16px;
+    height: 16px;
   }
 }
 
@@ -92,9 +103,9 @@
   top: 100%;
   left: 0;
   z-index: 10;
-  min-width: fluid(180);
-  margin-top: var(--space-8);
-  padding: var(--space-8);
+  min-width: 180px;
+  margin-top: 8px;
+  padding: 8px;
   // Stays dark text on white, also when the header uses the light theme.
   color: var(--color-ink);
   background: var(--color-white);
@@ -107,7 +118,7 @@
   &::before {
     content: "";
     position: absolute;
-    inset: calc(-1 * var(--space-8)) 0 100%;
+    inset: -8px 0 100%;
   }
 }
 
@@ -119,10 +130,10 @@
 
 .site-nav__dropdown-link {
   display: block;
-  padding: var(--space-8);
+  padding: 8px;
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fluid(14);
+  font-size: 14px;
   line-height: normal;
   letter-spacing: -0.02em;
   border-radius: var(--radius-sm);

@@ -86,3 +86,13 @@ Saat menempel, menu bar akan melewati **section gelap**, yaitu What we do (`#111
 - [x] Implementasi
 - [x] Verifikasi
 - [x] Dokumentasi, commit, push
+
+---
+
+### Revisi (27 Okt 2026): fixed, ukuran Figma, menyusut saat scroll
+Keputusan pengguna: menu bar **selalu terlihat** (tidak sembunyi saat scroll ke bawah) dan tidak terlalu tinggi.
+- `position: fixed`. `main` diberi `padding-top: fluid(104)` supaya semua section tetap di posisinya (hero, statement, our work, dan trusted sama seperti sebelumnya).
+- **Ukuran tetap Figma di semua lebar layar** (tidak fluid): logo 50,25 × 24, teks 14px, gap 40px, padding atas-bawah 40px = 104px. Sebelumnya ikut skala, sehingga di 2560px tingginya 185px dengan logo 89 × 43. Tepi kiri-kanan tetap mengikuti `.container`, jadi logo sejajar dengan isi halaman.
+- **Saat scroll (>10px):** padding menyusut ke 20px (tinggi 64px), transisi 0,4 detik. Kembali 104px di paling atas. Nilai 20px adalah usulan.
+- Efek kaca dan tema gelap di atas section gelap tetap ada. Logika sembunyi/muncul dihapus dari `header.js`.
+- Diuji dengan scroll roda: 104 → 64px, selalu di `top: 0`, tema gelap di What we do dan Motto, kembali 104px di atas. Langkah What we do dan Motto tetap benar.
