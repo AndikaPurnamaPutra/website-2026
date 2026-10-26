@@ -91,6 +91,11 @@ Variants handled at section level (same size, different line-height or tracking 
 ## Breakpoints
 Not defined yet. The designer will deliver mobile designs, and breakpoints will be added (`src/scss/abstracts/_breakpoints.scss`) when they arrive.
 
+## Header
+- Sticky, 104px (40px padding), `rgba(255,255,255,0.1)` from Figma `1574:2063`, with `blur(20px) saturate(160%)` (proposal). [T]/[U]
+- Hides on scroll down, shows on scroll up. Light theme (white text, logo and chevron via `filter: brightness(0) invert(1)`) while over a section marked `data-header-theme="dark"`. [U]
+- Any new dark section must get `data-header-theme="dark"`.
+
 ## Decisions
 - `1523:3214` is the final Homepage (confirmed by the user, 23 Oct 2026). Other Homepage frames in Phase 4 are not used.
 - Client logos will be exported by the designer as single SVG files (one per logo).

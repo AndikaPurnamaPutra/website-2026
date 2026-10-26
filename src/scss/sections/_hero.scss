@@ -1,9 +1,11 @@
 // Figma: Hero 1523:3215
 @use "../abstracts/functions" as *;
 
+// The sticky header (104px) sits above in the flow, so 40px here keeps the
+// content at y = 144 as in Figma.
 .hero__inner {
   position: relative;
-  padding-top: var(--space-80);
+  padding-top: var(--page-gutter);
   padding-bottom: var(--page-gutter);
 }
 
@@ -11,7 +13,7 @@
 // Horizontally its center sits 182px right of the content center.
 .hero__coin {
   position: absolute;
-  top: fluid(301);
+  top: fluid(261); // page y 365 minus the 104px header
   left: calc(50% + #{fluid(182 - 224)});
   width: fluid(448);
   height: fluid(420);

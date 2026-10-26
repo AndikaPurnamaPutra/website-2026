@@ -132,7 +132,7 @@ Link aset dari Figma kedaluwarsa dalam 7 hari. Jika lewat, saya ambil ulang dari
 ## 6. Keputusan (dijawab pengguna, 23 Okt 2026)
 1. **Link navigasi:** `#` dulu.
 2. **Dropdown "Work":** dibuat **dummy**. Isinya 5 kategori yang ada di desain (filter Our Work: Branding, UI/UX, Illustration, 2D/3D, Graphic Design), semua link `#`. Muncul saat hover atau fokus keyboard, dengan CSS saja (tanpa JS). Style dari token yang ada: latar putih, border `--color-border`, radius 4px, teks `.text-14.text-medium`. *Ini interpretasi sementara, bukan dari Figma.*
-3. **Menu bar saat scroll:** ikut tergulir.
+3. **Menu bar saat scroll:** ~~ikut tergulir~~. **Diganti 26 Okt 2026:** menu bar menempel dengan efek kaca, sembunyi saat scroll ke bawah, muncul saat scroll ke atas, dan berwarna putih di atas section gelap. Lihat `09-sticky-header.md`.
 4. **Tanggal dan jam:** live, waktu Jakarta (`Asia/Jakarta`), diperbarui setiap menit, dengan format yang sama seperti Figma.
 5. **Behance/Dribbble:** sementara mengarah ke `https://www.behance.net` dan `https://dribbble.com`, dibuka di tab baru.
 6. **Tombol showreel:** tampil saja, belum melakukan apa-apa.
