@@ -1,0 +1,30 @@
+//- Figma: Milestones 1574:1160. Values render final (Figma state) without JS;
+//- src/js/milestone-counter.js counts them up, then fades in the gradient.
+-
+  var stats = [
+    { prefix: "$", value: 139, suffix: "M+", label: "Capital raised", gradient: true },
+    { prefix: "", value: 120, suffix: "+", label: "Acquisitions" },
+    { prefix: "", value: 8, suffix: "", label: "Unicorn branded" }
+  ]
+
+section.milestone
+  .container.milestone__inner
+    .milestone__intro
+      p.milestone__eyebrow.text-16.text-muted ( Milestone Achieved )
+      h2.text-heading-42
+        | From Concept
+        br
+        | To Impact
+
+    .milestone__stats(data-milestone)
+      ul.milestone__list
+        each stat in stats
+          li.milestone__row
+            p.milestone__value.text-display-48(data-count=stat.value data-prefix=stat.prefix data-suffix=stat.suffix class=stat.gradient ? "milestone__value--gradient" : null)
+              span.milestone__number= `${stat.prefix}${stat.value}${stat.suffix}`
+              if stat.gradient
+                span.milestone__gradient.text-gradient(aria-hidden="true")= `${stat.prefix}${stat.value}${stat.suffix}`
+            p.milestone__label.text-16= stat.label
+      p.milestone__text
+        span.milestone__text-lead Visual trends evolve, but solid systems don’t age.
+        |  We build clean digital products designed to scale with your business for years, not just seasons.

@@ -44,7 +44,7 @@ All sizes in this document are **Figma pixels** at the 1440px frame. In code the
 
 - Muted text uses `opacity: .5` (`.text-muted`), not a grey color. Exception: Milestone paragraph uses `rgba(0,0,0,.4)`. [T]
 - Brand gradient: `--gradient-brand-stops` = `#0B1550` 18.9% → `#496AF8` 52.4% → `#81C4FB` 80.9% (revised to blue in Figma `1574:796`, 26 Oct 2026; was blue → yellow → red). Used by the hero accent, the Statement decorative icon and "$139M+". The angle differs per element (≈185–207deg), so it is set where used. `.text-gradient` reads `--gradient-angle` (default 201deg). [T]
-- `--gradient-brand-stops-dark` (Motto "believers." on dark): still the old `#457BF9` → `#FFDC7B` → `#FD1D1D` in Figma. Not revised yet; pending confirmation. [T]
+- Motto "believers." (on dark): Figma still shows the old `#457BF9` → `#FFDC7B` → `#FD1D1D`, but the user decided (26 Oct 2026) to use the latest blue gradient there too. `--gradient-brand-stops-dark` will be switched to the blue stops when the Motto section is built. [U]
 
 ## Typography
 Letter-spacing is in `em`: -0.02em in most places, -0.03em for 42px and larger.
