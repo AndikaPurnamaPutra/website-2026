@@ -104,3 +104,9 @@ Keputusan pengguna: menu bar **selalu terlihat** (tidak sembunyi saat scroll ke 
 - Bayangan Figma hanya tampil setelah halaman discroll (`is-scrolled` dari `header.js`), dengan transisi 0,4 detik. Di posisi paling atas tanpa bayangan.
 - **Versi gelap (usulan, disetujui):** di atas What we do dan Motto, menu bar menjadi latar `#111` dengan logo dan teks putih (transisi 0,4 detik), lalu kembali putih di luar section tersebut. Dropdown tetap putih. Diuji di sepanjang halaman: putih di hero, our work, dan milestone; gelap di what we do dan motto (termasuk saat section tertahan).
 - **Sembunyi saat scroll ke bawah, muncul saat scroll ke atas (opsi A, disetujui):** supaya menu bar tidak menutupi section What we do dan Motto. Meluncur keluar/masuk dalam 0,4 detik. Selalu terlihat di paling atas halaman dan saat link menu difokus dengan keyboard. Diuji dengan scroll roda di hero, What we do, dan Motto: sembunyi saat ke bawah, muncul saat ke atas (versi gelap tetap berlaku).
+
+### Header disembunyikan di What we do dan Motto (27 Okt 2026, permintaan pengguna)
+- Selama garis tengah header berada di atas section What we do atau Motto (termasuk seluruh area tertahannya), header **selalu tersembunyi**, baik saat scroll ke bawah maupun ke atas. Memakai trigger `data-header-theme="dark"` yang sudah ada. Pengecualian tetap berlaku saat link header mendapat fokus keyboard.
+- Di luar kedua section, aturan lama tetap berlaku (sembunyi saat scroll ke bawah, muncul saat scroll ke atas).
+- Diuji di 1440px: tersembunyi di dalam Services (naik dan turun) dan di dalam Motto (naik); muncul saat scroll ke atas sebelum Services dan di antara keduanya (Milestone).
+- Catatan: footer lebih pendek dari layar, jadi di posisi paling bawah halaman bagian atas layar masih berisi Motto, sehingga header tetap tersembunyi di sana.
