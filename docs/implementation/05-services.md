@@ -187,3 +187,9 @@ Semua versi berikut dicoba lalu dibatalkan oleh pengguna. Batasnya tetap langsun
 2. Statement ditahan lalu meredup sementara Services menutupinya.
 3. Latar seluruh layar dengan wrapper, mulai di 50% (seperti Milestone → Motto), dengan tiga variasi kemunculan isi Services: disembunyikan, versi terang kartu, dan gambar dulu baru kartu.
 4. Services "terbuka" dari gambarnya (clip-path membesar dari kotak gambar).
+
+### Sudut kartu tetap 4px (27 Okt 2026, masukan pengguna)
+- Radius sudut kartu terlihat berubah-ubah: kartu tumpukan diperkecil (skala 0,92 / 0,83) sehingga sudutnya ikut mengecil, dan potongan strip (`clip-path: inset(...)`) tidak membulat, jadi sudut bawah strip tajam lalu baru membulat saat kartu menjadi aktif.
+- Sekarang potongan selalu membulat dengan radius `--radius-sm` dibagi skala kartu (`inset(... round r/scale)`), sehingga di layar setiap sudut tetap 4px (1440), selama berpindah juga. Radius bawaan kartu yang diperkecil selalu ≤ 4px, jadi tidak perlu dianimasikan.
+- Terukur di 1440: radius potongan di layar 4 / 4 / 4 (kartu aktif, tumpukan 0,92, 0,83) di langkah 0, tengah perpindahan, dan langkah 1; di 2560 7,11 untuk semua. Posisi kartu tidak berubah (98 / 88).
+- **Perbaikan lanjutan** (masukan pengguna: lebar kartu sempat berubah tiba-tiba): browser menyingkat `clip-path` saat dibaca kembali (`inset(0px round 4px)`), sehingga GSAP menganimasikan dari angka yang tidak sejajar dengan targetnya, dan radius sempat terbaca sebagai potongan sisi. Sekarang potongan bawah dan radius dianimasikan sebagai dua angka biasa (objek per kartu), lalu `clip-path` ditulis ulang di setiap update timeline. Terukur selama perpindahan langkah 0 → 1 (sampel setiap ±60ms): potongan kiri/kanan selalu 0, lebar berubah mulus mengikuti skala (317 → 344, 285 → 316), dan radius di layar 4,00px di setiap frame. Langkah 0–5 maju/mundur dan muat ulang tetap benar.

@@ -11,6 +11,7 @@ import { designPx, typePx } from "./design-px.js";
 const FIRST_TOP = 98; // active card top in frame 1
 const LATER_TOP = 88; // active card top from frame 2 on
 const PREVIOUS_GAP = 12; // card that moved up ends 12px above the active card (Figma: 76 → 88)
+const RADIUS = 4; // --radius-sm (Figma 4px, layout scale)
 // Deck cards are scaled from their top edge and placed so their visible strip
 // (the clipped title area) always ends `peek` px below the active card, as in
 // Figma (16px and 32px), whatever the cards' heights. Text-sized: type scale.
@@ -38,14 +39,22 @@ export function initServicesScroll() {
 
   // Position of card `i` while card `active` is in front. Values are px offsets
   // from the card's CSS anchor (top: FIRST_TOP).
+  // Corners: the clip carries the card's radius (--radius-sm, 4px in Figma)
+  // divided by the card's scale, so on screen every corner stays 4px: scaled
+  // deck cards and their clipped strips no longer show other corners (the
+  // card's own, scaled-down radius is always within the clip).
+  // The clip is tweened as two numbers (bottom inset, corner) and written out
+  // on every update: tweening the clip-path string itself starts from the
+  // browser's shortened form ("inset(0px round 4px)"), whose numbers do not
+  // line up with the target, and made the card width jump.
+  const corner = (scale) => (RADIUS * designPx()) / scale;
   const cardState = (i, active) => {
     const px = designPx();
     const offset = i - active;
     const height = cards[i].offsetHeight;
-    const fullClip = "inset(0px 0px 0px 0px)";
 
     if (offset === 0) {
-      return { y: (activeTop(active) - FIRST_TOP) * px, scale: 1, clipPath: fullClip, autoAlpha: 1, zIndex: 4 };
+      return { y: (activeTop(active) - FIRST_TOP) * px, scale: 1, clipBottom: 0, clipRound: corner(1), autoAlpha: 1, zIndex: 4 };
     }
     // Cards that moved up stay in front, so the outgoing card slides away over
     // the incoming one instead of the incoming card popping in front of it.
@@ -55,7 +64,8 @@ export function initServicesScroll() {
       return {
         y: (activeTop(active) - FIRST_TOP) * px - PREVIOUS_GAP * typePx() - height,
         scale: 1,
-        clipPath: fullClip,
+        clipBottom: 0,
+        clipRound: corner(1),
         autoAlpha: offset === -1 ? 1 : 0,
         zIndex: 5,
       };
@@ -67,7 +77,8 @@ export function initServicesScroll() {
       y: activeBottom + (deck.peek - deck.clip * deck.scale) * t - FIRST_TOP * px,
       scale: deck.scale,
       // The visible strip shows the card title, so it follows the type scale.
-      clipPath: `inset(0px 0px ${height - deck.clip * t}px 0px)`,
+      clipBottom: height - deck.clip * t,
+      clipRound: corner(deck.scale),
       autoAlpha: offset <= DECK.length ? 1 : 0,
       zIndex: offset <= DECK.length ? 3 - offset : 0,
     };
@@ -75,19 +86,29 @@ export function initServicesScroll() {
 
   // Function values are re-read on resize (invalidateOnRefresh).
   const stateVars = (i, active) =>
-    Object.fromEntries(
-      ["y", "scale", "clipPath", "autoAlpha"].map((key) => [key, () => cardState(i, active)[key]]),
-    );
+    Object.fromEntries(["y", "scale", "autoAlpha"].map((key) => [key, () => cardState(i, active)[key]]));
+  const clips = cards.map((card) => ({ card, bottom: 0, round: 0 }));
+  const drawClips = () =>
+    clips.forEach(({ card, bottom, round }) => {
+      card.style.clipPath = `inset(0px 0px ${bottom}px 0px round ${round}px)`;
+    });
+  const clipVars = (i, active) => ({
+    bottom: () => cardState(i, active).clipBottom,
+    round: () => cardState(i, active).clipRound,
+  });
 
   const clearMedia = () => gsap.set(media, { clearProps: "inset,top,right,bottom,left,borderRadius" });
 
   const ctx = gsap.context(() => {
-    cards.forEach((card, i) =>
-      gsap.set(card, { ...stateVars(i, 0), zIndex: cardState(i, 0).zIndex, transformOrigin: "50% 0%" }),
-    );
+    cards.forEach((card, i) => {
+      gsap.set(card, { ...stateVars(i, 0), zIndex: cardState(i, 0).zIndex, transformOrigin: "50% 0%" });
+      gsap.set(clips[i], clipVars(i, 0));
+    });
+    drawClips();
 
     const timeline = gsap.timeline({
       defaults: { duration: 1, ease: reduceMotion ? "steps(1)" : "power2.inOut" },
+      onUpdate: drawClips,
       scrollTrigger: {
         trigger: section,
         start: "top top",
@@ -124,7 +145,10 @@ export function initServicesScroll() {
 
     // Step 0 lives in the timeline too, so it is re-measured on refresh (card
     // heights change once the web fonts have loaded or the type scale changes).
-    cards.forEach((card, i) => timeline.set(card, stateVars(i, 0), 0));
+    cards.forEach((card, i) => {
+      timeline.set(card, stateVars(i, 0), 0);
+      timeline.set(clips[i], clipVars(i, 0), 0);
+    });
     timeline.addLabel("step0", 0);
 
     for (let active = 1; active < cards.length; active++) {
@@ -134,6 +158,7 @@ export function initServicesScroll() {
       cards.forEach((card, i) => {
         timeline.set(card, { zIndex: cardState(i, active).zIndex }, at + 0.001);
         timeline.to(card, stateVars(i, active), at);
+        timeline.to(clips[i], clipVars(i, active), at);
       });
       // The new image is revealed from the bottom like a curtain, settling from
       // a slight zoom, over the previous image (no half-transparent overlap).
@@ -170,6 +195,7 @@ export function initServicesScroll() {
   return () => {
     window.removeEventListener("load", refresh);
     ctx.revert();
+    cards.forEach((card) => card.style.removeProperty("clip-path"));
     section.classList.remove("is-enhanced");
   };
 }
