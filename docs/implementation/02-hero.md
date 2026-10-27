@@ -213,3 +213,5 @@ Hasil:
 - Perbaikan: ekor huruf "g" sempat terpotong putih saat menyala, karena gradien hanya digambar di kotak setinggi line-height (88px), sedangkan teksnya 100px. Salinan huruf sekarang memakai `line-height: normal` (kotak 108px), dan posisinya tetap tepat (selisih 0px).
 - Revisi (permintaan pengguna): gelombang dibuat lebih santai, tapi versi ±3 detik terasa terlalu lambat. Yang dipakai adalah nilai tengahnya: jarak antarhuruf 0,045 detik, menyala 0,15 detik (`sine.out`), ditahan 0,35 detik, dan memudar 1,2 detik (`sine.inOut`), total ±2,2 detik.
 
+### Tombol sosial mengikuti skala huruf (27 Okt 2026, permintaan pengguna)
+Di layar 2K ke atas tombol Behance/Dribbble terasa terlalu besar, karena mengikuti skala layout (89px di 2560). Ukuran tombol, jarak, dan ikon sekarang memakai `fs()` (skala huruf, maksimal 1,2×). Terukur: tombol 44,4 / 50 / 54,3 / 60px di 1280 / 1440 / 1920 / 2560. Di 1440 sama dengan Figma (tombol 50, jarak 11, ikon 32 × 21,1).

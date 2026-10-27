@@ -77,29 +77,31 @@
   opacity: 0;
 }
 
+// Buttons and icons follow the type scale (max 1.2×), not the layout scale,
+// so they stay modest on large screens (user decision); Figma size at 1440.
 .hero__social {
   display: flex;
-  gap: fluid(11);
+  gap: fs(11);
 }
 
 .hero__social-link {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: fluid(50);
-  height: fluid(50);
+  width: fs(50);
+  height: fs(50);
   background: var(--color-surface-soft);
   border-radius: var(--radius-sm);
 }
 
 .hero__social-icon--behance {
-  width: fluid(32);
-  height: fluid(21.12);
+  width: fs(32);
+  height: fs(21.12);
 }
 
 .hero__social-icon--dribbble {
-  width: fluid(24);
-  height: fluid(24);
+  width: fs(24);
+  height: fs(24);
 }
 
 .hero__info {
