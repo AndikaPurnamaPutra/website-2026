@@ -13,6 +13,7 @@ import { initMottoScroll } from "./motto-scroll.js";
 import { initHeader } from "./header.js";
 import { initFooterForm } from "./footer-form.js";
 import { initBackLink } from "./back-link.js";
+import { initScrollMemory } from "./scroll-memory.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -34,6 +35,8 @@ function initPage() {
   cleanups.push(initHeader());
   cleanups.push(initFooterForm());
   cleanups.push(initBackLink());
+  // Last, so every pin spacer exists before the scroll position is restored.
+  cleanups.push(initScrollMemory());
 }
 
 function destroyPage() {
