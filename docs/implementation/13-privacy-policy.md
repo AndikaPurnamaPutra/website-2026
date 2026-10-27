@@ -24,7 +24,7 @@ Figma: "Privacy and Policy" 1611:7774 (1440 × 3893). Desktop dulu; mobile menun
 | `src/pug/layouts/default.pug` | `block header` (default: menu bar biasa) |
 | `src/pug/partials/header-back.pug` | Bar "Back + logo" |
 | `src/pug/partials/footer.pug` | Tautan "Privacy Policy" → `privacy-policy.html` |
-| `src/scss/pages/_privacy-policy.scss`, `src/scss/main.scss` | Style halaman |
+| `src/scss/pages/_policy.scss` (dulu `_privacy-policy.scss`), `src/scss/main.scss` | Style halaman legal (dipakai juga Terms of Service; markup lewat mixin `src/pug/mixins/policy.pug`) |
 | `src/scss/components/_header.scss` | Varian bar Back |
 | `src/scss/base/_tokens.scss`, `_fonts.scss` | Token #555, Inter SemiBold |
 | `src/js/back-link.js`, `src/js/main.js` | Back ke halaman sebelumnya |

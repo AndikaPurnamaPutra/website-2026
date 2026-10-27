@@ -1,0 +1,136 @@
+extends ../layouts/default
+
+//- Figma: "Terms of Service" 1611:11735. Text exactly as in Figma (user
+//- decision), including subsection 3.2, which appears twice there.
+//- Item types: see src/pug/mixins/policy.pug.
+
+block title
+  | Terms of Service — OWW
+
+block header
+  include ../partials/header-back
+
+block content
+  -
+    var meta = [
+      ["Effective Date :", "October 26, 2026"],
+      ["Last Updated :", "October 26, 2026"],
+      ["Entity :", 'PT. One Week Wonders ("Agency," "we," "us," or "our")'],
+      ["Address :", "Jl. Mampang Prapatan Raya No. 73A, Jakarta Selatan, DKI Jakarta 12790, Indonesia"],
+      ["Contact Email :", "admin@oneweekwonders.com"]
+    ]
+    var invoicing = { num: "3.2", items: [
+      { lead: ["Invoicing & Payment Terms", "Invoices are payable within three (3) business days of receipt. If any milestone payment remains unpaid for more than five (5) business days beyond its due date, the Agency reserves the right to suspend all active work, including withholding access to deliverables, work-in-progress files, or staging environments."] }
+    ] }
+    var sections = [
+      { title: "Overview & Acceptance of Terms", groups: [[
+        { p: [
+          'These Terms of Service ("Terms") govern your use of the website operated by PT. One Week Wonders and all professional design, branding, and development services provided by the Agency.',
+          "",
+          'By accessing our website, booking a discovery session via Calendly, filling out an intake form via ClickUp, or executing a Project Agreement with us, you ("Client," "you") agree to be bound by these Terms. In the event of any direct conflict between these general Terms and a customized, signed Project Agreement (including Exhibit A), the signed Project Agreement shall take precedence.'
+        ] }
+      ]] },
+      { title: "Agency Services & Scope", groups: [
+        [{ p: ["PT. One Week Wonders provides specialized digital design and front-end development services, including:"] }],
+        [{ ul: [
+          ["Brand Identity:", "Visual branding, brand strategy, identity development, digital and print collateral, brand guidelines, and mockup design."],
+          ["Visual Design:", "Design systems, responsive websites, digital products, motion & interaction design, illustrations, 3D design, and graphics design."],
+          ["Development:", "Front-end development, CMS integrations, custom code implementation, basic SEO foundations, web maintenance, and quality assurance/testing."]
+        ] }],
+        [{ p: ["All specific deliverables, timelines, and scope boundaries for a client engagement are strictly defined in Exhibit A of each project agreement. Any work requested outside the agreed specifications will be treated as a Change Order subject to additional fees."] }],
+        [
+          { lead: ["Explicit Exclusions", "Unless explicitly agreed upon in writing in Exhibit A, our services do not include:"] },
+          { ol: [
+            "Extensive original content creation (e.g., copywriting, blog posts, product descriptions).",
+            "Advanced back-end development or complex third-party software integrations requiring specialized non-front-end infrastructure.",
+            "Web hosting fees, domain renewal fees, or security updates beyond the agreed-upon web maintenance scope."
+          ] }
+        ]
+      ] },
+      { title: "Fees, Payment Terms & Schedules", groups: [
+        [{ num: "3.1", items: [
+          { lead: ["Milestone Payment Structure", "Unless otherwise specified in a custom agreement, agency services follow a standard 3-milestone payment structure:"] },
+          { ul: [
+            ["Retainer Deposit (50%):", "A non-refundable 50% deposit due prior to project kickoff. Work will not commence until this payment is cleared."],
+            ["Milestone 2 Payment (30%):", "Due immediately upon completion and approval (or Deemed Approval) of the development or production phase (e.g., design finalization, code implementation)."],
+            ["Final Payment (20%):", "Due upon completion of all services and prior to the release of final deliverables or master source files."]
+          ] }
+        ] }],
+        [invoicing],
+        [invoicing],
+        [{ num: "3.3", items: [
+          { lead: ["Third-Party Expenses", "Clients are responsible for reimbursing the Agency for any third-party costs (e.g., premium fonts, stock assets, plugins) required for the project, provided such expenses are approved by the Client in writing in advance."] }
+        ] }],
+        [{ num: "3.4", items: [
+          { lead: ["Rush Fees", "Any deliverable requested with a turnaround time of under 48 hours, or requested outside standard business hours (Monday–Friday, 9:00 AM–5:00 PM WIB), is subject to a Rush Fee of a 50% premium on the cost of that specific task or milestone. Acceptance of rush requests remains at the sole discretion of the Agency."] }
+        ] }],
+        [{ num: "3.5", items: [
+          { sub: "Refund Policy" },
+          { ul: [
+            "The 50% Deposit is non-refundable once work has commenced.",
+            "For subsequent milestones, refunds are only applicable if the Agency fails to provide progress updates for more than fourteen (14) consecutive days, in which case a maximum of 20% of the total funds transferred to date may be refunded."
+          ] }
+        ] }]
+      ] },
+      { title: "Client Responsibilities & Project Delays", groups: [[
+        { ul: [
+          ["Timely Assets & Feedback:", "Project timelines (ETAs) are contingent upon the Client providing timely feedback, brand assets, access credentials, and content."],
+          ["Schedule Adjustments:", "If the Client fails to provide requested feedback or approvals for more than seven (7) consecutive days, the overall project schedule will automatically be extended by a minimum of fourteen (14) days to accommodate agency rescheduling."]
+        ] }
+      ]] },
+      { title: "Revisions, Approval & Deemed Acceptance", groups: [
+        [{ num: "5.1", items: [
+          { sub: "Revision Allowance" },
+          { ul: [
+            ["Quantity:", "Deliverables include up to two (2) rounds of revisions per milestone (e.g., First Draft, High Fidelity Mockups)."],
+            ["No Rollover:", "Unused revisions in one milestone cannot be rolled over or added to subsequent milestones."],
+            ["Minor vs. Major Changes:", "Adjustments to typography, color alignment, or simple content shifts constitute standard revisions. Requests for new visual concepts, layout overhauls, or new functionality after milestone approval constitute Major Changes and will be billed as a Change Order."]
+          ] }
+        ] }],
+        [{ num: "5.2", items: [
+          { lead: ["Review Window & Deemed Approval", "The Client must provide written feedback or explicit approval within three (3) business days of receiving any deliverable. If no written feedback is received within this window, the deliverable will be deemed fully approved and accepted as-is. The Agency will proceed to the next milestone, and any subsequent request to modify a deemed-approved milestone will be billed as a Change Request."] }
+        ] }]
+      ] },
+      { title: "Dormancy, Hold & Termination", groups: [
+        [{ num: "6.1", items: [
+          { lead: ["Project Dormancy & Restart Fee", "If the Client fails to provide necessary feedback, assets, or approvals for more than fourteen (14) consecutive days, the project will be classified as Dormant."] },
+          { ul: [
+            "Upon dormancy, the Agency releases the project team to other client work and cannot guarantee immediate availability when the Client returns.",
+            "To reactivate a dormant project, the Client must pay a Restart Fee equal to 15% of the total contract value to cover team re-onboarding and resource reallocation."
+          ] }
+        ] }],
+        [{ num: "6.2", items: [
+          { lead: ["Termination for Convenience & Kill Fee", "The Client may terminate a project agreement for convenience by providing seven (7) days' written notice. Upon termination, the Client must pay for all completed work up to the termination date, plus a Kill Fee equal to 15% of the remaining contract balance."] }
+        ] }],
+        [{ num: "6.3", items: [
+          { lead: ["Immediate Termination for Cause", "Either party may terminate the agreement immediately if the other party breaches a material term and fails to cure such breach within five (5) business days of written notice."] }
+        ] }]
+      ] },
+      { title: "Intellectual Property & Portfolio Rights", groups: [
+        [{ num: "7.1", items: [
+          { lead: ["Conditional IP Assignment", "All ownership, right, title, and interest in final deliverables and source files (e.g., Figma mockups, source code, high-resolution renders, vector assets, Webflow transfers) shall transfer to the Client only upon receipt of final payment in full."] }
+        ] }],
+        [{ num: "7.2", items: [
+          { lead: ["Retained Rights & Portfolio Usage", "Until final payment is cleared, the Agency retains full legal ownership of all preliminary designs, concepts, and code. PT. One Week Wonders retains the perpetual right to display completed visual work, designs, and case studies in its professional portfolio, website, Dribbble profile, and promotional channels."] }
+        ] }]
+      ] },
+      { title: "Limitation of Liability & Warranties", groups: [[
+        { ul: [
+          ["Service Quality:", "Services are provided on a professional, best-efforts basis according to agreed quality assurance standards."],
+          ["Third-Party Platforms:", "The Agency is not liable for third-party hosting outages, plugin failures, third-party platforms, CMS updates, software integrations, or API changes beyond our reasonable control."],
+          ["Liability Cap:", "To the maximum extent permitted by applicable law, the total cumulative liability of PT. One Week Wonders for any claim arising out of or related to these Terms or any project shall not exceed the total amount paid by the Client to the Agency for the specific project giving rise to the claim."]
+        ] }
+      ]] },
+      { title: "Governing Law & Jurisdiction", groups: [[
+        { p: [
+          "These Terms and any non-contractual obligations or disputes arising out of them shall be governed by and construed in accordance with the laws of the Republic of Indonesia.",
+          "",
+          "Any legal suit, action, or proceeding arising out of or relating to these Terms or Agency services shall be instituted exclusively in the District Court of South Jakarta (Pengadilan Negeri Jakarta Selatan)."
+        ] }
+      ]] },
+      { title: "Contact Information", groups: [[
+        { html: "If you have questions regarding these Terms of Service or wish to submit formal notices, please contact us at:<br><strong>PT. One Week Wonders</strong> Jl. Mampang Prapatan Raya No. 73A, Jakarta Selatan, DKI Jakarta 12790, Indonesia<br><strong>Email:</strong> admin@oneweekwonders.com" }
+      ]] }
+    ]
+
+  +policyPage(["One Week Wonders -", "Terms of Service"], meta, sections)

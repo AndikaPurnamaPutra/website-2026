@@ -1,0 +1,68 @@
+//- Legal page body shared by Privacy Policy (Figma 1611:7774) and Terms of
+//- Service (1611:11735). Styles: src/scss/pages/_policy.scss.
+//- title: the h1 lines; meta: [label, value] rows; sections: { title, groups }.
+//- Groups are 8px apart, the items of a group 2px apart. Item types:
+//-   p    lines ("" = empty line)
+//-   lead [bold lead-in, text]: one paragraph starting in bold
+//-   sub  bold subheading
+//-   ul / ol  entries: "text" or [bold label, text]
+//-   html paragraph with inline markup
+//-   num  { num: "3.1", items: [...] }: numbered subsection
+
+mixin policyItem(item)
+  if item.p
+    p
+      each line, i in item.p
+        if i > 0
+          br
+        | #{line}
+  else if item.lead
+    p
+      strong= item.lead[0]
+      |  #{item.lead[1]}
+  else if item.sub
+    p.policy__sub= item.sub
+  else if item.ul || item.ol
+    - var tag = item.ul ? "ul" : "ol"
+    #{tag}.policy__list(class=item.ol ? "policy__list--numbered" : null)
+      each entry in (item.ul || item.ol)
+        li
+          if Array.isArray(entry)
+            strong= entry[0]
+            |  #{entry[1]}
+          else
+            = entry
+  else if item.html
+    p!= item.html
+  else if item.num
+    .policy__subsection
+      span.policy__subnumber= item.num
+      .policy__group
+        each child in item.items
+          +policyItem(child)
+
+mixin policyPage(title, meta, sections)
+  article.policy
+    .container
+      header.policy__header
+        h1.policy__title.text-heading-42
+          each line, i in title
+            if i > 0
+              br
+            | #{line}
+        dl.policy__meta
+          each row in meta
+            .policy__meta-row
+              dt= row[0]
+              dd= row[1]
+
+      ol.policy__sections
+        each section, index in sections
+          li.policy__section
+            span.policy__number(aria-hidden="true")= `${index + 1}.`
+            .policy__body
+              h2.policy__heading= section.title
+              each group in section.groups
+                .policy__group
+                  each item in group
+                    +policyItem(item)

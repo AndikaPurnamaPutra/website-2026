@@ -110,42 +110,4 @@ block content
       ]] }
     ]
 
-  article.policy
-    .container
-      header.policy__header
-        h1.policy__title.text-heading-42
-          | One Week Wonders -
-          br
-          | Privacy and Policy
-        dl.policy__meta
-          each row in meta
-            .policy__meta-row
-              dt= row[0]
-              dd= row[1]
-
-      ol.policy__sections
-        each section, index in sections
-          li.policy__section
-            span.policy__number(aria-hidden="true")= `${index + 1}.`
-            .policy__body
-              h2.policy__heading= section.title
-              each group in section.groups
-                .policy__group
-                  each item in group
-                    if item.p
-                      p
-                        each line, i in item.p
-                          if i > 0
-                            br
-                          | #{line}
-                    else if item.sub
-                      p.policy__sub= item.sub
-                    else if item.ul || item.ol
-                      - var tag = item.ul ? "ul" : "ol"
-                      #{tag}.policy__list(class=item.ol ? "policy__list--numbered" : null)
-                        each entry in (item.ul || item.ol)
-                          li
-                            strong= entry[0]
-                            |  #{entry[1]}
-                    else if item.html
-                      p!= item.html
+  +policyPage(["One Week Wonders -", "Privacy and Policy"], meta, sections)
