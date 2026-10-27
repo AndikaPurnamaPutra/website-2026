@@ -38,3 +38,16 @@ section.hero
       button.hero__showreel-button(type="button")
         span.text-14.text-medium Play Showreel
         img(src="assets/icons/play.svg" width="16" height="16" alt="")
+
+  //- Showreel pop-up (reference from the user: manual.studio). Not in Figma:
+  //- dark backdrop from the design system, glass close button like the
+  //- showreel button. src/js/hero-showreel.js moves it to <body>, opens it from
+  //- the showreel and plays the video with sound.
+  .showreel-lightbox(data-showreel-lightbox role="dialog" aria-modal="true" aria-label="Showreel" aria-hidden="true")
+    .showreel-lightbox__backdrop
+    .showreel-lightbox__stage
+      video.showreel-lightbox__video(poster="assets/images/hero/showreel-poster.jpg" controls playsinline preload="none")
+        source(src="assets/images/hero/showreel.mp4" type="video/mp4")
+    button.showreel-lightbox__close(type="button" aria-label="Close")
+      svg(width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true")
+        path(d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round")

@@ -159,6 +159,16 @@
   overflow: hidden;
 }
 
+// The whole showreel opens the pop-up; on pointer devices the button follows
+// the cursor, which is hidden (src/js/hero-showreel.js).
+.hero__showreel.is-interactive {
+  cursor: pointer;
+}
+
+.hero__showreel.is-following {
+  cursor: none;
+}
+
 .hero__showreel-image {
   display: block;
   width: 100%;

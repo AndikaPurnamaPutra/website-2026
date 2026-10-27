@@ -215,3 +215,34 @@ Hasil:
 
 ### Tombol sosial mengikuti skala huruf (27 Okt 2026, permintaan pengguna)
 Di layar 2K ke atas tombol Behance/Dribbble terasa terlalu besar, karena mengikuti skala layout (89px di 2560). Ukuran tombol, jarak, dan ikon sekarang memakai `fs()` (skala huruf, maksimal 1,2×). Terukur: tombol 44,4 / 50 / 54,3 / 60px di 1280 / 1440 / 1920 / 2560. Di 1440 sama dengan Figma (tombol 50, jarak 11, ikon 32 × 21,1).
+
+### Showreel: tombol mengikuti kursor dan pop-up video (27 Okt 2026), selesai, menunggu review
+Acuan pengguna: manual.studio. Di sana kursor di atas video diganti tombol play. Saat diklik, video membesar dari posisinya ke tengah layar (±90%, 0,35 detik) dengan latar gelap, lalu tombol × muncul. Pop-up ditutup dengan ×, klik latar, atau Esc, dan video mengecil kembali ke posisi asalnya (0,3 detik). Selama terbuka, scroll halaman dikunci.
+
+Keputusan pengguna:
+- Kursor bawaan disembunyikan di atas showreel (opsi A).
+- Tombol × sederhana dengan gaya kaca yang sama dengan tombol showreel.
+- Latar gelap memakai design system (#111).
+- Video sementara memakai `showreel.mp4` yang sama.
+
+Cara kerja:
+- **Mengikuti kursor** (hanya perangkat dengan hover dan pointer presisi): tombol menyusul kursor dengan `gsap.quickTo`, durasi 0,6 detik `power3.out`, dan dibatasi di dalam video. Saat kursor keluar, tombol meluncur kembali ke tengah (posisi Figma) dengan gerakan yang sama.
+- **Pop-up** (`.showreel-lightbox`, dipindah JS ke `<body>` dengan z-index di atas header):
+  - Panggung video membesar dari kotak showreel ke tengah layar (90% layar, rasio video 3:2). Yang dianimasikan adalah posisi dan ukuran kotak, bukan scale, supaya video tidak meregang.
+  - Latar #111 memudar masuk, lalu tombol × muncul.
+  - Video diputar dari awal dengan suara dan kontrol browser (jika browser menolak suara, diputar tanpa suara). Video hero dijeda selama pop-up terbuka.
+  - Menutup dengan ×, klik latar, atau Esc. Video berhenti, lalu panggung kembali ke kotak showreel.
+  - Scroll dikunci dengan menahan wheel, sentuh, dan tombol scroll, tanpa mengubah layout, supaya pin tidak bergeser.
+  - Fokus pindah ke ×, Tab berputar di dalam pop-up, dan fokus kembali ke tombol showreel setelah ditutup.
+- **Reduced motion:** tombol tidak mengikuti kursor, dan pop-up muncul tanpa animasi.
+
+File: `src/pug/partials/hero.pug`, `src/scss/sections/_hero.scss`, `src/scss/components/_showreel-lightbox.scss` (baru), `src/scss/main.scss`, `src/js/hero-showreel.js` (baru), dan `src/js/main.js`.
+
+Hasil (1440 × 1024, halaman di-scroll 500px):
+- **Mengikuti kursor:** tombol tepat di posisi kursor setelah ±1 detik. 120ms setelah kursor pindah, tombol baru setengah jalan (jeda halus). Kursor disembunyikan di atas video (`cursor: none`). Setelah keluar, tombol kembali ke tengah (720, 509).
+- **Pop-up:** kotak video 1296 × 864 (90% tinggi layar, 3:2). Latar 0,89 pada 150ms, lalu 1. Tombol × muncul, dan fokus ada di ×. Scroll terkunci (posisi tetap 500 setelah roda). Video hero dijeda.
+- **Menutup:** Esc dan klik latar mengembalikan kotak tepat ke showreel (40, 118, 1360 × 781). Fokus kembali ke tombol showreel, dan video hero berjalan lagi.
+- **Reduced motion:** pop-up langsung di tengah tanpa animasi, dan tombol tidak mengikuti kursor (kursor tetap pointer).
+
+### Revisi kecil (27 Okt 2026, permintaan pengguna)
+- **Latar pop-up showreel:** #111 dengan transparansi 80% (`rgba(17, 17, 17, 0.8)`), tidak solid, jadi halaman samar terlihat di belakangnya.

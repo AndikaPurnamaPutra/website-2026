@@ -3,6 +3,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import barba from "@barba/core";
 import { initHeroClock } from "./hero-clock.js";
 import { initHeroHighlight } from "./hero-highlight.js";
+import { initHeroShowreel } from "./hero-showreel.js";
 import { initServicesScroll } from "./services-scroll.js";
 import { initInviewVideos } from "./inview-videos.js";
 import { initWorkCarousels } from "./work-carousel.js";
@@ -20,6 +21,7 @@ function initPage() {
   // Initialize page-specific animations here.
   cleanups.push(initHeroClock());
   cleanups.push(initHeroHighlight());
+  cleanups.push(initHeroShowreel());
   cleanups.push(initServicesScroll());
   cleanups.push(initWorkCarousels());
   cleanups.push(initTestimonialsMarquee());
