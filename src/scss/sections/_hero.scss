@@ -1,6 +1,13 @@
 // Figma: Hero 1523:3215
 @use "../abstracts/functions" as *;
 
+// The full-screen showreel reaches 1px past the screen edges (no seam); after
+// its pin it stays that size in the flow, so the sides are clipped here to keep
+// the page from scrolling sideways. clip (not hidden) leaves the pin working.
+.hero {
+  overflow-x: clip;
+}
+
 // The sticky header (104px) sits above in the flow, so 40px here keeps the
 // content at y = 144 as in Figma.
 .hero__inner {
