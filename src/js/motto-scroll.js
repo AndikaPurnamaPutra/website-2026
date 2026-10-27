@@ -21,6 +21,7 @@ export function initMottoScroll() {
   const wrapper = section.closest("[data-tone-shift]");
   const milestone = wrapper?.querySelector(".milestone__inner");
   const backdrop = section.querySelector(".motto__backdrop");
+  const label = section.querySelector(".motto__label");
   const wrapperTexture = wrapper?.querySelector(".tone-shift__texture");
   const lines = [...section.querySelectorAll(".motto__line")];
   const ellipse = section.querySelector(".motto__ellipse");
@@ -107,12 +108,14 @@ export function initMottoScroll() {
         start: "top top",
         end: () => `+=${window.innerHeight * steps}`,
         pin: true,
-        scrub: reduceMotion ? true : 1,
+        scrub: reduceMotion ? true : 0.5,
+        // Same snap as the What we do section: starts at once, soft landing.
         snap: {
           snapTo: "labelsDirectional",
           inertia: false,
-          duration: { min: 0.4, max: 1 },
-          ease: "power2.inOut",
+          delay: 0,
+          duration: { min: 0.6, max: 0.9 },
+          ease: "power3.out",
         },
         invalidateOnRefresh: true,
         onUpdate: (self) => {
@@ -221,6 +224,7 @@ export function initMottoScroll() {
       gsap.set(wrapperTexture, { opacity: 0 });
       gsap.set(backdrop, { autoAlpha: 0 });
       gsap.set(linesBox, { autoAlpha: 0, y: () => 12 * designPx(), filter: "blur(6px)" });
+      gsap.set(label, { autoAlpha: 0, y: () => 8 * designPx() });
       gsap
         .timeline({
           defaults: { ease: "sine.inOut" },
@@ -230,7 +234,26 @@ export function initMottoScroll() {
         .to(wrapper, { backgroundColor: "#111111", duration: 0.7 }, 0.1)
         .to(wrapperTexture, { opacity: 0.1, duration: 0.7 }, 0.1)
         .to(backdrop, { autoAlpha: 1, duration: 0.4 }, 0.6)
-        .to(linesBox, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.4, ease: "power2.out" }, 0.6);
+        // Motto 1 blurs in while the section scrolls in (it is complete before
+        // the pin), once the background is dark.
+        .to(linesBox, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.35, ease: "power2.out" }, 0.45);
+
+      // The label follows once motto 1 has settled in the center, i.e. when the
+      // section pins. It plays on its own clock (the reader rests on step 0
+      // there) and reverses when scrolling back up past that point.
+      const labelIn = gsap.to(label, { autoAlpha: 0.5, y: 0, duration: 0.6, ease: "power2.out", paused: true });
+      ScrollTrigger.create({
+        trigger: section,
+        // Just before the pin (24px), so a scroll that stops right at it counts;
+        // motto 1 is already centered there.
+        start: "top top+=24",
+        onEnter: () => labelIn.play(),
+        onLeaveBack: () => labelIn.reverse(),
+        // Page loaded or restored below this point: show it at once.
+        onRefresh: (self) => {
+          if (self.progress > 0 || self.scroll() >= self.start) labelIn.progress(1);
+        },
+      });
     }
   }, section);
 

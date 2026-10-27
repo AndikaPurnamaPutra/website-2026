@@ -93,17 +93,17 @@ export function initServicesScroll() {
         start: "top top",
         end: () => `+=${window.innerHeight * steps}`,
         pin: true,
-        scrub: reduceMotion ? true : 1,
+        scrub: reduceMotion ? true : 0.5,
         // Snap to the next step in the scroll direction. inertia: false keeps a
-        // fast flick from projecting past several steps. A longer, softer snap
-        // with a short delay avoids the jolt of the earlier 0.2–0.6s snap
-        // (same feel as the Motto section).
+        // fast flick from projecting past several steps. The snap starts right
+        // away and eases out (fast start, soft landing), so there is no pause
+        // after the scroll stops (same feel as the Motto section).
         snap: {
           snapTo: "labelsDirectional",
           inertia: false,
-          delay: 0.15,
-          duration: { min: 0.5, max: 1 },
-          ease: "power2.inOut",
+          delay: 0,
+          duration: { min: 0.6, max: 0.9 },
+          ease: "power3.out",
         },
         invalidateOnRefresh: true,
         onRefresh: (self) => {

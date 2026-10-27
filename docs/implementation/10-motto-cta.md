@@ -102,3 +102,12 @@ Section **tertahan saat di-scroll** (seperti What we do). Satu langkah scroll = 
 - **Tekstur tanpa celah saat transisi:** tekstur sekarang berada di wrapper `.tone-shift` sebagai lapisan sticky setinggi layar (`margin-bottom: -100vh`) di atas konten (screen 10%). Lapisan ini memudar masuk bersamaan dengan latar yang menggelap, jadi tidak ada lagi garis pemisah antara area Milestone dan area Motto. Tekstur di dalam section Motto hanya dipakai tanpa efek masuk (tanpa JS atau reduce motion; kelas `is-toned` di wrapper). Diukur: perbedaan kecerahan di batas section ≤ 1,6/255.
 - **Gradient otomatis (disetujui):** gelombang per huruf tidak lagi mengikuti scroll. Gelombang dimulai sendiri (±0,8 detik, kiri → kanan) saat scroll melewati tengah langkahnya, dan berbalik (kanan → kiri) saat scroll mundur. Flip, cahaya, dan ellipse tetap mengikuti scroll. Sinkronisasi diabaikan selama refresh/resize, lalu diulang setelah posisi dipulihkan (sebelumnya resize di langkah 5 sempat mengembalikan gradient ke putih).
 - **Pengujian ulang:** maju/mundur semua langkah, muat ulang di langkah 4 lalu scroll ke atas, resize 1440 → 1920 → 1280 → 1440 di langkah 1–5 (langkah dan gradient tetap), sampel opacity gradient terhadap waktu (maju dan mundur).
+
+### Snap disamakan dengan What we do (28 Okt 2026)
+scrub 1 → 0,5, snap 0,4–1 detik `power2.inOut` → 0,6–0,9 detik `power3.out` tanpa jeda. Terukur sama dengan What we do: ±0,3 detik deteksi, lalu ±0,7 detik meluncur.
+
+### Urutan masuk motto 1 dan label, versi 3 (28 Okt 2026)
+Atas permintaan pengguna: motto 1 muncul lebih dulu, dan label "( Our Motto's )" baru muncul ketika motto sudah benar-benar di tengah (section tertahan).
+- Motto 1 muncul dari blur di 0,45–0,8 timeline masuk (lengkap sebelum pin). Terukur: 0,37 di 50%, 0,98 di 70%.
+- Label: animasi otomatis (memudar 0 → 0,5 sambil naik 8px, 0,6 detik `power2.out`) yang dipicu ScrollTrigger tersendiri di 24px sebelum pin (`top top+=24`), dan berbalik saat scroll kembali ke atas. Dibuat otomatis karena pengguna berhenti di langkah 0 saat section tertahan. Saat halaman dimuat di bawah titik itu, label langsung tampil.
+- Terukur: label 0 hingga 100px sebelum pin; 0,29 / 0,49 / 0,5 pada 0,15 / 0,45 / 1 detik setelah tiba di pin; tampil juga bila scroll roda berhenti 14px sebelum pin; kembali 0 saat scroll ke atas; langsung 0,5 setelah muat ulang di langkah 3. Langkah 0–5 maju/mundur tetap benar. Reduce motion: tampil tanpa animasi.
