@@ -248,3 +248,25 @@ Hasil (1440 × 1024, halaman di-scroll 500px):
 - **Latar pop-up showreel:** #111 dengan transparansi 80% (`rgba(17, 17, 17, 0.8)`), tidak solid, jadi halaman samar terlihat di belakangnya.
 - **Jarak label zona waktu ke jam:** 5px → 8px (`fs(8)`). Terukur 8px di 1440.
 - **Titik dua jam berkedip** seperti jam digital: terlihat di paruh pertama setiap detik dan hilang di paruh kedua (`step-end`, 1 detik). Animasinya disinkronkan ke detik sungguhan lewat `animation-delay` negatif saat jam diperbarui. Dengan reduced motion tidak berkedip. Lebar kotak jam tidak berubah (selisih 0,02px dibanding teks utuh).
+
+### Showreel membesar saat di-scroll (27 Okt 2026), selesai, menunggu review
+Permintaan pengguna: begitu video showreel berada di tengah layar, video membesar sampai layar penuh, lalu halaman lanjut ke section berikutnya. Keputusan: **layar penuh** (opsi A, tepi atas dan bawah video sedikit terpotong) dan **langsung dilepas** setelah penuh (opsi A).
+
+Cara kerja:
+- `.hero__showreel` di-pin (ScrollTrigger) dari `center center` sepanjang satu layar scroll (`+=100%`), dengan scrub 1.
+- Video (`.hero__showreel-image`) diposisikan absolut di dalam showreel. Sudut membulat dipindah dari showreel ke video, dan showreel tidak lagi memotong isinya (`overflow`). Tampilan tanpa JS tetap sama.
+- Selama pin, posisi dan ukuran video (left, top, width, height) membesar sampai menutup seluruh layar (dihitung dari ukuran layar dan kotak showreel, dihitung ulang saat refresh), dan radius → 0 (`power1.inOut`). Video diberi `max-width: none`, karena reset membatasi media di 100%.
+- Karena showreel berada tepat di tengah layar selama pin, titik tengah video tetap sama. Tombol showreel dan pop-up memakai kotak video (bukan kotak showreel) untuk batas gerak kursor dan titik awal animasi pop-up.
+- Scroll ke atas mengecilkan video kembali. Reduced motion: tanpa efek.
+
+File: `src/scss/sections/_hero.scss` dan `src/js/hero-showreel.js`.
+
+Hasil:
+- 1440 × 1024: video 1360 × 781 saat mulai, 1400 × 903 di tengah hold, dan 1440 × 1024 (radius 0) di akhir. Setelah itu dilepas, dan Statement menyusul. 1920 × 1080: 1813 × 1041 → 1920 × 1080. Tombol showreel tetap di tengah video selama hold.
+- Services (langkah 0 dan 1) dan Motto (langkah 0, top 0) tetap benar setelah halaman bertambah satu layar.
+- Pop-up dibuka dari video yang sedang membesar dan kembali tepat ke kotaknya (13, 38, 1414 × 946).
+- Reduced motion: tanpa pin, dan video tetap 1360 × 781.
+
+Revisi (permintaan pengguna):
+- **Celah kecil di kanan** (terlihat oleh pengguna, kemungkinan karena scrollbar klasik dan posisi pecahan piksel): ukuran akhir sekarang dihitung dari posisi showreel yang sebenarnya, dengan lebar seluruh jendela (termasuk area scrollbar) ditambah 1px di setiap sisi. Terukur di 1440 / 2174 / 2560 / 3000px: video melewati keempat tepi layar (misalnya −1 … 1441 × −2 … 1024 di 1440).
+- **Tahan setengah layar** setelah penuh (saran disetujui): pin `+=150%`, dengan 1 layar untuk membesar dan 0,5 layar ditahan penuh, lalu dilepas. Terukur: video penuh dari posisi 1 sampai 1,5 layar, lalu bergerak ke atas bersama Statement.

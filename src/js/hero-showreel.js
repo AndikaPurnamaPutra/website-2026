@@ -6,7 +6,10 @@ import gsap from "gsap";
 // the centre when the cursor leaves. A click anywhere on the showreel opens a
 // pop-up: the video grows from the showreel to the centre of the screen over a
 // dark backdrop and plays with sound; ×, a click on the backdrop or Esc close
-// it, and it shrinks back to the showreel.
+// it, and it shrinks back to the showreel. When the showreel reaches the
+// middle of the screen it holds while the video grows to fill the screen over
+// one screen of scrolling, holds full for half a screen, then the page
+// moves on (user decision).
 const FOLLOW = 0.6; // also the glide back to the centre
 const OPEN = 0.5;
 const CLOSE = 0.4;
@@ -39,18 +42,55 @@ export function initHeroShowreel() {
 
   // Button follows the cursor (offset from its centred Figma position).
   const ctx = gsap.context(() => {
-    if (!finePointer || reduceMotion) return;
+    if (reduceMotion) return;
+
+    // Grows to fill the screen while held in the middle of it: the video
+    // reaches out from the showreel to the screen edges (measured from the
+    // showreel's own position, the whole window including a classic
+    // scrollbar, and 1px extra on every side so no seam is left).
+    const edge = () => {
+      const box = showreel.getBoundingClientRect();
+      const y = (window.innerHeight - box.height) / 2; // centred during the hold
+      return { left: -box.left - 1, top: -y - 1, width: window.innerWidth + 2, height: window.innerHeight + 2 };
+    };
+    // One screen of scrolling to grow, then half a screen held full (user
+    // decision) before the page moves on.
+    gsap
+      .timeline({
+        scrollTrigger: {
+          trigger: showreel,
+          start: "center center",
+          end: "+=150%",
+          pin: true,
+          scrub: 1,
+          invalidateOnRefresh: true,
+        },
+      })
+      .to(preview, {
+        left: () => edge().left,
+        top: () => edge().top,
+        width: () => edge().width,
+        height: () => edge().height,
+        borderRadius: 0,
+        duration: 1,
+        ease: "power1.inOut",
+      })
+      .to({}, { duration: 0.5 });
+
+    if (!finePointer) return;
     gsap.set(button, { xPercent: -50, yPercent: -50, x: 0, y: 0 });
     const toX = gsap.quickTo(button, "x", { duration: FOLLOW, ease: "power3.out" });
     const toY = gsap.quickTo(button, "y", { duration: FOLLOW, ease: "power3.out" });
+    // Kept inside the video, which may have grown past the showreel box; both
+    // share the same centre.
     const follow = (event) => {
-      const box = showreel.getBoundingClientRect();
+      const box = preview.getBoundingClientRect();
       const halfW = button.offsetWidth / 2;
       const halfH = button.offsetHeight / 2;
-      const x = gsap.utils.clamp(halfW, box.width - halfW, event.clientX - box.left);
-      const y = gsap.utils.clamp(halfH, box.height - halfH, event.clientY - box.top);
-      toX(x - box.width / 2);
-      toY(y - box.height / 2);
+      const x = gsap.utils.clamp(box.left + halfW, box.right - halfW, event.clientX);
+      const y = gsap.utils.clamp(box.top + halfH, box.bottom - halfH, event.clientY);
+      toX(x - (box.left + box.width / 2));
+      toY(y - (box.top + box.height / 2));
     };
     on(showreel, "mouseenter", (event) => {
       showreel.classList.add("is-following");
@@ -72,7 +112,7 @@ export function initHeroShowreel() {
     return { left: (window.innerWidth - width) / 2, top: (window.innerHeight - height) / 2, width, height };
   };
   const source = () => {
-    const box = showreel.getBoundingClientRect();
+    const box = preview.getBoundingClientRect();
     return { left: box.left, top: box.top, width: box.width, height: box.height };
   };
 
