@@ -139,3 +139,8 @@ Pengguna memilih tetap memakai transisi scrub dengan wrapper (versi "mulai lebih
 - Jarak dari teks terakhir Milestone ke Motto 1 adalah ±710px di 1440px: padding bawah Milestone 200px ditambah Motto 1 di tengah layar 512px. Mengubah timing tidak mengurangi jarak ini.
 - Dengan transisi JS aktif (`.tone-shift.is-toned`), `.milestone` diberi margin bawah negatif, sehingga section Motto dimulai lebih tinggi. Percobaan pertama 200px (jarak ke Motto 1 ±495px), lalu dipilih **350px** (`fluid(-350)`), sehingga jarak ke Motto 1 menjadi ±345px. Tumpukannya tidak terlihat, karena latar Motto masih transparan dan Milestone memudar sebelum latar gelap. Frame Motto yang tertahan tidak berubah. Tanpa JS atau dengan reduced motion, padding 200px tetap seperti Figma.
 - Terukur di 1440px dengan 350px: saat atas Motto di 50%, teks Milestone berakhir di 662px dan Motto 1 di 1007px. Milestone memudar saat teksnya di 66 → 46% layar, dan Motto 1 muncul di ±73 → 67%. Urutan transisi sama seperti sebelumnya. Langkah 0–6 maju dan mundur, muat ulang di langkah 6, dan pelepasan ke footer tetap benar.
+
+### Ekor huruf terpotong pada gradien per huruf (27 Okt 2026)
+- Ekor huruf "g" di "Trendsetting Design" sempat terpotong saat gradien menyala, karena salinan gradien diposisikan absolut, sehingga kotaknya hanya setinggi line-height (46px), sedangkan teksnya 52px.
+- Peran kedua salinan sekarang ditukar: salinan gradien tetap inline (kotak gradien setinggi teks penuh, sama seperti teks aksen tanpa JS), dan salinan putih yang absolut di atasnya.
+- Terukur di 1440px: kedua salinan tepat di atas huruf asli (selisih 0px) di ketiga baris, dan kotak gradien 52px. Screenshot langkah 0, 3, dan 5: ekor "g" utuh.

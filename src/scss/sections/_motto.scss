@@ -176,10 +176,17 @@
   left: var(--x);
 }
 
-.motto__glyph-gradient {
+// The plain copy lies over the gradient one. The gradient copy stays inline,
+// so its background covers the whole text box like the original accent text,
+// descenders included (an absolute copy would only cover the line height and
+// cut the tail of "g").
+.motto__glyph-text {
   position: absolute;
   top: 0;
   left: 0;
+}
+
+.motto__glyph-gradient {
   // One gradient box for the whole line (--pw, in em), as in Figma.
   background-image: var(--motto-gradient);
   background-size: var(--pw) 100%;
