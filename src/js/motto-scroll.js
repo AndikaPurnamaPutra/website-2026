@@ -240,19 +240,21 @@ export function initMottoScroll() {
       gsap
         .timeline({
           defaults: { ease: "sine.inOut" },
-          // Starts once Motto is a quarter into the screen (user decision), so
-          // Milestone stays on white for longer.
-          scrollTrigger: { trigger: section, start: "top 75%", end: "top top", scrub: 1, invalidateOnRefresh: true },
+          // Starts once Motto is halfway into the screen (user decision), so
+          // the change happens close to Motto. Motto top: 50% → 0% of the screen.
+          scrollTrigger: { trigger: section, start: "top 50%", end: "top top", scrub: 1, invalidateOnRefresh: true },
         })
-        // Milestone fades out first, while the background is still white, then
-        // the background darkens: no dark text over a grey background.
+        // Hand-over: Milestone fades out first while the background is still
+        // white (no dark text over grey), the background darkens, and motto 1,
+        // already in the lower part of the screen, comes in as Milestone goes,
+        // so the space between them never reads as empty.
         .to(milestone, { autoAlpha: 0, y: () => -40 * designPx(), duration: 0.3, ease: "power1.inOut" }, 0)
-        .to(wrapper, { backgroundColor: "#111111", duration: 0.5 }, 0.3)
-        .to(wrapperTexture, { opacity: 0.1, duration: 0.5 }, 0.3)
+        .to(wrapper, { backgroundColor: "#111111", duration: 0.5 }, 0.2)
+        .to(wrapperTexture, { opacity: 0.1, duration: 0.5 }, 0.2)
         .to(backdrop, { autoAlpha: 1, duration: 0.3 }, 0.7)
         // Motto 1 blurs in while the section scrolls in (it is complete before
-        // the pin), once the background is dark.
-        .to(linesBox, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.35, ease: "power2.out" }, 0.55);
+        // the pin), as the background turns dark.
+        .to(linesBox, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.4, ease: "power2.out" }, 0.4);
 
       // The label follows once motto 1 has settled in the center, i.e. when the
       // section pins. It plays on its own clock (the reader rests on step 0

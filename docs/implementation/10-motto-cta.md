@@ -121,3 +121,16 @@ Atas permintaan pengguna: motto 1 muncul lebih dulu, dan label "( Our Motto's )"
 - Sebelumnya transisi mulai saat Motto baru masuk dari bawah layar, dan teks gelap Milestone masih terlihat di atas latar abu-abu.
 - Sekarang transisi baru mulai saat Motto sudah masuk 25% dari bawah layar (`start: "top 75%"`). Milestone memudar lebih dulu selagi latar masih putih, baru setelah itu latar menggelap.
 - Terukur di 1440px (posisi atas Motto dari atas layar): Milestone 1 → 0,22 → 0 di 70 / 60 / 50%. Latar putih sampai 50%, lalu #c3c3c3 di 40%, #636363 di 30%, #1b1b1b di 20%, dan #111 di 10%. Motto 1 0,37 di 30% dan penuh di 10%. Scroll kembali ke atas mengembalikan Milestone dan latar putih.
+
+### Variasi transisi Milestone → Motto: dicoba, tidak dipakai (27 Okt 2026)
+Pengguna memilih tetap memakai transisi scrub dengan wrapper (versi "mulai lebih lambat" di atas). Waktunya disesuaikan lagi di bagian berikut. Tiga variasi sudah dicoba dan dibatalkan:
+1. Transisi hanya di section Motto, tanpa wrapper, mulai di 15% dari atas layar.
+2. Berbasis waktu (seperti manual.studio), dipicu di 15%.
+3. Berbasis waktu, dipicu di 60%, dengan teks Milestone versi terang dan menu bar gelap.
+
+### Transisi dimulai lebih dekat, dengan serah terima (27 Okt 2026, saran disetujui)
+- Tujuannya supaya jarak Milestone → Motto 1 (±710px di 1440px: padding bawah Milestone 200px ditambah Motto 1 di tengah section) tidak terasa kosong.
+- `start: "top 50%"` (sebelumnya 75%). Urutannya, diukur dari posisi atas Motto: Milestone memudar 50 → 35%, latar menggelap 40 → 15%, Motto 1 muncul 30 → 10% (saat itu Motto 1 sudah terlihat di ±80 → 60% layar), dan latar Motto 15 → 0%.
+- Terukur di 1440px: Milestone 1 / 0,77 / 0,22 / 0 di 50 / 45 / 40 / 35%. Latar #e8e8e8 / #acacac / #636363 / #272727 / #111 di 35 / 30 / 25 / 20 / 15%. Motto 1 0,58 / 0,88 / 1 di 25 / 20 / 10%.
+- Sisa fase kosong (abu-abu tanpa teks) hanya di sekitar 35 → 27%, ±80px scroll. Teks putih Motto 1 baru terbaca setelah latar cukup gelap.
+- Langkah 0–4 dan scroll balik tetap benar.
