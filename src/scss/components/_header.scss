@@ -21,12 +21,14 @@
     background-color 0.4s ease-out,
     color 0.4s ease-out;
 
+  // 1px extra so no hairline stays at a fractional height (browser zoom).
   &.is-hidden {
-    transform: translateY(-100%);
+    transform: translateY(calc(-100% - 1px));
   }
 
-  // Figma shadow, only once the page has left the top.
-  &.is-scrolled {
+  // Figma shadow, only once the page has left the top. Not while hidden: the
+  // shadow falls below the bar and would stay at the top of the screen.
+  &.is-scrolled:not(.is-hidden) {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
   }
 
