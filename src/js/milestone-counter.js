@@ -7,7 +7,9 @@ import { createGradientWave } from "./gradient-wave.js";
 // 2. a brand-gradient wave runs through "$139M+", which stays black at rest
 //    like the hero accent (user decision; src/js/gradient-wave.js), and again
 //    whenever the pointer enters its row;
-// 3. the lead sentence turns from the paragraph grey to ink, all at once.
+// 3. ink flows through the lead sentence from left to right with a soft edge,
+//    from the paragraph grey (reference from the user: drone.riotters.com,
+//    played on its own clock instead of the scroll; once, no replay).
 // Without JS or with reduced motion the final values are shown, in black.
 export function initMilestoneCounter() {
   const root = document.querySelector("[data-milestone]");
@@ -26,7 +28,10 @@ export function initMilestoneCounter() {
   const counters = values.map((el) => ({ el, n: 0 }));
   values.forEach((el) => setNumber(el, 0));
   gsap.set(values, { autoAlpha: 0, y: 12, filter: "blur(6px)" });
-  gsap.set(lead, { color: "rgba(0, 0, 0, 0.4)" });
+  // A gradient (ink | soft edge | grey) clipped to the text is moved across
+  // it, so the text is not split and keeps its kerning (_milestone.scss).
+  lead.classList.add("is-sweeping");
+  gsap.set(lead, { backgroundPosition: "100% 0%" });
 
   const timeline = gsap.timeline({ paused: true });
   timeline
@@ -56,8 +61,19 @@ export function initMilestoneCounter() {
       wave = createGradientWave(waveNumber, "linear-gradient(207.35deg, var(--gradient-brand-stops))");
       wave.play();
       waveRow.addEventListener("mouseenter", wave.play);
-    })
-    .to(lead, { color: "#111", duration: 0.7, ease: "sine.inOut" }, 1.6);
+    });
+
+  // The sweep has its own trigger: the paragraph sits below the numbers and is
+  // often still off screen when they start, and this way it does not run at
+  // the same time as the "$139M+" wave. A short pause first lets the grey text
+  // register.
+  const sweep = gsap.to(lead, { backgroundPosition: "0% 0%", duration: 1.3, delay: 0.2, ease: "power2.inOut", paused: true });
+  const sweepTrigger = ScrollTrigger.create({
+    trigger: lead.closest(".milestone__text"),
+    start: "top 85%",
+    once: true,
+    onEnter: () => sweep.play(),
+  });
 
   const trigger = ScrollTrigger.create({
     trigger: root,
@@ -68,13 +84,16 @@ export function initMilestoneCounter() {
 
   return () => {
     trigger.kill();
+    sweepTrigger.kill();
     timeline.kill();
+    sweep.kill();
     if (wave) {
       waveRow.removeEventListener("mouseenter", wave.play);
       wave.destroy();
     }
     values.forEach((el) => setNumber(el, el.dataset.count));
     gsap.set(values, { clearProps: "opacity,visibility,transform,filter" });
-    gsap.set(lead, { clearProps: "color" });
+    lead.classList.remove("is-sweeping");
+    gsap.set(lead, { clearProps: "backgroundPosition" });
   };
 }

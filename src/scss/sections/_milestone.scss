@@ -61,3 +61,14 @@
 .milestone__text-lead {
   color: var(--color-ink);
 }
+
+// JS sweep (src/js/milestone-counter.js): ink | soft edge | paragraph grey,
+// twice the text width, moved from the grey end to the ink end. On a wrapped
+// line the background runs on from one line to the next.
+.milestone__text-lead.is-sweeping {
+  background-image: linear-gradient(90deg, var(--color-ink) 45%, rgba(0, 0, 0, 0.4) 55%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
