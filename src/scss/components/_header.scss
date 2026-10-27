@@ -70,6 +70,30 @@ main {
   align-items: flex-start;
 }
 
+// Privacy Policy bar (Figma 1611:12268): Back on the left, logo centred.
+.site-header--back .site-header__inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.site-header__back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: start;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: normal;
+  letter-spacing: -0.02em;
+
+  img {
+    width: 20px;
+    height: 20px;
+  }
+}
+
 .site-header__logo {
   display: block;
 

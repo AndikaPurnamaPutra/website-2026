@@ -1,0 +1,151 @@
+extends ../layouts/default
+
+//- Figma: "Privacy and Policy" 1611:7774. Text exactly as in Figma (user
+//- decision), including the repeated title of section 9.
+//- Each section is a list of groups (8px apart); the items of a group are 2px
+//- apart. Item types: p (lines; "" = empty line), sub (bold subheading),
+//- ul / ol (items of [bold label, text]), html (paragraph with inline markup).
+block title
+  | Privacy Policy — OWW
+
+block header
+  include ../partials/header-back
+
+block content
+  -
+    var meta = [
+      ["Effective Date :", "October 26, 2026"],
+      ["Last Updated :", "October 26, 2026"],
+      ["Data Controller :", 'PT. One Week Wonders ("Agency," "we," "us," or "our")'],
+      ["Address :", "Jl. Mampang Prapatan Raya No. 73A, Jakarta Selatan, DKI Jakarta 12790, Indonesia"],
+      ["Contact Email :", "admin@oneweekwonders.com"]
+    ]
+    var sections = [
+      { title: "Introduction & Scope", groups: [[
+        { p: [
+          "PT. One Week Wonders is a creative design and front-end development agency headquartered in Jakarta, Indonesia.",
+          "We provide Brand Identity, Visual Design, UI/UX Prototyping, and Webflow Development services to local and international clients.",
+          "",
+          "This Privacy Policy explains how we collect, process, disclose, and safeguard personal data when you interact with our website, schedule meetings through our booking links, fill out inquiry or onboarding questionnaires, or engage our agency services.",
+          "",
+          "By accessing our website or utilizing our services, you acknowledge the terms outlined in this policy."
+        ] }
+      ]] },
+      { title: "Information We Collect", groups: [
+        [{ p: ["We collect data directly from you, automatically through site navigation, and through integrated third-party platforms."] }],
+        [
+          { sub: "A. Information You Provide Directly" },
+          { ul: [
+            ["Discovery & Lead Generation Data:", "Name, business email, job title, company name, address, website URL, project scope preferences, and budget details collected via contact forms, onboarding questionnaires, or meeting bookings."],
+            ["Project & Communications Data:", "Brand assets, strategy materials, proprietary text/copy, credentials for domain or CMS setup, and feedback provided during design and development iterations."],
+            ["Billing & Financial Records:", "Tax identifiers, billing addresses, and invoice history associated with retainer deposits and project milestone payments."]
+          ] }
+        ],
+        [
+          { sub: "B. Information Collected Automatically" },
+          { ul: [
+            ["Device & Usage Analytics:", "IP address, geographic location, browser type, operating system, pages visited, time spent on site, referring URLs, and device telemetry recorded via web analytics scripts and cookies."]
+          ] }
+        ]
+      ] },
+      { title: "Third-Party Tools & Data Processors", groups: [[
+        { p: ["Third-Party Tools & Data Processors"] },
+        { ul: [
+          ["Calendly (Scheduling):", "To coordinate discovery calls, project kickoff meetings, and client reviews."],
+          ["ClickUp (Onboarding & Workflows):", "To host client intake forms, project briefs, and internal task tracking."],
+          ["Google Analytics (Performance Tracking):", "To analyze website performance, visitor traffic, and engagement metrics."],
+          ["Figma (Design Environment):", "To host collaborative design systems, wireframes, mockups, and client prototypes."],
+          ["Webflow (Development & Hosting):", "To build staging environments, manage CMS assets, and deploy responsive web builds."]
+        ] }
+      ]] },
+      { title: "Legal Basis for Processing Data", groups: [[
+        { p: ["We process personal data under the following legal bases:"] },
+        { ol: [
+          ["Performance of Contract:", "Processing necessary to execute project agreements, deliver milestones, manage revisions, and process payments."],
+          ["Legitimate Interests:", "Operations related to agency business performance, fraud prevention, site optimization, and client account management."],
+          ["Consent:", "Where you expressly consent to non-essential cookie tracking or opt into direct marketing communications."],
+          ["Legal Compliance:", "Fulfilling statutory record-keeping, tax reporting, and regulatory requirements under Indonesian law."]
+        ] }
+      ]] },
+      { title: "International Data Transfers", groups: [[
+        { p: ["As an Indonesian entity serving a global clientele, the data we collect may be transferred to, stored, or processed outside your country of residence, including servers in Indonesia, the United States, and the European Union."] },
+        { ul: [
+          ["For European & International Clients:", "When transferring personal data outside the EEA/UK, we rely on standard contractual clauses, adequacy mechanisms, or explicit contractual necessity to ensure appropriate data protection safeguards."],
+          ["Cross-Border Protections:", "We ensure our cloud vendors maintain robust security standards (such as ISO/IEC 27001 or SOC 2 certifications) for cross-border data handling."]
+        ] }
+      ]] },
+      { title: "Cookies and Tracking Technologies", groups: [[
+        { p: ["Our website utilizes cookies to distinguish you from other users, provide necessary site functionality, and improve our services."] },
+        { ul: [
+          ["Essential Cookies:", "Required for core site functionality and security."],
+          ["Analytics/Performance Cookies:", "Used to understand how visitors interact with our site (subject to your consent)."]
+        ] },
+        { p: ["You can manage your cookie preferences at any time through our website's cookie consent banner or your browser settings."] }
+      ]] },
+      { title: "Data Retention & Security", groups: [[
+        { ul: [
+          ["Security Measures:", "We enforce administrative, technical, and physical security measures—including restricted access controls, secure credential management, and encrypted data transfers—to protect client files and personal data."],
+          ["Data Breach Notification:", "In the highly unlikely event of a data breach that poses a risk to your rights and freedoms, we will notify you and the relevant supervisory authorities within the legally mandated timeframes (e.g., 72 hours under GDPR/UU PDP)."],
+          ["Retention Schedule:", "Contact and financial records are retained for 10 years as required by Indonesian tax laws and corporate accounting needs. Staging credentials, domain access tokens, and temporary files granted for Webflow launches are removed or revoked following final project handover."]
+        ] }
+      ]] },
+      { title: "Your Data Protection Rights", groups: [[
+        { p: ["Depending on your jurisdiction (e.g., EU GDPR, US State Laws, or Indonesia UU PDP No. 27/2022), you hold specific privacy rights:"] },
+        { ul: [
+          ["Access & Rectification:", "Request access to or correction of inaccurate personal data held by us."],
+          ['Erasure ("Right to be Forgotten"):', "Request deletion of your personal data, subject to statutory retention obligations."],
+          ["Restriction & Objection:", "Restrict or object to certain processing activities, including marketing or analytics profiling."],
+          ["Withdraw Consent:", "Withdraw consent previously granted for optional cookies or marketing communications."]
+        ] },
+        { html: 'To exercise any of these rights, please email us directly at <a href="mailto:admin@oneweekwonders.com">admin@oneweekwonders.com</a>.<br>You may also contact our Data Protection Officer directly at <a href="mailto:internal@oneweekwonders.com">internal@oneweekwonders.com</a>.' }
+      ]] },
+      { title: "Cookies and Tracking Technologies", groups: [[
+        { p: ["Our services and website are intended strictly for business professionals and adults. We do not knowingly collect personal data from children under the age of 16. If we become aware that we have inadvertently collected data from a child, we will take immediate steps to delete such information from our records."] }
+      ]] },
+      { title: "Governing Law & Dispute Resolution", groups: [[
+        { p: ["This Privacy Policy is governed by and construed in accordance with the laws of the Republic of Indonesia. Any disputes arising out of or in connection with data protection or agency services shall be submitted to the exclusive jurisdiction of the District Court of South Jakarta (Pengadilan Negeri Jakarta Selatan)."] }
+      ]] },
+      { title: "Updates to This Policy", groups: [[
+        { p: ['We may update this Privacy Policy from time to time to reflect operational changes, tool integrations, or legal updates. Revisions will be posted on our website with an updated "Effective Date."'] }
+      ]] }
+    ]
+
+  article.policy
+    .container
+      header.policy__header
+        h1.policy__title.text-heading-42
+          | One Week Wonders -
+          br
+          | Privacy and Policy
+        dl.policy__meta
+          each row in meta
+            .policy__meta-row
+              dt= row[0]
+              dd= row[1]
+
+      ol.policy__sections
+        each section, index in sections
+          li.policy__section
+            span.policy__number(aria-hidden="true")= `${index + 1}.`
+            .policy__body
+              h2.policy__heading= section.title
+              each group in section.groups
+                .policy__group
+                  each item in group
+                    if item.p
+                      p
+                        each line, i in item.p
+                          if i > 0
+                            br
+                          | #{line}
+                    else if item.sub
+                      p.policy__sub= item.sub
+                    else if item.ul || item.ol
+                      - var tag = item.ul ? "ul" : "ol"
+                      #{tag}.policy__list(class=item.ol ? "policy__list--numbered" : null)
+                        each entry in (item.ul || item.ol)
+                          li
+                            strong= entry[0]
+                            |  #{entry[1]}
+                    else if item.html
+                      p!= item.html

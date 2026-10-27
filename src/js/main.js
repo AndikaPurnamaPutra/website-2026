@@ -12,6 +12,7 @@ import { initMilestoneCounter } from "./milestone-counter.js";
 import { initMottoScroll } from "./motto-scroll.js";
 import { initHeader } from "./header.js";
 import { initFooterForm } from "./footer-form.js";
+import { initBackLink } from "./back-link.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -32,6 +33,7 @@ function initPage() {
   // After the services pin so its pin spacer can be measured.
   cleanups.push(initHeader());
   cleanups.push(initFooterForm());
+  cleanups.push(initBackLink());
 }
 
 function destroyPage() {

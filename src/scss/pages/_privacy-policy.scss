@@ -1,0 +1,122 @@
+// Figma: "Privacy and Policy" 1611:7774. Text sizes, the text column and the
+// spacing between text blocks follow the type scale; the page spacing (top,
+// title → sections, bottom) the layout scale.
+@use "../abstracts/functions" as *;
+
+.policy {
+  // Above the footer, so the footer coin passes behind it, as behind the
+  // Motto section on the homepage.
+  position: relative;
+  z-index: 1;
+  background: var(--color-white);
+  // Title at 144px in Figma: 104px header space (main) + 40px.
+  padding-top: fluid(40);
+  // Footer 128px below the last section.
+  padding-bottom: fluid(128);
+}
+
+.policy__header {
+  display: flex;
+  flex-direction: column;
+  gap: fs(24);
+  max-width: fs(599);
+}
+
+.policy__meta {
+  display: flex;
+  flex-direction: column;
+  gap: fs(8);
+  margin: 0;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: fs(14);
+  // Figma's 160% renders as 22px lines.
+  line-height: calc(22 / 14);
+  letter-spacing: -0.02em;
+
+  dt,
+  dd {
+    display: inline;
+  }
+
+  // One line each, as in Figma (the address runs past the title width).
+  .policy__meta-row {
+    white-space: nowrap;
+  }
+
+  dt {
+    font-weight: 600;
+  }
+
+  dd {
+    margin-left: 0.25em;
+    color: var(--color-text-secondary);
+  }
+}
+
+.policy__sections {
+  display: flex;
+  flex-direction: column;
+  gap: fs(24);
+  max-width: fs(900);
+  margin-top: fluid(100);
+}
+
+.policy__section {
+  display: flex;
+  gap: fs(8);
+}
+
+.policy__number,
+.policy__heading {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: fs(28);
+  // Figma "normal": 38px per line.
+  line-height: calc(38 / 28);
+  letter-spacing: -0.03em;
+}
+
+.policy__number {
+  flex: 0 0 fs(32);
+}
+
+.policy__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: fs(8);
+  min-width: 0;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: fs(16);
+  // Figma's 160% renders as 26px lines (6 lines = 156px).
+  line-height: calc(26 / 16);
+  letter-spacing: -0.03em;
+  color: var(--color-text-secondary);
+}
+
+.policy__heading {
+  color: var(--color-ink);
+}
+
+.policy__group {
+  display: flex;
+  flex-direction: column;
+  gap: fs(2);
+}
+
+.policy__sub,
+.policy__body strong,
+.policy__body a {
+  font-weight: 600;
+}
+
+.policy__list {
+  padding-left: fs(24);
+  list-style: disc;
+}
+
+.policy__list--numbered {
+  list-style: decimal;
+}

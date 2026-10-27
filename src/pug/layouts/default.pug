@@ -11,7 +11,8 @@ html(lang="en")
         | OWW
     link(rel="stylesheet" href="css/main.css")
   body
-    include ../partials/header
+    block header
+      include ../partials/header
     main
       block content
     include ../partials/footer

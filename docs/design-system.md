@@ -31,6 +31,7 @@ All sizes in this document are **Figma pixels** at the 1440px frame. In code the
 |---|---|---|---|
 | `--color-ink` | `#111111` | Primary text, dark surfaces, buttons | [T] |
 | `--color-ink-2` | `#1f1f1f` | End of dark CTA gradient | [T] |
+| `--color-text-secondary` | `#555555` | Privacy Policy body text and metadata values (Figma 1611:7774) | [T] |
 | `--color-white` | `#ffffff` | Light surfaces, text on dark | [T] |
 | `--color-surface-muted` | `#f6f6f6` | Clients section background | [T] |
 | `--color-surface-soft` | `#eeeeee` | Social icon tiles | [T] |
@@ -45,6 +46,7 @@ All sizes in this document are **Figma pixels** at the 1440px frame. In code the
 | `--color-divider-dark` | `rgba(255,255,255,.1)` | Dividers on dark (0.5px) | [T] |
 
 - Muted text uses `opacity: .5` (`.text-muted`), not a grey color. Exception: Milestone paragraph uses `rgba(0,0,0,.4)`. [T]
+- Body font weights: Inter 400, 500 and 600 (SemiBold, added for the Privacy Policy labels; official Inter 4.1 release, same as the other Inter files). [T]
 - Brand gradient: `--gradient-brand-stops` = `#0B1550` 18.9% → `#496AF8` 52.4% → `#81C4FB` 80.9% (revised to blue in Figma `1574:796`, 26 Oct 2026; was blue → yellow → red). Used by the hero accent, the Statement decorative icon and "$139M+". The angle differs per element (≈185–207deg), so it is set where used. `.text-gradient` reads `--gradient-angle` (default 201deg). [T]
 - Motto "believers." (on dark): Figma still shows the old `#457BF9` → `#FFDC7B` → `#FD1D1D`, but the user decided (26 Oct 2026) to use the latest blue gradient there too. `--gradient-brand-stops-dark` will be switched to the blue stops when the Motto section is built. [U]
 

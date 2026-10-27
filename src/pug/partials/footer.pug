@@ -7,7 +7,7 @@
     { title: "Navigation", links: [["Works", "#"], ["About", "#"], ["Team", "#"], ["Services", "#"], ["Career", "#"], ["Blog", "#"]] },
     { title: "Contact", links: [["owwstudio@gmail.com", "mailto:owwstudio@gmail.com"], ["+62 878 869 785 4", "tel:+628788697854"]] }
   ]
-  var legal = ["Privacy Policy", "Terms & Conditions", "Legal"]
+  var legal = [["Privacy Policy", "privacy-policy.html"], ["Terms & Conditions", "#"], ["Legal", "#"]]
 
 footer.site-footer
   .site-footer__inner
@@ -41,4 +41,4 @@ footer.site-footer
       ul.site-footer__legal
         each item in legal
           li
-            a.site-footer__link(href="#")= item
+            a.site-footer__link(href=item[1])= item[0]

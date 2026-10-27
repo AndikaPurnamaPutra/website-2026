@@ -1,0 +1,10 @@
+//- Figma: Menu Bar of the Privacy Policy page (1611:12268): "Back" on the left,
+//- logo in the middle. Same fixed behaviour as the main header (user decision).
+//- src/js/back-link.js goes back to the previous page when it was on this site.
+header.site-header.site-header--back(data-header)
+  .container.site-header__inner
+    a.site-header__back(href="index.html" data-back-link)
+      img(src="assets/icons/caret-left.svg" width="20" height="20" alt="")
+      | Back
+    a.site-header__logo(href="index.html" aria-label="One Week Wonders — Home")
+      img(src="assets/images/logo.svg" width="50.25" height="24" alt="")
