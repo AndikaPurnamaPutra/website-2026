@@ -1,7 +1,7 @@
 extends ../layouts/default
 
 //- Figma: "Terms of Service" 1611:11735. Text exactly as in Figma (user
-//- decision), including subsection 3.2, which appears twice there.
+//- decision); subsection 3.2 appears twice there, shown once (user decision).
 //- Item types: see src/pug/mixins/policy.pug.
 
 block title
@@ -19,9 +19,6 @@ block content
       ["Address :", "Jl. Mampang Prapatan Raya No. 73A, Jakarta Selatan, DKI Jakarta 12790, Indonesia"],
       ["Contact Email :", "admin@oneweekwonders.com"]
     ]
-    var invoicing = { num: "3.2", items: [
-      { lead: ["Invoicing & Payment Terms", "Invoices are payable within three (3) business days of receipt. If any milestone payment remains unpaid for more than five (5) business days beyond its due date, the Agency reserves the right to suspend all active work, including withholding access to deliverables, work-in-progress files, or staging environments."] }
-    ] }
     var sections = [
       { title: "Overview & Acceptance of Terms", groups: [[
         { p: [
@@ -56,8 +53,9 @@ block content
             ["Final Payment (20%):", "Due upon completion of all services and prior to the release of final deliverables or master source files."]
           ] }
         ] }],
-        [invoicing],
-        [invoicing],
+        [{ num: "3.2", items: [
+          { lead: ["Invoicing & Payment Terms", "Invoices are payable within three (3) business days of receipt. If any milestone payment remains unpaid for more than five (5) business days beyond its due date, the Agency reserves the right to suspend all active work, including withholding access to deliverables, work-in-progress files, or staging environments."] }
+        ] }],
         [{ num: "3.3", items: [
           { lead: ["Third-Party Expenses", "Clients are responsible for reimbursing the Agency for any third-party costs (e.g., premium fonts, stock assets, plugins) required for the project, provided such expenses are approved by the Client in writing in advance."] }
         ] }],

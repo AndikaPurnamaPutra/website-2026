@@ -13,7 +13,7 @@ Figma: "Terms of Service" 1611:11735 (1440 × 4493). Desktop dulu; mobile menung
   - **Subbagian bernomor** (3.1 … 7.2): nomor SemiBold di kolom 26px, jarak 8px, isi di sebelahnya.
   - **Paragraf dengan lead tebal** ("**Rush Fees** Any deliverable …").
   - Daftar tanpa label tebal (mis. Explicit Exclusions, Refund Policy).
-- Teks persis Figma, termasuk **subbagian 3.2 "Invoicing & Payment Terms" yang muncul dua kali** di Figma.
+- Teks persis Figma. **Subbagian 3.2 "Invoicing & Payment Terms" muncul dua kali di Figma; ditampilkan sekali** (keputusan pengguna, 27 Okt 2026). Karena itu halaman 86px lebih pendek dari Figma mulai subbagian 3.3.
 
 ## Implementasi
 - Kerangka halaman legal dijadikan mixin bersama `src/pug/mixins/policy.pug` (`+policyPage(title, meta, sections)`), dipakai Privacy Policy dan Terms of Service. Tipe item baru: `lead`, `num`, dan entri daftar berupa teks biasa.
