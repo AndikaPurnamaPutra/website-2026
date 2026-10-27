@@ -8,8 +8,8 @@ import gsap from "gsap";
 // dark backdrop and plays with sound; ×, a click on the backdrop or Esc close
 // it, and it shrinks back to the showreel. When the showreel reaches the
 // middle of the screen it holds while the video grows to fill the screen over
-// one screen of scrolling, holds full for half a screen, then the page
-// moves on (user decision).
+// 0.6 of a screen of scrolling, holds full for 0.3, then the page moves on
+// (user decision).
 const FOLLOW = 0.6; // also the glide back to the centre
 const OPEN = 0.5;
 const CLOSE = 0.4;
@@ -53,16 +53,17 @@ export function initHeroShowreel() {
       const y = (window.innerHeight - box.height) / 2; // centred during the hold
       return { left: -box.left - 1, top: -y - 1, width: window.innerWidth + 2, height: window.innerHeight + 2 };
     };
-    // One screen of scrolling to grow, then half a screen held full (user
-    // decision) before the page moves on.
+    // 0.6 of a screen of scrolling to grow, then 0.3 held full before the
+    // page moves on (user: quicker, still smooth). The growth answers at once
+    // and lands softly (power2.out); scrub 0.5 keeps it smooth.
     gsap
       .timeline({
         scrollTrigger: {
           trigger: showreel,
           start: "center center",
-          end: "+=150%",
+          end: "+=90%",
           pin: true,
-          scrub: 1,
+          scrub: 0.5,
           invalidateOnRefresh: true,
         },
       })
@@ -72,10 +73,10 @@ export function initHeroShowreel() {
         width: () => edge().width,
         height: () => edge().height,
         borderRadius: 0,
-        duration: 1,
-        ease: "power1.inOut",
+        duration: 0.6,
+        ease: "power2.out",
       })
-      .to({}, { duration: 0.5 });
+      .to({}, { duration: 0.3 });
 
     if (!finePointer) return;
     gsap.set(button, { xPercent: -50, yPercent: -50, x: 0, y: 0 });
