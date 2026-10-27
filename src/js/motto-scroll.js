@@ -240,15 +240,19 @@ export function initMottoScroll() {
       gsap
         .timeline({
           defaults: { ease: "sine.inOut" },
-          scrollTrigger: { trigger: section, start: "top bottom", end: "top top", scrub: 1, invalidateOnRefresh: true },
+          // Starts once Motto is a quarter into the screen (user decision), so
+          // Milestone stays on white for longer.
+          scrollTrigger: { trigger: section, start: "top 75%", end: "top top", scrub: 1, invalidateOnRefresh: true },
         })
-        .to(milestone, { autoAlpha: 0, y: () => -40 * designPx(), duration: 0.5, ease: "power1.in" }, 0)
-        .to(wrapper, { backgroundColor: "#111111", duration: 0.7 }, 0.1)
-        .to(wrapperTexture, { opacity: 0.1, duration: 0.7 }, 0.1)
-        .to(backdrop, { autoAlpha: 1, duration: 0.4 }, 0.6)
+        // Milestone fades out first, while the background is still white, then
+        // the background darkens: no dark text over a grey background.
+        .to(milestone, { autoAlpha: 0, y: () => -40 * designPx(), duration: 0.3, ease: "power1.inOut" }, 0)
+        .to(wrapper, { backgroundColor: "#111111", duration: 0.5 }, 0.3)
+        .to(wrapperTexture, { opacity: 0.1, duration: 0.5 }, 0.3)
+        .to(backdrop, { autoAlpha: 1, duration: 0.3 }, 0.7)
         // Motto 1 blurs in while the section scrolls in (it is complete before
         // the pin), once the background is dark.
-        .to(linesBox, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.35, ease: "power2.out" }, 0.45);
+        .to(linesBox, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.35, ease: "power2.out" }, 0.55);
 
       // The label follows once motto 1 has settled in the center, i.e. when the
       // section pins. It plays on its own clock (the reader rests on step 0

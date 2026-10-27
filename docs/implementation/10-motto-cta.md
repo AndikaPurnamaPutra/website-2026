@@ -116,3 +116,8 @@ Atas permintaan pengguna: motto 1 muncul lebih dulu, dan label "( Our Motto's )"
 - Setelah langkah 5 (highlight "One Week Wonders Studio™") ada **satu scroll lagi (langkah 6)** sebelum section dilepas ke footer, supaya frame terakhir dan tombol Get a Quote sempat terbaca.
 - Di langkah 6 hanya cahaya yang "bernapas" sedikit: posisi bergeser ke x 736,5 / y −355,5 dan skala 0,83 → 0,87 (`sine.inOut`). Teks dan tombol tetap sama seperti Figma 1527:4241.
 - Diuji di 1440px: maju 5 → 6 → footer dan mundur footer → 6 → 5 berjalan per langkah, footer baru naik setelah langkah 6. Langkah 6 tetap terjaga setelah resize ke 1920px. Reduced motion juga lolos.
+
+### Transisi Milestone → Motto dimulai lebih lambat (27 Okt 2026, permintaan pengguna)
+- Sebelumnya transisi mulai saat Motto baru masuk dari bawah layar, dan teks gelap Milestone masih terlihat di atas latar abu-abu.
+- Sekarang transisi baru mulai saat Motto sudah masuk 25% dari bawah layar (`start: "top 75%"`). Milestone memudar lebih dulu selagi latar masih putih, baru setelah itu latar menggelap.
+- Terukur di 1440px (posisi atas Motto dari atas layar): Milestone 1 → 0,22 → 0 di 70 / 60 / 50%. Latar putih sampai 50%, lalu #c3c3c3 di 40%, #636363 di 30%, #1b1b1b di 20%, dan #111 di 10%. Motto 1 0,37 di 30% dan penuh di 10%. Scroll kembali ke atas mengembalikan Milestone dan latar putih.
