@@ -112,6 +112,16 @@ export function initServicesScroll() {
       },
     });
 
+    // From 2px before the pin (step 0 sits right at its start) until it ends,
+    // a 2px dark edge above the section (_services.scss) covers the sub-pixel seam
+    // its fractional page position can leave at the top of the screen.
+    ScrollTrigger.create({
+      trigger: section.parentElement,
+      start: "top top+=2",
+      end: "bottom bottom",
+      toggleClass: { targets: section, className: "is-pinned" },
+    });
+
     // Step 0 lives in the timeline too, so it is re-measured on refresh (card
     // heights change once the web fonts have loaded or the type scale changes).
     cards.forEach((card, i) => timeline.set(card, stateVars(i, 0), 0));

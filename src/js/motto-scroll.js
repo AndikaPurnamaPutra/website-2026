@@ -119,11 +119,20 @@ export function initMottoScroll() {
           ease: "power3.out",
         },
         invalidateOnRefresh: true,
+        // The section's page position is fractional (fluid sizes), and GSAP
+        // pins it where it was, up to 1px below the top of the screen; on some
+        // GPUs that leaves a light seam above it. Pinned exactly at 0 instead.
+        onToggle: (self) => {
+          if (self.isActive) section.style.top = "0px";
+        },
+        onRefresh: (self) => {
+          if (self.isActive) section.style.top = "0px";
+        },
         onUpdate: (self) => {
           if (resizing) return;
           const at = self.progress * steps;
           inside = self.scroll() >= self.start - 2 && self.scroll() <= self.end + 2;
-          if (Math.abs(at - Math.round(at)) < 0.002) settledStep = Math.round(at);
+          if (Math.abs(at - Math.round(at)) < 0.005) settledStep = Math.round(at);
         },
       },
     });
@@ -190,7 +199,9 @@ export function initMottoScroll() {
       timeline.to(lines[to], { rotationX: 0, y: 0, autoAlpha: 1, duration: 0.55, ease: reduceMotion ? "steps(1)" : "power3.out" }, at + 0.45);
     };
 
-    timeline.addLabel("step0", 0);
+    // Step 0 sits a few px into the pin (not at its very start), so it is
+    // pinned at 0 too (see onToggle above).
+    timeline.addLabel("step0", 0.003);
 
     toGradient(0, 0);
     timeline.to(ellipse, { autoAlpha: 1, y: 0 }, 0);
@@ -224,7 +235,9 @@ export function initMottoScroll() {
       { x: () => 736.5 * designPx(), y: () => -355.5 * designPx(), scale: 0.87, ease: reduceMotion ? "steps(1)" : "sine.inOut" },
       5,
     );
-    timeline.addLabel("step6", 6);
+    // A few px before the end of the pin, so the hold is still pinned at 0
+    // (see step 0).
+    timeline.addLabel("step6", 6 - 0.003);
 
     // Entry (before the pin): full-screen light → dark on the wrapper.
     // Start values are set here, not with fromTo: ScrollTrigger's refresh

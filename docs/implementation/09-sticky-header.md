@@ -110,3 +110,14 @@ Keputusan pengguna: menu bar **selalu terlihat** (tidak sembunyi saat scroll ke 
 - Di luar kedua section, aturan lama tetap berlaku (sembunyi saat scroll ke bawah, muncul saat scroll ke atas).
 - Diuji di 1440px: tersembunyi di dalam Services (naik dan turun) dan di dalam Motto (naik); muncul saat scroll ke atas sebelum Services dan di antara keduanya (Milestone).
 - Catatan: footer lebih pendek dari layar, jadi di posisi paling bawah halaman bagian atas layar masih berisi Motto, sehingga header tetap tersembunyi di sana.
+
+### Tepi bawah saat tersembunyi (27 Okt 2026)
+- Saat tersembunyi, menu bar sebenarnya sudah naik penuh (bawahnya di 0px), tapi bayangan Figma (`0 4px 10px`, hitam 4%) jatuh di bawahnya dan tetap terlihat di tepi atas layar.
+- Bayangan sekarang hanya ada saat menu bar terlihat (`.is-scrolled:not(.is-hidden)`, memudar 0,4 detik), dan posisi tersembunyi menjadi `translateY(calc(-100% - 1px))` supaya tidak tersisa garis saat zoom browser.
+- Terukur: tersembunyi → bawah −1px, bayangan transparan. Terlihat lagi → bawah 72px, bayangan kembali.
+- **Garis putih ternyata bukan dari menu bar** (screenshot pengguna, Motto langkah 0). Posisi section yang tertahan (Services, Motto) ada di piksel pecahan, karena ukuran fluid di atasnya: Motto +0,31px di 1440×900 dan 2174×1200, Services sampai +0,42px di 2560. Di browser dengan GPU, celah sepecahan piksel di tepi atas itu bisa memperlihatkan latar dasar yang putih (tidak tergambar di pengujian headless). Dengan `-99%`, sisa menu bar menutupi celah ini.
+- **Perbaikan Services:** dari 2px sebelum pin sampai pin berakhir (ScrollTrigger pada pin-spacer), section mendapat kelas `is-pinned` dengan `box-shadow: 0 -2px 0 #111`, sehingga celahnya tertutup warna section. Tepi ini tidak aktif sebelum dan sesudah pin. Dikonfirmasi pengguna: garisnya hilang.
+- **Perbaikan Motto** (tepi gelap saja tidak cukup di sana):
+  - Saat tertahan, Motto dipaksa tepat di `top: 0px` (`onToggle` dan `onRefresh`). Isinya bergeser ke atas kurang dari 1px.
+  - Label snap `step0` dan `step6` digeser 0,003 ke dalam pin (±3px scroll), karena tepat di awal atau akhir pin section belum atau sudah dilepas dan kembali ke posisi pecahan.
+  - Terukur di 1440×1024, 2174×1200, dan 2560×1440 (layar 2×): `top` tepat 0 di langkah 0–6, setelah resize, dan setelah muat ulang. Pelepasan ke footer tetap mulus.

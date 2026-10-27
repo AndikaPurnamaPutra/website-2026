@@ -19,6 +19,13 @@
   height: 100vh;
 }
 
+// While pinned: the section's page position is fractional (fluid sizes), so
+// the pinned layer can sit a fraction of a pixel below the top of the screen
+// and leave a light seam there. A 2px dark edge above it covers that.
+.services.is-pinned {
+  box-shadow: 0 -2px 0 var(--color-ink);
+}
+
 .services__label {
   position: absolute;
   top: fluid(39);
