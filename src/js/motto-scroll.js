@@ -8,9 +8,13 @@ import { designPx } from "./design-px.js";
 // step 1: "Trendsetting Design" turns gradient letter by letter (on its own
 //         clock once the step is reached), the ellipse rises;
 // step 2: the line flips to motto 2;   step 3: "believers." turns gradient;
-// step 4: flip to motto 3, the ellipse gives way to the light, Get a Quote appears;
-// step 5: the whole motto turns gradient, the light turns and glides to the center;
-// step 6: hold, the light breathes a little before the section releases.
+// step 4: flip to motto 3 and to the CTA label, the glow gives way to the
+//         left stage light, Get a Quote appears;
+// step 5: the whole motto turns gradient, the left light goes off as the
+//         center light comes on;
+// step 6: hold before the section releases.
+// The glow from below follows one smoothed journey (see lightPath); the stage
+// lights switch like a lighting cue on their own clock (see cue).
 // Timing and easing are not in Figma (approved proposal).
 
 
@@ -26,7 +30,9 @@ export function initMottoScroll() {
   const wrapperTexture = wrapper?.querySelector(".tone-shift__texture");
   const lines = [...section.querySelectorAll(".motto__line")];
   const ellipse = section.querySelector(".motto__ellipse");
-  const light = section.querySelector(".motto__light");
+  const beamLeft = section.querySelector(".motto__beam--left");
+  const beamCenter = section.querySelector(".motto__beam--center");
+  const labelTexts = [...section.querySelectorAll(".motto__label-text")];
   const diagonal = section.querySelector(".motto__bg--diagonal");
   const cta = section.querySelector(".cta");
   const steps = 6; // 5 Figma steps + a final hold before the footer
@@ -89,8 +95,6 @@ export function initMottoScroll() {
 
   // Ellipse offsets from its CSS position (bottom -602, left -115 in Figma px).
   const ellipseHidden = () => 322 * designPx(); // fully below the frame
-  const ellipseHigh = () => -155 * designPx(); // frame 1527:4201: y 802 → 647
-  const ellipseShift = () => -9 * designPx(); // x -15 → -24
 
   let cleanupListeners = () => {};
   // Last step the reader settled on (see the resize handling below).
@@ -104,11 +108,13 @@ export function initMottoScroll() {
     gsap.set([lines[1], lines[2]], { autoAlpha: 0, rotationX: -90, y: () => 10 * designPx() });
     gsap.set(charText.flatMap((list) => [...list]), { opacity: 1 });
     gsap.set(charGradient.flatMap((list) => [...list]), { opacity: 0 });
-    gsap.set(ellipse, { autoAlpha: 0, y: ellipseHidden });
-    gsap.set(light, { autoAlpha: 0, x: () => -80 * designPx(), y: 0, rotation: 0, scale: 1, transformOrigin: "6.015% 7.259%" });
+    gsap.set(labelTexts[0], { autoAlpha: 1, y: 0 });
+    gsap.set(labelTexts[1], { autoAlpha: 0, y: () => 6 * designPx() });
     gsap.set(diagonal, { autoAlpha: 0 });
     gsap.set(cta, { autoAlpha: 0, y: () => 12 * designPx() });
 
+    // Set up with the lights below; called with the pin's scroll progress.
+    let driveLight = () => {};
     const timeline = gsap.timeline({
       defaults: { duration: 1, ease: smooth },
       scrollTrigger: {
@@ -129,6 +135,7 @@ export function initMottoScroll() {
         },
         onUpdate: (self) => {
           if (resizing) return;
+          driveLight(self.progress);
           const time = self.progress * steps * (1 + REST);
           const step = Math.round(time / (1 + REST));
           inside = self.scroll() >= self.start - 2 && self.scroll() <= self.end + 2;
@@ -166,7 +173,7 @@ export function initMottoScroll() {
     };
 
     // Letters change from white to the gradient one after another, left to
-    // right. Unlike the flips and the light, this plays on its own clock
+    // right. Unlike the flips, this plays on its own clock
     // (≈0.8s) once the scroll passes the middle of its step, and plays back
     // when scrolling up, so the wave has the same tempo however one scrolls.
     const gradients = [];
@@ -192,7 +199,90 @@ export function initMottoScroll() {
         g.on = on;
       });
     };
-    timeline.eventCallback("onUpdate", syncGradients);
+    // Glow from below (1527:4169 / 4201) on one smoothed journey that follows
+    // the scroll (trails ≈0.6s), so it never stops in the rest zones. Time =
+    // screens of scrolling: 0.2–1 it comes up, 1–3 it rises slowly, 3.2–4 it
+    // fades as the stage lights take over. A CSS-drawn layer that is only
+    // moved (no redraw). fromTo with explicit starts, so a refresh
+    // (invalidate) can re-render it.
+    const flow = { ease: "sine.inOut", immediateRender: false };
+    const glowLow = { x: 0, y: 0 };
+    // Frame 1527:4201: y 802 → 647, x -15 → -24.
+    const glowHigh = { x: () => -9 * designPx(), y: () => -155 * designPx() };
+    gsap.set(ellipse, { autoAlpha: 0, y: ellipseHidden, x: 0 });
+    const lightPath = gsap
+      .timeline({ paused: true })
+      .fromTo(ellipse, { autoAlpha: 0, x: 0, y: ellipseHidden }, { autoAlpha: 1, ...glowLow, duration: 0.8, ...flow }, 0.2)
+      .fromTo(ellipse, { ...glowLow }, { ...glowHigh, duration: 2, ...flow }, 1)
+      .fromTo(ellipse, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.8, ...flow }, 3.2)
+      .to({}, { duration: 2 }, 4);
+
+    // Stage lights (approved option A, like a lighting cue): two lights stay
+    // at their Figma places and never move; each comes on by opening its iris
+    // (the beam widens from a slit and reaches out while it brightens) and
+    // goes off by closing it. Step 4: the left light comes on; step 5: it
+    // goes off while the center light comes on over the title. They play on
+    // their own clock when the scroll passes the middle of a step, and back
+    // when scrolling up.
+    const closed = (scale) => ({ autoAlpha: 0, scaleX: scale * 0.12, scaleY: scale * 0.7 });
+    const open = (scale) => ({ autoAlpha: 1, scaleX: scale, scaleY: scale });
+    gsap.set(beamLeft, { rotation: -46.4, ...closed(1.205) });
+    gsap.set(beamCenter, { rotation: 0.9, ...closed(1) });
+    const cue = gsap
+      .timeline({ paused: true })
+      .addLabel("off", 0)
+      .fromTo(beamLeft, closed(1.205), { ...open(1.205), duration: 1.4, ease: "power2.inOut", immediateRender: false }, 0)
+      .addLabel("left")
+      .fromTo(beamLeft, open(1.205), { ...closed(1.205), duration: 1.1, ease: "power2.inOut", immediateRender: false }, "left")
+      .fromTo(beamCenter, closed(1), { ...open(1), duration: 1.4, ease: "power2.inOut", immediateRender: false }, "left+=0.4")
+      .addLabel("center");
+    const cueStates = [
+      ["left", stepTime(3) + 0.5],
+      ["center", stepTime(4) + 0.5],
+    ];
+    let cueState = null;
+    const syncCue = () => {
+      if (ScrollTrigger.isRefreshing || resizing) return;
+      const time = timeline.time();
+      const state = cueStates.reduce((current, [name, at]) => (time >= at ? name : current), "off");
+      if (state === cueState) return;
+      // First sync (page load, possibly mid-section) and reduced motion jump;
+      // a jump over both cues is done in 1.5s.
+      if (cueState === null || reduceMotion) cue.seek(state);
+      else cue.tweenTo(state, { duration: Math.min(Math.abs(cue.labels[state] - cue.time()), 1.5), ease: "none" });
+      cueState = state;
+    };
+
+    const lightClock = { time: 0 };
+    const toLightTime = gsap.quickTo(lightClock, "time", {
+      duration: 0.6,
+      ease: "power2.out",
+      onUpdate: () => lightPath.time(lightClock.time),
+    });
+    let lightStarted = false;
+    driveLight = (progress) => {
+      const time = progress * steps;
+      // First update (page load, possibly mid-section) and reduced motion jump.
+      if (!lightStarted || reduceMotion) {
+        lightClock.time = time;
+        lightPath.time(time);
+        toLightTime(time, time);
+        lightStarted = true;
+      } else toLightTime(time);
+    };
+    // Sizes follow the screen: re-read them after a refresh.
+    const refreshLight = () => lightPath.invalidate().time(lightClock.time);
+    ScrollTrigger.addEventListener("refresh", refreshLight);
+    const cleanupTimers = cleanupListeners;
+    cleanupListeners = () => {
+      cleanupTimers();
+      ScrollTrigger.removeEventListener("refresh", refreshLight);
+    };
+
+    timeline.eventCallback("onUpdate", () => {
+      syncGradients();
+      syncCue();
+    });
 
     // The whole line turns like one flip-clock card: out to the top, in from below.
     const flip = (from, to, at) => {
@@ -205,32 +295,20 @@ export function initMottoScroll() {
     for (let k = 0; k <= steps; k++) timeline.addLabel(`step${k}`, restTime(k));
 
     toGradient(0, stepTime(0));
-    timeline.to(ellipse, { autoAlpha: 1, y: 0 }, stepTime(0));
 
     flip(0, 1, stepTime(1));
 
     toGradient(1, stepTime(2));
-    timeline.to(ellipse, { y: ellipseHigh, x: ellipseShift }, stepTime(2));
 
     flip(1, 2, stepTime(3));
-    timeline.to(ellipse, { autoAlpha: 0 }, stepTime(3));
-    timeline.to(light, { autoAlpha: 1, x: 0 }, stepTime(3));
+    // The label changes with motto 3 (Figma 1527:4219), like the lines.
+    timeline.to(labelTexts[0], { autoAlpha: 0, y: () => -6 * designPx(), duration: 0.45, ease: reduceMotion ? "steps(1)" : "power3.in" }, stepTime(3));
+    timeline.to(labelTexts[1], { autoAlpha: 1, y: 0, duration: 0.55, ease: reduceMotion ? "steps(1)" : "power3.out" }, stepTime(3) + 0.45);
     timeline.to(diagonal, { autoAlpha: 1 }, stepTime(3));
     timeline.to(cta, { autoAlpha: 1, y: 0, duration: 0.6 }, stepTime(3.4));
 
     toGradient(2, stepTime(4));
-    // Same shape, turned around its tip and glided to the center-light position.
-    timeline.to(light, { x: () => 716.5 * designPx(), y: () => -365.5 * designPx(), rotation: 47.3, scale: 0.83 }, stepTime(4));
 
-    // Hold (approved proposal): one more scroll before the footer so the final
-    // frame and Get a Quote can be read. Only the light breathes a little
-    // (slightly wider and further), so the scroll still answers; text and
-    // button stay as in Figma 1527:4241.
-    timeline.to(
-      light,
-      { x: () => 736.5 * designPx(), y: () => -355.5 * designPx(), scale: 0.87, ease: reduceMotion ? "steps(1)" : "sine.inOut" },
-      stepTime(5),
-    );
     // The last rest zone runs to the end of the pin.
     timeline.to({}, { duration: REST / 2 }, stepTime(steps - 1) + 1);
 

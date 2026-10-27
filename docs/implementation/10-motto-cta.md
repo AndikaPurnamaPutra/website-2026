@@ -154,3 +154,75 @@ Pengguna memilih tetap memakai transisi scrub dengan wrapper (versi "mulai lebih
 - Karena Motto dimulai 350px lebih tinggi, section Motto (masih transparan) menutupi bagian bawah Milestone, sehingga paragraf "Visual trends evolve…" tidak bisa diseleksi atau diklik (elemen di bawah kursor: `motto`).
 - Dengan transisi JS aktif, Milestone diletakkan di atas Motto (`position: relative; z-index: 1`). Hanya `.milestone__inner` yang menangkap pointer, dan setelah Milestone memudar (`visibility: hidden`), klik kembali sampai ke Motto.
 - Terukur: paragraf, baris angka, dan judul Milestone kini terkena kursor (OK). Tombol Get a Quote dan label Motto tetap terkena kursor saat Motto tertahan.
+
+### Cahaya yang lebih halus dan label CTA (27 Okt 2026, saran disetujui)
+Masukan pengguna: gerak cahaya terasa kasar, terutama perpindahan dari kiri ke tengah yang memakai rotasi.
+
+Rencana:
+- **Dua lapisan cahaya** (`light.svg` = Vector 3209, sama dengan Figma): kiri di posisi frame 1527:4219, dan tengah di posisi akhir 1527:4241 (rotasi 47,3° dan skala 0,83 sebagai posisi tetap, tidak dianimasikan). **Tidak ada rotasi yang dianimasikan.**
+- **Berbasis waktu, bukan scrub:** cahaya punya timeline sendiri (`off → left → center → hold`) yang diputar ke label yang sesuai saat timeline scroll melewati tengah langkahnya (cara yang sama dengan gradien huruf), dan berbalik saat scroll ke atas. Setiap segmen 1,6 detik `sine.inOut`.
+  - Kiri masuk: memudar masuk sambil bergeser dari −80px.
+  - Kiri → tengah: kiri memudar keluar sambil bergeser sedikit ke kanan, dan cahaya tengah memudar masuk sambil sedikit membesar (0,78 → 0,83).
+  - Tahan terakhir: cahaya tengah "bernapas" (posisi dan skala 0,87 seperti sebelumnya), sekarang dengan tempo tetap.
+- **Label** (temuan dari Figma): di 1527:4219/4241 label menjadi **"( Got an idea? Let’s work with us )"**. Label berganti bersamaan dengan flip ke motto 3 (dua teks ditumpuk, saling memudar). Tanpa JS, frame terakhir menampilkan label CTA.
+
+Hasil:
+- Terukur di 1440: langkah 3: kedua cahaya 0, label "Our Motto’s". Langkah 4: kiri 1 (x 0), label CTA 1. Perpindahan ke tengah (di tengah segmen): kiri 0,75, tengah 0,25 (skala 0,79). Rotasi cahaya tengah 47,3° di semua keadaan (tidak berputar). Langkah 5: tengah 1 (skala 0,83). Tahan: skala 0,87.
+- Scroll ke atas melewati beberapa langkah: perjalanan dibatasi maksimal 1,6 detik (dari tahan ke mati ±2 detik termasuk scrub), bukan 3 × 1,6 detik.
+- Screenshot langkah akhir cocok dengan frame Center Light (label CTA, cahaya tengah dari atas).
+- Reduced motion: keadaan langsung (langkah 3 mati, langkah 4 kiri, langkah 5,6 tengah). Tanpa JS: hanya cahaya tengah dan label CTA (frame terakhir).
+
+### Cahaya mengalir sebagai satu gerakan (27 Okt 2026, saran disetujui)
+- Masukan pengguna: cahaya hanya bergerak di setiap perpindahan langkah. Sekarang cahaya mengikuti **seluruh scroll dari langkah 3 sampai akhir pin pada satu lintasan** (`LIGHT_FROM = 3.2` → `steps`, dalam layar), tidak berhenti di zona diam, dan **menyusul scroll ±1,5 detik** (`quickTo` pada waktu timeline cahaya, `power3.out`).
+- Lintasan: kiri menyala dan bergeser masuk (0–1), lalu crossfade panjang kiri → tengah (0,9–2,3; tengah 0,78 → 0,83), lalu tengah bernapas (2,3–3,2; skala 0,87). Tetap tanpa rotasi yang dianimasikan.
+- **Ambient** (usulan, tidak ada di Figma): wadah `.motto__lights` bergeser ±24 / 16px dan kecerahannya berdenyut 1 ↔ 0,8, dengan siklus 9 / 7 / 4,5 detik `sine.inOut` (yoyo). Hanya berjalan saat Motto di layar, dan dimatikan untuk reduced motion.
+- Terukur di 1440 (posisi pin dalam layar → kiri / tengah): 3,5 → 0,26 / 0; 3,9 → 0,9 / 0; 4,1 → 0,98 / 0,02; 4,5 → 0,63 / 0,37; 4,9 → 0,15 / 0,85; 5,5 → 0 / 1 (skala 0,84); akhir → skala 0,87. Lompat 3,5 → 5: 0,3 detik 0,72 / 0,28; 1 detik 0,09 / 0,91. Rotasi tengah tetap 47,3°. Gradien huruf dan label tidak berubah.
+
+### Satu cahaya lembut (27 Okt 2026, keputusan pengguna)
+- Masukan pengguna: cahaya masih kasar dan tidak menyatu, dan cahaya tengah terlihat sejak awal section (di browser pengguna: CSS tanpa JS menampilkan frame terakhir sebelum JS menyembunyikannya).
+- Dua bentuk cahaya segitiga Figma (1527:4219 / 4241, `light.svg`) diganti **satu pendar lembut** `.motto__glow`: radial gradient putih 10% → 5% → 0, kotak 1500 × 1100 dengan pusat di tengah atas (top −430). Bentuknya sedikit berbeda dari Figma (disetujui pengguna). Tidak ada rotasi.
+- **Tersembunyi lewat CSS** begitu JS aktif (`.motto.is-enhanced .motto__glow { opacity: 0; visibility: hidden }`), jadi tidak bergantung pada urutan animasi. Tanpa JS: pendar di posisi akhir (frame terakhir).
+- Lintasan (satu timeline, mengikuti scroll dari 3,2 layar sampai akhir pin dengan jeda menyusul ±1,5 detik): muncul di kiri atas (offset −390, +140; skala 0,9 → 1), meluncur ke tengah atas, lalu bernapas (skala 1 → 1,06). Gerak ambient tetap pada wadah `.motto__lights`.
+- Terukur di 1440 (scroll roda dari Milestone): tersembunyi sampai 3,0; opacity 0,03 / 0,34 / 0,88 / 1 di 3,3 / 3,6 / 3,9 / 4,2 (pusat ±355, 270); meluncur 4,5 → 5,4 (pusat 425,238 → 744,120); bernapas sampai lebar 1590. Screenshot langkah 4 (kiri atas) dan langkah akhir (tengah atas).
+- `light.svg` tidak dipakai lagi.
+
+### Kembali ke dua sinar Figma, dengan perpindahan searah (27 Okt 2026, saran disetujui)
+- Pengguna tidak menyukai pendar bulat. Kembali ke dua sinar Figma (`light.svg`, kiri 1527:4219 dan tengah 1527:4241), dengan gerak versi terakhir: satu lintasan sepanjang scroll (3,2 layar → akhir pin), jeda menyusul ±1,5 detik, dan gerak ambient pada `.motto__lights`.
+- **Perpindahan searah:** selama 1,4 unit kedua sinar bergerak ke arah yang sama (dari kiri ke tengah atas). Sinar kiri bergeser 35% dari jarak kiri → tengah sambil memudar. Sinar tengah datang dari 65% jarak itu (skala 0,8) ke posisinya (skala 0,83) sambil menyala. Posisi memakai `sine.inOut`, sedangkan opacity bersilang linear, sehingga jumlahnya tetap 1 (tidak ada lonjakan terang). Sudut sinar tengah tetap 47,3° (tidak dianimasikan). Di akhir sinar tengah bernapas (skala 0,87).
+- **Tersembunyi lewat CSS** begitu JS aktif (`.motto.is-enhanced .motto__light`), jadi sinar tengah tidak lagi terlihat sejak awal section. Tanpa JS: hanya sinar tengah (frame terakhir).
+- Terukur di 1440 (scroll roda): tersembunyi sampai 3,0; kiri 0,03 / 0,34 / 0,82 / 0,96 di 3,3 / 3,6 / 3,9 / 4,2. Perpindahan 4,2 → 5,4: kiri / tengah 0,72 / 0,28 → 0,48 / 0,52 → 0,24 / 0,76 → 0 / 1, dengan jumlah 1,00 di setiap titik. Kedua sinar bergeser searah (kiri x 0 → 251, tengah x 466 → 716). Sudut tetap 47°.
+
+### Cahaya yang tenang (27 Okt 2026, saran disetujui)
+- Masukan pengguna: versi yang bergerak terasa "memusingkan" (gerak ambient yang terus berjalan, jeda menyusul yang membuat cahaya masih bergerak setelah scroll berhenti, dan sinar besar yang bergeser).
+- Sekarang **kedua sinar Figma diam di posisi Figma**, tidak bergeser dan tidak berputar. Gerak ambient dan wadah `.motto__lights` dihapus. Hanya kecerahan yang berubah, pelan (2 detik `sine.inOut`, dengan waktunya sendiri), saat scroll melewati tengah langkah: langkah 4 sinar kiri menyala; langkah 5 sinar kiri meredup sementara sinar tengah menyala (kurva sama, jumlah tetap 1). Setelah itu semuanya diam. Scroll ke atas membaliknya (paling lama 2 detik). Langkah tahan tidak lagi menggerakkan cahaya. Tetap disembunyikan lewat CSS sampai waktunya.
+- Terukur di 1440: posisi kiri (0, 0) dan tengah (717, −365) sama di semua titik. Langkah 0 dan 3: 0 / 0. Langkah 4: kiri 0,28 setelah 0,8 detik, 1 setelah 3,3 detik. Langkah 5: 0,57 / 0,43 setelah 1 detik, 0 / 1 setelah 3,5 detik (jumlah 1,00). Langkah 6: tetap 0 / 1. Kembali ke langkah 3: 0 / 0.
+
+### Konsep "lampu sorot di atas panggung" (27 Okt 2026, disetujui)
+Masukan pengguna: versi tenang terasa jelek. Pengguna ingin bentuk cahaya seperti di Figma, dibuat dengan versi sendiri, dan bergerak mulus (tidak patah-patah).
+
+- **Penyebab patah-patah:** cahaya berupa SVG besar dengan `feGaussianBlur`. Setiap perubahan skala membuat browser menggambar ulang dan mem-blur ulang di setiap frame.
+- **Cahaya dibuat ulang dengan gradien CSS** (tanpa filter blur, digambar sekali, lalu dipindahkan oleh GPU):
+  - **Pendar bawah** (Ellipse 8998: elips 1440 × 724 di y 802, gradien putih 4% → 1%, blur 50): elemen bulat dengan gradien yang sama dan tepi lembut lewat `mask-image` radial.
+  - **Sinar** (Vector 3209: segitiga dari ujungnya, sebaran ±40°, gradien putih 1% → 4% menjauhi ujung, blur 64): elemen dengan gradien sepanjang sinar, bentuk dan tepi lembut lewat `mask` conic (sudut) dan radial (ujung jauh).
+- **Satu perjalanan cahaya yang utuh**, mengikuti scroll di seluruh pin dan dihaluskan (menyusul ±0,6 detik), tidak berhenti di zona diam:
+  - 0 → 1: pendar bawah muncul (frame 1527:4169).
+  - 1 → 3: pendar naik perlahan ke posisi 1527:4201.
+  - 3,2 → 4: pendar memudar sementara sinar menyala di kiri atas (1527:4219).
+  - 4 → 5: lampu sorot meluncur ke tengah atas sambil sinarnya menegak (berputar di ujungnya sendiri, seperti lampu sorot), sampai posisi 1527:4241.
+  - 5 → 6: diam.
+- Tanpa gerak ambient. Kedua cahaya disembunyikan lewat CSS sampai JS menampilkannya. Tanpa JS: frame akhir (sinar tengah). Reduced motion: langsung ke keadaan langkahnya.
+- `light.svg` dan `ellipse.svg` tidak dipakai lagi.
+
+Hasil:
+- Terukur di 1440 (scroll roda dari Milestone; posisi dalam layar sejak pin): pendar bawah 0,12 / 0,64 / 1 di 0,4 / 0,7 / 1,0, lalu naik y 0 → −155 di 1 → 3. Di 3,3 / 3,6 / 3,9 pendar 0,95 / 0,49 / 0,04 sementara sinar 0,05 / 0,51 / 0,96 (sinar kiri, −46,4°). Lampu sorot meluncur: 4,2 → (−655, 334) −42°; 4,5 → (−378, 193) −24°; 4,8 → (−85, 44) −5°; 5,1 → (0, 0) 0,9°. Setelah itu diam.
+- Screenshot langkah 4 dan 5 dibandingkan dengan frame Figma "Left Light" dan "Center Light": arah, posisi, dan kecerahan sinar mirip.
+- Reduced motion: langsung ke keadaan langkahnya. `light.svg` dan `ellipse.svg` tidak dipakai lagi.
+- **Tidak ada kilatan sinar saat dimuat** (masukan pengguna: segitiga terlihat sejak awal; tidak bisa direproduksi di pengujian, termasuk dengan GPU dan layar 2×, di mana langkah 0 sama dengan Figma per area). Penyebab yang paling mungkin: sebelum JS berjalan, CSS menampilkan keadaan tanpa JS. Sekarang `<head>` langsung memasang kelas `js` pada `<html>` sebelum apa pun digambar (`src/pug/layouts/default.pug`), dan sinar serta pendar disembunyikan oleh `.js .motto :is(.motto__beam, .motto__ellipse)` sejak gambar pertama. Terukur: langkah 0 tersembunyi; langkah 1 pendar; langkah 4–5 sinar.
+
+### Lampu panggung: pergantian dengan iris (27 Okt 2026, opsi A disetujui)
+- Seperti lampu panggung sungguhan: lampunya diam, dan pergantian adegan memakai lampu lain (*lighting cue*). Dua lampu CSS (`.motto__beam--left` / `--center`) diam di posisi Figma (kiri: ujung −12, −65, −46,4°, skala 1,205; tengah: ujung 704,5, −430,5, 0,9°, skala 1). Tidak bergeser dan tidak berputar.
+- **Iris:** lampu menyala dengan sinar yang melebar dari celah (`scaleX` 12% → 100%) dan memanjang (`scaleY` 70% → 100%) sambil terang naik, 1,4 detik `power2.inOut`. Lampu mati dengan iris menutup (1,1 detik).
+- **Cue** dengan waktunya sendiri saat scroll melewati tengah langkah: langkah 4 lampu kiri menyala; langkah 5 lampu kiri mati dan lampu tengah menyala 0,4 detik kemudian, menyorot judul. Scroll ke atas membaliknya (lompatan dua cue maksimal 1,5 detik).
+- Pendar bawah tetap pada lintasan yang mengikuti scroll (langkah 1–3, memudar di 3,2–4).
+- Terukur di 1440: langkah 3 kedua lampu 0 (lebar 12–14%). Lampu kiri terbuka: 0,06 / 0,24 / 0,6 / 0,87 / 1 dengan lebar 0,21 / 0,40 / 0,78 / 1,06 / 1,2 (setiap ±0,2 detik). Langkah 5: kiri 0,88 → 0,42 → 0,07 → 0 sementara tengah 0,01 → 0,11 → 0,89 → 1. Sudut tetap −46,4° dan 0,9°. Kembali ke langkah 3: keduanya mati, pendar menyala.
+- `light.svg` dan `ellipse.svg` tidak dipakai lagi.

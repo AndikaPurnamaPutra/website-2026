@@ -10,6 +10,9 @@ html(lang="en")
     title
       block title
         | OWW
+    //- Marks JS as available before the first paint, so styles for the JS
+    //- versions (e.g. the Motto lights, hidden until their step) apply at once.
+    script document.documentElement.classList.add("js");
     link(rel="stylesheet" href="css/main.css")
   body
     block header
