@@ -9,7 +9,8 @@ import { designPx } from "./design-px.js";
 //         clock once the step is reached), the ellipse rises;
 // step 2: the line flips to motto 2;   step 3: "believers." turns gradient;
 // step 4: flip to motto 3, the ellipse gives way to the light, Get a Quote appears;
-// step 5: the whole motto turns gradient, the light turns and glides to the center.
+// step 5: the whole motto turns gradient, the light turns and glides to the center;
+// step 6: hold, the light breathes a little before the section releases.
 // Timing and easing are not in Figma (approved proposal).
 
 
@@ -28,7 +29,7 @@ export function initMottoScroll() {
   const light = section.querySelector(".motto__light");
   const diagonal = section.querySelector(".motto__bg--diagonal");
   const cta = section.querySelector(".cta");
-  const steps = 5;
+  const steps = 6; // 5 Figma steps + a final hold before the footer
   const smooth = reduceMotion ? "steps(1)" : "power2.inOut";
   const linesBox = section.querySelector(".motto__lines");
 
@@ -213,6 +214,17 @@ export function initMottoScroll() {
     // Same shape, turned around its tip and glided to the center-light position.
     timeline.to(light, { x: () => 716.5 * designPx(), y: () => -365.5 * designPx(), rotation: 47.3, scale: 0.83 }, 4);
     timeline.addLabel("step5", 5);
+
+    // Hold (approved proposal): one more scroll before the footer so the final
+    // frame and Get a Quote can be read. Only the light breathes a little
+    // (slightly wider and further), so the scroll still answers; text and
+    // button stay as in Figma 1527:4241.
+    timeline.to(
+      light,
+      { x: () => 736.5 * designPx(), y: () => -355.5 * designPx(), scale: 0.87, ease: reduceMotion ? "steps(1)" : "sine.inOut" },
+      5,
+    );
+    timeline.addLabel("step6", 6);
 
     // Entry (before the pin): full-screen light → dark on the wrapper.
     // Start values are set here, not with fromTo: ScrollTrigger's refresh

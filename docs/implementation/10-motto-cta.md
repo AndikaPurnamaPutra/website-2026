@@ -111,3 +111,8 @@ Atas permintaan pengguna: motto 1 muncul lebih dulu, dan label "( Our Motto's )"
 - Motto 1 muncul dari blur di 0,45–0,8 timeline masuk (lengkap sebelum pin). Terukur: 0,37 di 50%, 0,98 di 70%.
 - Label: animasi otomatis (memudar 0 → 0,5 sambil naik 8px, 0,6 detik `power2.out`) yang dipicu ScrollTrigger tersendiri di 24px sebelum pin (`top top+=24`), dan berbalik saat scroll kembali ke atas. Dibuat otomatis karena pengguna berhenti di langkah 0 saat section tertahan. Saat halaman dimuat di bawah titik itu, label langsung tampil.
 - Terukur: label 0 hingga 100px sebelum pin; 0,29 / 0,49 / 0,5 pada 0,15 / 0,45 / 1 detik setelah tiba di pin; tampil juga bila scroll roda berhenti 14px sebelum pin; kembali 0 saat scroll ke atas; langsung 0,5 setelah muat ulang di langkah 3. Langkah 0–5 maju/mundur tetap benar. Reduce motion: tampil tanpa animasi.
+
+### Langkah tahan sebelum footer (27 Okt 2026, opsi A disetujui)
+- Setelah langkah 5 (highlight "One Week Wonders Studio™") ada **satu scroll lagi (langkah 6)** sebelum section dilepas ke footer, supaya frame terakhir dan tombol Get a Quote sempat terbaca.
+- Di langkah 6 hanya cahaya yang "bernapas" sedikit: posisi bergeser ke x 736,5 / y −355,5 dan skala 0,83 → 0,87 (`sine.inOut`). Teks dan tombol tetap sama seperti Figma 1527:4241.
+- Diuji di 1440px: maju 5 → 6 → footer dan mundur footer → 6 → 5 berjalan per langkah, footer baru naik setelah langkah 6. Langkah 6 tetap terjaga setelah resize ke 1920px. Reduced motion juga lolos.
