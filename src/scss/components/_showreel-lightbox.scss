@@ -17,11 +17,15 @@
   }
 }
 
-// Dark but see-through (user decision): the page shows faintly behind.
+// Dark but see-through, with a light glass blur (user decisions): the page
+// shows faintly behind without competing with the video; matches the glass
+// close and showreel buttons.
 .showreel-lightbox__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(17, 17, 17, 0.8);
+  background: rgba(17, 17, 17, 0.85);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   opacity: 0;
 }
 
