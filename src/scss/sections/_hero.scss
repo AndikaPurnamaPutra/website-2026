@@ -39,8 +39,42 @@
   min-width: 0;
 }
 
+// "Elite digital": black at rest (user decision, Figma shows the gradient).
+// With JS the text only keeps the layout; per-letter copies at the measured
+// positions (--x, --y, in em) are drawn black and light up in the brand gradient
+// (src/js/hero-highlight.js). One gradient box spans the phrase (--pw).
 .hero__title-accent {
-  --gradient-angle: 201deg;
+  position: relative;
+}
+
+.hero__title-accent.is-enhanced {
+  color: transparent;
+}
+
+.hero__glyph {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  // Box as tall as the text (the headline's line height is smaller), so the
+  // gradient also covers descenders like the tail of "g".
+  line-height: normal;
+}
+
+.hero__glyph-text {
+  color: var(--color-ink);
+}
+
+.hero__glyph-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-image: linear-gradient(201deg, var(--gradient-brand-stops));
+  background-size: var(--pw) 100%;
+  background-position: calc(var(--x) * -1) 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  opacity: 0;
 }
 
 .hero__social {

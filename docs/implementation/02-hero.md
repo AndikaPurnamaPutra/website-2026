@@ -189,3 +189,27 @@ Link aset dari Figma kedaluwarsa dalam 7 hari. Jika lewat, saya ambil ulang dari
 
 ### Revisi (27 Okt 2026): showreel menjadi video
 Gambar showreel diganti `hero/showreel.mp4` (H.264, 3000 × 2000, 12 detik, 7,5 MB). File punya audio, tetapi diputar `muted` sebagai latar. Poster `showreel-poster.jpg` = frame pertama (2400 × 1600, 180 KB). Diputar hanya saat terlihat oleh `src/js/inview-videos.js`, tidak diputar dengan reduce motion. Tombol "Play Showreel" tetap dummy. Ukuran dan posisi kotak tidak berubah (40, 618, 1360 × 781).
+
+### Animasi highlight "Elite digital" (27 Okt 2026), selesai, menunggu review
+Acuan pengguna: highlight "ambitious ideas." di manual.studio. Di sana huruf menyala satu per satu (setiap 37ms), setiap huruf menyala 0,35 detik lalu memudar kembali dalam 1 detik. Animasi berjalan sekali saat teks terlihat, lalu diputar ulang saat kursor masuk ke judul jika animasi sebelumnya sudah selesai.
+
+Keputusan pengguna:
+- **Keadaan diam:** "Elite digital" berwarna hitam, sama seperti teks lain di judul. Ini mengubah Figma, yang menampilkan gradien terus-menerus.
+- **Warna nyala** adalah gradien brand (opsi A). Gradien membentang di sepanjang frasa, dan setiap huruf menampilkan bagian gradien di posisinya.
+- Animasi berjalan ±0,8 detik setelah halaman dimuat, lalu diputar ulang setiap kursor masuk ke h1 jika animasi sebelumnya sudah selesai.
+- Reduced motion dan tanpa JS: tanpa animasi, teks hitam.
+
+Cara kerja:
+- Teknik salinan huruf seperti di Motto. Teks asli tidak dipecah (jarak huruf tetap persis), dan JS mengukur posisi setiap huruf dalam em.
+- Setiap huruf mendapat salinan hitam dan salinan gradien. Gradien memakai satu kotak selebar frasa (`--pw`). Teks asli hanya menjaga layout.
+- Gelombang: salinan gradien 0 → 1 dan salinan hitam 1 → 0 dalam 0,1 detik, ditahan, lalu kembali dalam 1 detik (`power1.out`), dengan selisih 37ms antarhuruf.
+
+File: `src/pug/partials/hero.pug` (hapus `.text-gradient`), `src/scss/sections/_hero.scss`, `src/js/hero-highlight.js` (baru), dan `src/js/main.js`.
+
+Hasil:
+- Salinan huruf tepat di atas huruf asli (selisih 0px horizontal dan vertikal) di 1280, 1440, 1920, dan 2560px. Selisih vertikal dihitung di JS (`--y`), karena line-height judul (88px) lebih kecil dari kotak teks font (100px). Ukuran judul tetap 789,75 × 264 di 1440px (Figma).
+- Saat diam teks hitam. Gelombang berjalan ±0,8 detik setelah dimuat dan diputar ulang saat kursor masuk ke judul (screenshot: saat menyala gradien Figma 201° terlihat di sepanjang frasa, lalu memudar kembali ke hitam).
+- Reduced motion dan tanpa JS: teks hitam, tanpa salinan huruf.
+- Perbaikan: ekor huruf "g" sempat terpotong putih saat menyala, karena gradien hanya digambar di kotak setinggi line-height (88px), sedangkan teksnya 100px. Salinan huruf sekarang memakai `line-height: normal` (kotak 108px), dan posisinya tetap tepat (selisih 0px).
+- Revisi (permintaan pengguna): gelombang dibuat lebih santai, tapi versi ±3 detik terasa terlalu lambat. Yang dipakai adalah nilai tengahnya: jarak antarhuruf 0,045 detik, menyala 0,15 detik (`sine.out`), ditahan 0,35 detik, dan memudar 1,2 detik (`sine.inOut`), total ±2,2 detik.
+
