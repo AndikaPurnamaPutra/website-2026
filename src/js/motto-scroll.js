@@ -30,6 +30,13 @@ export function initMottoScroll() {
   const diagonal = section.querySelector(".motto__bg--diagonal");
   const cta = section.querySelector(".cta");
   const steps = 6; // 5 Figma steps + a final hold before the footer
+  // No snap (user decision): each step has a rest zone where the frame holds
+  // while the scroll goes on, so the scroll stays free and smooth yet a step
+  // is easy to stop on. Transitions keep a length of 1; REST is added between
+  // them (half before the first, half after the last), ≈40% of each step.
+  const REST = 0.6;
+  const stepTime = (p) => Math.floor(p) * (1 + REST) + REST / 2 + (p - Math.floor(p));
+  const restTime = (k) => (k === 0 ? REST / 4 : k === steps ? steps * (1 + REST) - REST / 4 : k * (1 + REST));
   const smooth = reduceMotion ? "steps(1)" : "power2.inOut";
   const linesBox = section.querySelector(".motto__lines");
 
@@ -109,15 +116,7 @@ export function initMottoScroll() {
         start: "top top",
         end: () => `+=${window.innerHeight * steps}`,
         pin: true,
-        scrub: reduceMotion ? true : 0.5,
-        // Same snap as the What we do section: starts at once, soft landing.
-        snap: {
-          snapTo: "labelsDirectional",
-          inertia: false,
-          delay: 0,
-          duration: { min: 0.6, max: 0.9 },
-          ease: "power3.out",
-        },
+        scrub: reduceMotion ? true : 0.8,
         invalidateOnRefresh: true,
         // The section's page position is fractional (fluid sizes), and GSAP
         // pins it where it was, up to 1px below the top of the screen; on some
@@ -130,9 +129,11 @@ export function initMottoScroll() {
         },
         onUpdate: (self) => {
           if (resizing) return;
-          const at = self.progress * steps;
+          const time = self.progress * steps * (1 + REST);
+          const step = Math.round(time / (1 + REST));
           inside = self.scroll() >= self.start - 2 && self.scroll() <= self.end + 2;
-          if (Math.abs(at - Math.round(at)) < 0.005) settledStep = Math.round(at);
+          // Inside a step's rest zone.
+          if (Math.abs(time - step * (1 + REST)) <= REST / 2) settledStep = step;
         },
       },
     });
@@ -199,32 +200,27 @@ export function initMottoScroll() {
       timeline.to(lines[to], { rotationX: 0, y: 0, autoAlpha: 1, duration: 0.55, ease: reduceMotion ? "steps(1)" : "power3.out" }, at + 0.45);
     };
 
-    // Step 0 sits a few px into the pin (not at its very start), so it is
-    // pinned at 0 too (see onToggle above).
-    timeline.addLabel("step0", 0.003);
+    // Step labels sit in the middle of each rest zone (step 0 and the last
+    // one inside the pin, so they are pinned at 0 too, see onToggle above).
+    for (let k = 0; k <= steps; k++) timeline.addLabel(`step${k}`, restTime(k));
 
-    toGradient(0, 0);
-    timeline.to(ellipse, { autoAlpha: 1, y: 0 }, 0);
-    timeline.addLabel("step1", 1);
+    toGradient(0, stepTime(0));
+    timeline.to(ellipse, { autoAlpha: 1, y: 0 }, stepTime(0));
 
-    flip(0, 1, 1);
-    timeline.addLabel("step2", 2);
+    flip(0, 1, stepTime(1));
 
-    toGradient(1, 2);
-    timeline.to(ellipse, { y: ellipseHigh, x: ellipseShift }, 2);
-    timeline.addLabel("step3", 3);
+    toGradient(1, stepTime(2));
+    timeline.to(ellipse, { y: ellipseHigh, x: ellipseShift }, stepTime(2));
 
-    flip(1, 2, 3);
-    timeline.to(ellipse, { autoAlpha: 0 }, 3);
-    timeline.to(light, { autoAlpha: 1, x: 0 }, 3);
-    timeline.to(diagonal, { autoAlpha: 1 }, 3);
-    timeline.to(cta, { autoAlpha: 1, y: 0, duration: 0.6 }, 3.4);
-    timeline.addLabel("step4", 4);
+    flip(1, 2, stepTime(3));
+    timeline.to(ellipse, { autoAlpha: 0 }, stepTime(3));
+    timeline.to(light, { autoAlpha: 1, x: 0 }, stepTime(3));
+    timeline.to(diagonal, { autoAlpha: 1 }, stepTime(3));
+    timeline.to(cta, { autoAlpha: 1, y: 0, duration: 0.6 }, stepTime(3.4));
 
-    toGradient(2, 4);
+    toGradient(2, stepTime(4));
     // Same shape, turned around its tip and glided to the center-light position.
-    timeline.to(light, { x: () => 716.5 * designPx(), y: () => -365.5 * designPx(), rotation: 47.3, scale: 0.83 }, 4);
-    timeline.addLabel("step5", 5);
+    timeline.to(light, { x: () => 716.5 * designPx(), y: () => -365.5 * designPx(), rotation: 47.3, scale: 0.83 }, stepTime(4));
 
     // Hold (approved proposal): one more scroll before the footer so the final
     // frame and Get a Quote can be read. Only the light breathes a little
@@ -233,11 +229,10 @@ export function initMottoScroll() {
     timeline.to(
       light,
       { x: () => 736.5 * designPx(), y: () => -355.5 * designPx(), scale: 0.87, ease: reduceMotion ? "steps(1)" : "sine.inOut" },
-      5,
+      stepTime(5),
     );
-    // A few px before the end of the pin, so the hold is still pinned at 0
-    // (see step 0).
-    timeline.addLabel("step6", 6 - 0.003);
+    // The last rest zone runs to the end of the pin.
+    timeline.to({}, { duration: REST / 2 }, stepTime(steps - 1) + 1);
 
     // Entry (before the pin): full-screen light → dark on the wrapper.
     // Start values are set here, not with fromTo: ScrollTrigger's refresh

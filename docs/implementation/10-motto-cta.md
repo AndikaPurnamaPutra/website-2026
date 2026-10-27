@@ -144,3 +144,8 @@ Pengguna memilih tetap memakai transisi scrub dengan wrapper (versi "mulai lebih
 - Ekor huruf "g" di "Trendsetting Design" sempat terpotong saat gradien menyala, karena salinan gradien diposisikan absolut, sehingga kotaknya hanya setinggi line-height (46px), sedangkan teksnya 52px.
 - Peran kedua salinan sekarang ditukar: salinan gradien tetap inline (kotak gradien setinggi teks penuh, sama seperti teks aksen tanpa JS), dan salinan putih yang absolut di atasnya.
 - Terukur di 1440px: kedua salinan tepat di atas huruf asli (selisih 0px) di ketiga baris, dan kotak gradien 52px. Screenshot langkah 0, 3, dan 5: ekor "g" utuh.
+
+### Tanpa snap: scroll halus dengan zona diam (27 Okt 2026, saran disetujui)
+- Masukan pengguna: snap terasa "tertahan". Penyebabnya, setelah scroll berhenti browser butuh ±0,3 detik untuk mendeteksinya, lalu halaman ditarik ke langkah terdekat, dan satu gerakan scroll hanya memindahkan satu langkah.
+- Snap dihapus dari What we do dan Motto. Scrub 0,8 detik. Setiap langkah tetap selebar satu layar scroll, tapi dibagi: transisi (panjang 1) + **zona diam** `REST = 0.6` (setengah sebelum transisi pertama, setengah setelah transisi terakhir), sehingga ±40% setiap langkah menahan tampilan langkah itu walaupun scroll berjalan. Posisi timeline dipetakan dengan `stepTime()`. Label `stepN` ada di tengah zona diam (`restTime()`), dan dipakai untuk menjaga langkah saat resize.
+- Terukur di 1440: langkah 1 diam di 0,85–1,15, flip ke motto 2 di 1,5, motto 3 dan CTA di ±3,85, cahaya ke tengah di 4,5–4,85, tahan terakhir (bernapas) di 5,5–5,9, lalu dilepas ke footer. Gradien huruf tetap berjalan dengan waktunya sendiri. Resize di langkah 3 ke 1920px tetap di langkah 3.

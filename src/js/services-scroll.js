@@ -32,6 +32,13 @@ export function initServicesScroll() {
   const label = section.querySelector(".services__label");
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const steps = cards.length; // service changes + final fullscreen step
+  // No snap (user decision): each step has a rest zone where the frame holds
+  // while the scroll goes on, so the scroll stays free and smooth yet a step
+  // is easy to stop on. Transitions keep a length of 1; REST is added between
+  // them (half before the first, half after the last), ≈40% of each step.
+  const REST = 0.6;
+  const stepTime = (n) => n * (1 + REST) + REST / 2;
+  const restTime = (k) => (k === 0 ? REST / 4 : k === steps ? steps * (1 + REST) - REST / 4 : k * (1 + REST));
 
   section.classList.add("is-enhanced");
 
@@ -114,21 +121,10 @@ export function initServicesScroll() {
         start: "top top",
         end: () => `+=${window.innerHeight * steps}`,
         pin: true,
-        scrub: reduceMotion ? true : 0.5,
-        // Snap to the next step in the scroll direction. inertia: false keeps a
-        // fast flick from projecting past several steps. The snap starts right
-        // away and eases out (fast start, soft landing), so there is no pause
-        // after the scroll stops (same feel as the Motto section).
-        snap: {
-          snapTo: "labelsDirectional",
-          inertia: false,
-          delay: 0,
-          duration: { min: 0.6, max: 0.9 },
-          ease: "power3.out",
-        },
+        scrub: reduceMotion ? true : 0.8,
         invalidateOnRefresh: true,
         onRefresh: (self) => {
-          if (self.animation.time() < steps - 1) clearMedia();
+          if (self.animation.time() < stepTime(steps - 1)) clearMedia();
         },
       },
     });
@@ -149,10 +145,10 @@ export function initServicesScroll() {
       timeline.set(card, stateVars(i, 0), 0);
       timeline.set(clips[i], clipVars(i, 0), 0);
     });
-    timeline.addLabel("step0", 0);
+    for (let k = 0; k < steps; k++) timeline.addLabel(`step${k}`, restTime(k));
 
     for (let active = 1; active < cards.length; active++) {
-      const at = active - 1;
+      const at = stepTime(active - 1);
       // Stacking order switches just after a step starts so the incoming card
       // is in front while it moves (a set exactly at 0 would apply on load).
       cards.forEach((card, i) => {
@@ -172,7 +168,6 @@ export function initServicesScroll() {
         timeline.to(fade, { autoAlpha: 1 }, at);
         timeline.to(label, { autoAlpha: 0 }, at);
       }
-      timeline.addLabel(`step${active}`, active);
     }
 
     // Final step: the last image grows to fill the section (storyboard "Fullscreen").
@@ -181,9 +176,11 @@ export function initServicesScroll() {
     timeline.to(
       media,
       { top: 0, right: 0, bottom: 0, left: 0, borderRadius: 0, onReverseComplete: clearMedia },
-      steps - 1,
+      stepTime(steps - 1),
     );
-    timeline.addLabel("fullscreen", steps);
+    timeline.addLabel("fullscreen", restTime(steps));
+    // The last rest zone runs to the end of the pin.
+    timeline.to({}, { duration: REST / 2 }, stepTime(steps - 1) + 1);
   }, section);
 
   const refresh = () => ScrollTrigger.refresh();
