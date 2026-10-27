@@ -53,25 +53,29 @@ export function createGradientWave(element, gradient) {
   measure();
   document.fonts?.ready.then(measure);
 
-  const wave = gsap.timeline({ paused: true });
-  glyphs.forEach((glyph, i) => {
-    const text = glyph.firstChild;
-    const lit = glyph.lastChild;
-    const at = i * STAGGER;
-    wave
-      .to(lit, { opacity: 1, duration: LIGHT, ease: "sine.out" }, at)
-      .to(text, { opacity: 0, duration: LIGHT, ease: "sine.out" }, at)
-      .to(lit, { opacity: 0, duration: FADE, ease: "sine.inOut" }, at + LIGHT + HOLD)
-      .to(text, { opacity: 1, duration: FADE, ease: "sine.inOut" }, at + LIGHT + HOLD);
-  });
+  // Every play starts a new wave at once (a hover during a running wave is
+  // not ignored); each letter goes on from its current state, so nothing
+  // jumps back.
+  let wave;
+  const play = () => {
+    wave?.kill();
+    wave = gsap.timeline();
+    glyphs.forEach((glyph, i) => {
+      const text = glyph.firstChild;
+      const lit = glyph.lastChild;
+      const at = i * STAGGER;
+      wave
+        .to(lit, { opacity: 1, duration: LIGHT, ease: "sine.out" }, at)
+        .to(text, { opacity: 0, duration: LIGHT, ease: "sine.out" }, at)
+        .to(lit, { opacity: 0, duration: FADE, ease: "sine.inOut" }, at + LIGHT + HOLD)
+        .to(text, { opacity: 1, duration: FADE, ease: "sine.inOut" }, at + LIGHT + HOLD);
+    });
+  };
 
   return {
-    // Plays unless a wave is still running.
-    play: () => {
-      if (!wave.isActive()) wave.restart();
-    },
+    play,
     destroy: () => {
-      wave.kill();
+      wave?.kill();
       glyphs.forEach((glyph) => glyph.remove());
       element.classList.remove("gradient-wave");
       ["--wave-color", "--wave-gradient", "--pw", "--y"].forEach((name) => element.style.removeProperty(name));
