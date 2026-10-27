@@ -120,3 +120,10 @@ Dinilai terlalu lambat. Angka muncul 1 detik dan menghitung 1,6 detik (jeda per 
 
 ### Revisi keempat (27 Okt 2026): sedikit lebih cepat (±20%)
 Angka muncul 0,8 detik dan menghitung 1,3 detik (jeda per baris 0,1). Gradient mulai di detik ke-1: crossfade 1 detik, pergeseran 1,3 detik. Kalimat aksen mulai di detik ke-1,6, durasi 0,7 detik. Total sekitar 2,3 detik.
+
+### "$139M+": gelombang gradien seperti hero (27 Okt 2026, permintaan pengguna)
+- Saat diam, "$139M+" berwarna hitam seperti "120+" dan "8" (sebelumnya gradien Figma tetap). Ini keputusan pengguna dan berbeda dari Figma.
+- Efek gradien yang memudar masuk dan bergeser setelah hitungan diganti **gelombang gradien yang sama dengan h1 hero**: tiap karakter menyala dengan gradien brand (207,35°, satu kotak gradien selebar angka), lalu kembali hitam. Kecepatannya sama dengan hero.
+- Gelombang berjalan sekali setelah **semua** hitungan selesai (hitungan menulis ulang semua angka sampai angka terakhir berhenti), lalu diputar ulang setiap kursor masuk ke baris "$139M+" (opsi A).
+- Kode gelombang sekarang modul bersama `src/js/gradient-wave.js` + `components/_gradient-wave.scss`, dipakai hero dan Milestone. Salinan gradien lama (`.milestone__gradient`) dan kelas `is-counting` dihapus. Penanda di markup: `data-wave`.
+- Terukur di 1440px: 6 salinan karakter tepat di atas angka (selisih 0px), lebar angka tetap 161,19px. Gelombang menyala setelah hitungan dan kembali hitam. Hover di baris memutar ulang (semua menyala, lalu kembali 0). Hero tetap sama (12 salinan, selisih 0px). Reduced motion: angka hitam, tanpa salinan.

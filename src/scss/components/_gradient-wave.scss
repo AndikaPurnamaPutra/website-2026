@@ -1,0 +1,34 @@
+// Gradient highlight wave (src/js/gradient-wave.js). The text itself only
+// keeps the layout; per-letter copies at the measured positions (--x, --y, in
+// em) are drawn in the text colour (--wave-color) and light up in the
+// gradient (--wave-gradient), one gradient box spanning the text (--pw).
+.gradient-wave {
+  position: relative;
+  color: transparent;
+}
+
+.gradient-wave__glyph {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  // Box as tall as the text (a smaller line height would cut the gradient
+  // off descenders like the tail of "g").
+  line-height: normal;
+}
+
+.gradient-wave__text {
+  color: var(--wave-color);
+}
+
+.gradient-wave__gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-image: var(--wave-gradient);
+  background-size: var(--pw) 100%;
+  background-position: calc(var(--x) * -1) 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  opacity: 0;
+}

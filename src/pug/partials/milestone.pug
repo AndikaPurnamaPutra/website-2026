@@ -1,5 +1,6 @@
-//- Figma: Milestones 1574:1160. Values render final (Figma state) without JS;
-//- src/js/milestone-counter.js counts them up, then fades in the gradient.
+//- Figma: Milestones 1574:1160. Values render final without JS;
+//- src/js/milestone-counter.js counts them up, then runs a gradient wave
+//- through "$139M+" (black at rest, user decision; Figma shows the gradient).
 -
   var stats = [
     { prefix: "$", value: 139, suffix: "M+", label: "Capital raised", gradient: true },
@@ -20,10 +21,8 @@ section.milestone
       ul.milestone__list
         each stat in stats
           li.milestone__row
-            p.milestone__value.text-display-48(data-count=stat.value data-prefix=stat.prefix data-suffix=stat.suffix class=stat.gradient ? "milestone__value--gradient" : null)
+            p.milestone__value.text-display-48(data-count=stat.value data-prefix=stat.prefix data-suffix=stat.suffix data-wave=stat.gradient ? "" : null)
               span.milestone__number= `${stat.prefix}${stat.value}${stat.suffix}`
-              if stat.gradient
-                span.milestone__gradient.text-gradient(aria-hidden="true")= `${stat.prefix}${stat.value}${stat.suffix}`
             p.milestone__label.text-16= stat.label
       p.milestone__text
         span.milestone__text-lead Visual trends evolve, but solid systems don’t age.

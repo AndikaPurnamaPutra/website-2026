@@ -270,3 +270,4 @@ Hasil:
 Revisi (permintaan pengguna):
 - **Celah kecil di kanan** (terlihat oleh pengguna, kemungkinan karena scrollbar klasik dan posisi pecahan piksel): ukuran akhir sekarang dihitung dari posisi showreel yang sebenarnya, dengan lebar seluruh jendela (termasuk area scrollbar) ditambah 1px di setiap sisi. Terukur di 1440 / 2174 / 2560 / 3000px: video melewati keempat tepi layar (misalnya −1 … 1441 × −2 … 1024 di 1440).
 - **Tahan setengah layar** setelah penuh (saran disetujui): pin `+=150%`, dengan 1 layar untuk membesar dan 0,5 layar ditahan penuh, lalu dilepas. Terukur: video penuh dari posisi 1 sampai 1,5 layar, lalu bergerak ke atas bersama Statement.
+- Kode gelombang "Elite digital" dipindah ke modul bersama `src/js/gradient-wave.js` + `components/_gradient-wave.scss` (dipakai juga oleh Milestone). Tampilan dan waktunya tidak berubah.

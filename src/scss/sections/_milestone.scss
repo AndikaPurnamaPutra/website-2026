@@ -42,24 +42,7 @@
 }
 
 .milestone__value {
-  position: relative;
   white-space: nowrap;
-}
-
-// Gradient copy laid over the solid number; JS fades it in after counting.
-.milestone__gradient {
-  position: absolute;
-  inset: 0;
-  --gradient-angle: 207.35deg;
-}
-
-// The solid number underneath only shows while counting.
-.milestone__value--gradient .milestone__number {
-  color: transparent;
-}
-
-.milestone__value--gradient.is-counting .milestone__number {
-  color: inherit;
 }
 
 .milestone__label {
