@@ -26,7 +26,10 @@ export function initHeroClock() {
   const update = () => {
     const now = new Date();
     dateEl.textContent = dateFormat.format(now);
-    timeEl.textContent = timeFormat.format(now).replace(/\s/g, "");
+    // "03:38PM" with the colon in its own span so it can blink; its animation
+    // is offset to start on a whole second.
+    const [hours, rest] = timeFormat.format(now).replace(/\s/g, "").split(":");
+    timeEl.innerHTML = `${hours}<span class="hero__time-colon" style="animation-delay: -${now.getMilliseconds()}ms">:</span>${rest}`;
     // Schedule the next update at the start of the next minute.
     timer = setTimeout(update, 60000 - (now.getTime() % 60000));
   };

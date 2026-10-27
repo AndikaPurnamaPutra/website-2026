@@ -128,7 +128,8 @@
 .hero__timezone {
   display: flex;
   align-items: center;
-  gap: fs(5);
+  // 8px (user decision; Figma 5px).
+  gap: fs(8);
 }
 
 .hero__timezone-label {
@@ -149,6 +150,24 @@
   font-size: fs(14);
   line-height: 1;
   letter-spacing: -0.02em;
+}
+
+// The colon blinks with the seconds like a clock (user decision; JS keeps it
+// in step with the real seconds). Still with reduced motion.
+.hero__time-colon {
+  animation: hero-colon-blink 1s step-end infinite;
+}
+
+@keyframes hero-colon-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__time-colon {
+    animation: none;
+  }
 }
 
 .hero__showreel {

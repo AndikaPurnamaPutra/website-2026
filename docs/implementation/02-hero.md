@@ -246,3 +246,5 @@ Hasil (1440 × 1024, halaman di-scroll 500px):
 
 ### Revisi kecil (27 Okt 2026, permintaan pengguna)
 - **Latar pop-up showreel:** #111 dengan transparansi 80% (`rgba(17, 17, 17, 0.8)`), tidak solid, jadi halaman samar terlihat di belakangnya.
+- **Jarak label zona waktu ke jam:** 5px → 8px (`fs(8)`). Terukur 8px di 1440.
+- **Titik dua jam berkedip** seperti jam digital: terlihat di paruh pertama setiap detik dan hilang di paruh kedua (`step-end`, 1 detik). Animasinya disinkronkan ke detik sungguhan lewat `animation-delay` negatif saat jam diperbarui. Dengan reduced motion tidak berkedip. Lebar kotak jam tidak berubah (selisih 0,02px dibanding teks utuh).
