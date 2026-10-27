@@ -96,7 +96,17 @@
 // overlap is not visible: Motto's background is transparent until Milestone
 // has faded out. The pinned Motto frame itself is unchanged.
 .tone-shift.is-toned .milestone {
+  // Above the (still transparent) Motto it overlaps, so the Milestone text can
+  // be selected and clicked; only its content takes the pointer, and once it
+  // has faded out (hidden) the pointer reaches Motto again.
+  position: relative;
+  z-index: 1;
   margin-bottom: fluid(-350);
+  pointer-events: none;
+}
+
+.tone-shift.is-toned .milestone__inner {
+  pointer-events: auto;
 }
 
 // Texture covers the whole section at any screen size (Figma: 1550 × 1033

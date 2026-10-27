@@ -149,3 +149,8 @@ Pengguna memilih tetap memakai transisi scrub dengan wrapper (versi "mulai lebih
 - Masukan pengguna: snap terasa "tertahan". Penyebabnya, setelah scroll berhenti browser butuh ±0,3 detik untuk mendeteksinya, lalu halaman ditarik ke langkah terdekat, dan satu gerakan scroll hanya memindahkan satu langkah.
 - Snap dihapus dari What we do dan Motto. Scrub 0,8 detik. Setiap langkah tetap selebar satu layar scroll, tapi dibagi: transisi (panjang 1) + **zona diam** `REST = 0.6` (setengah sebelum transisi pertama, setengah setelah transisi terakhir), sehingga ±40% setiap langkah menahan tampilan langkah itu walaupun scroll berjalan. Posisi timeline dipetakan dengan `stepTime()`. Label `stepN` ada di tengah zona diam (`restTime()`), dan dipakai untuk menjaga langkah saat resize.
 - Terukur di 1440: langkah 1 diam di 0,85–1,15, flip ke motto 2 di 1,5, motto 3 dan CTA di ±3,85, cahaya ke tengah di 4,5–4,85, tahan terakhir (bernapas) di 5,5–5,9, lalu dilepas ke footer. Gradien huruf tetap berjalan dengan waktunya sendiri. Resize di langkah 3 ke 1920px tetap di langkah 3.
+
+### Teks Milestone bisa diseleksi lagi (27 Okt 2026, masukan pengguna)
+- Karena Motto dimulai 350px lebih tinggi, section Motto (masih transparan) menutupi bagian bawah Milestone, sehingga paragraf "Visual trends evolve…" tidak bisa diseleksi atau diklik (elemen di bawah kursor: `motto`).
+- Dengan transisi JS aktif, Milestone diletakkan di atas Motto (`position: relative; z-index: 1`). Hanya `.milestone__inner` yang menangkap pointer, dan setelah Milestone memudar (`visibility: hidden`), klik kembali sampai ke Motto.
+- Terukur: paragraf, baris angka, dan judul Milestone kini terkena kursor (OK). Tombol Get a Quote dan label Motto tetap terkena kursor saat Motto tertahan.
