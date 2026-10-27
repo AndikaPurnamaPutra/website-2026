@@ -134,3 +134,8 @@ Pengguna memilih tetap memakai transisi scrub dengan wrapper (versi "mulai lebih
 - Terukur di 1440px: Milestone 1 / 0,77 / 0,22 / 0 di 50 / 45 / 40 / 35%. Latar #e8e8e8 / #acacac / #636363 / #272727 / #111 di 35 / 30 / 25 / 20 / 15%. Motto 1 0,58 / 0,88 / 1 di 25 / 20 / 10%.
 - Sisa fase kosong (abu-abu tanpa teks) hanya di sekitar 35 → 27%, ±80px scroll. Teks putih Motto 1 baru terbaca setelah latar cukup gelap.
 - Langkah 0–4 dan scroll balik tetap benar.
+
+### Motto menumpuk ke padding bawah Milestone (27 Okt 2026, disetujui)
+- Jarak dari teks terakhir Milestone ke Motto 1 adalah ±710px di 1440px: padding bawah Milestone 200px ditambah Motto 1 di tengah layar 512px. Mengubah timing tidak mengurangi jarak ini.
+- Dengan transisi JS aktif (`.tone-shift.is-toned`), `.milestone` diberi margin bawah negatif, sehingga section Motto dimulai lebih tinggi. Percobaan pertama 200px (jarak ke Motto 1 ±495px), lalu dipilih **350px** (`fluid(-350)`), sehingga jarak ke Motto 1 menjadi ±345px. Tumpukannya tidak terlihat, karena latar Motto masih transparan dan Milestone memudar sebelum latar gelap. Frame Motto yang tertahan tidak berubah. Tanpa JS atau dengan reduced motion, padding 200px tetap seperti Figma.
+- Terukur di 1440px dengan 350px: saat atas Motto di 50%, teks Milestone berakhir di 662px dan Motto 1 di 1007px. Milestone memudar saat teksnya di 66 → 46% layar, dan Motto 1 muncul di ±73 → 67%. Urutan transisi sama seperti sebelumnya. Langkah 0–6 maju dan mundur, muat ulang di langkah 6, dan pelepasan ke footer tetap benar.

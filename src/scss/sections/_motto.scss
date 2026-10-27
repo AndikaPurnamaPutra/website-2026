@@ -91,6 +91,14 @@
   display: none;
 }
 
+// With the JS entry, Motto starts 350px higher, over Milestone's bottom padding
+// (user decision), so motto 1 arrives sooner after the Milestone text. The
+// overlap is not visible: Motto's background is transparent until Milestone
+// has faded out. The pinned Motto frame itself is unchanged.
+.tone-shift.is-toned .milestone {
+  margin-bottom: fluid(-350);
+}
+
 // Texture covers the whole section at any screen size (Figma: 1550 × 1033
 // centered over the 1440 × 1024 frame, i.e. slightly larger than the frame).
 .motto__texture {
