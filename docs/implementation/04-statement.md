@@ -141,3 +141,20 @@ Varian terang tombol (untuk section Motto) dibuat saat section Motto dikerjakan,
 - [x] Langkah 3: Section Statement
 - [x] Langkah 4: Interaksi hover
 - [x] Langkah 5: Verifikasi dan perbaikan
+
+## Tinta mengikuti scroll (28 Okt 2026, permintaan pengguna)
+- Acuan: paragraf "Our processing pipeline…" di drone.riotters.com.
+- Teks statement (baris 1–4) mulai **abu-abu** (`rgba(0,0,0,.2)`) dan menghitam dari kiri ke kanan dengan tepi lembut, baris demi baris, **mengikuti scroll**. Saat di-scroll ke atas, teks kembali abu-abu. Ikon dan folder tetap berwarna aslinya.
+- Teknik sama dengan kalimat Milestone (gradient yang di-clip ke teks dan digeser, teks tidak dipecah), tapi terikat ke scroll.
+  - Setiap potongan teks mendapat bagian scroll sesuai lebarnya, jadi kecepatan tinta merata.
+  - Rentang scroll: dari `top 75%` sampai `center center`, sehingga kalimat sudah hitam penuh saat tepat di tengah layar.
+- File: `src/js/statement-ink.js` (baru), `main.js`, `_statement.scss` (`.is-inked`).
+- Tanpa JS atau dengan reduced motion: teks hitam seperti sebelumnya.
+- Dicek dengan screenshot pada beberapa posisi scroll: baris 1 menghitam lebih dulu, lalu baris 2 dan 3, dan baris 4 abu-abu sampai gilirannya.
+- Terukur:
+  - Teks di tengah layar: semua potongan `0%` (hitam penuh).
+  - Teks di bawah layar (scroll ke atas): semua `100%` (abu-abu).
+- **Lebih lambat dan halus** (masukan pengguna: terlalu cepat, kurang halus dibanding referensi).
+  - Terukur di referensi: paragraf mulai menghitam saat atasnya di ±87% layar dan selesai di ±28% (±530px scroll untuk 3 baris). Setiap huruf berubah dengan transisinya sendiri (abu `#c7cccb` → `#24363f`).
+  - Sekarang rentangnya `top 90%` → `top 25%`, dan tinta mengejar posisi scroll dengan halus (`gsap.quickTo`, 0,6 detik, `power3.out`), sehingga tidak melompat saat scroll cepat.
+  - **Selesai di tengah** (keputusan pengguna): rentang akhir `top 90%` → `center center`, ±510px scroll di 1440 × 900 (referensi ±530px). Kalimat sudah hitam penuh saat tepat di tengah layar, dan penghalusan tetap dipakai.
