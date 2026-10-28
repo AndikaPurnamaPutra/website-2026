@@ -1,4 +1,6 @@
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { designPx } from "./design-px.js";
 
 // Hero showreel (reference from the user: manual.studio; approved proposal,
 // not in Figma). On pointer devices the "Play Showreel" button follows the
@@ -56,7 +58,7 @@ export function initHeroShowreel() {
     // 0.6 of a screen of scrolling to grow, then 0.3 held full before the
     // page moves on (user: quicker, still smooth). The growth answers at once
     // and lands softly (power2.out); scrub 0.5 keeps it smooth.
-    gsap
+    const grow = gsap
       .timeline({
         scrollTrigger: {
           trigger: showreel,
@@ -67,16 +69,49 @@ export function initHeroShowreel() {
           invalidateOnRefresh: true,
         },
       })
-      .to(preview, {
-        left: () => edge().left,
-        top: () => edge().top,
-        width: () => edge().width,
-        height: () => edge().height,
-        borderRadius: 0,
-        duration: 0.6,
-        ease: "power2.out",
-      })
+      // Explicit start values (the showreel box), re-read on every refresh:
+      // a plain .to would start again from the px size left inline from the
+      // previous screen width, so the video kept its old width after a resize.
+      .fromTo(
+        preview,
+        {
+          left: 0,
+          top: 0,
+          width: () => showreel.offsetWidth,
+          height: () => showreel.offsetHeight,
+          borderRadius: () => 4 * designPx(), // --radius-sm
+        },
+        {
+          left: () => edge().left,
+          top: () => edge().top,
+          width: () => edge().width,
+          height: () => edge().height,
+          borderRadius: 0,
+          duration: 0.6,
+          ease: "power2.out",
+        },
+      )
       .to({}, { duration: 0.3 });
+
+    // A resize changes the hold's length (it follows the screen height), so
+    // the same scroll would land at another point of the growth. Keep the
+    // reader at the same point instead (as in the Motto section).
+    let keepProgress = null;
+    const rememberProgress = () => {
+      const trigger = grow.scrollTrigger;
+      keepProgress = trigger.isActive ? trigger.progress : null;
+    };
+    const restoreProgress = () => {
+      const trigger = grow.scrollTrigger;
+      if (keepProgress !== null) window.scrollTo(0, trigger.start + keepProgress * (trigger.end - trigger.start));
+      keepProgress = null;
+    };
+    ScrollTrigger.addEventListener("refreshInit", rememberProgress);
+    ScrollTrigger.addEventListener("refresh", restoreProgress);
+    listeners.push(() => {
+      ScrollTrigger.removeEventListener("refreshInit", rememberProgress);
+      ScrollTrigger.removeEventListener("refresh", restoreProgress);
+    });
 
     if (!finePointer) return;
     gsap.set(button, { xPercent: -50, yPercent: -50, x: 0, y: 0 });
