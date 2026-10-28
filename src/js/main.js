@@ -16,6 +16,7 @@ import { initFooterForm } from "./footer-form.js";
 import { initFooterReveal } from "./footer-reveal.js";
 import { initSmoothScroll } from "./smooth-scroll.js";
 import { initBackLink } from "./back-link.js";
+import { initContactForm } from "./contact-form.js";
 import { initScrollMemory } from "./scroll-memory.js";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -41,6 +42,7 @@ function initPage() {
   cleanups.push(initFooterForm());
   cleanups.push(initFooterReveal());
   cleanups.push(initBackLink());
+  cleanups.push(initContactForm());
   // Last, so every pin spacer exists before the scroll position is restored.
   cleanups.push(initScrollMemory());
 }

@@ -1,6 +1,7 @@
 //- Work dropdown is a placeholder: there is no dropdown design in Figma yet.
 - var workCategories = ["Branding", "UI/UX", "Illustration", "2D/3D", "Graphic Design"]
-- var navLinks = ["About", "Team", "Services", "Career"]
+//- "Career" replaced by "Contact" (user decision).
+- var navLinks = [["About", "#"], ["Team", "#"], ["Services", "#"], ["Contact", "contact.html"]]
 
 header.site-header(data-header)
   .container.site-header__inner
@@ -16,6 +17,6 @@ header.site-header(data-header)
             each category in workCategories
               li
                 a.site-nav__dropdown-link(href="#")= category
-        each label in navLinks
+        each link in navLinks
           li.site-nav__item
-            a.site-nav__link(href="#")= label
+            a.site-nav__link(href=link[1])= link[0]

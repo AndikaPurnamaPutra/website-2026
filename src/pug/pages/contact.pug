@@ -1,0 +1,142 @@
+extends ../layouts/default
+
+//- Figma: "Contact - Idle" 1611:1042; states 1611:1972 – 1611:7579
+//- (docs/implementation/17-contact.md). The form is not sent anywhere yet
+//- (user decision): src/js/contact-form.js only plays its states.
+//- Figma typos fixed (user decision): "Partnership", Email placeholder,
+//- "$10K - $20K USD".
+block title
+  | Contact — OWW
+
+block content
+  -
+    var scopes = ["Branding", "Web Design", "App Design", "Dashboard", "Motion", "AI/Development", "UX Design", "Illustration", "Graphic Design", "2D/3D Design", "Packaging", "Others"]
+    var budgets = ["< $5K USD", "$5K - $10K USD", "$10K - $20K USD", "$30K - $40K USD", "> 50K USD"]
+    var types = ["Inquiries", "Partnership"]
+    var gallery = [[210, 281], [210, 229], [440, 480], [325, 200], [210, 229], [210, 168]]
+    var mapsUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("Jl. Raya Tajem No.A09 RT.05 RW.27 Kenayan, Wedomartani, Ngemplak, Sleman, Daerah Istimewa Yogyakarta 55584")
+
+  mixin textField(name, label, placeholder, type, autocomplete)
+    .contact-form__field(data-field=name)
+      label.contact-form__label(for=`contact-${name}`)
+        = label
+        span.contact-form__required *
+      input.contact-form__input(id=`contact-${name}` name=name type=type placeholder=placeholder autocomplete=autocomplete)
+
+  mixin chips(name, legend, options, type, required)
+    fieldset.contact-form__field(data-field=name)
+      legend.contact-form__label
+        = legend
+        if required
+          span.contact-form__required *
+        if block
+          block
+      .contact-form__chips
+        each option in options
+          label.contact-form__chip
+            input(type=type name=name value=option)
+            span= option
+
+  section.contact
+    .container.contact__inner
+      .contact__aside
+        .contact__intro
+          .contact__heading
+            h1.text-heading-42 We’d love to hear from you. Tell us all the things.
+            p.contact__lead Have an ambitious idea or a product ready to scale? Tell us about your goals, timeline, and vision—we’ll help you bring it to life.
+          .contact__cta
+            a.button.text-18(href="#") Schedule a call
+            p.contact__cta-caption Free 15min call
+
+        .contact__office
+          img.contact__office-image(src="assets/images/contact/office.jpg" width="210" height="122" alt="")
+          .contact__office-info
+            a.contact__office-link(href=mapsUrl target="_blank" rel="noopener")
+              | Office HQ
+              span.contact__office-arrow
+                img(src="assets/icons/arrow-down-right.svg" width="9.5" height="9.5" alt="")
+            p.contact__address
+              | Jl. Raya Tajem No.A09 RT.05 RW.27 Kenayan,
+              br
+              | Wedomartani, Kec. Ngemplak, Kab. Sleman
+              br
+              | Daerah Istimewa Yogyakarta 55584
+          p.contact__note Not a full-scale project? No problem—reach out at #[a(href="mailto:owwstudio@gmail.com") owwstudio@gmail.com] and let’s see how we can collaborate.
+
+      form.contact-form(novalidate data-contact-form)
+        h2.contact-form__title Start a project?
+
+        .contact-form__fields
+          +textField("company", "Company Name", "Your company name", "text", "organization")
+          +textField("name", "Your Name", "Your name", "text", "name")
+          +textField("email", "Email", "Your email", "email", "email")
+
+          +chips("scope", "Project Scope", scopes, "checkbox", true)
+          +chips("budget", "Project Budget (USD)", budgets, "radio", false)
+          +chips("type", "Project Type", types, "radio", true)
+            span.contact-form__info
+              button.contact-form__info-button(type="button" aria-describedby="contact-type-tip")
+                img(src="assets/icons/info.svg" width="24" height="24" alt="About project types")
+              span.contact-form__tip#contact-type-tip(role="tooltip") Inquiries: a one-off project. Partnership: ongoing work with our team.
+
+          //- Shown once a Project Type is chosen; its options follow the type.
+          .contact-form__field(data-field="turnaround" hidden)
+            span.contact-form__label#contact-turnaround-label
+              | Turnaround
+              span.contact-form__required *
+            .contact-form__select
+              input(type="hidden" name="turnaround")
+              button.contact-form__select-button(type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="contact-turnaround-label contact-turnaround-value")
+                span.contact-form__select-value#contact-turnaround-value(data-placeholder="Select timeline") Select timeline
+                img(src="assets/icons/caret-down.svg" width="24" height="24" alt="")
+              .contact-form__options(hidden)
+                ul.contact-form__option-list(role="listbox" aria-labelledby="contact-turnaround-label" tabindex="-1")
+                .contact-form__deadline(hidden)
+                  input.contact-form__input(name="deadline" type="text" placeholder="write your deadline" aria-label="Your deadline")
+
+          .contact-form__field
+            label.contact-form__label(for="contact-message") Tell us about your project...
+            .contact-form__message
+              textarea.contact-form__input.contact-form__textarea#contact-message(name="message" maxlength="200" placeholder="Give us a quick overview of your project, key goals, and any details we should know.")
+              p.contact-form__count(aria-live="polite")
+                span(data-count) 0
+                | /200
+
+          .contact-form__field
+            span.contact-form__label Document Attachment
+            label.contact-form__dropzone(data-dropzone)
+              input.contact-form__file(type="file" name="attachment" accept=".pdf,.doc,.docx,.ppt,.pptx,image/*,video/*,audio/*")
+              img(src="assets/icons/upload.svg" width="32" height="32" alt="")
+              span.contact-form__dropzone-text
+                span.contact-form__dropzone-title Drag and drop here or click to upload
+                span.contact-form__dropzone-hint PDF, DOC, PPTX or Media (max. 100mb)
+            .contact-form__upload(data-upload hidden)
+              span.contact-form__file-icon
+                img(src="assets/icons/file.svg" width="32" height="40" alt="")
+                span.contact-form__file-type(data-file-type)
+              span.contact-form__file-info
+                span.contact-form__file-name(data-file-name)
+                span.contact-form__file-size(data-file-size)
+                span.contact-form__progress(data-progress)
+                  span.contact-form__progress-track
+                    span.contact-form__progress-fill(data-progress-fill)
+                  span.contact-form__progress-value(data-progress-value) 0%
+              button.contact-form__file-remove(type="button" data-file-remove aria-label="Remove file" hidden)
+                img(src="assets/icons/close.svg" width="20" height="20" alt="")
+
+        .contact-form__divider
+        //- Placeholder until Cloudflare Turnstile is set up (user decision).
+        img.contact-form__turnstile(src="assets/images/contact/turnstile-placeholder.png" width="297" height="63" alt="")
+
+        .contact-form__submit-row
+          button.contact-form__submit(type="submit")
+            span(data-submit-label) Submit
+            img.contact-form__submit-check(src="assets/icons/check.svg" width="20" height="20" alt="" hidden)
+          p.contact-form__privacy Your details are safe with us. By sending this, you agree to our #[a(href="privacy-policy.html") Privacy Policy].
+
+        p.contact-form__error(role="alert" hidden)
+        button.contact-form__again(type="button" data-again hidden) Submit another form
+
+    .contact-gallery
+      each size, i in gallery
+        img(src=`assets/images/contact/gallery-${i + 1}.jpg` width=size[0] height=size[1] style=`--w: ${size[0]}; --h: ${size[1]}` alt="")

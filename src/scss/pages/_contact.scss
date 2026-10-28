@@ -1,0 +1,718 @@
+// Contact page. Figma: "Contact - Idle" 1611:1042 and its states (1611:1972 –
+// 1611:7579, docs/implementation/17-contact.md). Layout follows the layout
+// scale (fluid), text and the boxes that hug text the type scale (fs).
+// Figma's percentage line-heights render as whole pixels (14px at 170% =
+// 24px lines), so they are written as px ratios.
+@use "../abstracts/functions" as *;
+
+$color-line: #cacaca;
+$color-error: #fc0000; // error underline and message (Figma 1611:5344)
+$color-required: #ff0000; // "*" after required labels
+$color-hint: #888888;
+$color-file: #344054; // file type label and upload percentage
+$color-track: #eaecf0;
+$color-done: #29df00;
+$shadow-card: 0 0 fluid(20) rgba(0, 0, 0, 0.05);
+
+.contact {
+  // Above the footer, so the footer coin passes behind it (as on the other
+  // pages); the gallery reaches past the right edge, clipped here.
+  position: relative;
+  z-index: 1;
+  overflow-x: clip;
+  background: var(--color-white);
+  // Content at 144px in Figma: 104px header space (main) + 40px.
+  padding-top: fluid(40);
+  // Footer 80px below the gallery.
+  padding-bottom: fluid(80);
+}
+
+.contact__inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+// The left column stays put while the form scrolls (user decision). Where
+// the screen is shorter than the column (901px + 40px), it first scrolls up
+// until its bottom is 40px above the screen edge, then stays.
+.contact__aside {
+  position: sticky;
+  top: min(#{fluid(144)}, calc(100vh - #{fluid(941)}));
+  display: flex;
+  flex-direction: column;
+  gap: fluid(309);
+  width: fluid(478);
+}
+
+.contact__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-40);
+}
+
+.contact__heading {
+  display: flex;
+  flex-direction: column;
+  gap: fs(20);
+}
+
+.contact__lead {
+  font-weight: 500;
+  font-size: fs(14);
+  line-height: calc(22 / 14);
+  color: var(--color-text-secondary);
+}
+
+.contact__cta {
+  display: flex;
+  align-items: center;
+  gap: fs(16);
+}
+
+.contact__cta-caption {
+  font-weight: 500;
+  font-size: fs(14);
+  line-height: calc(24 / 14);
+  opacity: 0.5;
+}
+
+.contact__office {
+  display: flex;
+  flex-direction: column;
+  gap: fluid(35);
+  width: fluid(381);
+}
+
+.contact__office-image {
+  width: fluid(210);
+  height: fluid(122);
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.contact__office-info {
+  display: flex;
+  flex-direction: column;
+  gap: fs(8);
+}
+
+.contact__office-link {
+  display: inline-flex;
+  align-items: center;
+  gap: fs(8);
+  align-self: flex-start;
+  font-weight: 500;
+  font-size: fs(14);
+  line-height: calc(22 / 14);
+}
+
+// ArrowDownRight from Figma, flipped to point up-right as in the design.
+.contact__office-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fs(20);
+  height: fs(20);
+  background: var(--color-surface-muted);
+  border-radius: var(--radius-sm);
+
+  img {
+    width: fs(9.5);
+    height: fs(9.5);
+    transform: scaleY(-1);
+  }
+}
+
+.contact__address {
+  font-size: fs(14);
+  line-height: calc(22 / 14);
+  opacity: 0.5;
+}
+
+.contact__note {
+  font-size: fs(13);
+  line-height: calc(22 / 13);
+  color: $color-hint;
+
+  a {
+    color: var(--color-ink);
+    text-decoration: underline;
+  }
+}
+
+// Form card
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-40);
+  width: fluid(786);
+  padding: var(--space-32);
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  box-shadow: $shadow-card;
+}
+
+.contact-form__title {
+  font-family: var(--font-display);
+  font-size: fs(28);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.contact-form__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-40);
+}
+
+.contact-form__field {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.contact-form__label {
+  display: flex;
+  align-items: center;
+  margin-bottom: fs(16);
+  padding: 0;
+  font-weight: 500;
+  font-size: fs(14);
+  line-height: calc(24 / 14);
+}
+
+.contact-form__required {
+  color: $color-required;
+}
+
+// Toggled states use the hidden attribute; it must win over display rules.
+.contact-form [hidden] {
+  display: none;
+}
+
+// Text, select value and textarea: General Sans 20, Medium once filled.
+// 20px text + 12px space + 0.5px line (Figma 32px).
+.contact-form__input {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0 0 fs(12);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: fs(20);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--color-ink);
+  background: none;
+  border: 0;
+  border-bottom: 0.5px solid $color-line;
+  border-radius: 0;
+  outline: none;
+  transition: border-color 0.2s ease-out;
+
+  &::placeholder {
+    font-weight: 400;
+    color: var(--color-ink);
+    opacity: 0.2;
+  }
+
+  // Browsers keep inputs at least a "normal" line tall; Figma's is 1.
+  &:not(textarea) {
+    height: calc(#{fs(32)} + 0.5px);
+  }
+
+  // Figma 1611:1972: the line turns dark on hover.
+  &:hover,
+  &:focus-visible {
+    border-bottom-color: var(--color-ink);
+  }
+
+  // Disabled after sending: keep the text, faded (Figma 1611:5825).
+  &:disabled {
+    -webkit-text-fill-color: currentColor;
+    opacity: 1;
+    color: rgba(17, 17, 17, 0.2);
+    border-bottom-color: $color-line;
+  }
+}
+
+// Figma 1611:5344: an empty required field shows a red line and no placeholder.
+.is-invalid .contact-form__input,
+.is-invalid .contact-form__select-button {
+  border-bottom-color: $color-error;
+
+  &::placeholder {
+    opacity: 0;
+  }
+}
+
+// Chips: a hidden checkbox or radio and its label.
+.contact-form__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: fs(16);
+}
+
+.contact-form__chip {
+  position: relative;
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: inherit;
+  }
+
+  span {
+    display: block;
+    padding: fs(10) fs(16);
+    font-size: fs(16);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+    border: 1px solid $color-line;
+    border-radius: var(--radius-sm);
+    transition:
+      color 0.2s ease-out,
+      background-color 0.2s ease-out,
+      border-color 0.2s ease-out;
+  }
+
+  input:checked + span {
+    font-weight: 500;
+    color: var(--color-white);
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+  }
+
+  input:focus-visible + span {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+
+  input:disabled + span {
+    cursor: default;
+  }
+
+  input:checked:disabled + span {
+    background: #cfcfcf;
+    border-color: #cfcfcf;
+  }
+}
+
+// Info icon next to "Project Type". The tooltip is not in Figma (approved
+// proposal); it shows on hover and keyboard focus.
+.contact-form__info {
+  position: relative;
+  display: flex;
+  margin-left: fs(4);
+}
+
+.contact-form__info-button {
+  display: flex;
+
+  img {
+    width: fs(24);
+    height: fs(24);
+  }
+}
+
+.contact-form__tip {
+  position: absolute;
+  bottom: calc(100% + #{fs(8)});
+  left: 50%;
+  z-index: 2;
+  width: max-content;
+  max-width: fs(260);
+  padding: fs(8) fs(12);
+  font-weight: 400;
+  font-size: fs(12);
+  line-height: calc(18 / 12);
+  color: var(--color-white);
+  background: var(--color-ink);
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%);
+  transition:
+    opacity 0.2s ease-out,
+    visibility 0.2s;
+}
+
+.contact-form__info:hover .contact-form__tip,
+.contact-form__info-button:focus-visible + .contact-form__tip {
+  opacity: 1;
+  visibility: visible;
+}
+
+// Turnaround dropdown: 24px row + 12px + line (Figma 36px).
+.contact-form__select {
+  position: relative;
+}
+
+.contact-form__select-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: fs(12);
+  width: 100%;
+  padding-bottom: fs(12);
+  text-align: left;
+  border-bottom: 0.5px solid $color-line;
+  transition: border-color 0.2s ease-out;
+
+  &:hover,
+  &:focus-visible {
+    border-bottom-color: var(--color-ink);
+    outline: none;
+  }
+
+  &:disabled {
+    cursor: default;
+    border-bottom-color: $color-line;
+  }
+
+  img {
+    flex-shrink: 0;
+    width: fs(24);
+    height: fs(24);
+  }
+}
+
+.contact-form__select-value {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: fs(20);
+  line-height: 1;
+  letter-spacing: -0.04em;
+
+  &.is-placeholder {
+    font-weight: 400;
+    opacity: 0.2;
+  }
+
+  .is-invalid &.is-placeholder {
+    opacity: 0;
+  }
+
+  :disabled > & {
+    opacity: 0.2;
+  }
+}
+
+// Figma 1611:2643: 8px below the line, full width.
+.contact-form__options {
+  position: absolute;
+  top: calc(100% + #{fs(8)});
+  right: 0;
+  left: 0;
+  z-index: 2;
+  padding: fs(16);
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  box-shadow: $shadow-card;
+}
+
+.contact-form__option-list {
+  display: flex;
+  flex-direction: column;
+  gap: fs(16);
+  outline: none;
+}
+
+// The current or pointed item is full black, the others 50%.
+.contact-form__option {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: fs(16);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  opacity: 0.5;
+  cursor: pointer;
+  transition: opacity 0.2s ease-out;
+
+  &[aria-selected="true"],
+  &.is-active,
+  &:hover {
+    opacity: 1;
+  }
+}
+
+// "Others" (Inquiries) opens a deadline field below it (Figma 1611:6716).
+.contact-form__deadline {
+  margin-top: fs(16);
+}
+
+// Message: 137px box with the counter in its bottom right corner.
+.contact-form__message {
+  position: relative;
+}
+
+.contact-form__textarea {
+  height: fs(137);
+  padding-bottom: fs(32);
+  resize: none;
+}
+
+.contact-form__count {
+  position: absolute;
+  right: 0;
+  bottom: fs(8);
+  font-size: fs(12);
+  line-height: calc(19 / 12);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+// Drop zone and the uploaded file share the box (Figma 1611:3418, 1611:5069).
+.contact-form__dropzone,
+.contact-form__upload {
+  display: flex;
+  align-items: center;
+  gap: fs(8);
+  width: fit-content;
+  padding: fs(20) fs(24);
+  background: var(--color-surface-muted);
+  border: 0.5px dashed $color-line;
+  border-radius: var(--radius-sm);
+}
+
+.contact-form__dropzone {
+  position: relative;
+  cursor: pointer;
+  transition: border-color 0.2s ease-out;
+
+  &:hover,
+  &.is-dragover,
+  &:focus-within {
+    border-color: var(--color-ink);
+  }
+
+  > img {
+    width: fs(32);
+    height: fs(32);
+  }
+}
+
+.contact-form__file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.contact-form__dropzone-text,
+.contact-form__file-info {
+  display: flex;
+  flex-direction: column;
+  width: fs(219);
+}
+
+.contact-form__dropzone-title,
+.contact-form__file-name {
+  font-size: fs(13);
+  line-height: calc(20 / 13);
+}
+
+.contact-form__file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-form__dropzone-hint,
+.contact-form__file-size {
+  font-size: fs(12);
+  line-height: calc(18 / 12);
+  color: $color-hint;
+}
+
+// 40px file icon with its type ("PDF") in the page.
+.contact-form__file-icon {
+  position: relative;
+  flex-shrink: 0;
+  width: fs(40);
+  height: fs(40);
+
+  img {
+    width: fs(32);
+    height: fs(40);
+    margin-left: fs(4);
+  }
+}
+
+// Figma uses Inter Bold 9; the site loads Inter up to SemiBold.
+.contact-form__file-type {
+  position: absolute;
+  top: fs(23);
+  left: fs(4);
+  width: fs(32);
+  font-weight: 600;
+  font-size: fs(9);
+  line-height: calc(11 / 9);
+  letter-spacing: 0;
+  text-align: center;
+  color: $color-file;
+}
+
+.contact-form__progress {
+  display: flex;
+  align-items: center;
+  gap: fs(12);
+  height: fs(20);
+}
+
+.contact-form__progress-track {
+  flex: 1 0 0;
+  height: fs(8);
+  overflow: hidden;
+  background: $color-track;
+  border-radius: 9999px;
+}
+
+.contact-form__progress-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--color-ink);
+  border-radius: inherit;
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left;
+}
+
+.contact-form__progress-value {
+  flex-shrink: 0;
+  width: fs(37);
+  font-weight: 500;
+  font-size: fs(14);
+  line-height: calc(20 / 14);
+  letter-spacing: 0;
+  color: $color-file;
+  text-align: right;
+}
+
+.contact-form__file-remove {
+  display: flex;
+  flex-shrink: 0;
+
+  img {
+    width: fs(20);
+    height: fs(20);
+  }
+}
+
+.contact-form__divider {
+  border-top: 0.5px solid $color-line;
+}
+
+.contact-form__turnstile {
+  width: fs(297);
+  height: fs(63);
+}
+
+.contact-form__submit-row {
+  display: flex;
+  align-items: center;
+  gap: fs(16);
+}
+
+// Outline in idle, dark on hover (Figma 1611:5630), light grey with a green
+// check once sent (1611:5825). Always 44px tall.
+.contact-form__submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: fs(10);
+  flex-shrink: 0;
+  width: fs(156);
+  padding: fs(10) fs(20);
+  font-weight: 500;
+  font-size: fs(18);
+  line-height: fs(22);
+  color: var(--color-ink);
+  border: 1px solid var(--color-ink);
+  border-radius: var(--radius-sm);
+  transition:
+    color 0.2s ease-out,
+    background-color 0.2s ease-out,
+    border-color 0.2s ease-out;
+
+  &:hover:enabled,
+  &:focus-visible {
+    color: var(--color-white);
+    background: var(--color-ink);
+  }
+
+  &:disabled {
+    color: rgba(17, 17, 17, 0.5);
+    background: var(--color-surface-muted);
+    border-color: var(--color-surface-muted);
+    cursor: default;
+  }
+}
+
+.contact-form__submit-check {
+  width: fs(20);
+  height: fs(20);
+}
+
+.contact-form__privacy {
+  font-weight: 500;
+  font-size: fs(13);
+  line-height: calc(22 / 13);
+  opacity: 0.5;
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+.contact-form__error,
+.contact-form__again {
+  font-weight: 500;
+  font-size: fs(14);
+  line-height: calc(24 / 14);
+}
+
+.contact-form__error {
+  color: $color-error;
+}
+
+.contact-form__again {
+  align-self: flex-start;
+  text-decoration: underline;
+}
+
+// Six pictures, 20px apart, starting 6.5px from the left edge (Figma) and
+// running past the right edge.
+.contact-gallery {
+  display: flex;
+  align-items: flex-start;
+  gap: fluid(20);
+  width: fluid(1427);
+  margin: fluid(128) auto 0;
+
+  img {
+    flex-shrink: 0;
+    width: calc(var(--w) * var(--px));
+    height: calc(var(--h) * var(--px));
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-form__input,
+  .contact-form__chip span,
+  .contact-form__tip,
+  .contact-form__select-button,
+  .contact-form__option,
+  .contact-form__dropzone,
+  .contact-form__submit {
+    transition: none;
+  }
+}
