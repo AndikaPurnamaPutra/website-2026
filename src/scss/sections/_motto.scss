@@ -37,51 +37,9 @@
   background: linear-gradient(227.53deg, #111 13.428%, #1f1f1f 69.715%);
 }
 
-// Two stage lights: Figma's Vector 3209 (a triangle from its tip, ±20° wide,
-// white 1% → 4% away from the tip, blurred 64px), drawn with gradients and
-// masks instead of a blurred SVG, so changing them never redraws anything.
-// Each box hangs from its tip (top center = transform origin): the left light
-// as in 1527:4219 (tip at -12, -65, turned -46.4°, full size), the center
-// light as in 1527:4241 (tip at 704.5, -430.5, beam down, 83%). JS switches
-// them like a lighting cue, opening and closing their iris (no movement).
-// Without JS the last frame shows: the center light only.
-.motto__beam {
-  position: absolute;
-  width: fluid(1700);
-  height: fluid(1700);
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.012), rgba(255, 255, 255, 0.04) 80%);
-  // Soft sides (conic, from the tip) and a soft far end (radial).
-  -webkit-mask-image:
-    conic-gradient(from 158deg at 50% 0, transparent 0deg, #000 9deg, #000 35deg, transparent 44deg),
-    radial-gradient(circle at 50% 0, #000 55%, transparent 98%);
-  -webkit-mask-composite: source-in;
-  mask-image:
-    conic-gradient(from 158deg at 50% 0, transparent 0deg, #000 9deg, #000 35deg, transparent 44deg),
-    radial-gradient(circle at 50% 0, #000 55%, transparent 98%);
-  mask-composite: intersect;
-  transform-origin: 50% 0;
-  pointer-events: none;
-  will-change: transform, opacity;
-}
-
-// Tips anchored to the horizontal center (-12 = center - 732; 704.5 = center
-// - 15.5); the box is centered on its tip.
-.motto__beam--left {
-  top: fluid(-65);
-  left: calc(50% + #{fluid(-732)} - #{fluid(850)});
-  transform: rotate(-46.4deg) scale(1.205);
-  opacity: 0;
-}
-
-.motto__beam--center {
-  top: fluid(-430.5);
-  left: calc(50% + #{fluid(-15.5)} - #{fluid(850)});
-  transform: rotate(0.9deg);
-}
-
-// With JS both lights stay hidden until JS shows them, from the first paint
+// With JS the glow stays hidden until JS shows it, from the first paint
 // (.js is set in <head>, before the scripts load).
-.js .motto :is(.motto__beam, .motto__ellipse) {
+.js .motto .motto__ellipse {
   opacity: 0;
   visibility: hidden;
 }
@@ -257,7 +215,7 @@
 .motto__ellipse {
   position: absolute;
   bottom: fluid(-502);
-  // Centered like the beam (frame x -15 = center - 735).
+  // Centered on the screen (frame x -15 = center - 735).
   left: calc(50% + #{fluid(-735)});
   width: fluid(1440);
   height: fluid(724);

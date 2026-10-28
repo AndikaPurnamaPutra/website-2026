@@ -8,13 +8,11 @@ import { designPx } from "./design-px.js";
 // step 1: "Trendsetting Design" turns gradient letter by letter (on its own
 //         clock once the step is reached), the ellipse rises;
 // step 2: the line flips to motto 2;   step 3: "believers." turns gradient;
-// step 4: flip to motto 3 and to the CTA label, the glow gives way to the
-//         left stage light, Get a Quote appears;
-// step 5: the whole motto turns gradient, the left light goes off as the
-//         center light comes on;
+// step 4: flip to motto 3 and to the CTA label, the glow fades out, Get a
+//         Quote appears;
+// step 5: the whole motto turns gradient;
 // step 6: hold before the section releases.
-// The glow from below follows one smoothed journey (see lightPath); the stage
-// lights switch like a lighting cue on their own clock (see cue).
+// The glow from below follows one smoothed journey (see lightPath).
 // Timing and easing are not in Figma (approved proposal).
 
 
@@ -30,8 +28,6 @@ export function initMottoScroll() {
   const wrapperTexture = wrapper?.querySelector(".tone-shift__texture");
   const lines = [...section.querySelectorAll(".motto__line")];
   const ellipse = section.querySelector(".motto__ellipse");
-  const beamLeft = section.querySelector(".motto__beam--left");
-  const beamCenter = section.querySelector(".motto__beam--center");
   const labelTexts = [...section.querySelectorAll(".motto__label-text")];
   const diagonal = section.querySelector(".motto__bg--diagonal");
   const cta = section.querySelector(".cta");
@@ -202,7 +198,8 @@ export function initMottoScroll() {
     // Glow from below (1527:4169 / 4201) on one smoothed journey that follows
     // the scroll (trails ≈0.6s), so it never stops in the rest zones. Time =
     // screens of scrolling: 0.2–1 it comes up, 1–3 it rises slowly, 3.2–4 it
-    // fades as the stage lights take over. A CSS-drawn layer that is only
+    // fades out (Figma has no glow from step 4 on; the light beams of
+    // 1527:4219 / 4241 were removed at the user's request). A CSS-drawn layer that is only
     // moved (no redraw). fromTo with explicit starts, so a refresh
     // (invalidate) can re-render it.
     const flow = { ease: "sine.inOut", immediateRender: false };
@@ -216,42 +213,6 @@ export function initMottoScroll() {
       .fromTo(ellipse, { ...glowLow }, { ...glowHigh, duration: 2, ...flow }, 1)
       .fromTo(ellipse, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.8, ...flow }, 3.2)
       .to({}, { duration: 2 }, 4);
-
-    // Stage lights (approved option A, like a lighting cue): two lights stay
-    // at their Figma places and never move; each comes on by opening its iris
-    // (the beam widens from a slit and reaches out while it brightens) and
-    // goes off by closing it. Step 4: the left light comes on; step 5: it
-    // goes off while the center light comes on over the title. They play on
-    // their own clock when the scroll passes the middle of a step, and back
-    // when scrolling up.
-    const closed = (scale) => ({ autoAlpha: 0, scaleX: scale * 0.12, scaleY: scale * 0.7 });
-    const open = (scale) => ({ autoAlpha: 1, scaleX: scale, scaleY: scale });
-    gsap.set(beamLeft, { rotation: -46.4, ...closed(1.205) });
-    gsap.set(beamCenter, { rotation: 0.9, ...closed(1) });
-    const cue = gsap
-      .timeline({ paused: true })
-      .addLabel("off", 0)
-      .fromTo(beamLeft, closed(1.205), { ...open(1.205), duration: 1.4, ease: "power2.inOut", immediateRender: false }, 0)
-      .addLabel("left")
-      .fromTo(beamLeft, open(1.205), { ...closed(1.205), duration: 1.1, ease: "power2.inOut", immediateRender: false }, "left")
-      .fromTo(beamCenter, closed(1), { ...open(1), duration: 1.4, ease: "power2.inOut", immediateRender: false }, "left+=0.4")
-      .addLabel("center");
-    const cueStates = [
-      ["left", stepTime(3) + 0.5],
-      ["center", stepTime(4) + 0.5],
-    ];
-    let cueState = null;
-    const syncCue = () => {
-      if (ScrollTrigger.isRefreshing || resizing) return;
-      const time = timeline.time();
-      const state = cueStates.reduce((current, [name, at]) => (time >= at ? name : current), "off");
-      if (state === cueState) return;
-      // First sync (page load, possibly mid-section) and reduced motion jump;
-      // a jump over both cues is done in 1.5s.
-      if (cueState === null || reduceMotion) cue.seek(state);
-      else cue.tweenTo(state, { duration: Math.min(Math.abs(cue.labels[state] - cue.time()), 1.5), ease: "none" });
-      cueState = state;
-    };
 
     const lightClock = { time: 0 };
     const toLightTime = gsap.quickTo(lightClock, "time", {
@@ -279,10 +240,7 @@ export function initMottoScroll() {
       ScrollTrigger.removeEventListener("refresh", refreshLight);
     };
 
-    timeline.eventCallback("onUpdate", () => {
-      syncGradients();
-      syncCue();
-    });
+    timeline.eventCallback("onUpdate", syncGradients);
 
     // The whole line turns like one flip-clock card: out to the top, in from below.
     const flip = (from, to, at) => {

@@ -226,3 +226,8 @@ Hasil:
 - Pendar bawah tetap pada lintasan yang mengikuti scroll (langkah 1–3, memudar di 3,2–4).
 - Terukur di 1440: langkah 3 kedua lampu 0 (lebar 12–14%). Lampu kiri terbuka: 0,06 / 0,24 / 0,6 / 0,87 / 1 dengan lebar 0,21 / 0,40 / 0,78 / 1,06 / 1,2 (setiap ±0,2 detik). Langkah 5: kiri 0,88 → 0,42 → 0,07 → 0 sementara tengah 0,01 → 0,11 → 0,89 → 1. Sudut tetap −46,4° dan 0,9°. Kembali ke langkah 3: keduanya mati, pendar menyala.
 - `light.svg` dan `ellipse.svg` tidak dipakai lagi.
+
+### Sinar segitiga dihapus (28 Okt 2026, permintaan pengguna)
+- Kedua sinar lampu (kiri 1527:4219 dan tengah 1527:4241, `.motto__beam`) dihapus dari markup, CSS, dan JS (cue lampu panggung). Ini keputusan pengguna dan berbeda dari Figma.
+- Pendar dari bawah (Ellipse 8998, langkah 1–3) tetap, dan memudar di langkah 4 seperti di Figma, jadi langkah 4–6 tanpa cahaya. Label CTA, tombol, dan langkah lain tidak berubah.
+- Terukur di 1440: tidak ada elemen sinar. Pendar 0 / 1 / 1 / 0 / 0 / 0 di langkah 0 / 1 / 3 / 4,2 / 5,2 / 6. Label CTA dan tombol tetap muncul di langkah 4.
