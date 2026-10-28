@@ -152,5 +152,7 @@ block content
       .contact-gallery__track(data-marquee-track)
         each item, i in gallery
           a.contact-gallery__item(href="#" style=`--w: ${item.size[0]}; --h: ${item.size[1]}`)
-            img(src=`assets/images/contact/gallery-${i + 1}.jpg` width=item.size[0] height=item.size[1] alt="")
-            span.contact-gallery__title.text-13= item.title
+            span.contact-gallery__media
+              img(src=`assets/images/contact/gallery-${i + 1}.jpg` width=item.size[0] height=item.size[1] alt="")
+            span.contact-gallery__title.text-13
+              span= item.title

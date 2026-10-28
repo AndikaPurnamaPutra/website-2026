@@ -189,3 +189,10 @@ Dibaca dari properti layer (28 Okt 2026).
   - Testimonial homepage tetap 40 px/detik.
 - **Saat hover tetap ikut scroll** (keputusan pengguna, mengganti "diam termasuk saat di-scroll"): selama kursor di atas foto, gerak sendirinya berhenti, tapi scroll tetap mendorongnya. Setelah scroll berhenti, marquee diam lagi.
   - Terukur: hover −197 (diam), scroll 270px → −467, lalu tetap −467.
+- **Hover lebih elegan** (pilihan pengguna A + D, tidak ada di Figma):
+  - Judul naik dari balik batas bawahnya (mask reveal): masuk 0,6 detik dengan `cubic-bezier(0.16, 1, 0.3, 1)`, keluar 0,4 detik.
+  - Foto membesar 3% di dalam bingkainya selama 0,8 detik. Foto lain tidak diredupkan.
+  - Dengan reduced motion: tanpa gerakan.
+  - Terukur saat hover: judul turun dari 19px ke 1,2px lalu ke 0. Zoom 1 → 1,026 → 1,03.
+  - **Arah judul diganti** (permintaan pengguna): turun dari balik batas atasnya (`translateY(-105%)` → 0), dan saat kursor keluar naik lagi ke atas.
+  - **Tanpa jeda saat sembunyi** (masukan pengguna): kurva keluar `cubic-bezier(0.7, 0, 0.84, 0)` (ease-in, hampir diam di awal) diganti `cubic-bezier(0.33, 1, 0.68, 1)` 0,35 detik, yang langsung bergerak.

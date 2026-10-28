@@ -729,38 +729,57 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
 }
 
 .contact-gallery__item {
+  --ease-reveal: cubic-bezier(0.16, 1, 0.3, 1); // fast start, long soft stop
+
   position: relative;
   flex-shrink: 0;
   padding-right: calc(20 * #{$site-px});
+}
+
+// On hover the picture grows 3% inside its frame (user decision, not in Figma).
+.contact-gallery__media {
+  display: block;
+  overflow: hidden;
+  border-radius: fluid(4);
 
   img {
     width: calc(var(--w) * #{$site-px});
     height: calc(var(--h) * #{$site-px});
     object-fit: cover;
-    border-radius: fluid(4);
+    transition: transform 0.8s var(--ease-reveal);
+  }
+
+  .contact-gallery__item:hover & img,
+  .contact-gallery__item:focus-visible & img {
+    transform: scale(1.03);
   }
 }
 
 // The project title shows 16px below the picture on hover, as the Our Work
-// cards; it sits outside the flow, so the pictures do not move. It wraps
-// within the picture's width, so it never runs under the next (taller) one.
+// cards, coming down from behind its own upper edge (user decision, not in
+// Figma).
+// It sits outside the flow, so the pictures do not move, and wraps within the
+// picture's width, so it never runs under the next (taller) one.
 .contact-gallery__title {
   position: absolute;
   top: calc(100% + #{fs(16)});
   left: 0;
   width: calc(var(--w) * #{$site-px});
+  overflow: hidden;
   line-height: 1.4;
-  opacity: 0;
-  transform: translateY(#{fs(-4)});
-  transition:
-    opacity 0.3s ease-out,
-    transform 0.3s ease-out;
   pointer-events: none;
 
-  .contact-gallery__item:hover &,
-  .contact-gallery__item:focus-visible & {
-    opacity: 1;
+  span {
+    display: block;
+    transform: translateY(-105%);
+    // Leaves at once (an ease-in here felt like a delay).
+    transition: transform 0.35s cubic-bezier(0.33, 1, 0.68, 1);
+  }
+
+  .contact-gallery__item:hover & span,
+  .contact-gallery__item:focus-visible & span {
     transform: none;
+    transition: transform 0.6s var(--ease-reveal);
   }
 }
 
@@ -772,7 +791,8 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
   .contact-form__option,
   .contact-form__dropzone,
   .contact-form__submit,
-  .contact-gallery__title {
-    transition: none;
+  .contact-gallery__media img,
+  .contact-gallery__title span {
+    transition: none !important;
   }
 }
