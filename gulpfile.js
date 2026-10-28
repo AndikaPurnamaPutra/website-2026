@@ -38,7 +38,11 @@ export const scripts = () =>
   esbuildBuild({
     entryPoints: [paths.scriptsEntry],
     bundle: true,
-    outfile: `${paths.dist}/js/main.js`,
+    // Split so code loaded with import() (the 3D hero coin and three.js)
+    // becomes its own file instead of growing main.js.
+    outdir: `${paths.dist}/js`,
+    splitting: true,
+    minify: true,
     sourcemap: true,
     format: "esm",
   });
