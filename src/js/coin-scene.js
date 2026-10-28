@@ -10,9 +10,10 @@ import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUnifo
 // layer behind the page content, shown in the hero and the footer only. It
 // only ever travels down; only the scroll turns it, slowly (user decision):
 // - Hero: on load it comes down from above, growing from small to its size
-//   with half a flip slowing to a stop, and rests whole (pose B). Scrolling, it glides into its
-//   design place behind the top of the showreel, then the scroll turns it
-//   over (half a flip) as it goes down behind the showreel and fades out.
+//   with half a flip slowing to a stop, and rests in its Figma place and size
+//   (the hero coin picture: its lower part behind the showreel; user
+//   decision). Scrolling, the scroll turns it over (half a flip) as it goes
+//   down behind the showreel and fades out.
 // - Footer: as the footer is uncovered (src/js/footer-reveal.js), the coin
 //   comes down from above, from behind Motto, and rests in its design place;
 //   the scroll carries on the hero's flip unseen, and once it shows below
@@ -37,10 +38,6 @@ const CENTER_X = 220 / 448;
 const CENTER_Y = 208 / 420;
 const COIN_BOTTOM = 0.47; // coin's lower edge below its center, × picture box height
 const ZOOM_PER_BOX = 1.14 * 2;
-// Pose B in the hero, as a share of the picture box: whole, above the
-// showreel, beside the info column (24, -175 at 1440).
-const INTRO_X = 24 / 448;
-const INTRO_Y = -175 / 420;
 const FLIP = -Math.PI; // half a flip as it leaves the hero, over its horizontal axis
 // The footer carries on the hero's flip: the coin left the hero half turned
 // over (FLIP) and, in the footer, completes the turn the same way and at the
@@ -49,7 +46,7 @@ const FLIP = -Math.PI; // half a flip as it leaves the hero, over its horizontal
 const HERO_DOWN = 0.4; // px the coin moves down per px of scroll, leaving the hero
 const DROP = 0.6; // screens the coin travels down while it arrives in the footer
 const INTRO = 2.4; // s: the entrance on load
-const INTRO_DROP = 0.35; // screens it comes down from, above pose B
+const INTRO_DROP = 0.35; // screens it comes down from, above its place
 const INTRO_SCALE = 0.35; // size it starts from, growing to its own
 
 const clamp = (t) => Math.min(1, Math.max(0, t));
@@ -144,7 +141,9 @@ export function mountCoin(anchors, fallback) {
       scene.add(gltf.scene);
       gltf.scene.traverse((child) => {
         if (child.name.includes("Rot_1")) coinRot1 = child;
-        if (child.name.includes("Rot_2")) child.rotation.set(THREE.MathUtils.degToRad(75), THREE.MathUtils.degToRad(45), 0, "YXZ");
+        // Leans back 55° (the user's script had 45°) so the coin shows the
+        // narrow, tilted look of the Figma picture.
+        if (child.name.includes("Rot_2")) child.rotation.set(THREE.MathUtils.degToRad(75), THREE.MathUtils.degToRad(55), 0, "YXZ");
       });
       if (coinRot1) initialQuat1.copy(coinRot1.quaternion);
       modelIn = true;
@@ -182,20 +181,20 @@ export function mountCoin(anchors, fallback) {
     if (anchors.hero) {
       const s = scroll / screen;
       if (s < 1.2) {
-        // Pose B with the page at the top (document place - scroll 0).
+        // Its Figma place with the page at the top (document place - scroll 0).
         const at = rest(anchors.hero);
         const top = at.y + window.scrollY;
         // On load: comes down from above, growing from small to its size
         // while half a flip slows to a stop (user decision), then rests in
-        // pose B.
+        // its Figma place and size.
         const enter = out(intro);
         // Scrolling: it moves down, slower than the showreel rises over it,
-        // drifting into its design column, while the scroll slowly turns it
-        // over (half a flip); fades out behind the showreel.
+        // while the scroll slowly turns it over (half a flip); fades out
+        // behind the showreel.
         const turn = sine(span(s, 0, 1.1));
         return {
-          x: at.x + at.box.width * INTRO_X * (1 - inOut(span(s, 0, 0.5))),
-          y: top + at.box.height * INTRO_Y - screen * INTRO_DROP * (1 - enter) + scroll * HERO_DOWN,
+          x: at.x,
+          y: top - screen * INTRO_DROP * (1 - enter) + scroll * HERO_DOWN,
           zoom: at.zoom * (INTRO_SCALE + (1 - INTRO_SCALE) * enter),
           tilt: FLIP * turn + FLIP * (1 - enter),
           opacity: span(intro, 0, 0.25) * (1 - span(s, 0.95, 1.2)),
