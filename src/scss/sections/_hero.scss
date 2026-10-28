@@ -29,6 +29,46 @@
   pointer-events: none;
 }
 
+// 3D coin (trial, src/js/hero-coin-3d.js): fades in over the picture once the
+// model has loaded; it can be turned by dragging. Its stage is twice the
+// picture box, centered on the coin in the picture (203, 212 in the 448 × 420
+// box; +17, -4 measured on screen), so the coin can lift and turn without
+// being cut off.
+.hero__coin--3d {
+  top: fluid(261 + 212 - 420 - 4);
+  left: calc(50% + #{fluid(182 - 224 + 203 - 448 + 17)});
+  width: fluid(896);
+  height: fluid(840);
+  filter: none;
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+  pointer-events: auto;
+  cursor: grab;
+
+  &.is-ready {
+    opacity: 1;
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// With JS (and motion) the 3D coin replaces the picture: the picture is hidden
+// from the first paint (.js is set in <head>), so the two never show
+// together. It comes back if the 3D coin cannot load (is-fallback).
+@media (prefers-reduced-motion: no-preference) {
+  .js img.hero__coin:not(.is-fallback) {
+    visibility: hidden;
+  }
+}
+
 // Content and showreel are positioned so they stack above the coin.
 .hero__content {
   position: relative;
