@@ -1,6 +1,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { designPx } from "./design-px.js";
+import { startSmoothScroll, stopSmoothScroll } from "./smooth-scroll.js";
 
 // Hero showreel (reference from the user: manual.studio; approved proposal,
 // not in Figma). On pointer devices the "Play Showreel" button follows the
@@ -178,6 +179,7 @@ export function initHeroShowreel() {
     preview.pause();
     lightbox.classList.add("is-open");
     lightbox.setAttribute("aria-hidden", "false");
+    stopSmoothScroll();
     window.addEventListener("wheel", lockScroll, { passive: false });
     window.addEventListener("touchmove", lockScroll, { passive: false });
     window.addEventListener("keydown", lockScroll);
@@ -204,6 +206,7 @@ export function initHeroShowreel() {
     if (!open) return;
     open = false;
     video.pause();
+    startSmoothScroll();
     window.removeEventListener("wheel", lockScroll);
     window.removeEventListener("touchmove", lockScroll);
     window.removeEventListener("keydown", lockScroll);

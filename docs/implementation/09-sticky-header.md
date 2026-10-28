@@ -121,3 +121,7 @@ Keputusan pengguna: menu bar **selalu terlihat** (tidak sembunyi saat scroll ke 
   - Saat tertahan, Motto dipaksa tepat di `top: 0px` (`onToggle` dan `onRefresh`). Isinya bergeser ke atas kurang dari 1px.
   - Label snap `step0` dan `step6` digeser 0,003 ke dalam pin (±3px scroll), karena tepat di awal atau akhir pin section belum atau sudah dilepas dan kembali ke posisi pecahan.
   - Terukur di 1440×1024, 2174×1200, dan 2560×1440 (layar 2×): `top` tepat 0 di langkah 0–6, setelah resize, dan setelah muat ulang. Pelepasan ke footer tetap mulus.
+
+### Transparan di posisi paling atas (28 Okt 2026, permintaan pengguna)
+Latar menu bar transparan selama halaman belum di-scroll (`:not(.is-scrolled)`), supaya koin 3D di hero tidak terpotong. Putih lagi begitu halaman di-scroll. Lihat `16-coin-journey.md`.
+

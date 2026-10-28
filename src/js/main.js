@@ -14,6 +14,7 @@ import { initMottoScroll } from "./motto-scroll.js";
 import { initHeader } from "./header.js";
 import { initFooterForm } from "./footer-form.js";
 import { initFooterReveal } from "./footer-reveal.js";
+import { initSmoothScroll } from "./smooth-scroll.js";
 import { initBackLink } from "./back-link.js";
 import { initScrollMemory } from "./scroll-memory.js";
 
@@ -23,6 +24,7 @@ let cleanups = [];
 
 function initPage() {
   // Initialize page-specific animations here.
+  cleanups.push(initSmoothScroll());
   cleanups.push(initHeroClock());
   cleanups.push(initHeroHighlight());
   cleanups.push(initHeroShowreel());
