@@ -2,10 +2,12 @@
 // top-left; the inner box is the 1440 frame, centered on wider screens.
 @use "../abstracts/functions" as *;
 
+// No background of its own (the page is white): the 3D coin's fixed layer
+// sits below the page content and must show through the footer
+// (src/js/coin-scene.js); the footer content still paints above it.
 .site-footer {
   position: relative;
   color: var(--color-ink);
-  background: var(--color-white);
 }
 
 .site-footer__inner {

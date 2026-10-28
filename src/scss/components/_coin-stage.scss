@@ -1,0 +1,27 @@
+// Fixed layer for the 3D coin journey (src/js/coin-scene.js). First in
+// <body> with z-index 0, so every positioned part of the page (hero content,
+// showreel, .tone-shift / Motto, .policy, footer content) paints above it:
+// the coin stays behind them, as in the design.
+.coin-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  // Set by JS: shown while the coin is on screen.
+  opacity: 0;
+  pointer-events: none;
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// With JS (and motion) the 3D coin replaces both coin pictures, hidden from
+// the first paint (.js is set in <head>) so a picture and the 3D coin never
+// show together. They come back if the 3D coin cannot load (is-fallback).
+@media (prefers-reduced-motion: no-preference) {
+  .js :is(img.hero__coin, img.site-footer__coin):not(.is-fallback) {
+    visibility: hidden;
+  }
+}

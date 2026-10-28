@@ -1,6 +1,6 @@
 # 15 — Koin 3D di Hero (percobaan)
 
-Status: **Percobaan berhasil dan dioptimasi (28 Okt 2026), menunggu review dan commit.**
+Status: **Selesai (28 Okt 2026). Dilanjutkan oleh `16-coin-journey.md`** (koin yang sama untuk hero dan footer, dengan file JS baru).
 
 ## Asal
 Pengguna memberikan skrip Three.js mandiri (`~/Downloads/web-coin/main.js` dengan aset `Oww-Pin.glb` dan `white_studio_04_2k.hdr`) untuk menggantikan gambar `hero__coin` (`coin.png`).

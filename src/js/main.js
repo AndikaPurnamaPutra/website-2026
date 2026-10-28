@@ -4,7 +4,7 @@ import barba from "@barba/core";
 import { initHeroClock } from "./hero-clock.js";
 import { initHeroHighlight } from "./hero-highlight.js";
 import { initHeroShowreel } from "./hero-showreel.js";
-import { initHeroCoin3d } from "./hero-coin-3d.js";
+import { initCoin3d } from "./coin-3d.js";
 import { initServicesScroll } from "./services-scroll.js";
 import { initInviewVideos } from "./inview-videos.js";
 import { initWorkCarousels } from "./work-carousel.js";
@@ -25,7 +25,7 @@ function initPage() {
   cleanups.push(initHeroClock());
   cleanups.push(initHeroHighlight());
   cleanups.push(initHeroShowreel());
-  cleanups.push(initHeroCoin3d());
+  cleanups.push(initCoin3d());
   cleanups.push(initServicesScroll());
   cleanups.push(initWorkCarousels());
   cleanups.push(initTestimonialsMarquee());
