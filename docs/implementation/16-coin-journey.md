@@ -128,3 +128,11 @@ Perbaikan:
 - Pose B (koin utuh di atas showreel) tidak dipakai lagi. Koin turun dari atas (membesar dari 35% dengan flip yang melambat) lalu **berhenti di posisi koin Figma** (kotak `img.hero__coin`, bagian bawahnya di belakang showreel), dengan ukuran yang sama. Scroll tetap: turun 0,4px per 1px scroll di belakang showreel, setengah putaran.
 - Terukur saat diam dibandingkan PNG Figma: 1440 → tinggi 399 vs 401px, pusat (878, 580) vs (881, 579); 1920 → 533 vs 535px, (1171, 774) vs (1174, 772). Lebar 3D sedikit lebih besar karena sudut model dan putaran pelannya.
 - **Sudut seperti foto Figma** (permintaan pengguna): koin dimiringkan ke belakang 55° (sebelumnya 45° dari skrip pengguna), jadi bentuknya lebih sempit dan tepi kirinya terlihat seperti di Figma. Dicoba 4 sudut lain; dengan 55°, lebar (x 740–1010 di 1440) dan tepi atas (±y 380) sama dengan foto Figma. Logo di tengah bisa sedikit berbeda arah karena putaran pelan koin.
+
+### Koin hero tidak bocor setelah showreel (28 Okt 2026, laporan pengguna)
+- **Masalah:** setelah pin showreel dihapus (showreel seamless, `02-hero.md`), video showreel sudah naik pergi di ±0,6 layar, padahal koin hero masih terlihat sampai 1,2 layar. Lapisan koin ada di belakang halaman, sehingga koin terlihat menembus bagian berikutnya (Statement), terutama saat scroll kembali ke atas.
+- **Perbaikan:** koin hero hilang begitu video showreel menutupi layar penuh (showreel tepat di tengah), dan muncul lagi di titik itu saat scroll ke atas. Karena layar sedang tertutup video, pergantian ini tidak terlihat.
+- Terukur di 1440 × 900 (opacity lapisan koin):
+  - Ke bawah: 0 / 300 / 540 → 1, lalu 560 / 900 / 1400 → 0.
+  - Ke atas: 900 / 560 → 0, lalu 540 / 300 → 1.
+  - Screenshot di 900 tanpa koin. Koin footer di akhir halaman tetap tampil (opacity 1).
