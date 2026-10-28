@@ -7,7 +7,26 @@ section.statement
       p.statement__text
         span.statement__line.statement__line--1
           span We specialize
-          img.statement__icon(src="assets/images/statement/decorative-icon.svg" width="66" height="52" alt="")
+          //- Decorative icon (Figma 1523:3270, same as decorative-icon.svg),
+          //- inline so src/js/statement-ink.js can move its two parts.
+          svg.statement__icon(viewBox="0 0 66 52" width="66" height="52" fill="none" aria-hidden="true" focusable="false")
+            defs
+              linearGradient#statement-ring-gradient(x1="27.5" y1="7.5" x2="-2.91335" y2="26.6174" gradientUnits="userSpaceOnUse")
+                stop(stop-color="#0B1550")
+                stop(offset="0.539925" stop-color="#496AF8")
+                stop(offset="1" stop-color="#81C4FB")
+              linearGradient#statement-dot-gradient(x1="51.5" y1="-2.5" x2="21.0867" y2="16.6174" gradientUnits="userSpaceOnUse")
+                stop(stop-color="#0B1550")
+                stop(offset="0.539925" stop-color="#496AF8")
+                stop(offset="1" stop-color="#81C4FB")
+              clipPath#statement-star-clip
+                rect(width="24" height="24" fill="white" transform="translate(36.678 6.21) rotate(15.6345)")
+            g.statement__icon-ring
+              path(d="M41.5 31C41.5 42.3218 32.3218 51.5 21 51.5C9.67816 51.5 0.5 42.3218 0.5 31C0.5 19.6782 9.67816 10.5 21 10.5C32.3218 10.5 41.5 19.6782 41.5 31Z" stroke="url(#statement-ring-gradient)")
+            g.statement__icon-dot
+              circle(cx="45" cy="21" r="21" fill="url(#statement-dot-gradient)")
+              g(clip-path="url(#statement-star-clip)")
+                path.statement__icon-star(d="M52.7241 11.9552L53.3276 14.692L55.3535 16.6284L52.6168 17.2321L50.6803 19.258L50.0767 16.5212L48.0508 14.5847L50.7875 13.9811L52.7241 11.9552ZM44.4353 18.0728L48.5316 21.9882L42.998 23.2088L39.0825 27.3051L37.862 21.7714L33.7656 17.8559L39.2993 16.6354L43.2148 12.5391L44.4353 18.0728ZM44.4389 20.8429L42.6134 19.0979L42.0694 16.6318L40.3245 18.4574L37.8584 19.0013L39.6839 20.7462L40.2279 23.2124L41.9728 21.3868L44.4389 20.8429ZM51.2158 27.2393L50.453 23.7808L48.0058 26.341L44.5473 27.1037L47.1075 29.551L47.8703 33.0095L50.3175 30.4493L53.776 29.6864L51.2158 27.2393Z" fill="white")
           span in a diverse range of cutting-edge
         = " "
         span.statement__line.statement__line--2 technologies, ensuring that we can tailor the

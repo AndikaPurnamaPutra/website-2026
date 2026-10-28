@@ -80,9 +80,12 @@
 }
 
 .statement__icon {
+  flex-shrink: 0;
   width: fs(66);
   height: fs(52);
   margin-top: fs(7.5);
+  // The two parts orbit a little past the box while they split.
+  overflow: visible;
 }
 
 // Folder "in a pocket": three layers rebuilt from Figma (Folder Illustration

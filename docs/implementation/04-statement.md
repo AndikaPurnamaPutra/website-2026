@@ -158,3 +158,34 @@ Varian terang tombol (untuk section Motto) dibuat saat section Motto dikerjakan,
   - Terukur di referensi: paragraf mulai menghitam saat atasnya di ±87% layar dan selesai di ±28% (±530px scroll untuk 3 baris). Setiap huruf berubah dengan transisinya sendiri (abu `#c7cccb` → `#24363f`).
   - Sekarang rentangnya `top 90%` → `top 25%`, dan tinta mengejar posisi scroll dengan halus (`gsap.quickTo`, 0,6 detik, `power3.out`), sehingga tidak melompat saat scroll cepat.
   - **Selesai di tengah** (keputusan pengguna): rentang akhir `top 90%` → `center center`, ±510px scroll di 1440 × 900 (referensi ±530px). Kalimat sudah hitam penuh saat tepat di tengah layar, dan penghalusan tetap dipakai.
+
+## Ikon biru hidup setelah tinta melewatinya (28 Okt 2026, permintaan pengguna)
+- **Pemicu:** begitu tinta selesai menghitamkan "We specialize" (potongan teks pertama), ikon di sebelahnya beranimasi dengan waktunya sendiri (saran yang disetujui). Saat di-scroll kembali ke atas titik itu, animasinya berjalan mundur sampai ikon kosong. Kalau halaman dibuka di bawah titik itu, ikon langsung tampil jadi.
+- **Urutan** (±1,5 detik, tidak ada di Figma):
+  1. Garis outline tergambar melingkar (0–0,5 detik, `power2.inOut`, stroke-dashoffset).
+  2. Lingkaran solid membesar dari pusatnya di tengah kotak, menumpuk di atas outline, dan bintang putih berputar −90° sampai tegak (mulai 0,35 detik, 0,45 detik, `back.out(1.6)`).
+  3. Keduanya membelah sambil mengorbit 120° mengelilingi titik tengah (33, 26) sampai posisi Figma (outline (21, 31), solid (45, 21)), 0,75–1,5 detik, `power3.inOut`.
+- **Teknis:**
+  - SVG ikon ditanam langsung di `statement.pug` (bentuk dan warna sama dengan `decorative-icon.svg`, dengan id gradient sendiri), supaya kedua bagiannya bisa digerakkan.
+  - Transform SVG diatur langsung lewat atribut. `svgOrigin` milik GSAP menggeser x/y sendiri setiap frame, dan geserannya menumpuk (posisi akhir sempat terbalik).
+  - Kode ada di `src/js/statement-ink.js` (`createIcon`).
+- Tanpa JS atau dengan reduced motion: ikon tampil seperti Figma.
+- Dicek per frame (setiap ±0,16 detik): garis tergambar → solid membesar di tengah → membelah melengkung → posisi Figma. Scroll balik: transform kembali ke awal (outline tak terlihat, solid skala 0).
+- **Pemicu dipindah** (laporan pengguna: animasi outline tidak terlihat):
+  - Dipicu tinta, animasi berjalan saat kalimat masih di dekat bawah layar (±85%), sehingga garis sudah tergambar sebelum dilihat.
+  - Sekarang ikon punya pemicu sendiri: saat pusatnya di 70% tinggi layar (`center 70%`). Saat itu baris pertama sudah hitam.
+  - Penggambaran garis 0,5 → 0,7 detik (solid mulai 0,55 detik, membelah 0,95–1,7 detik).
+  - Halaman dibuka di bawah titik itu: ikon langsung jadi.
+  - Terukur saat scroll pelan dengan roda: garis mulai tergambar saat pusat ikon di 68% layar, dan selesai di 62%.
+
+## Folder keluar dari saku (28 Okt 2026, pilihan pengguna A)
+- **Pemicu:** sama seperti ikon, yaitu saat pusat folder di 70% tinggi layar. Berjalan dengan waktunya sendiri dan mundur saat di-scroll kembali ke atas. Halaman dibuka di bawahnya: langsung jadi.
+- **Urutan** (±1,1 detik, tidak ada di Figma):
+  1. Saku abu-abu terbuka dari tengah (`scaleX` 0,3 → 1, memudar masuk, 0,45 detik, `power3.out`).
+  2. Mulai 0,25 detik, folder naik keluar dari saku (`yPercent` 55 → 0, 0,85 detik, `back.out(1.4)`, dengan pantulan halus). Selama naik, potongan atasnya dipotong di mulut saku (`clip-path inset` bawah 20% → 0), jadi folder terlihat keluar dari dalam saku, bukan melewati depannya.
+- Kode: `createFolder` di `src/js/statement-ink.js`. Pemicu ikon dan folder memakai pola yang sama.
+- Terukur:
+  - Sebelum: saku opacity 0, folder turun 66px dan terpotong di mulut saku.
+  - Sesudah: saku opacity 1, `inset(0%)`, tanpa transform.
+  - Scroll balik: kembali ke kondisi awal.
+- **Kertas di dalam folder** (dicoba 28 Okt 2026, dibatalkan pengguna): `folder.png` sempat dipecah menjadi lapisan kertas dan badan folder, supaya kertas terdorong naik sesaat. Dikembalikan ke satu gambar seperti sebelumnya.
