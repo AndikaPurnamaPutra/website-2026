@@ -26,12 +26,6 @@
     transform: translateY(calc(-100% - 1px));
   }
 
-  // At the very top the bar is see-through (user decision), so the 3D coin
-  // coming down from above is not cut off by it; white again once scrolled.
-  &:not(.is-scrolled) {
-    background-color: transparent;
-  }
-
   // Figma shadow, only once the page has left the top. Not while hidden: the
   // shadow falls below the bar and would stay at the top of the screen.
   &.is-scrolled:not(.is-hidden) {
