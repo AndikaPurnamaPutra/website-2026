@@ -77,6 +77,10 @@ export function initHeroShowreel() {
       preview.style.transform = `translate3d(${fit.shiftX * progress}px, 0, 0) scale(${scale})`;
       preview.style.clipPath = `inset(${fit.clipY * progress}px ${fit.clipX * progress}px round ${(fit.radius * (1 - progress)) / scale}px)`;
     };
+    // Measured before the trigger exists: created with the page already
+    // scrolled (a reload further down), it updates at once, before its first
+    // refresh, and an unmeasured fit stopped every animation after this one.
+    measure();
     // Tied directly to the (already smooth) Lenis scroll, with no extra
     // delay: a delay made the video lag behind the moving showreel.
     ScrollTrigger.create({

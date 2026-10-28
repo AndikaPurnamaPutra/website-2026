@@ -306,3 +306,7 @@ Revisi (permintaan pengguna):
     - Scroll 0: `clip-path: inset(0 round 4px)`, tanpa transform (sama seperti Figma).
     - Scroll 559: `scale(1.15493)` dan `inset(0 55.7px)`. Keempat sudut dan tepi layar berisi video (tanpa celah).
     - Screenshot 0 / 280 / 559 / 800 sesuai.
+- **Perbaikan: refresh di tengah halaman mematikan semua animasi** (laporan pengguna).
+  - Penyebab: ScrollTrigger pelebaran dibuat dengan halaman yang sudah ter-scroll (posisi dipulihkan setelah refresh), sehingga langsung menjalankan `onUpdate` sebelum `onRefresh` mengukur showreel (`fit` belum ada). Akibatnya muncul `TypeError: Cannot read properties of undefined (reading 'scale')`, dan semua inisialisasi setelahnya (tinta Statement, marquee, dan lainnya) tidak berjalan.
+  - Sekarang `measure()` dipanggil sebelum ScrollTrigger dibuat.
+  - Diuji: refresh di 15–100% halaman pada homepage, Contact, dan Privacy Policy, tanpa exception. Setelah refresh di Statement, tinta, marquee, dan scroll langsung berjalan.
