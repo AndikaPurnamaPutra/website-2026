@@ -31,6 +31,9 @@ export function initSmoothScroll() {
   };
 }
 
+// The Lenis instance (null when off: reduced motion).
+export const getSmoothScroll = () => lenis;
+
 // Pauses and resumes the smooth scroll (e.g. while a pop-up is open).
 export const stopSmoothScroll = () => lenis?.stop();
 export const startSmoothScroll = () => lenis?.start();

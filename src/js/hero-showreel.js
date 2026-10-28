@@ -1,7 +1,8 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { designPx } from "./design-px.js";
-import { startSmoothScroll, stopSmoothScroll } from "./smooth-scroll.js";
+import { getSmoothScroll, startSmoothScroll, stopSmoothScroll } from "./smooth-scroll.js";
+import { holdHeaderHidden } from "./header.js";
 
 // Hero showreel (reference from the user: manual.studio; approved proposal,
 // not in Figma). On pointer devices the "Play Showreel" button follows the
@@ -68,6 +69,9 @@ export function initHeroShowreel() {
           pin: true,
           scrub: 0.5,
           invalidateOnRefresh: true,
+          // The header stays hidden while the showreel is held, as over What
+          // we do and Motto (user decision).
+          onToggle: (self) => holdHeaderHidden("showreel", self.isActive),
         },
       })
       // Explicit start values (the showreel box), re-read on every refresh:
@@ -93,6 +97,59 @@ export function initHeroShowreel() {
         },
       )
       .to({}, { duration: 0.3 });
+
+    // One scroll, one step (user: "1× scroll" feel; two steps, as one was too
+    // short): from the top of the page, one wheel gesture glides to the
+    // showreel centered on screen, the next to the showreel full screen;
+    // past that the scroll is free again. Scrolling up does the same
+    // backwards. Done with the smooth scroll (Lenis), so it is one smooth
+    // glide; only the first wheel event of a gesture counts, so a trackpad's
+    // momentum does not run on to the next step. Mouse wheel / trackpad only.
+    const STEP = 1.2; // s per step
+    const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+    let gliding = false;
+    let lastWheel = 0;
+    let gestureBlocked = false;
+    const stops = () => {
+      const trigger = grow.scrollTrigger;
+      return [0, trigger.start, trigger.start + (trigger.end - trigger.start) * (0.6 / 0.9)];
+    };
+    const onWheel = (event) => {
+      const lenis = getSmoothScroll();
+      const now = performance.now();
+      const newGesture = now - lastWheel > 180;
+      lastWheel = now;
+      if (!lenis || lenis.isStopped || Math.abs(event.deltaY) < 1) return;
+      if (gliding) {
+        gestureBlocked = true;
+        return;
+      }
+      if (!newGesture && gestureBlocked) return;
+      gestureBlocked = false;
+      if (!newGesture) return;
+
+      const points = stops();
+      const y = lenis.animatedScroll;
+      const last = points[points.length - 1];
+      const target =
+        event.deltaY > 0
+          ? y < last - 2 && points.find((point) => point > y + 2)
+          : y <= last + 2 && y > 2 && [...points].reverse().find((point) => point < y - 2);
+      if (target === undefined || target === false) return;
+      gliding = true;
+      gestureBlocked = true;
+      lenis.scrollTo(target, {
+        duration: STEP,
+        easing: easeInOut,
+        lock: true,
+        force: true,
+        onComplete: () => {
+          gliding = false;
+        },
+      });
+    };
+    window.addEventListener("wheel", onWheel, { passive: true });
+    listeners.push(() => window.removeEventListener("wheel", onWheel));
 
     // A resize changes the hold's length (it follows the screen height), so
     // the same scroll would land at another point of the growth. Keep the

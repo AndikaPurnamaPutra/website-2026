@@ -125,3 +125,5 @@ Keputusan pengguna: menu bar **selalu terlihat** (tidak sembunyi saat scroll ke 
 ### Transparan di posisi paling atas (28 Okt 2026, permintaan pengguna)
 Latar menu bar transparan selama halaman belum di-scroll (`:not(.is-scrolled)`), supaya koin 3D di hero tidak terpotong. Putih lagi begitu halaman di-scroll. Lihat `16-coin-journey.md`.
 
+### Tersembunyi juga selama showreel hero tertahan (28 Okt 2026, permintaan pengguna)
+- `header.js` menyediakan `holdHeaderHidden(key, hold)`. Pin showreel (`hero-showreel.js`, `onToggle`) memakainya, jadi menu bar tetap tersembunyi saat scroll naik maupun turun selama showreel tertahan, sama seperti di What we do dan Motto. Terukur: tersembunyi saat showreel penuh (scroll 1111–1291).
