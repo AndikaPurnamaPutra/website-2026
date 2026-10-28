@@ -277,3 +277,32 @@ Revisi (permintaan pengguna):
 - **Latar pop-up showreel lebih gelap dan berefek kaca** (saran disetujui): `rgba(17, 17, 17, 0.85)` (sebelumnya 0,8) + `backdrop-filter: blur(12px)`, senada dengan tombol × dan "Play Showreel". Tanpa dukungan blur, latar tetap gelap 85%. Terukur: blur aktif, animasi buka tetap jalan (latar 0,75 di tengah animasi, lalu 1; kotak video 1296px).
 - **Perbaikan resize** (masukan pengguna: lebar video tidak mengikuti layar yang lebih lebar): animasi membesar memakai `fromTo` dengan nilai awal dari kotak showreel (`offsetWidth/Height`, radius 4 × designPx), yang dihitung ulang setiap refresh. Sebelumnya `.to` mulai lagi dari ukuran piksel lama yang tertinggal inline (video tetap 1360px setelah dilebarkan ke 1920/2560). Selain itu, kemajuan pin showreel diingat saat `refreshInit` dan dikembalikan setelah `refresh`, karena panjang tahan mengikuti tinggi layar. Terukur saat resize 1440 → 1920 → 2560 → 1280: di atas, video = kotak showreel (1813 / 2418 / 1209); saat penuh, video menutup layar di setiap ukuran; di tengah membesar, tetap di titik yang sama. Langkah Motto dan What we do tetap terjaga saat resize.
 - **Satu scroll, satu langkah** (permintaan pengguna, "feel 1× scroll"; dibuat 2 langkah karena 1 terlalu pendek): dengan smooth scroll (Lenis), satu gerakan roda atau trackpad meluncur halus (1,2 detik, `easeInOutCubic`, `lenis.scrollTo` dengan `lock`) dari puncak halaman ke showreel di tengah layar (awal pin), lalu langkah berikutnya ke showreel penuh layar (2/3 pin). Setelah itu scroll bebas. Scroll naik membalik langkahnya. Hanya event pertama dari satu gerakan yang dihitung (jeda > 180 ms), jadi momentum trackpad tidak langsung melompat ke langkah berikutnya. Mouse/trackpad saja; reduced motion tanpa Lenis = scroll biasa. Terukur di 1440: 0 → 497 → 1111 (penuh 1442 × 1026), lalu bebas (1201, 1291). Naik: 1201 → 1111 → 497.
+
+### Showreel seamless: tanpa pin dan tanpa langkah otomatis (28 Okt 2026, keputusan pengguna)
+- Acuan pengguna: format.obys.agency (scroll terasa mulus, tidak tertahan). Situsnya menolak dibuka oleh browser otomatis (403), jadi tidak bisa diukur.
+- **Dihapus:**
+  - Pin di tengah layar (termasuk menu bar yang disembunyikan selama pin, dan penjaga progres saat resize).
+  - Langkah "satu scroll satu langkah", yang meluncur sendiri 1,2 detik dengan scroll terkunci.
+- **Sekarang:**
+  - Scroll selalu bebas, dengan Lenis.
+  - Video mulai melebar dari scroll 0 dan penuh layar tepat saat showreel di tengah layar (`end: "center center"`, scrub 0,5, linear). Setelah itu video ikut ter-scroll dengan ukuran penuh.
+- Halaman jadi lebih pendek 0,9 layar (tidak ada pin spacer).
+- Terukur di 1440 × 900 (lebar video):
+  - Scroll 0 → 1360, 200 → 1389, 400 → 1419, 559 → 1442 × 902 (penuh, atas −2).
+  - Lalu 700 → atas −143 dan 1000 → atas −443, jadi video terus bergerak.
+  - Satu putaran roda menggeser ±90px dengan halus, tanpa luncuran otomatis.
+- Versi dengan pin dan langkah ada di riwayat git (commit 8fccd85).
+- **Tidak patah-patah lagi** (laporan pengguna): pelebaran memakai `scrub: true` (sebelumnya `scrub: 0.5`).
+  - Penyebab: pelebaran tertinggal ±0,5 detik dari scroll, padahal showreel kini bergerak bersama halaman, sehingga tepi video tersendat mengejar posisinya. Waktu frame tidak bermasalah (16,6 ms rata-rata, tanpa frame > 20 ms, juga di 2560 × 1451 DPR 2).
+  - Terukur selama scroll dengan roda: selisih lebar video dari posisi seharusnya maksimal **9,7px** dengan scrub 0,5, dan **0,5px** dengan `scrub: true`.
+- **Pelebaran lewat transform + clip-path** (laporan pengguna: lebar masih patah-patah di layar 2560 × 1451 Retina):
+  - Penyebab: lebar dan tinggi elemen video dianimasikan, sehingga setiap frame video sebesar ±5000 × 2900 piksel diukur dan digambar ulang (bersama koin 3D). Browser uji tanpa layar tidak memperlihatkan frame yang terlewat.
+  - Sekarang ukuran elemen tidak berubah:
+    - Video diperbesar rata dengan `transform: scale()` sampai menutupi layar (di 1440 × 900: 1,155×).
+    - Sisi yang melewati layar dipotong dengan `clip-path: inset()`. Sudut potongannya berubah dari 4px ke siku.
+    - Video juga digeser ke tengah layar bila kotaknya tidak simetris.
+    - Dihitung ulang setiap refresh ScrollTrigger (resize), dan mengikuti scroll langsung (`onUpdate`, tanpa tween).
+  - Terukur di 1440 × 900:
+    - Scroll 0: `clip-path: inset(0 round 4px)`, tanpa transform (sama seperti Figma).
+    - Scroll 559: `scale(1.15493)` dan `inset(0 55.7px)`. Keempat sudut dan tepi layar berisi video (tanpa celah).
+    - Screenshot 0 / 280 / 559 / 800 sesuai.

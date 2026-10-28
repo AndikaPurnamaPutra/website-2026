@@ -4,17 +4,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 // its soft shadow fades in once the page is scrolled away from the top, and it switches to a dark version (proposal,
 // approved) while its middle line is over a section with
 // data-header-theme="dark". Timing is a proposal. It stays hidden in both
-// directions while over the pinned What we do and Motto sections, and while
-// the hero showreel is held (user decisions; see holdHeaderHidden).
-
-// Other modules can keep the header hidden while something is on screen.
-const holds = new Set();
-let applyHolds = () => {};
-export function holdHeaderHidden(key, hold) {
-  if (hold) holds.add(key);
-  else holds.delete(key);
-  applyHolds();
-}
+// directions while over the pinned What we do and Motto sections (user
+// decisions).
 
 export function initHeader() {
   const header = document.querySelector("[data-header]");
@@ -27,9 +18,8 @@ export function initHeader() {
   const activeDark = new Set();
   const setHidden = () => {
     const focused = header.querySelector(":focus-visible");
-    header.classList.toggle("is-hidden", !focused && (scrollHidden || activeDark.size > 0 || holds.size > 0));
+    header.classList.toggle("is-hidden", !focused && (scrollHidden || activeDark.size > 0));
   };
-  applyHolds = setHidden;
   const update = () => {
     const y = window.scrollY;
     header.classList.toggle("is-scrolled", y > 0);
@@ -63,7 +53,6 @@ export function initHeader() {
   return () => {
     window.removeEventListener("scroll", update);
     triggers.forEach((trigger) => trigger.kill());
-    applyHolds = () => {};
     header.classList.remove("is-scrolled", "is-hidden", "is-dark");
   };
 }

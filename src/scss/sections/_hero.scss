@@ -140,7 +140,8 @@
 }
 
 // The video is laid over the box, so JS can grow it past the box to fill the
-// screen while scrolling (src/js/hero-showreel.js); it carries the corners.
+// screen while scrolling (src/js/hero-showreel.js, transform + clip-path); it
+// carries the corners.
 .hero__showreel {
   position: relative;
   margin-top: var(--space-80);
@@ -164,10 +165,11 @@
   display: block;
   width: 100%;
   height: 100%;
-  // Grows past the showreel box (reset caps media at 100%).
   max-width: none;
   object-fit: cover;
   border-radius: var(--radius-sm);
+  transform-origin: 50% 50%;
+  will-change: transform, clip-path;
 }
 
 // Glass effect: fill from Figma; blur, saturation and edge are an

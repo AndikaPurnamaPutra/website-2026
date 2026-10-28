@@ -1,8 +1,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { designPx } from "./design-px.js";
-import { getSmoothScroll, startSmoothScroll, stopSmoothScroll } from "./smooth-scroll.js";
-import { holdHeaderHidden } from "./header.js";
+import { startSmoothScroll, stopSmoothScroll } from "./smooth-scroll.js";
 
 // Hero showreel (reference from the user: manual.studio; approved proposal,
 // not in Figma). On pointer devices the "Play Showreel" button follows the
@@ -10,10 +9,9 @@ import { holdHeaderHidden } from "./header.js";
 // the centre when the cursor leaves. A click anywhere on the showreel opens a
 // pop-up: the video grows from the showreel to the centre of the screen over a
 // dark backdrop and plays with sound; ×, a click on the backdrop or Esc close
-// it, and it shrinks back to the showreel. When the showreel reaches the
-// middle of the screen it holds while the video grows to fill the screen over
-// 0.6 of a screen of scrolling, holds full for 0.3, then the page moves on
-// (user decision).
+// it, and it shrinks back to the showreel. While the page scrolls, the video
+// grows from the first scroll until it fills the screen with the showreel
+// centred, then scrolls on: no hold, no automatic steps (user decisions).
 const FOLLOW = 0.6; // also the glide back to the centre
 const OPEN = 0.5;
 const CLOSE = 0.4;
@@ -48,127 +46,54 @@ export function initHeroShowreel() {
   const ctx = gsap.context(() => {
     if (reduceMotion) return;
 
-    // Grows to fill the screen while held in the middle of it: the video
-    // reaches out from the showreel to the screen edges (measured from the
-    // showreel's own position, the whole window including a classic
-    // scrollbar, and 1px extra on every side so no seam is left).
-    const edge = () => {
+    // Grows to fill the screen as the page scrolls, with no hold and no
+    // automatic steps: the scroll stays free and seamless (user decision,
+    // reference format.obys.agency). From the very first scroll the video
+    // reaches out from the showreel to the screen edges (the whole window
+    // including a classic scrollbar, and 1px extra on every side so no seam
+    // is left) by the time the showreel is centred on screen, then simply
+    // scrolls on at that size.
+    // Only transform and clip-path change (handled by the graphics card):
+    // growing the video's width and height redrew the whole video every frame
+    // and looked jerky on large screens (user report). The video scales
+    // evenly until it covers the screen, and the clip trims the sides that
+    // reach past it; the clip's corners go from 4px to square.
+    let fit;
+    const measure = () => {
       const box = showreel.getBoundingClientRect();
-      const y = (window.innerHeight - box.height) / 2; // centred during the hold
-      return { left: -box.left - 1, top: -y - 1, width: window.innerWidth + 2, height: window.innerHeight + 2 };
+      const width = window.innerWidth + 2;
+      const height = window.innerHeight + 2;
+      const scale = Math.max(width / box.width, height / box.height);
+      fit = {
+        scale,
+        shiftX: window.innerWidth / 2 - (box.left + box.width / 2),
+        clipX: (box.width - width / scale) / 2,
+        clipY: (box.height - height / scale) / 2,
+        radius: 4 * designPx(), // --radius-sm
+      };
     };
-    // 0.6 of a screen of scrolling to grow, then 0.3 held full before the
-    // page moves on (user: quicker, still smooth). The growth answers at once
-    // and lands softly (power2.out); scrub 0.5 keeps it smooth.
-    const grow = gsap
-      .timeline({
-        scrollTrigger: {
-          trigger: showreel,
-          start: "center center",
-          end: "+=90%",
-          pin: true,
-          scrub: 0.5,
-          invalidateOnRefresh: true,
-          // The header stays hidden while the showreel is held, as over What
-          // we do and Motto (user decision).
-          onToggle: (self) => holdHeaderHidden("showreel", self.isActive),
-        },
-      })
-      // Explicit start values (the showreel box), re-read on every refresh:
-      // a plain .to would start again from the px size left inline from the
-      // previous screen width, so the video kept its old width after a resize.
-      .fromTo(
-        preview,
-        {
-          left: 0,
-          top: 0,
-          width: () => showreel.offsetWidth,
-          height: () => showreel.offsetHeight,
-          borderRadius: () => 4 * designPx(), // --radius-sm
-        },
-        {
-          left: () => edge().left,
-          top: () => edge().top,
-          width: () => edge().width,
-          height: () => edge().height,
-          borderRadius: 0,
-          duration: 0.6,
-          ease: "power2.out",
-        },
-      )
-      .to({}, { duration: 0.3 });
-
-    // One scroll, one step (user: "1× scroll" feel; two steps, as one was too
-    // short): from the top of the page, one wheel gesture glides to the
-    // showreel centered on screen, the next to the showreel full screen;
-    // past that the scroll is free again. Scrolling up does the same
-    // backwards. Done with the smooth scroll (Lenis), so it is one smooth
-    // glide; only the first wheel event of a gesture counts, so a trackpad's
-    // momentum does not run on to the next step. Mouse wheel / trackpad only.
-    const STEP = 1.2; // s per step
-    const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
-    let gliding = false;
-    let lastWheel = 0;
-    let gestureBlocked = false;
-    const stops = () => {
-      const trigger = grow.scrollTrigger;
-      return [0, trigger.start, trigger.start + (trigger.end - trigger.start) * (0.6 / 0.9)];
+    const grow = (progress) => {
+      const scale = 1 + (fit.scale - 1) * progress;
+      preview.style.transform = `translate3d(${fit.shiftX * progress}px, 0, 0) scale(${scale})`;
+      preview.style.clipPath = `inset(${fit.clipY * progress}px ${fit.clipX * progress}px round ${(fit.radius * (1 - progress)) / scale}px)`;
     };
-    const onWheel = (event) => {
-      const lenis = getSmoothScroll();
-      const now = performance.now();
-      const newGesture = now - lastWheel > 180;
-      lastWheel = now;
-      if (!lenis || lenis.isStopped || Math.abs(event.deltaY) < 1) return;
-      if (gliding) {
-        gestureBlocked = true;
-        return;
-      }
-      if (!newGesture && gestureBlocked) return;
-      gestureBlocked = false;
-      if (!newGesture) return;
-
-      const points = stops();
-      const y = lenis.animatedScroll;
-      const last = points[points.length - 1];
-      const target =
-        event.deltaY > 0
-          ? y < last - 2 && points.find((point) => point > y + 2)
-          : y <= last + 2 && y > 2 && [...points].reverse().find((point) => point < y - 2);
-      if (target === undefined || target === false) return;
-      gliding = true;
-      gestureBlocked = true;
-      lenis.scrollTo(target, {
-        duration: STEP,
-        easing: easeInOut,
-        lock: true,
-        force: true,
-        onComplete: () => {
-          gliding = false;
-        },
-      });
-    };
-    window.addEventListener("wheel", onWheel, { passive: true });
-    listeners.push(() => window.removeEventListener("wheel", onWheel));
-
-    // A resize changes the hold's length (it follows the screen height), so
-    // the same scroll would land at another point of the growth. Keep the
-    // reader at the same point instead (as in the Motto section).
-    let keepProgress = null;
-    const rememberProgress = () => {
-      const trigger = grow.scrollTrigger;
-      keepProgress = trigger.isActive ? trigger.progress : null;
-    };
-    const restoreProgress = () => {
-      const trigger = grow.scrollTrigger;
-      if (keepProgress !== null) window.scrollTo(0, trigger.start + keepProgress * (trigger.end - trigger.start));
-      keepProgress = null;
-    };
-    ScrollTrigger.addEventListener("refreshInit", rememberProgress);
-    ScrollTrigger.addEventListener("refresh", restoreProgress);
+    // Tied directly to the (already smooth) Lenis scroll, with no extra
+    // delay: a delay made the video lag behind the moving showreel.
+    ScrollTrigger.create({
+      trigger: showreel,
+      start: 0,
+      end: "center center",
+      onRefresh: (self) => {
+        measure();
+        grow(self.progress);
+      },
+      onUpdate: (self) => grow(self.progress),
+    });
+    preview.style.borderRadius = "0";
     listeners.push(() => {
-      ScrollTrigger.removeEventListener("refreshInit", rememberProgress);
-      ScrollTrigger.removeEventListener("refresh", restoreProgress);
+      preview.style.transform = "";
+      preview.style.clipPath = "";
+      preview.style.borderRadius = "";
     });
 
     if (!finePointer) return;

@@ -129,6 +129,7 @@ Latar menu bar transparan selama halaman belum di-scroll (`:not(.is-scrolled)`),
 
 ### Tersembunyi juga selama showreel hero tertahan (28 Okt 2026, permintaan pengguna)
 - `header.js` menyediakan `holdHeaderHidden(key, hold)`. Pin showreel (`hero-showreel.js`, `onToggle`) memakainya, jadi menu bar tetap tersembunyi saat scroll naik maupun turun selama showreel tertahan, sama seperti di What we do dan Motto. Terukur: tersembunyi saat showreel penuh (scroll 1111–1291).
+- **Dihapus (28 Okt 2026):** pin showreel tidak ada lagi (showreel seamless, `02-hero.md`), jadi `holdHeaderHidden` ikut dihapus dari `header.js`.
 
 ### Lebih lambat (28 Okt 2026, keputusan pengguna)
 - Versi berlapis (isi dulu, lalu bar; menu muncul satu per satu) dicoba, lalu dibatalkan karena terasa terlalu cepat.
