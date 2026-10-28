@@ -66,3 +66,12 @@ Aset: logo dan koin sudah ada di project. Garis dibuat dengan CSS.
 Atas permintaan pengguna, koin berada di **belakang** section Motto: bagian atasnya (125px) tertutup area gelap, sehingga koin seolah muncul dari bawah section itu. Caranya: wrapper `.tone-shift` diberi `z-index: 1` (di atas footer), dan `z-index` footer dihapus.
 - Efek samping yang ditemukan: lapisan tekstur sticky di wrapper (yang memakai margin negatif) melewati batas bawah wrapper dan membuat latar footer abu-abu bertekstur. Diperbaiki dengan `overflow: clip` di wrapper (tidak mengganggu `position: sticky`). Latar footer kembali putih (diukur: 0/255).
 - Diuji ulang: langkah-langkah Motto tetap tertahan dan berganti dengan benar, tekstur tetap menempel di layar, dan transisi masuk tetap tanpa garis pemisah.
+
+## Footer diam dan tersingkap (28 Okt 2026, permintaan pengguna)
+- Sebelumnya footer bergeser naik lebih lambat dari scroll (parallax), sehingga terasa ditarik. Sempat dibuat **diam di bawah layar**, dengan bagian di atasnya (Motto, `.contact`, `.policy`) bergeser naik seperti tirai yang menyingkapnya (lihat koreksi di bawah).
+- Diukur di sstr.tech (acuan pengguna): isi footernya bergerak setengah kecepatan scroll (footer naik 463px, isinya 232px). Di sini dibuat diam penuh, sesuai keputusan pengguna.
+- `footer-reveal.js`:
+  - `y` bergerak dari −tinggi footer ke 0, dengan scrub, dari saat akhir `main` menyentuh bawah layar sampai akhir halaman.
+  - **Perbaikan:** patokan rentangnya sekarang akhir `main`, bukan footer itu sendiri. Posisi footer sudah termasuk geserannya, sehingga rentang dimulai terlalu awal dan footer ikut bergerak bersama halaman di sebagian besar rentang. Masalah ini juga ada di versi 25%.
+- Terukur di homepage, Contact, dan Privacy Policy (1440 × 900): logo footer tetap di y 377 pada 100% / 75% / 50% / 25% / 0% sisa jarak, tanpa exception. Koin footer tetap tampil (opacity 1).
+- **Tidak diam penuh** (koreksi pengguna): footer bergerak naik **setengah kecepatan scroll**, sama seperti sstr.tech (`y` dari −50% tinggi footer ke 0, rentang dan patokan tetap). Terukur di homepage dan Contact: logo footer naik 659 → 377 (282px) selama 563px scroll terakhir (50%), tanpa exception.
