@@ -231,3 +231,12 @@ Hasil:
 - Kedua sinar lampu (kiri 1527:4219 dan tengah 1527:4241, `.motto__beam`) dihapus dari markup, CSS, dan JS (cue lampu panggung). Ini keputusan pengguna dan berbeda dari Figma.
 - Pendar dari bawah (Ellipse 8998, langkah 1–3) tetap, dan memudar di langkah 4 seperti di Figma, jadi langkah 4–6 tanpa cahaya. Label CTA, tombol, dan langkah lain tidak berubah.
 - Terukur di 1440: tidak ada elemen sinar. Pendar 0 / 1 / 1 / 0 / 0 / 0 di langkah 0 / 1 / 3 / 4,2 / 5,2 / 6. Label CTA dan tombol tetap muncul di langkah 4.
+
+## Keluar dari Motto tanpa "tertahan" (28 Okt 2026, laporan pengguna)
+- **Masalah:** setelah langkah 5 (seluruh kalimat bergradasi), pin masih menahan section selama ±1,2 layar scroll tanpa perubahan apa pun (langkah 6 "tahan sebelum footer"), lalu section dilepas dari diam langsung ke kecepatan penuh. Rasanya tertahan, lalu tiba-tiba lepas.
+- **Perbaikan:**
+  - Langkah 6 dihapus (`steps = 5`). Setelah langkah 5 tersisa setengah jeda biasa, lalu **keluar**: selama 0,4 layar terakhir pin, isi (`.motto__inner`) naik makin cepat (y = −0,2 layar × t²), sehingga kecepatannya mencapai kecepatan halaman tepat saat section dilepas.
+  - Bagian keluar terikat langsung ke scroll (ScrollTrigger tanpa scrub). Di dalam timeline yang memakai scrub 0,8, isi sempat melonjak ±2× kecepatan scroll saat dilepas.
+  - Panjang pin dihitung dari panjang timeline (`length`), sehingga satu layar tetap 1,6 satuan timeline.
+- **Terukur** (kecepatan isi dibanding scroll, roda mouse): 0 → 0,06 → 0,33 → 0,59 → 0,81 → 0,96 → 1,0, lalu tetap 1. Section dilepas di 1,0, tanpa lonjakan.
+- Screenshot langkah 5 (gradasi dan CTA), keluar, dan sesudah lepas (footer tersingkap) sesuai. Pin sekarang 4860px (sebelumnya 6 layar = 5400px di 900px).

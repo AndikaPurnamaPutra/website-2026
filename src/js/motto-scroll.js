@@ -10,8 +10,10 @@ import { designPx } from "./design-px.js";
 // step 2: the line flips to motto 2;   step 3: "believers." turns gradient;
 // step 4: flip to motto 3 and to the CTA label, the glow fades out, Get a
 //         Quote appears;
-// step 5: the whole motto turns gradient;
-// step 6: hold before the section releases.
+// step 5: the whole motto turns gradient; in the short rest after it the
+//         content starts to rise, faster and faster, so it is already moving
+//         with the page when the section releases (user: the long hold before
+//         the footer felt stuck, then let go all at once).
 // The glow from below follows one smoothed journey (see lightPath).
 // Timing and easing are not in Figma (approved proposal).
 
@@ -31,16 +33,26 @@ export function initMottoScroll() {
   const labelTexts = [...section.querySelectorAll(".motto__label-text")];
   const diagonal = section.querySelector(".motto__bg--diagonal");
   const cta = section.querySelector(".cta");
-  const steps = 6; // 5 Figma steps + a final hold before the footer
+  // 5 Figma steps; the final hold (a sixth step, 1.2 screens with nothing
+  // changing) was removed (user decision).
+  const steps = 5;
   // No snap (user decision): each step has a rest zone where the frame holds
   // while the scroll goes on, so the scroll stays free and smooth yet a step
   // is easy to stop on. Transitions keep a length of 1; REST is added between
   // them (half before the first, half after the last), ≈40% of each step.
   const REST = 0.6;
+  // The exit: over the last 0.4 of a screen the content rises faster and
+  // faster until it moves with the page as the section releases.
+  const EXIT = 0.4; // of the screen height
+  // The last rest zone (after step 5) holds half a rest, then the exit.
+  const lastRest = REST / 2 + EXIT * (1 + REST);
   const stepTime = (p) => Math.floor(p) * (1 + REST) + REST / 2 + (p - Math.floor(p));
   const restTime = (k) => (k === 0 ? REST / 4 : k === steps ? steps * (1 + REST) - REST / 4 : k * (1 + REST));
+  // Timeline length: the steps, then the last rest zone with the exit.
+  const length = stepTime(steps - 1) + 1 + lastRest;
   const smooth = reduceMotion ? "steps(1)" : "power2.inOut";
   const linesBox = section.querySelector(".motto__lines");
+  const content = section.querySelector(".motto__inner");
 
   // Per-letter copies over the accent text, placed at the measured letter
   // positions in em so they follow the fluid scale. The gradient box is the
@@ -116,7 +128,7 @@ export function initMottoScroll() {
       scrollTrigger: {
         trigger: section,
         start: "top top",
-        end: () => `+=${window.innerHeight * steps}`,
+        end: () => `+=${window.innerHeight * (length / (1 + REST))}`,
         pin: true,
         scrub: reduceMotion ? true : 0.8,
         invalidateOnRefresh: true,
@@ -132,7 +144,7 @@ export function initMottoScroll() {
         onUpdate: (self) => {
           if (resizing) return;
           driveLight(self.progress);
-          const time = self.progress * steps * (1 + REST);
+          const time = self.progress * length;
           const step = Math.round(time / (1 + REST));
           inside = self.scroll() >= self.start - 2 && self.scroll() <= self.end + 2;
           // Inside a step's rest zone.
@@ -267,8 +279,23 @@ export function initMottoScroll() {
 
     toGradient(2, stepTime(4));
 
-    // The last rest zone runs to the end of the pin.
-    timeline.to({}, { duration: REST / 2 }, stepTime(steps - 1) + 1);
+    // The last rest zone runs to the end of the pin (the exit is below).
+    timeline.to({}, { duration: lastRest }, stepTime(steps - 1) + 1);
+
+    // The exit, tied straight to the scroll (a scrub delay here made the
+    // content overshoot as the section let go): over the last EXIT of a
+    // screen of the pin the content rises by half that distance, easing in
+    // (t²), so its speed reaches the page's just as the section releases.
+    if (!reduceMotion) {
+      const setY = gsap.quickSetter(content, "y", "px");
+      const exit = (self) => setY(-0.5 * EXIT * window.innerHeight * self.progress ** 2);
+      ScrollTrigger.create({
+        start: () => timeline.scrollTrigger.end - EXIT * window.innerHeight,
+        end: () => timeline.scrollTrigger.end,
+        onUpdate: exit,
+        onRefresh: exit,
+      });
+    }
 
     // Entry (before the pin): full-screen light → dark on the wrapper.
     // Start values are set here, not with fromTo: ScrollTrigger's refresh
@@ -323,6 +350,7 @@ export function initMottoScroll() {
     cleanupListeners();
     ctx.revert();
     glyphs.forEach((glyph) => glyph.remove());
+    gsap.set(content, { clearProps: "transform" });
     section.classList.remove("is-enhanced");
     wrapper?.classList.remove("is-toned");
   };
