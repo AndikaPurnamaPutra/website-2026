@@ -132,6 +132,7 @@ export function mountCoin(anchors, fallback) {
   });
 
   let coinRot1 = null;
+  let model = null;
   const initialQuat1 = new THREE.Quaternion();
   let readyAt = null;
   // Compressed with gltf-transform (meshopt geometry, WebP textures at 1024).
@@ -139,6 +140,7 @@ export function mountCoin(anchors, fallback) {
     "assets/models/oww-pin.glb",
     (gltf) => {
       scene.add(gltf.scene);
+      model = gltf.scene;
       gltf.scene.traverse((child) => {
         if (child.name.includes("Rot_1")) coinRot1 = child;
         // Leans back 55° (the user's script had 45°) so the coin shows the
@@ -261,6 +263,29 @@ export function mountCoin(anchors, fallback) {
   };
   // The section above the footer covers the coin there (main's lower edge).
   const cover = document.querySelector("main");
+
+  // The coin turns to face the cursor (user decision, reference
+  // thewatch.60fps.fr): it stays in place and only its facing follows, up to
+  // LOOK at the screen's edges, catching up softly; back to straight when
+  // the cursor leaves the window. Mouse and trackpad only.
+  const LOOK = THREE.MathUtils.degToRad(18);
+  const look = { x: 0, y: 0 }; // where the cursor is, -1..1 from the centre
+  const facingCursor = { x: 0, y: 0 }; // the coin's eased facing
+  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const onPointerMove = (event) => {
+    if (event.pointerType !== "mouse") return;
+    look.x = (event.clientX / window.innerWidth) * 2 - 1;
+    look.y = (event.clientY / window.innerHeight) * 2 - 1;
+  };
+  const onPointerOut = (event) => {
+    if (event.relatedTarget) return;
+    look.x = 0;
+    look.y = 0;
+  };
+  if (finePointer) {
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    document.addEventListener("pointerout", onPointerOut);
+  }
   let idle = THREE.MathUtils.degToRad(-45);
   let last = performance.now();
 
@@ -283,6 +308,13 @@ export function mountCoin(anchors, fallback) {
     coinRot1.rotateX(p.tilt);
     coinRot1.rotateY(idle);
 
+    // Facing the cursor: the whole model turns round the screen's axes
+    // (right → turns right, up → looks up), eased over about 0.6s.
+    const ease = 1 - Math.exp(-dt * 6);
+    facingCursor.x += (look.x - facingCursor.x) * ease;
+    facingCursor.y += (look.y - facingCursor.y) * ease;
+    model.rotation.set(facingCursor.y * LOOK, facingCursor.x * LOOK, 0);
+
     const width = window.innerWidth;
     const height = window.innerHeight;
     camera.setViewOffset(width, height, width / 2 - p.x, height / 2 - p.y, width, height);
@@ -301,6 +333,8 @@ export function mountCoin(anchors, fallback) {
   return () => {
     gsap.ticker.remove(tick);
     window.removeEventListener("resize", onResize);
+    window.removeEventListener("pointermove", onPointerMove);
+    document.removeEventListener("pointerout", onPointerOut);
     renderer.dispose();
     stage.remove();
   };

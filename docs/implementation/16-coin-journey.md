@@ -136,3 +136,14 @@ Perbaikan:
   - Ke bawah: 0 / 300 / 540 → 1, lalu 560 / 900 / 1400 → 0.
   - Ke atas: 900 / 560 → 0, lalu 540 / 300 → 1.
   - Screenshot di 900 tanpa koin. Koin footer di akhir halaman tetap tampil (opacity 1).
+
+### Koin menghadap kursor (28 Okt 2026, permintaan pengguna)
+- Acuan: thewatch.60fps.fr. Posisi koin tetap; hanya arah hadapnya yang mengikuti kursor.
+- Seluruh model (`gltf.scene`) diputar terhadap sumbu layar:
+  - Kursor di kanan atau kiri → yaw.
+  - Kursor di atas atau bawah → pitch.
+  - Maksimal ±18° di tepi layar, 0° di tengah.
+- Gerak mengejar dengan halus (`1 − e^(−6·dt)`, ±0,6 detik). Flip saat scroll dan putaran pelan pada mukanya tetap berjalan; arah ke kursor ditambahkan di atasnya.
+- Hanya untuk mouse atau trackpad (`hover: hover` dan `pointer: fine`, `pointerType === "mouse"`). Saat kursor keluar dari jendela, koin kembali lurus.
+- Berlaku untuk koin hero dan footer (model yang sama).
+- Dicek dengan screenshot untuk kursor di tengah, kanan, kiri, atas, dan bawah: kursor ke kanan membuat muka koin berbalik ke kanan (tampak lebih sempit, karena koin sudah condong ke kanan), ke kiri lebih menghadap kita, dan ke bawah atau atas miring.
