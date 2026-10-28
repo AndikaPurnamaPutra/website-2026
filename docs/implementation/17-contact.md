@@ -160,3 +160,12 @@ Dibaca dari properti layer (28 Okt 2026).
   - Setelah Others dipilih, field tertutup menampilkan "Others". Figma tetap menampilkan "Select timeline".
   - Kotak upload diberi garis gelap saat hover atau saat file diseret ke atasnya (tidak ada di Figma, sebagai tanda bisa di-drop).
 - **Menu "Career" diganti "Contact"** (permintaan pengguna) di navbar (`header.pug`) dan footer (`footer.pug`, kolom Navigation). Keduanya mengarah ke `contact.html`, dan tampilannya sudah dicek di 1440.
+- **Ukuran tetap 1× di atas 1440** (masukan pengguna, layar 2560 × 1451: masih terasa terlalu besar dan aneh; halaman harus tetap selebar layar).
+  - **Penyebab:** di 2560 halaman memakai tiga skala sekaligus: menu bar 1×, teks dan formulir 1,2× (setelah langkah sebelumnya), jarak dan foto 1,78×. Judul turun ke y 256 (Figma 144), dan foto tengah 782 × 853.
+  - **Perbaikan:** `.contact` mengganti `--px` dan `--type-px` di dalam halaman ini, sehingga keduanya berhenti di 1× di atas 1440. Di bawah 1440 tetap mengecil seperti situs lainnya. Kolom kiri, formulir, teks, dan jarak di dalamnya jadi berukuran Figma di semua layar lebar.
+  - **Tetap mengikuti skala situs:** ruang menu bar (halaman digeser naik selisihnya, jadi judul tetap di y 144), jarak samping (sejajar dengan logo dan menu), dan deretan foto (tetap memenuhi lebar layar).
+  - **Terukur:**
+    - 1440 sama persis dengan sebelumnya.
+    - 1920: kolom kiri 40,144 (478 × 901), formulir 786 lebar di kanan.
+    - 2560: kolom kiri dan logo di x 71, tepi kanan formulir dan menu di 2489, judul di y 144.
+    - Tanpa scroll horizontal.

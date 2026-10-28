@@ -1,9 +1,13 @@
 // Contact page. Figma: "Contact - Idle" 1611:1042 and its states (1611:1972 –
-// 1611:7579, docs/implementation/17-contact.md). Layout follows the layout
-// scale (fluid), text and the boxes that hug text the type scale (fs).
+// 1611:7579, docs/implementation/17-contact.md).
 // Figma's percentage line-heights render as whole pixels (14px at 170% =
 // 24px lines), so they are written as px ratios.
 @use "../abstracts/functions" as *;
+
+// The site's layout scale (--px in base/_tokens.scss), for the parts that
+// keep growing with the screen here: the header space, the side gutters and
+// the gallery.
+$site-px: clamp(calc(1280px / 1440), calc(100vw / 1440), calc(2560px / 1440));
 
 $color-line: #cacaca;
 $color-error: #fc0000; // error underline and message (Figma 1611:5344)
@@ -12,25 +16,39 @@ $color-hint: #888888;
 $color-file: #344054; // file type label and upload percentage
 $color-track: #eaecf0;
 $color-done: #29df00;
-$shadow-card: 0 0 fluid(20) rgba(0, 0, 0, 0.05);
+$shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
 
 .contact {
+  // Above 1440px the page keeps Figma's sizes (1x) instead of growing with
+  // the screen (user decision, seen too large on a 2560px screen); it stays
+  // full width and the space between the column and the form grows. Below
+  // 1440px it shrinks like the rest of the site. fluid() and fs() follow
+  // these two values inside the page.
+  --px: clamp(calc(1280px / 1440), calc(100vw / 1440), 1px);
+  --type-px: clamp(calc(0.0625rem * 1280 / 1440), calc(0.0625rem + (100vw - 1440px) / 1440), 0.0625rem);
+
   // Above the footer, so the footer coin passes behind it (as on the other
   // pages); the gallery reaches past the right edge, clipped here.
   position: relative;
   z-index: 1;
   overflow-x: clip;
   background: var(--color-white);
-  // Content at 144px in Figma: 104px header space (main) + 40px.
+  // Content at 144px in Figma. main reserves 104px at the site's scale,
+  // which is more than 104px on wide screens, so the page moves up by the
+  // difference.
+  margin-top: calc(#{fluid(104)} - 104 * #{$site-px});
   padding-top: fluid(40);
   // Footer 80px below the gallery.
-  padding-bottom: fluid(80);
+  padding-bottom: calc(80 * #{$site-px});
 }
 
+// Full width; the sides follow the site's gutter, in line with the menu bar.
 .contact__inner {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  max-width: none;
+  padding-inline: calc(40 * #{$site-px});
 }
 
 // The left column stays put while the form scrolls (user decision). Where
@@ -38,17 +56,17 @@ $shadow-card: 0 0 fluid(20) rgba(0, 0, 0, 0.05);
 // until its bottom is 40px above the screen edge, then stays.
 .contact__aside {
   position: sticky;
-  top: min(#{fluid(144)}, calc(100vh - #{fluid(941)}));
+  top: min(#{fluid(144)}, calc(100vh - #{fs(901)} - #{fluid(40)}));
   display: flex;
   flex-direction: column;
-  gap: fluid(309);
-  width: fluid(478);
+  gap: fs(309);
+  width: fs(478);
 }
 
 .contact__intro {
   display: flex;
   flex-direction: column;
-  gap: var(--space-40);
+  gap: fs(40);
 }
 
 .contact__heading {
@@ -70,6 +88,11 @@ $shadow-card: 0 0 fluid(20) rgba(0, 0, 0, 0.05);
   gap: fs(16);
 }
 
+// The radius tokens follow the site's scale; here they stay at Figma's 4px.
+.contact__cta .button {
+  border-radius: fluid(4);
+}
+
 .contact__cta-caption {
   font-weight: 500;
   font-size: fs(14);
@@ -80,15 +103,15 @@ $shadow-card: 0 0 fluid(20) rgba(0, 0, 0, 0.05);
 .contact__office {
   display: flex;
   flex-direction: column;
-  gap: fluid(35);
-  width: fluid(381);
+  gap: fs(35);
+  width: fs(381);
 }
 
 .contact__office-image {
-  width: fluid(210);
-  height: fluid(122);
+  width: fs(210);
+  height: fs(122);
   object-fit: cover;
-  border-radius: var(--radius-sm);
+  border-radius: fluid(4);
 }
 
 .contact__office-info {
@@ -115,7 +138,7 @@ $shadow-card: 0 0 fluid(20) rgba(0, 0, 0, 0.05);
   width: fs(20);
   height: fs(20);
   background: var(--color-surface-muted);
-  border-radius: var(--radius-sm);
+  border-radius: fluid(4);
 
   img {
     width: fs(9.5);
@@ -145,11 +168,11 @@ $shadow-card: 0 0 fluid(20) rgba(0, 0, 0, 0.05);
 .contact-form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-40);
-  width: fluid(786);
-  padding: var(--space-32);
+  gap: fs(40);
+  width: fs(786);
+  padding: fs(32);
   background: var(--color-white);
-  border-radius: var(--radius-md);
+  border-radius: fluid(8);
   box-shadow: $shadow-card;
 }
 
@@ -163,7 +186,7 @@ $shadow-card: 0 0 fluid(20) rgba(0, 0, 0, 0.05);
 .contact-form__fields {
   display: flex;
   flex-direction: column;
-  gap: var(--space-40);
+  gap: fs(40);
 }
 
 .contact-form__field {
@@ -275,7 +298,7 @@ $shadow-card: 0 0 fluid(20) rgba(0, 0, 0, 0.05);
     letter-spacing: -0.04em;
     white-space: nowrap;
     border: 1px solid $color-line;
-    border-radius: var(--radius-sm);
+    border-radius: fluid(4);
     transition:
       color 0.2s ease-out,
       background-color 0.2s ease-out,
@@ -334,7 +357,7 @@ $shadow-card: 0 0 fluid(20) rgba(0, 0, 0, 0.05);
   line-height: calc(18 / 12);
   color: var(--color-white);
   background: var(--color-ink);
-  border-radius: var(--radius-sm);
+  border-radius: fluid(4);
   opacity: 0;
   visibility: hidden;
   transform: translateX(-50%);
@@ -413,7 +436,7 @@ $shadow-card: 0 0 fluid(20) rgba(0, 0, 0, 0.05);
   z-index: 2;
   padding: fs(16);
   background: var(--color-white);
-  border-radius: var(--radius-md);
+  border-radius: fluid(8);
   box-shadow: $shadow-card;
 }
 
@@ -478,7 +501,7 @@ $shadow-card: 0 0 fluid(20) rgba(0, 0, 0, 0.05);
   padding: fs(20) fs(24);
   background: var(--color-surface-muted);
   border: 0.5px dashed $color-line;
-  border-radius: var(--radius-sm);
+  border-radius: fluid(4);
 }
 
 .contact-form__dropzone {
@@ -635,7 +658,7 @@ $shadow-card: 0 0 fluid(20) rgba(0, 0, 0, 0.05);
   line-height: fs(22);
   color: var(--color-ink);
   border: 1px solid var(--color-ink);
-  border-radius: var(--radius-sm);
+  border-radius: fluid(4);
   transition:
     color 0.2s ease-out,
     background-color 0.2s ease-out,
@@ -689,19 +712,21 @@ $shadow-card: 0 0 fluid(20) rgba(0, 0, 0, 0.05);
 
 // Six pictures, 20px apart, starting 6.5px from the left edge (Figma) and
 // running past the right edge.
+// It keeps growing with the screen, so the row still runs off the right edge
+// on wide screens.
 .contact-gallery {
   display: flex;
   align-items: flex-start;
-  gap: fluid(20);
-  width: fluid(1427);
+  gap: calc(20 * #{$site-px});
+  width: calc(1427 * #{$site-px});
   margin: fluid(128) auto 0;
 
   img {
     flex-shrink: 0;
-    width: calc(var(--w) * var(--px));
-    height: calc(var(--h) * var(--px));
+    width: calc(var(--w) * #{$site-px});
+    height: calc(var(--h) * #{$site-px});
     object-fit: cover;
-    border-radius: var(--radius-sm);
+    border-radius: fluid(4);
   }
 }
 
