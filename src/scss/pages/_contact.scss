@@ -712,21 +712,55 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
 
 // Six pictures, 20px apart, starting 6.5px from the left edge (Figma) and
 // running past the right edge.
-// It keeps growing with the screen, so the row still runs off the right edge
-// on wide screens.
+// Six project pictures starting 6.5px from the left edge (Figma), as an
+// endless marquee to the left that stops on hover (user decision). They keep
+// growing with the screen, so the row always runs past the right edge.
 .contact-gallery {
-  display: flex;
-  align-items: flex-start;
-  gap: calc(20 * #{$site-px});
   width: calc(1427 * #{$site-px});
   margin: fluid(128) auto 0;
+}
+
+// The gap is padding on each item, so the copy used for the loop starts
+// exactly one gap after the last picture.
+.contact-gallery__track {
+  display: flex;
+  align-items: flex-start;
+  width: max-content;
+}
+
+.contact-gallery__item {
+  position: relative;
+  flex-shrink: 0;
+  padding-right: calc(20 * #{$site-px});
 
   img {
-    flex-shrink: 0;
     width: calc(var(--w) * #{$site-px});
     height: calc(var(--h) * #{$site-px});
     object-fit: cover;
     border-radius: fluid(4);
+  }
+}
+
+// The project title shows 16px below the picture on hover, as the Our Work
+// cards; it sits outside the flow, so the pictures do not move. It wraps
+// within the picture's width, so it never runs under the next (taller) one.
+.contact-gallery__title {
+  position: absolute;
+  top: calc(100% + #{fs(16)});
+  left: 0;
+  width: calc(var(--w) * #{$site-px});
+  line-height: 1.4;
+  opacity: 0;
+  transform: translateY(#{fs(-4)});
+  transition:
+    opacity 0.3s ease-out,
+    transform 0.3s ease-out;
+  pointer-events: none;
+
+  .contact-gallery__item:hover &,
+  .contact-gallery__item:focus-visible & {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -737,7 +771,8 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
   .contact-form__select-button,
   .contact-form__option,
   .contact-form__dropzone,
-  .contact-form__submit {
+  .contact-form__submit,
+  .contact-gallery__title {
     transition: none;
   }
 }

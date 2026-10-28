@@ -8,7 +8,7 @@ import { initCoin3d } from "./coin-3d.js";
 import { initServicesScroll } from "./services-scroll.js";
 import { initInviewVideos } from "./inview-videos.js";
 import { initWorkCarousels } from "./work-carousel.js";
-import { initTestimonialsMarquee } from "./testimonials-marquee.js";
+import { initMarquees } from "./marquee.js";
 import { initMilestoneCounter } from "./milestone-counter.js";
 import { initMottoScroll } from "./motto-scroll.js";
 import { initHeader } from "./header.js";
@@ -32,7 +32,7 @@ function initPage() {
   cleanups.push(initCoin3d());
   cleanups.push(initServicesScroll());
   cleanups.push(initWorkCarousels());
-  cleanups.push(initTestimonialsMarquee());
+  cleanups.push(initMarquees());
   cleanups.push(initMilestoneCounter());
   cleanups.push(initMottoScroll());
   // After the pinned sections so their pin spacers exist.

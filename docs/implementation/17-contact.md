@@ -169,3 +169,23 @@ Dibaca dari properti layer (28 Okt 2026).
     - 1920: kolom kiri 40,144 (478 × 901), formulir 786 lebar di kanan.
     - 2560: kolom kiri dan logo di x 71, tepi kanan formulir dan menu di 2489, judul di y 144.
     - Tanpa scroll horizontal.
+- **Deretan foto jadi marquee** (permintaan pengguna):
+  - Berjalan terus ke kiri (±40 px Figma per detik) dan **berhenti saat di-hover** atau difokus dengan keyboard. Dengan reduced motion, deretan diam seperti Figma.
+  - Setiap foto adalah link (sementara `#`). Saat di-hover, judul proyek muncul 16px di bawah foto (Inter 13, seperti kartu Our Work). Judul tidak menggeser foto lain dan melipat di dalam lebar fotonya.
+  - Judul: WELLMO dari Our Work. Lima lainnya **dummy** sesuai isi gambar: Finance Tracker, Factory Line A, S{TRI}, Renncybank, Goldsift Studio.
+  - Script marquee testimonial dipakai ulang dan diganti nama dari `testimonials-marquee.js` ke `src/js/marquee.js`. Semua `[data-marquee]` sekarang dijalankan, dan `data-marquee="pause"` membuatnya berhenti saat hover. Testimonial tetap berjalan saat hover (keputusan lama).
+  - Terukur: track bergerak (−79 → −145), diam saat hover (−185 → −185), lalu jalan lagi setelah kursor keluar (−225). Testimonial homepage tetap bergerak saat di-hover. Tanpa scroll horizontal di 1440 dan 2560.
+- **Perbaikan dan efek scroll pada marquee** (masukan pengguna):
+  - **Bug:** setelah foto diklik, fokus tertinggal di link dan marquee tetap berhenti meski kursor sudah keluar. Sekarang hanya fokus keyboard (`:focus-visible`) yang menahannya. Diuji dengan klik mouse sungguhan: setelah kursor keluar, marquee berjalan lagi.
+  - **Efek scroll** (`data-marquee="pause scroll"`): scroll ke bawah mendorong marquee ke kiri, scroll ke atas ke kanan (0,4 px per px scroll, makin cepat scroll makin cepat). Setelah scroll berhenti, marquee **tetap ke arah scroll terakhir** dengan kecepatan dasar (keputusan pengguna). Lompatan scroll lebih dari 120px per frame (pemulihan posisi setelah reload) diabaikan.
+  - **Saat kursor di atas foto, marquee diam, termasuk saat di-scroll** (keputusan pengguna).
+  - `marquee.js` sekarang digerakkan per frame di ticker GSAP. Testimonial homepage tetap ke kiri dengan kecepatan sama, tidak terpengaruh scroll, dan tetap berjalan saat hover (terukur −71 → −212 sambil hover dan scroll ke atas).
+  - Terukur di Contact:
+    - Idle: −75 → −115 dalam 1 detik.
+    - Scroll ke atas: berbalik ke kanan dan tetap ke kanan setelah berhenti (−699 → −659).
+    - Hover + scroll: tetap −156.
+- **Lebih cepat** (masukan pengguna, angka dari usulan saya): kecepatan dasar deretan foto 40 → **60 px/detik** (`data-marquee-speed="60"`), dan dorongan scroll 0,4 → **1×**, sehingga marquee bergeser sejauh halaman di-scroll.
+  - Terukur: −202 → −262 dalam 1 detik. Scroll 270px ke bawah menggeser marquee 379px (90 dari kecepatan dasar + ±270 dari scroll).
+  - Testimonial homepage tetap 40 px/detik.
+- **Saat hover tetap ikut scroll** (keputusan pengguna, mengganti "diam termasuk saat di-scroll"): selama kursor di atas foto, gerak sendirinya berhenti, tapi scroll tetap mendorongnya. Setelah scroll berhenti, marquee diam lagi.
+  - Terukur: hover −197 (diam), scroll 270px → −467, lalu tetap −467.

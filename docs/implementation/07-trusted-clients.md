@@ -69,7 +69,7 @@ Lebar 699px, rata tengah, gap 16px:
 |---|---|---|
 | `src/pug/partials/trusted-clients.pug` | Baru | Data logo dan testimoni, serta markup |
 | `src/scss/sections/_trusted-clients.scss` | Baru | Header, grid logo, garis, carousel, kartu, dan fade |
-| `src/js/testimonials-marquee.js` | Baru, **jika marquee disetujui** | Gerakan carousel. Mengembalikan fungsi cleanup |
+| `src/js/marquee.js` | Baru, **jika marquee disetujui** | Gerakan carousel. Mengembalikan fungsi cleanup |
 | `src/js/main.js`, `src/scss/main.scss`, `src/pug/pages/index.pug` | Ubah | Menyambungkan file baru |
 | `src/assets/images/clients/`, `src/assets/images/testimonials/` | Baru | Aset |
 
