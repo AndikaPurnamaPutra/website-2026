@@ -213,3 +213,24 @@ Semua versi berikut dicoba lalu dibatalkan oleh pengguna. Batasnya tetap langsun
   - Terukur: 0 → 0,06 → 0,28 → 0,47 → 0,70 → 0,90 → 1,0, lalu tetap 1.
   - Karena section berakhir 0,35 layar (15% + 20%) lebih tinggi dari tempatnya di layout, section berikutnya (Our Work) ditarik naik sebesar itu (`margin-top`, diatur saat ScrollTrigger mengukur). Jaraknya tetap seperti Figma.
   - Terukur: setelah dilepas, bawah Services = atas Our Work (jarak 0, sama dengan sebelum perubahan). Selama keluar, celahnya menyempit 38 → 0px dan tertutup latar putih. Refresh di bawah section: tanpa exception.
+
+## Gerak kartu tanpa hentakan, dengan batas kecepatan (29 Okt 2026, pilihan pengguna A)
+- **Masalah:** zona diam panjang (±40% per langkah) dan kurva `power2.inOut` membuat pola berhenti, lalu melesat, lalu berhenti. Setelah zona diam diperpendek, scroll cepat membuat kartu ikut melesat.
+- **Sekarang:**
+  - Zona diam `REST` 0,6 → **0,18** (±15% per langkah). Kurva **`sine.inOut`** untuk kartu dan gambar. Satu langkah = **1,25 layar** scroll (sebelumnya 1). Pin juga lebih panjang.
+  - **Batas kecepatan:** timeline tidak lagi di-scrub oleh ScrollTrigger. Pin (ScrollTrigger terpisah) hanya menentukan posisi tujuan, lalu ticker GSAP menggerakkan timeline ke sana: halus (`FOLLOW` 5/detik) dan **paling cepat satu perpindahan per 0,8 detik** (`MAX_SPEED`). Saat refresh (muat, resize, reload di tengah), timeline langsung ditempatkan di posisinya.
+  - Masuk dan keluar halus (versi sebelumnya) tetap, dan sekarang mengacu ke `pin.start`/`pin.end`.
+- Versi "satu gerakan scroll, satu kartu" (acuan simonholm.studio, dari sesi lain, belum di-commit) dibatalkan pengguna dan diganti versi ini.
+- **Terukur** (scroll cepat, 8 putaran roda × 400):
+  - Kecepatan kartu tertinggi 9725 → **3575 px/detik**.
+  - Kartu menyusul ±1 detik setelah scroll berhenti (sebelumnya berhenti bersamaan).
+  - Screenshot di 10/30/50/70/90% pin, scroll balik, dan reload di tengah: kartu dan gambar konsisten, tanpa exception.
+- **Selaras dengan Lenis** (masukan pengguna: terasa lebih lambat dan tidak seiring scroll):
+  - Batas 0,8 detik per perpindahan menahan kartu juga saat scroll normal, sehingga kartu tertinggal dari halaman.
+  - Sekarang: `FOLLOW` 5 → 14 (mengikuti Lenis dengan rapat), `MAX_SPEED` satu perpindahan per **0,35 detik** (hanya terasa saat scroll sangat cepat), dan satu langkah kembali **1 layar**.
+  - **Terukur** dibanding versi yang sudah di-commit (scrub 0,8, zona diam 0,6):
+
+    | Scroll | Kecepatan kartu tertinggi | Kartu berhenti |
+    |---|---|---|
+    | Normal | 2105 → 1255 px/detik | bersamaan dengan scroll (sebelumnya berhenti lebih dulu di zona diam) |
+    | Sangat cepat | 11727 → 2759 px/detik | bersamaan dengan scroll |

@@ -32,17 +32,28 @@ export function initServicesScroll() {
   const label = section.querySelector(".services__label");
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const steps = cards.length; // service changes + final fullscreen step
-  // No snap (user decision): each step has a rest zone where the frame holds
-  // while the scroll goes on, so the scroll stays free and smooth yet a step
-  // is easy to stop on. Transitions keep a length of 1; REST is added between
-  // them (half before the first, half after the last), ≈40% of each step.
-  const REST = 0.6;
+  // No snap (user decision): each step has a short rest zone where the frame
+  // holds while the scroll goes on. Transitions keep a length of 1; REST is
+  // added between them (half before the first, half after the last). It was
+  // ≈40% of each step, which felt like stop-and-jerk next to the other
+  // seamless scroll effects (user); now ≈15%, so the cards keep moving.
+  const REST = 0.18;
+  // Each step takes one screen of scrolling; U is the timeline time of one
+  // screen of scrolling.
+  const STEP_SCREENS = 1;
+  const U = (1 + REST) / STEP_SCREENS;
+  // The cards follow the (already smooth) Lenis scroll closely, and only a
+  // very fast scroll meets the speed limit: one move (1 of timeline time) in
+  // 0.35s at the fastest (user decision, option A). At 0.8s it held them back
+  // at a normal scroll too, and they lagged behind the page (user).
+  const MAX_SPEED = 1 / 0.35; // timeline time per second
+  const FOLLOW = 14; // how fast they close the gap (per second)
   // The entry: the pin starts with the section ENTRY of a screen below the
   // top, and over the next 2 × ENTRY of scrolling it glides up into place,
   // slowing from the page's speed to a stop (user: arriving at the pin
   // stopped it dead, not seamless). The steps come after that stretch.
   const ENTRY = 0.15; // of the screen height
-  const entryTime = 2 * ENTRY * (1 + REST); // timeline time of the entry
+  const entryTime = 2 * ENTRY * U; // timeline time of the entry
   // The exit, the same the other way (as in Motto): over the last EXIT of a
   // screen of the pin the section rises faster and faster, by half that
   // distance, so it already moves with the page when it is released.
@@ -125,20 +136,44 @@ export function initServicesScroll() {
     drawClips();
 
     const timeline = gsap.timeline({
-      defaults: { duration: 1, ease: reduceMotion ? "steps(1)" : "power2.inOut" },
+      paused: true,
+      // sine.inOut: a gentle curve, so the middle of each move does not rush.
+      defaults: { duration: 1, ease: reduceMotion ? "steps(1)" : "sine.inOut" },
       onUpdate: drawClips,
-      scrollTrigger: {
-        trigger: section,
-        start: () => `top top+=${ENTRY * window.innerHeight}`,
-        end: () => `+=${window.innerHeight * (steps + 2 * ENTRY + EXIT)}`,
-        pin: true,
-        scrub: reduceMotion ? true : 0.8,
-        invalidateOnRefresh: true,
-        onRefresh: (self) => {
-          if (self.animation.time() < stepTime(steps - 1)) clearMedia();
-        },
+    });
+
+    // The pin sets where the timeline should be (target); the ticker below
+    // moves it there, with the speed limit. On a refresh (load, resize, a
+    // reload further down) it is placed there at once.
+    let target = 0;
+    const pin = ScrollTrigger.create({
+      trigger: section,
+      start: () => `top top+=${ENTRY * window.innerHeight}`,
+      end: () => `+=${window.innerHeight * (steps * STEP_SCREENS + 2 * ENTRY + EXIT)}`,
+      pin: true,
+      invalidateOnRefresh: true,
+      onUpdate: (self) => {
+        target = self.progress * timeline.duration();
+        if (reduceMotion) timeline.time(target);
+      },
+      onRefresh: (self) => {
+        target = self.progress * timeline.duration();
+        timeline.invalidate().time(target);
+        if (timeline.time() < stepTime(steps - 1)) clearMedia();
       },
     });
+    const follow = (time, deltaMs) => {
+      const now = timeline.time();
+      const gap = target - now;
+      if (Math.abs(gap) < 0.0005) return;
+      const dt = Math.min(deltaMs / 1000, 0.1);
+      const limit = MAX_SPEED * dt;
+      timeline.time(now + gsap.utils.clamp(-limit, limit, gap * Math.min(1, dt * FOLLOW)));
+    };
+    if (!reduceMotion) {
+      gsap.ticker.add(follow);
+      cleanups.push(() => gsap.ticker.remove(follow));
+    }
 
     // The entry glide and the exit, tied straight to the scroll (no scrub
     // delay): the section rises by ENTRY of a screen easing out (its speed
@@ -163,14 +198,14 @@ export function initServicesScroll() {
         place();
       };
       const entry = ScrollTrigger.create({
-        start: () => timeline.scrollTrigger.start,
-        end: () => timeline.scrollTrigger.start + 2 * ENTRY * window.innerHeight,
+        start: () => pin.start,
+        end: () => pin.start + 2 * ENTRY * window.innerHeight,
         onUpdate: glide,
         onRefresh: glide,
       });
       const exit = ScrollTrigger.create({
-        start: () => timeline.scrollTrigger.end - EXIT * window.innerHeight,
-        end: () => timeline.scrollTrigger.end,
+        start: () => pin.end - EXIT * window.innerHeight,
+        end: () => pin.end,
         onUpdate: leave,
         onRefresh: leave,
       });
@@ -226,7 +261,7 @@ export function initServicesScroll() {
       timeline.fromTo(
         images[active],
         { autoAlpha: 1, clipPath: "inset(100% 0% 0% 0%)", scale: 1.08 },
-        { clipPath: "inset(0% 0% 0% 0%)", scale: 1, ease: reduceMotion ? "steps(1)" : "power3.inOut" },
+        { clipPath: "inset(0% 0% 0% 0%)", scale: 1, ease: reduceMotion ? "steps(1)" : "sine.inOut" },
         at,
       );
       if (active === 1) {
@@ -245,7 +280,11 @@ export function initServicesScroll() {
     );
     timeline.addLabel("fullscreen", restTime(steps));
     // The last rest zone runs to the end of the pin, the exit included.
-    timeline.to({}, { duration: REST / 2 + EXIT * (1 + REST) }, stepTime(steps - 1) + 1);
+    timeline.to({}, { duration: REST / 2 + EXIT * U }, stepTime(steps - 1) + 1);
+    // The pin may have measured before the steps were added: place the
+    // timeline for the current scroll now that it is complete.
+    target = pin.progress * timeline.duration();
+    timeline.time(target);
   }, section);
 
   const refresh = () => ScrollTrigger.refresh();
