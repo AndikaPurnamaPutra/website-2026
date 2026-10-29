@@ -69,8 +69,47 @@
 }
 
 .hero__social-icon--dribbble {
+  position: relative;
   width: fs(24);
   height: fs(24);
+  color: var(--color-ink);
+}
+
+// Social tiles on hover (Figma 1786:80 Dribbble, 1786:81 Behance; user
+// decision: a plain hover for now): the tile takes the brand colour and the
+// icon its hover colour, with a short fade. Colours from the Figma pictures.
+.hero__social-link,
+.hero__social-link > * {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    filter 0.3s ease;
+}
+
+.hero__social-link--dribbble:hover,
+.hero__social-link--dribbble:focus-visible {
+  background: #ffabe7;
+
+  .hero__social-icon--dribbble {
+    color: #b85098;
+  }
+}
+
+.hero__social-link--behance:hover,
+.hero__social-link--behance:focus-visible {
+  background: #0056ff;
+
+  // The Behance mark is a dark picture: made white.
+  .hero__social-icon--behance {
+    filter: brightness(0) invert(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__social-link,
+  .hero__social-link > * {
+    transition: none;
+  }
 }
 
 .hero__info {

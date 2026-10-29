@@ -319,3 +319,33 @@ Revisi (permintaan pengguna):
     - Batasnya adalah bagian video yang terlihat (kotak setelah scale dikurangi clip).
     - Kalau kursor tidak lagi di atas video, `is-following` dilepas dan tombol kembali ke tengah. Kursor keluar dari jendela juga mengembalikannya.
   - Terukur: kursor diam di (1300, 860) sambil scroll 0 → 705. Tombol tetap di bawah kursor selama video di bawahnya, lalu kembali ke tengah (`is-following` false) begitu bagian bawah video (755) melewati kursor.
+
+### Hover ikon Dribbble (30 Okt 2026, permintaan pengguna)
+- Acuan Figma 1786:80 (ikon Dribbble merah muda), dibuat elegan:
+  - Saat hover atau fokus keyboard, latar tile #EEEEEE → **#FFABE7** dan ikon #111 → **#B85098** (warna diambil dari gambar acuan), dengan transisi 0,5 detik.
+  - Bola Dribbble berputar **setengah putaran** (0,8 detik, `cubic-bezier(0.22, 1, 0.36, 1)`), lalu kembali saat kursor keluar.
+  - Dengan reduced motion: tanpa transisi dan tanpa putaran.
+- SVG Dribbble ditanam langsung (`src/pug/partials/icon-dribbble.svg`, jalur sama dengan `assets/icons/dribbble.svg`, isi `currentColor`), supaya warnanya bisa berubah.
+- Terukur: diam `rgb(238,238,238)` / `rgb(17,17,17)`. Hover `rgb(255,171,231)` / `rgb(184,80,152)` / rotasi 180°. Kursor keluar: kembali seperti semula.
+- **Tanpa putaran** (pengguna tidak suka bolanya berputar): hover sekarang hanya mengubah warna latar dan ikon (0,5 detik).
+- **Isi melingkar dari tengah** (pengguna: hanya ganti warna terlalu biasa; pilihan A):
+  - Merah muda #FFABE7 mengembang sebagai lingkaran dari tengah tile sampai penuh (`clip-path: circle()` pada `::before`, 0,7 detik, `cubic-bezier(0.33, 1, 0.68, 1)`).
+  - Ikon berubah ke #B85098 dengan jeda 0,12 detik, saat lingkaran melewatinya.
+  - Saat kursor keluar, lingkaran mengecil kembali ke tengah (0,45 detik).
+  - Dengan reduced motion: tanpa transisi.
+  - Dicek dengan screenshot per ±0,1 detik: lingkaran mengembang, penuh, lalu mengecil kembali.
+- **Diganti: merah muda naik dari bawah** (pilihan pengguna B, menggantikan versi lingkaran A yang sempat ditambahkan):
+  - Lapisan `::before` setinggi 140% kotak (merah muda padat sampai 72%, lalu memudar ke atas) naik dari bawah dalam 0,75 detik (`cubic-bezier(0.65, 0, 0.35, 1)`, pelan di awal dan akhir, sehingga naiknya terlihat), dan turun kembali dalam 0,6 detik.
+  - Ikon berubah warna dengan jeda 0,3 detik, saat tinta melewatinya.
+- **Diganti: lingkaran dari arah kursor** (pilihan pengguna C, menggantikan versi B):
+  - Lingkaran merah muda (3× ukuran kotak, `::before`) muncul tepat di titik kursor masuk dan membesar dari 0 sampai menutup kotak (0,7 detik, ease-out). Saat kursor keluar, lingkaran mengecil ke titik kursor keluar (0,5 detik).
+  - Ikon berubah ke #B85098 dengan jeda 0,12 detik. Fokus keyboard: dari tengah.
+  - Titik kursor diatur oleh `src/js/pointer-fill.js` (`data-pointer-fill`, variabel `--fill-x`/`--fill-y` dalam %).
+  - Hanya `transform: scale` yang dianimasikan. Versi `clip-path: circle(… at …)` ikut menganimasikan pusat lingkaran, sehingga pusatnya bergeser dari tengah ke kursor (terukur 46,8% → 4%).
+  - Dicek dengan screenshot per ±0,15 detik: masuk dari kiri → lingkaran dari kiri → penuh. Keluar ke atas → mengecil ke atas → kembali abu-abu dengan ikon hitam.
+
+### Hover ikon Behance (30 Okt 2026, permintaan pengguna)
+- Acuan Figma 1786:81 (kotak biru Behance, logo putih). Efeknya sama dengan Dribbble: lingkaran **#0056FF** (diambil dari gambar acuan) mengembang dari arah kursor, dan logo "Bē" (PNG gelap) menjadi putih (`filter: brightness(0) invert(1)`).
+- Gaya lingkaran sekarang dipakai bersama: `.hero__social-link[data-pointer-fill]` dengan `--fill-color` per ikon (`--dribbble` #FFABE7 / ikon #B85098, `--behance` #0056FF / ikon putih).
+- Dicek dengan screenshot: Behance → biru dari arah kursor, logo putih. Dribbble tetap merah muda. Keduanya kembali saat kursor keluar.
+- **Hover biasa dulu** (pengguna: hover lingkaran terasa aneh): kotak berubah ke warna brand dan ikon ke warna hover-nya, dengan transisi 0,3 detik (Dribbble #FFABE7 / ikon #B85098, Behance #0056FF / logo putih). Lingkaran dan `pointer-fill.js` dihapus.

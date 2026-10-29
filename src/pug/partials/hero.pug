@@ -13,11 +13,13 @@ section.hero
           | designed at venture speed
         ul.hero__social
           li
-            a.hero__social-link(href="https://www.behance.net" target="_blank" rel="noopener" aria-label="Behance")
+            a.hero__social-link.hero__social-link--behance(href="https://www.behance.net" target="_blank" rel="noopener" aria-label="Behance")
               img.hero__social-icon--behance(src="assets/icons/behance.png" width="32" height="21" alt="")
           li
-            a.hero__social-link(href="https://dribbble.com" target="_blank" rel="noopener" aria-label="Dribbble")
-              img.hero__social-icon--dribbble(src="assets/icons/dribbble.svg" width="24" height="24" alt="")
+            a.hero__social-link.hero__social-link--dribbble(href="https://dribbble.com" target="_blank" rel="noopener" aria-label="Dribbble")
+              //- Inline (same paths as assets/icons/dribbble.svg, in currentColor)
+              //- so the hover can recolour it.
+              include icon-dribbble.svg
 
       .hero__info
         p.hero__description.text-14.text-medium
