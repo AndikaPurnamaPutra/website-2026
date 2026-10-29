@@ -13,9 +13,12 @@ let lenis = null;
 export function initSmoothScroll() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return () => {};
 
-  // Matched to the references (measured: one wheel tick glides ±35 frames,
-  // first step 7–8px on drone.riotters.com and leoparpeix.com).
-  lenis = new Lenis({ lerp: 0.085, wheelMultiplier: 0.9 });
+  // First matched to the references (drone.riotters.com, leoparpeix.com:
+  // lerp 0.085, wheelMultiplier 0.9). Made a little heavier (user decision,
+  // 0.6 felt too heavy): one wheel tick moves a sixth less and glides a
+  // touch longer, so the scroll-tied animations are easier to follow
+  // without scrolling in small steps.
+  lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 0.75 });
   // For checking in the browser console: window.lenis.
   window.lenis = lenis;
   lenis.on("scroll", ScrollTrigger.update);

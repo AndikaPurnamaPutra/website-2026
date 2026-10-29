@@ -147,3 +147,8 @@ Perbaikan:
 - Hanya untuk mouse atau trackpad (`hover: hover` dan `pointer: fine`, `pointerType === "mouse"`). Saat kursor keluar dari jendela, koin kembali lurus.
 - Berlaku untuk koin hero dan footer (model yang sama).
 - Dicek dengan screenshot untuk kursor di tengah, kanan, kiri, atas, dan bawah: kursor ke kanan membuat muka koin berbalik ke kanan (tampak lebih sempit, karena koin sudah condong ke kanan), ke kiri lebih menghadap kita, dan ke bawah atau atas miring.
+
+### Scroll lebih berat (30 Okt 2026, keputusan pengguna)
+- Pengguna merasa harus scroll pendek-pendek untuk menikmati animasi yang terikat ke scroll. Lenis dibuat lebih berat untuk seluruh situs: `wheelMultiplier` 0,9 → **0,6** dan `lerp` 0,085 → **0,07**.
+- Terukur, satu putaran roda (deltaY 100): **90 → 60px**, luncuran sampai diam **±1,12 → ±1,29 detik**. Layar sentuh tidak terpengaruh (Lenis tidak aktif di sana).
+- **Di tengah** (pengguna: 0,6 terlalu berat): `wheelMultiplier` **0,75**, `lerp` **0,08**. Terukur: 75px per putaran roda, diam dalam ±1,16 detik.
