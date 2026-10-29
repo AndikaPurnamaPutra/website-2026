@@ -234,3 +234,8 @@ Semua versi berikut dicoba lalu dibatalkan oleh pengguna. Batasnya tetap langsun
     |---|---|---|
     | Normal | 2105 → 1255 px/detik | bersamaan dengan scroll (sebelumnya berhenti lebih dulu di zona diam) |
     | Sangat cepat | 11727 → 2759 px/detik | bersamaan dengan scroll |
+
+## Dicoba lalu dibatalkan (30 Okt 2026)
+- **B:** perpindahan dimainkan sampai selesai begitu scroll 12% masuk. Terasa kaku.
+- **D:** mengikuti scroll, lalu merapikan diri ke kartu terdekat setelah diam 300 ms. Masih kurang seamless.
+- Services tetap **A**: mengikuti scroll sepenuhnya (dengan batas kecepatan untuk scroll sangat cepat), seperti commit 8d460a4. Keputusan pengguna.

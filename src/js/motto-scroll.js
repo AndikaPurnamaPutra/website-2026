@@ -1,7 +1,6 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { designPx } from "./design-px.js";
-import { addWheelFilter, getSmoothScroll } from "./smooth-scroll.js";
 
 // Pinned Motto + CTA section (Figma storyboard 1527:4259, flow from the user):
 // entry: the Milestone + Motto wrapper turns from light to dark across the whole
@@ -203,8 +202,6 @@ export function initMottoScroll() {
     ScrollTrigger.addEventListener("refresh", restoreStep);
     cleanupListeners = () => {
       gsap.ticker.remove(follow);
-      removeBrake();
-      clearTimeout(settleTimer);
       window.removeEventListener("resize", onResize);
       ScrollTrigger.removeEventListener("refreshInit", rememberStep);
       ScrollTrigger.removeEventListener("refresh", restoreStep);
@@ -317,10 +314,11 @@ export function initMottoScroll() {
     // of the pin (the exit is below).
     timeline.to({}, { duration: length - highlight3 }, highlight3);
 
-    // Moves the timeline towards the scroll, softly (like a 1.2s scrub), but
+    // Moves the timeline towards the scroll, softly (like a 0.7s scrub; 1.2s
+    // felt heavy, user), but
     // not into a flip while the highlight before it is still playing, nor
     // back into a flip while the highlight after it is still reversing.
-    const FOLLOW = 3; // per second
+    const FOLLOW = 5; // per second
     const follow = (time, deltaMs) => {
       const now = timeline.time();
       let low = -Infinity;
@@ -339,73 +337,6 @@ export function initMottoScroll() {
     };
     if (!reduceMotion) gsap.ticker.add(follow);
 
-    // A brake at every calm point (user decisions): with the mouse wheel or a
-    // trackpad, one swipe moves the page freely, but not past the next calm
-    // point in its direction; the rest of that swipe (its momentum) is
-    // dropped, and the next swipe goes on. So one swipe makes one change: a
-    // flip or a highlight, each on its own (user: not both in one swipe).
-    // Keyboard and touch scroll as usual.
-    // A swipe that ends between two lines (a light swipe does not reach the
-    // next one) is finished by a magnet: once the wheel has been still for a
-    // moment, the page glides softly (0.6s) on to the next calm point in the
-    // swipe's direction (user decision: one swipe, one change).
-    // A new swipe is told apart from a trackpad's momentum by a pause, a
-    // change of direction, or a scroll that gets stronger again after fading.
-    const NEAR = 0.6; // of the screen: how close above the section a swipe is braked
-    const SETTLE = 200; // ms without wheel events: the swipe is over
-    const MAGNET = 0.6; // s, the glide that finishes a swipe
-    const easeOut = (t) => 1 - (1 - t) ** 3;
-    let settleTimer = 0;
-    const calmScroll = () => calm.map((point) => pin.start + point * window.innerHeight);
-    let limit = null; // where the current swipe stops (null: free)
-    let lastWheel = 0;
-    let lastStrength = 0;
-    let lastDirection = 0;
-    let peak = 0;
-    const brakeAt = (from, direction) => {
-      const points = calmScroll();
-      const near = NEAR * window.innerHeight;
-      // Braked from a little above the section (coming down) or a little
-      // below its last calm point (coming back up from the footer).
-      if (direction > 0 && (from < pin.start - near || from > points[points.length - 1] - 24)) return null;
-      if (direction < 0 && (from > points[points.length - 1] + near || from < points[0] + 24)) return null;
-      // A calm point the page is already on (within 24px) counts as passed,
-      // so a swipe never ends on a few pixels' move.
-      const found = direction > 0 ? points.find((point) => point > from + 24) : [...points].reverse().find((point) => point < from - 24);
-      return found === undefined ? null : found;
-    };
-    // On a calm point already (within 24px): nothing to finish.
-    const onCalm = (y) => calmScroll().some((point) => Math.abs(point - y) <= 24);
-    const removeBrake = addWheelFilter(({ deltaY, event }) => {
-      if (event.type !== "wheel") return true;
-      const lenis = getSmoothScroll();
-      if (!lenis) return true;
-      const now = performance.now();
-      const strength = Math.abs(deltaY);
-      const direction = Math.sign(deltaY);
-      const newSwipe =
-        now - lastWheel > 180 ||
-        (direction !== 0 && direction !== lastDirection) ||
-        (lastStrength < peak * 0.6 && strength > lastStrength * 1.5 && strength - lastStrength > 4);
-      peak = newSwipe ? strength : Math.max(peak, strength);
-      lastWheel = now;
-      lastStrength = strength;
-      if (direction) lastDirection = direction;
-      if (!direction) return true;
-      clearTimeout(settleTimer);
-      settleTimer = setTimeout(() => {
-        if (onCalm(lenis.targetScroll)) return;
-        const to = brakeAt(lenis.targetScroll, lastDirection);
-        if (to !== null) lenis.scrollTo(to, { duration: MAGNET, easing: easeOut });
-      }, SETTLE);
-      if (newSwipe) limit = brakeAt(lenis.targetScroll, direction);
-      if (limit === null) return true;
-      const next = lenis.targetScroll + deltaY * lenis.options.wheelMultiplier;
-      if (direction > 0 ? next < limit : next > limit) return true;
-      // Stop at the calm point, softly, and drop the rest of this swipe.
-      if (Math.abs(lenis.targetScroll - limit) > 0.5) lenis.scrollTo(limit);
-      return false;
-    });
 
     // The pin may have measured before the steps were added: place the
     // timeline for the current scroll now that it is complete.

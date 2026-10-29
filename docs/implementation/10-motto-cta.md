@@ -313,3 +313,7 @@ Masuk meluncur ke pin, langkah yang lebih panjang dengan batas kecepatan, zona d
       - Maju: 99 kalimat 1 → 297 highlight 1 → 837 kalimat 2 → 1033 highlight 2 → 1634 kalimat 3 → 1890 highlight 3 → bebas.
       - Mundur: 2243 → 1897 → 1634 (highlight 3 hilang) → 1035 (kalimat 2).
       - Satu usapan = satu perubahan di semua kasus. Reload tanpa exception.
+- **Lebih ringan** (30 Okt 2026, pengguna: Motto terasa berat):
+  - Rem dan magnet per usapan dihapus, termasuk `addWheelFilter` di `smooth-scroll.js`. Motto kembali mengikuti scroll bebas.
+  - Timeline mengejar scroll lebih cepat (`FOLLOW` 3 → 5 per detik, setara scrub ±1,2 → ±0,7 detik).
+  - Jeda tenang, flip yang menunggu highlight, highlight dengan hysteresis, dan tahan setelah highlight terakhir tetap.
