@@ -195,3 +195,6 @@ Varian terang tombol (untuk section Motto) dibuat saat section Motto dikerjakan,
   - Terukur (setiap ±0,28 detik): garis 129 → 118 → 53 → 5 → 0, lalu membelah `translate(12 −5)` → (10,6 −4,4) → (2,3 −1,0) → 0. Rasio x/y tetap, jadi gerakannya lurus.
 - Dicoba lalu dibatalkan (29 Okt 2026): pemicu ikon di 85% layar dengan tahapan bertumpuk (2,25 / 3,15 / 4,5 detik). Pengguna memilih versi ±2,7 detik di atas.
 - **Folder diselaraskan dengan ikon** (29 Okt 2026): saku 0,45 → 0,7 detik; folder naik 0,85 → 1,3 detik, mulai 0,45 detik, `back.out(1.2)` (sebelumnya 1.4). Total ±1,75 detik (sebelumnya ±1,1).
+- **Ikon dan folder lebih singkat** (30 Okt 2026, masukan pengguna: muncul sedikit terlalu lama), dengan urutan dan kurva yang sama:
+  - Ikon ±2,7 → **±1,9 detik**: garis 0,8, solid 0,5 mulai 0,6, membelah 0,8 mulai 1,1.
+  - Folder ±1,75 → **±1,3 detik**: saku 0,5, folder naik 1,0 mulai 0,3.

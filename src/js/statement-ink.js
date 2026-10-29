@@ -139,10 +139,10 @@ function createIcon(svg) {
 
   const timeline = gsap.timeline({ paused: true, onUpdate: apply });
   timeline
-    // Slower than first made (user decision): about 2.7s in all.
-    .to(state, { draw: 1, duration: 1.1, ease: "power2.inOut" }, 0)
-    .to(state, { pop: 1, duration: 0.7, ease: "back.out(1.4)" }, 0.85)
-    .to(state, { apart: 1, duration: 1.1, ease: "power3.inOut" }, 1.6);
+    // About 1.9s in all (2.7s felt a little long; user).
+    .to(state, { draw: 1, duration: 0.8, ease: "power2.inOut" }, 0)
+    .to(state, { pop: 1, duration: 0.5, ease: "back.out(1.4)" }, 0.6)
+    .to(state, { apart: 1, duration: 0.8, ease: "power3.inOut" }, 1.1);
 
   return {
     play: () => timeline.play(),
@@ -174,14 +174,14 @@ function createFolder(folder) {
     .fromTo(
       pocket,
       { scaleX: 0.3, autoAlpha: 0 },
-      { scaleX: 1, autoAlpha: 1, duration: 0.7, ease: "power3.out", transformOrigin: "50% 50%" },
+      { scaleX: 1, autoAlpha: 1, duration: 0.5, ease: "power3.out", transformOrigin: "50% 50%" },
       0,
     )
     // 55% of the 120px image: its top (6px above the crop) starts below the
     // pocket's opening, so nothing shows before it rises.
-    // Paced like the icon (user decision): about 1.75s in all.
-    .fromTo(images, { yPercent: 55 }, { yPercent: 0, duration: 1.3, ease: "back.out(1.2)" }, 0.45)
-    .fromTo(top, { clipPath: "inset(0% 0% 20% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.3, ease: "power2.out" }, 0.45);
+    // Paced like the icon: about 1.3s in all (1.75s felt a little long; user).
+    .fromTo(images, { yPercent: 55 }, { yPercent: 0, duration: 1, ease: "back.out(1.2)" }, 0.3)
+    .fromTo(top, { clipPath: "inset(0% 0% 20% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1, ease: "power2.out" }, 0.3);
 
   return {
     play: () => timeline.play(),
