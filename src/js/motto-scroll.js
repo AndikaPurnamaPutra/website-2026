@@ -36,20 +36,45 @@ export function initMottoScroll() {
   // 5 Figma steps; the final hold (a sixth step, 1.2 screens with nothing
   // changing) was removed (user decision).
   const steps = 5;
-  // No snap (user decision): each step has a rest zone where the frame holds
-  // while the scroll goes on, so the scroll stays free and smooth yet a step
-  // is easy to stop on. Transitions keep a length of 1; REST is added between
-  // them (half before the first, half after the last), ≈40% of each step.
-  const REST = 0.6;
+  // No snap (user decision): each step has a short rest zone where the frame
+  // holds while the scroll goes on. Transitions keep a length of 1; REST is
+  // added between them (half before the first, half after the last). At ≈40%
+  // of each step, a scroll and a half went by before anything moved (user);
+  // now ≈15%, as in What we do.
+  const REST = 0.18;
+  // Each step takes 1.1 screens of scrolling; U is the timeline time of one
+  // screen of scrolling.
+  const STEP_SCREENS = 1.1;
+  const U = (1 + REST) / STEP_SCREENS;
+  // The steps follow the (already smooth) Lenis scroll closely, and a very
+  // fast scroll meets a speed limit: one move (1 of timeline time) in 0.6s at
+  // the fastest (user: too fast; as in What we do), so a flip takes at least
+  // ≈0.5s, close to the letter highlight's ≈0.9s.
+  const MAX_SPEED = 1 / 0.6; // timeline time per second
+  const FOLLOW = 14; // how fast they close the gap (per second)
+  // The entry: the pin starts with the section ENTRY of a screen below the
+  // top, and over the next 2 × ENTRY of scrolling it glides up into place,
+  // slowing from the page's speed to a stop (user: as in What we do).
+  const ENTRY = 0.15; // of the screen height
+  const entryTime = 2 * ENTRY * U;
+  const entryPx = () => Math.round(ENTRY * window.innerHeight); // whole px: no seam
   // The exit: over the last 0.4 of a screen the content rises faster and
   // faster until it moves with the page as the section releases.
   const EXIT = 0.4; // of the screen height
   // The last rest zone (after step 5) holds half a rest, then the exit.
-  const lastRest = REST / 2 + EXIT * (1 + REST);
-  const stepTime = (p) => Math.floor(p) * (1 + REST) + REST / 2 + (p - Math.floor(p));
-  const restTime = (k) => (k === 0 ? REST / 4 : k === steps ? steps * (1 + REST) - REST / 4 : k * (1 + REST));
-  // Timeline length: the steps, then the last rest zone with the exit.
-  const length = stepTime(steps - 1) + 1 + lastRest;
+  const lastRest = REST / 2 + EXIT * U;
+  // Length of each move. The letter highlights (steps 1, 3, 5) play on their
+  // own clock as soon as their move starts, so a full-length move left most
+  // of it with nothing happening (user: the scroll hung); they get 0.35. The
+  // flips (steps 2 and 4) keep 1.
+  const moves = [0.35, 1, 0.35, 1, 0.35];
+  const moveStart = moves.map((_, k) => entryTime + REST / 2 + moves.slice(0, k).reduce((sum, m) => sum + m + REST, 0));
+  // Time at step p (a fraction runs into that step's move).
+  const stepTime = (p) => moveStart[Math.floor(p)] + (p - Math.floor(p)) * moves[Math.floor(p)];
+  // Middle of each rest zone (step 0 and the last one inside the pin).
+  const restTime = (k) => (k === 0 ? entryTime + REST / 4 : k === steps ? moveStart[steps - 1] + moves[steps - 1] + REST / 4 : moveStart[k] - REST / 2);
+  // Timeline length: the entry, the steps, then the last rest zone with the exit.
+  const length = stepTime(steps - 1) + moves[steps - 1] + lastRest;
   const smooth = reduceMotion ? "steps(1)" : "power2.inOut";
   const linesBox = section.querySelector(".motto__lines");
   const content = section.querySelector(".motto__inner");
@@ -123,35 +148,55 @@ export function initMottoScroll() {
 
     // Set up with the lights below; called with the pin's scroll progress.
     let driveLight = () => {};
-    const timeline = gsap.timeline({
-      defaults: { duration: 1, ease: smooth },
-      scrollTrigger: {
-        trigger: section,
-        start: "top top",
-        end: () => `+=${window.innerHeight * (length / (1 + REST))}`,
-        pin: true,
-        scrub: reduceMotion ? true : 0.8,
-        invalidateOnRefresh: true,
-        // The section's page position is fractional (fluid sizes), and GSAP
-        // pins it where it was, up to 1px below the top of the screen; on some
-        // GPUs that leaves a light seam above it. Pinned exactly at 0 instead.
-        onToggle: (self) => {
-          if (self.isActive) section.style.top = "0px";
-        },
-        onRefresh: (self) => {
-          if (self.isActive) section.style.top = "0px";
-        },
-        onUpdate: (self) => {
-          if (resizing) return;
-          driveLight(self.progress);
-          const time = self.progress * length;
-          const step = Math.round(time / (1 + REST));
-          inside = self.scroll() >= self.start - 2 && self.scroll() <= self.end + 2;
-          // Inside a step's rest zone.
-          if (Math.abs(time - step * (1 + REST)) <= REST / 2) settledStep = step;
-        },
+    const timeline = gsap.timeline({ paused: true, defaults: { duration: 1, ease: smooth } });
+
+    // The pin sets where the timeline should be (target); the ticker below
+    // moves it there, with the speed limit. On a refresh (load, resize, a
+    // reload further down) it is placed there at once.
+    let target = 0;
+    const pin = ScrollTrigger.create({
+      trigger: section,
+      start: () => `top top+=${entryPx()}`,
+      end: () => `+=${window.innerHeight * (length / U)}`,
+      pin: true,
+      // The section's page position is fractional (fluid sizes), and GSAP
+      // pins it where it was, up to 1px off; on some GPUs that leaves a light
+      // seam above it. Pinned at the whole-px entry offset instead.
+      onToggle: (self) => {
+        if (self.isActive) section.style.top = `${entryPx()}px`;
+      },
+      onRefresh: (self) => {
+        if (self.isActive) section.style.top = `${entryPx()}px`;
+        target = self.progress * length;
+        // Back to the start before re-reading the start values: read where the
+        // timeline was (e.g. a line already flipped away), they were wrong, and
+        // scrolling back up left the first line hidden (user report).
+        timeline.time(0).invalidate().time(target);
+      },
+      onUpdate: (self) => {
+        target = self.progress * length;
+        if (reduceMotion) timeline.time(target);
+        if (resizing) return;
+        driveLight(self.progress);
+        const time = target;
+        // Nearest rest zone.
+        const rests = [...Array(steps + 1).keys()];
+        const step = rests.reduce((best, k) => (Math.abs(restTime(k) - time) < Math.abs(restTime(best) - time) ? k : best), 0);
+        inside = self.scroll() >= self.start - 2 && self.scroll() <= self.end + 2;
+        // Inside a step's rest zone.
+        if (Math.abs(time - restTime(step)) <= REST / 2) settledStep = step;
       },
     });
+    const follow = (time, deltaMs) => {
+      const now = timeline.time();
+      const gap = target - now;
+      if (Math.abs(gap) < 0.0005) return;
+      const dt = Math.min(deltaMs / 1000, 0.1);
+      const limit = MAX_SPEED * dt;
+      timeline.time(now + gsap.utils.clamp(-limit, limit, gap * Math.min(1, dt * FOLLOW)));
+    };
+    if (!reduceMotion) gsap.ticker.add(follow);
+    const labelScroll = (name) => pin.start + (timeline.labels[name] / length) * (pin.end - pin.start);
 
     // A resize changes the pin length; keep the reader on the same step instead
     // of leaving the timeline between two steps. The step is recorded while
@@ -166,7 +211,7 @@ export function initMottoScroll() {
     };
     const restoreStep = () => {
       resizing = false;
-      if (keepStep !== null) window.scrollTo(0, timeline.scrollTrigger.labelToScroll(`step${keepStep}`));
+      if (keepStep !== null) window.scrollTo(0, labelScroll(`step${keepStep}`));
       keepStep = null;
       // Re-sync the gradient waves once the timeline shows the right step again.
       gsap.delayedCall(0.1, syncGradients);
@@ -175,6 +220,7 @@ export function initMottoScroll() {
     ScrollTrigger.addEventListener("refreshInit", rememberStep);
     ScrollTrigger.addEventListener("refresh", restoreStep);
     cleanupListeners = () => {
+      gsap.ticker.remove(follow);
       window.removeEventListener("resize", onResize);
       ScrollTrigger.removeEventListener("refreshInit", rememberStep);
       ScrollTrigger.removeEventListener("refresh", restoreStep);
@@ -182,16 +228,19 @@ export function initMottoScroll() {
 
     // Letters change from white to the gradient one after another, left to
     // right. Unlike the flips, this plays on its own clock
-    // (≈0.8s) once the scroll passes the middle of its step, and plays back
+    // (≈0.9s) once the scroll enters its step, and plays back
     // when scrolling up, so the wave has the same tempo however one scrolls.
     const gradients = [];
     const toGradient = (i, at) => {
-      const each = { duration: 0.35, ease: "power1.out", stagger: { amount: 0.45 } };
+      // ≈0.9s, in tempo with the flips (≈0.8s at first, ≈1.2s felt slow; user).
+      const each = { duration: 0.4, ease: "power1.out", stagger: { amount: 0.5 } };
       const wave = gsap
         .timeline({ paused: true })
         .to(charGradient[i], { opacity: 1, ...each }, 0)
         .to(charText[i], { opacity: 0, ...each }, 0);
-      gradients.push({ wave, at: at + 0.5, on: null });
+      // Starts as soon as the scroll enters the move (it waited for the
+      // middle, ≈0.4 of a screen with nothing happening; user: it hung).
+      gradients.push({ wave, at: at + 0.05, on: null });
     };
     const syncGradients = () => {
       // During a refresh/resize the timeline is briefly reverted; ignore that.
@@ -255,9 +304,16 @@ export function initMottoScroll() {
     timeline.eventCallback("onUpdate", syncGradients);
 
     // The whole line turns like one flip-clock card: out to the top, in from below.
+    // FLIP: share of the move the flip takes, centred in it. 1 felt too slow
+    // with the longer steps, 0.65 too quick next to the letter highlight
+    // (user); 0.85.
+    const FLIP = 0.85;
+    const flipOut = 0.45 * FLIP;
+    const flipIn = 0.55 * FLIP;
+    const flipAt = (at) => at + (1 - FLIP) / 2;
     const flip = (from, to, at) => {
-      timeline.to(lines[from], { rotationX: 90, y: () => -10 * designPx(), autoAlpha: 0, duration: 0.45, ease: reduceMotion ? "steps(1)" : "power3.in" }, at);
-      timeline.to(lines[to], { rotationX: 0, y: 0, autoAlpha: 1, duration: 0.55, ease: reduceMotion ? "steps(1)" : "power3.out" }, at + 0.45);
+      timeline.to(lines[from], { rotationX: 90, y: () => -10 * designPx(), autoAlpha: 0, duration: flipOut, ease: reduceMotion ? "steps(1)" : "power3.in" }, flipAt(at));
+      timeline.to(lines[to], { rotationX: 0, y: 0, autoAlpha: 1, duration: flipIn, ease: reduceMotion ? "steps(1)" : "power3.out" }, flipAt(at) + flipOut);
     };
 
     // Step labels sit in the middle of each rest zone (step 0 and the last
@@ -272,15 +328,19 @@ export function initMottoScroll() {
 
     flip(1, 2, stepTime(3));
     // The label changes with motto 3 (Figma 1527:4219), like the lines.
-    timeline.to(labelTexts[0], { autoAlpha: 0, y: () => -6 * designPx(), duration: 0.45, ease: reduceMotion ? "steps(1)" : "power3.in" }, stepTime(3));
-    timeline.to(labelTexts[1], { autoAlpha: 1, y: 0, duration: 0.55, ease: reduceMotion ? "steps(1)" : "power3.out" }, stepTime(3) + 0.45);
+    timeline.to(labelTexts[0], { autoAlpha: 0, y: () => -6 * designPx(), duration: flipOut, ease: reduceMotion ? "steps(1)" : "power3.in" }, flipAt(stepTime(3)));
+    timeline.to(labelTexts[1], { autoAlpha: 1, y: 0, duration: flipIn, ease: reduceMotion ? "steps(1)" : "power3.out" }, flipAt(stepTime(3)) + flipOut);
     timeline.to(diagonal, { autoAlpha: 1 }, stepTime(3));
     timeline.to(cta, { autoAlpha: 1, y: 0, duration: 0.6 }, stepTime(3.4));
 
     toGradient(2, stepTime(4));
 
     // The last rest zone runs to the end of the pin (the exit is below).
-    timeline.to({}, { duration: lastRest }, stepTime(steps - 1) + 1);
+    timeline.to({}, { duration: lastRest }, stepTime(steps - 1) + moves[steps - 1]);
+    // The pin may have measured before the steps were added: place the
+    // timeline for the current scroll now that it is complete.
+    target = pin.progress * length;
+    timeline.time(target);
 
     // The exit, tied straight to the scroll (a scrub delay here made the
     // content overshoot as the section let go): over the last EXIT of a
@@ -290,11 +350,49 @@ export function initMottoScroll() {
       const setY = gsap.quickSetter(content, "y", "px");
       const exit = (self) => setY(-0.5 * EXIT * window.innerHeight * self.progress ** 2);
       ScrollTrigger.create({
-        start: () => timeline.scrollTrigger.end - EXIT * window.innerHeight,
-        end: () => timeline.scrollTrigger.end,
+        start: () => pin.end - EXIT * window.innerHeight,
+        end: () => pin.end,
         onUpdate: exit,
         onRefresh: exit,
       });
+
+      // The entry glide, tied straight to the scroll: the section rises by
+      // the entry offset, easing out (its speed falls from the page's to 0).
+      // Once released it stays up; it is taller by as much (_motto.scss), so its
+      // backdrop covers the strip below it (the wrapper's showed there).
+      const glide = (self) => {
+        section.style.translate = `0 ${-entryPx() * (1 - (1 - self.progress) ** 2)}px`;
+      };
+      const resetGlide = () => {
+        section.style.translate = "";
+        section.style.setProperty("--motto-entry", `${entryPx()}px`);
+      };
+      resetGlide();
+      ScrollTrigger.addEventListener("refreshInit", resetGlide);
+      // The extra height takes no room in the page: the pin spacer (in the
+      // flow in place of the section) ends that much earlier. Set after each
+      // refresh, as ScrollTrigger rewrites the spacer's styles.
+      const spacerMargin = () => {
+        const spacer = section.parentElement;
+        if (spacer?.classList.contains("pin-spacer")) spacer.style.marginBottom = `${-entryPx()}px`;
+      };
+      spacerMargin();
+      ScrollTrigger.addEventListener("refresh", spacerMargin);
+      const entryTrigger = ScrollTrigger.create({
+        start: () => pin.start,
+        end: () => pin.start + 2 * ENTRY * window.innerHeight,
+        onUpdate: glide,
+        onRefresh: glide,
+      });
+      const cleanupBefore = cleanupListeners;
+      cleanupListeners = () => {
+        cleanupBefore();
+        ScrollTrigger.removeEventListener("refreshInit", resetGlide);
+        ScrollTrigger.removeEventListener("refresh", spacerMargin);
+        entryTrigger.kill();
+        section.style.translate = "";
+        section.style.removeProperty("--motto-entry");
+      };
     }
 
     // Entry (before the pin): full-screen light → dark on the wrapper.
@@ -311,31 +409,30 @@ export function initMottoScroll() {
       gsap
         .timeline({
           defaults: { ease: "sine.inOut" },
-          // Starts once Motto is halfway into the screen (user decision), so
-          // the change happens close to Motto. Motto top: 50% → 0% of the screen.
-          scrollTrigger: { trigger: section, start: "top 50%", end: "top top", scrub: 1, invalidateOnRefresh: true },
+          // From Motto's top at 85% of the screen to the pin. The darkening
+          // was squeezed into ≈120px of scrolling and hit like a flash (user);
+          // it now runs over ≈70% of this stretch (≈440px at 900px high).
+          scrollTrigger: { trigger: section, start: "top 85%", end: () => `top top+=${entryPx()}`, scrub: 1, invalidateOnRefresh: true },
         })
         // Hand-over: Milestone fades out first while the background is still
-        // white (no dark text over grey), the background darkens, and motto 1,
-        // already in the lower part of the screen, comes in as Milestone goes,
-        // so the space between them never reads as empty.
-        .to(milestone, { autoAlpha: 0, y: () => -40 * designPx(), duration: 0.3, ease: "power1.inOut" }, 0)
-        .to(wrapper, { backgroundColor: "#111111", duration: 0.5 }, 0.2)
-        .to(wrapperTexture, { opacity: 0.1, duration: 0.5 }, 0.2)
-        .to(backdrop, { autoAlpha: 1, duration: 0.3 }, 0.7)
+        // light (no dark text over grey), the background darkens slowly, and
+        // motto 1 comes in while it does, so the space never reads as empty.
+        .to(milestone, { autoAlpha: 0, y: () => -40 * designPx(), duration: 0.45, ease: "sine.inOut" }, 0.05)
+        .to(wrapper, { backgroundColor: "#111111", duration: 0.7 }, 0.25)
+        .to(wrapperTexture, { opacity: 0.1, duration: 0.7 }, 0.25)
+        .to(backdrop, { autoAlpha: 1, duration: 0.15 }, 0.85)
         // Motto 1 blurs in while the section scrolls in (it is complete before
         // the pin), as the background turns dark.
-        .to(linesBox, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.4, ease: "power2.out" }, 0.4);
+        .to(linesBox, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.5, ease: "power2.out" }, 0.38);
 
       // The label follows once motto 1 has settled in the center, i.e. when the
       // section pins. It plays on its own clock (the reader rests on step 0
       // there) and reverses when scrolling back up past that point.
       const labelIn = gsap.to(label, { autoAlpha: 0.5, y: 0, duration: 0.6, ease: "power2.out", paused: true });
       ScrollTrigger.create({
-        trigger: section,
         // Just before the pin (24px), so a scroll that stops right at it counts;
-        // motto 1 is already centered there.
-        start: "top top+=24",
+        // motto 1 is close to the centre there.
+        start: () => pin.start - 24,
         onEnter: () => labelIn.play(),
         onLeaveBack: () => labelIn.reverse(),
         // Page loaded or restored below this point: show it at once.

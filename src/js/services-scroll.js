@@ -158,7 +158,10 @@ export function initServicesScroll() {
       },
       onRefresh: (self) => {
         target = self.progress * timeline.duration();
-        timeline.invalidate().time(target);
+        // Back to the start before re-reading the start values: read where the
+        // timeline was (e.g. a line already flipped away), they were wrong, and
+        // scrolling back up left the first line hidden (user report).
+        timeline.time(0).invalidate().time(target);
         if (timeline.time() < stepTime(steps - 1)) clearMedia();
       },
     });

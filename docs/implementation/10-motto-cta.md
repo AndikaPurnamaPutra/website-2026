@@ -240,3 +240,33 @@ Hasil:
   - Panjang pin dihitung dari panjang timeline (`length`), sehingga satu layar tetap 1,6 satuan timeline.
 - **Terukur** (kecepatan isi dibanding scroll, roda mouse): 0 → 0,06 → 0,33 → 0,59 → 0,81 → 0,96 → 1,0, lalu tetap 1. Section dilepas di 1,0, tanpa lonjakan.
 - Screenshot langkah 5 (gradasi dan CTA), keluar, dan sesudah lepas (footer tersingkap) sesuai. Pin sekarang 4860px (sebelumnya 6 layar = 5400px di 900px).
+
+## Masuk halus dan tempo lebih pelan (29 Okt 2026, permintaan pengguna, sama seperti What we do)
+- **Masuk:** pin dimulai saat atas section masih 15% layar di bawah (dibulatkan ke px penuh, juga untuk perbaikan garis tipis di atas). Selama 0,3 layar berikutnya, section meluncur naik sambil melambat (CSS `translate`, terikat langsung ke scroll). Setelah dilepas, section tetap naik; jalur di bawahnya diisi latar gelap wrapper. Peralihan terang → gelap dan label "( Our Motto's )" sekarang mengacu ke awal pin yang baru.
+- **Tempo:**
+  - Satu langkah = **1,3 layar** scroll (sebelumnya 1).
+  - Timeline tidak lagi di-scrub. Pin menentukan posisi tujuan, dan ticker mengikutinya dengan rapat (`FOLLOW` 14), dengan batas **satu perpindahan per 0,45 detik** saat scroll sangat cepat.
+  - Gelombang gradasi huruf ±0,8 → **±1,2 detik**.
+- Langkah saat resize memakai posisi label yang dihitung dari pin (`labelScroll`).
+- **Terukur:**
+  - Kecepatan section saat masuk (dibanding scroll): 1,0 → 0,85 → 0,59 → 0,36 → 0,15 → 0.
+  - Screenshot di 8 / 24 / 42 / 60 / 78 / 92% pin: kelima langkah sesuai (gradasi "Trendsetting Design", flip ke motto 2, "believers.", motto 3 + CTA, gradasi penuh). Sesudah dilepas: footer tersingkap.
+  - Scroll balik ke 42% dan reload di tengah: langkah sama, tanpa exception.
+- **Flip lebih cepat** (masukan pengguna: terlalu lambat): flip kalimat dan label hanya memakai 65% dari jarak perpindahan, di tengahnya (sebelumnya 100%). Panjang langkah dan gradasi tetap.
+- **Perbaikan: kalimat 1 hilang** (laporan pengguna). Setelah refresh atau resize di tengah Motto, `timeline.invalidate()` membaca ulang nilai awal dari keadaan saat itu (kalimat 1 sudah ter-flip pergi). Akibatnya, saat scroll kembali ke langkah 0, kalimat 1 tetap tersembunyi dan kalimat 2 tampil. Sekarang timeline dikembalikan ke 0 dulu sebelum di-invalidate (`time(0).invalidate().time(target)`). Masalah yang sama diperbaiki juga di What we do.
+  - Terukur: reload di 60% pin, lalu scroll ke 8%: opacity kalimat 1/2/3 = 1/0/0 (sebelumnya 0/1/0). What we do: reload di 70%, lalu kembali ke 10%: posisi kartu dan gambar sama dengan tanpa reload.
+- **Terang → gelap lebih pelan** (masukan pengguna: terasa seperti kejutan):
+  - Terukur sebelumnya: latar berubah dari 255 ke 20 hanya dalam ±120px scroll.
+  - Sekarang rentangnya dimulai saat atas Motto di **85%** layar (sebelumnya 50%) sampai awal pin, dan latar menggelap selama 70% rentang itu. Terukur: 255 → 233 → 180 → 113 → 54 → 20 selama ±400px.
+  - Milestone memudar lebih pelan (0,45, `sine.inOut`), dan kalimat 1 mulai muncul lebih awal (0,38), sehingga keduanya bertumpuk dan tidak ada layar abu-abu kosong (dicek dengan screenshot di −640 / −520 / −440 / −360 / −280 / −160px dari pin).
+- **Tempo flip dan highlight diselaraskan** (masukan pengguna: flip terlalu cepat, highlight sedikit lambat). Flip terikat ke scroll, sedangkan highlight punya jam sendiri:
+  - Flip memakai 85% dari jarak perpindahan (sebelumnya 65%).
+  - Batas kecepatan satu perpindahan per 0,6 detik (sebelumnya 0,45), sehingga flip minimal ±0,5 detik.
+  - Highlight ±1,2 → ±0,9 detik.
+- **Perbaikan: pita latar wrapper di bawah Motto** (laporan pengguna). Karena section digeser naik 135px (masuk dengan meluncur), jalur di bawahnya memperlihatkan latar wrapper (#111 rata + tekstur wrapper), berbeda dengan latar Motto (gradasi #111 → #1f1f1f + teksturnya sendiri, sesuai Figma).
+  - Sekarang section lebih tinggi sebesar geserannya (`--motto-entry`, dengan padding bawah yang sama sehingga isi tetap di tengah layar), jadi latarnya menutup sampai bawah layar.
+  - Pin spacer diberi `margin-bottom` negatif sebesar itu (dipasang ulang setiap refresh). Wrapper `.tone-shift` dibuat `display: flow-root`, supaya margin itu memendekkan wrapper dan tidak bocor keluar (margin collapse).
+  - Terukur: selama pin section menutup 0–1035px (layar 900). Setelah dilepas, bawah section = bawah wrapper (700 = 700, sebelumnya 700 vs 835). Posisi Milestone dan Motto di halaman tidak berubah. Footer turun 1620px karena pin lebih panjang (langkah 1,3 layar + masuk). Screenshot saat pin dan sesudah dilepas: latar Motto tanpa pita. Reload tanpa exception.
+- **Highlight tanpa jeda** (masukan pengguna: terasa tertahan): gelombang gradasi dimulai saat scroll masuk ke perpindahannya (`at + 0.05`). Sebelumnya di tengah perpindahan (`at + 0.5`), sehingga ±0,4 layar scroll tidak menghasilkan apa-apa.
+- **Per scroll, tanpa menggantung** (masukan pengguna: perlu ±1,5 kali scroll sebelum ada yang bergerak): zona diam `REST` 0,6 → **0,18** (±15% per langkah, sama dengan What we do), dan satu langkah 1,3 → **1,1 layar**.
+  - Diukur ulang: bentangan scroll terpanjang tanpa perubahan justru 1,04 layar, letaknya **setelah highlight**. Highlight punya jam sendiri dan langsung selesai di awal langkahnya, sehingga sisa langkah kosong. Sekarang langkah highlight (1, 3, 5) hanya 0,35 dari panjang langkah flip (2, 4). `stepTime`/`restTime` dihitung dari daftar panjang langkah (`moves`).

@@ -14,9 +14,14 @@
   isolation: isolate;
 }
 
-// Pinned by JS: the section fills the viewport height.
+// Pinned by JS: the section fills the viewport height. While it glides into
+// the pin it is shifted up by --motto-entry (src/js/motto-scroll.js); it is
+// that much taller (the content stays centred in the screen above it), so its
+// own backdrop still reaches the bottom of the screen; JS takes the extra
+// height back from the page on the pin spacer (negative margin).
 .motto.is-enhanced {
-  height: 100vh;
+  height: calc(100vh + var(--motto-entry, 0px));
+  padding-bottom: var(--motto-entry, 0px);
 }
 
 // Section background; JS fades it in at the end of the light → dark change of
@@ -54,6 +59,10 @@
   // Keeps the sticky texture (pulled out of the flow with a negative margin)
   // inside the wrapper; clip, unlike hidden, does not break position: sticky.
   overflow: clip;
+  // Its own layout box, so the Motto pin spacer's negative bottom margin
+  // (src/js/motto-scroll.js) shortens the wrapper instead of passing through
+  // it (margin collapse) and leaving a strip of the wrapper under Motto.
+  display: flow-root;
 }
 
 // Sticks to the screen for the whole wrapper (height 100vh, pulled out of the
