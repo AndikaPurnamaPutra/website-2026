@@ -8,8 +8,8 @@ import { createGradientWave } from "./gradient-wave.js";
 //    like the hero accent (user decision; src/js/gradient-wave.js), and again
 //    whenever the pointer enters its row;
 // 3. ink flows through the lead sentence from left to right with a soft edge,
-//    from the paragraph grey (reference from the user: drone.riotters.com,
-//    played on its own clock instead of the scroll; once, no replay).
+//    from the paragraph grey, with the scroll (reference from the user:
+//    drone.riotters.com; like the Statement text), back to grey going up.
 // Without JS or with reduced motion the final values are shown, in black.
 export function initMilestoneCounter() {
   const root = document.querySelector("[data-milestone]");
@@ -63,16 +63,25 @@ export function initMilestoneCounter() {
       waveRow.addEventListener("mouseenter", wave.play);
     });
 
-  // The sweep has its own trigger: the paragraph sits below the numbers and is
-  // often still off screen when they start, and this way it does not run at
-  // the same time as the "$139M+" wave. A short pause first lets the grey text
-  // register.
-  const sweep = gsap.to(lead, { backgroundPosition: "0% 0%", duration: 1.3, delay: 0.2, ease: "power2.inOut", paused: true });
+  // The ink follows the scroll (user decision, like the Statement text):
+  // from the paragraph coming in at the bottom of the screen to its centre at
+  // 65% of the screen, just before the hand-over to Motto starts, so it is
+  // all black while Milestone is still fully in view; back to grey when
+  // scrolling up. It catches up softly (0.6s) so a fast scroll does not make
+  // it jump. It was played once on its own clock (1.3s).
+  const ink = { progress: 0 };
+  const paint = () => gsap.set(lead, { backgroundPosition: `${(1 - ink.progress) * 100}% 0%` });
+  const follow = gsap.quickTo(ink, "progress", { duration: 0.6, ease: "power3.out", onUpdate: paint });
   const sweepTrigger = ScrollTrigger.create({
     trigger: lead.closest(".milestone__text"),
-    start: "top 85%",
-    once: true,
-    onEnter: () => sweep.play(),
+    start: "top 95%",
+    end: "center 65%",
+    onUpdate: (self) => follow(self.progress),
+    onRefresh: (self) => {
+      ink.progress = self.progress;
+      follow(self.progress, self.progress);
+      paint();
+    },
   });
 
   const trigger = ScrollTrigger.create({
@@ -86,7 +95,7 @@ export function initMilestoneCounter() {
     trigger.kill();
     sweepTrigger.kill();
     timeline.kill();
-    sweep.kill();
+    gsap.killTweensOf(ink);
     if (wave) {
       waveRow.removeEventListener("mouseenter", wave.play);
       wave.destroy();
