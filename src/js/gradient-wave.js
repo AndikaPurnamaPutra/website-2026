@@ -53,30 +53,56 @@ export function createGradientWave(element, gradient) {
   measure();
   document.fonts?.ready.then(measure);
 
-  // Every play starts a new wave at once (a hover during a running wave is
-  // not ignored); each letter goes on from its current state, so nothing
-  // jumps back.
-  let wave;
+  // Every play starts a new wave at once and leaves the running ones going,
+  // so a wave started while another is under way follows it through the
+  // letters (as on manual.studio; user decision). Each letter is taken over
+  // by the newest wave when it reaches it, from its current state, so
+  // nothing jumps back.
+  const waves = new Set();
   const play = () => {
-    wave?.kill();
-    wave = gsap.timeline();
+    const wave = gsap.timeline({ onComplete: () => waves.delete(wave) });
+    waves.add(wave);
     glyphs.forEach((glyph, i) => {
       const text = glyph.firstChild;
       const lit = glyph.lastChild;
       const at = i * STAGGER;
-      wave
-        .to(lit, { opacity: 1, duration: LIGHT, ease: "sine.out" }, at)
-        .to(text, { opacity: 0, duration: LIGHT, ease: "sine.out" }, at)
-        .to(lit, { opacity: 0, duration: FADE, ease: "sine.inOut" }, at + LIGHT + HOLD)
-        .to(text, { opacity: 1, duration: FADE, ease: "sine.inOut" }, at + LIGHT + HOLD);
+      wave.add(() => {
+        gsap
+          .timeline()
+          .to(lit, { opacity: 1, duration: LIGHT, ease: "sine.out", overwrite: true }, 0)
+          .to(text, { opacity: 0, duration: LIGHT, ease: "sine.out", overwrite: true }, 0)
+          .to(lit, { opacity: 0, duration: FADE, ease: "sine.inOut" }, LIGHT + HOLD)
+          .to(text, { opacity: 1, duration: FADE, ease: "sine.inOut" }, LIGHT + HOLD);
+      }, at);
     });
+  };
+
+  // Index of the word (runs of non-space letters) under a pointer x, or -1.
+  const wordAt = (clientX) => {
+    const box = element.getBoundingClientRect();
+    const em = parseFloat(getComputedStyle(element).fontSize);
+    const x = (clientX - box.left) / em;
+    let word = -1;
+    let previous = -2;
+    for (const glyph of glyphs) {
+      const index = Number(glyph.dataset.index);
+      if (index !== previous + 1) word += 1;
+      previous = index;
+      const left = parseFloat(glyph.style.getPropertyValue("--x"));
+      if (x >= left && x <= left + glyph.offsetWidth / em) return word;
+    }
+    return -1;
   };
 
   return {
     play,
+    wordAt,
     destroy: () => {
-      wave?.kill();
-      glyphs.forEach((glyph) => glyph.remove());
+      waves.forEach((wave) => wave.kill());
+      glyphs.forEach((glyph) => {
+        gsap.killTweensOf([glyph.firstChild, glyph.lastChild]);
+        glyph.remove();
+      });
       element.classList.remove("gradient-wave");
       ["--wave-color", "--wave-gradient", "--pw", "--y"].forEach((name) => element.style.removeProperty(name));
     },

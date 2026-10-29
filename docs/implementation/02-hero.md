@@ -349,3 +349,9 @@ Revisi (permintaan pengguna):
 - Gaya lingkaran sekarang dipakai bersama: `.hero__social-link[data-pointer-fill]` dengan `--fill-color` per ikon (`--dribbble` #FFABE7 / ikon #B85098, `--behance` #0056FF / ikon putih).
 - Dicek dengan screenshot: Behance → biru dari arah kursor, logo putih. Dribbble tetap merah muda. Keduanya kembali saat kursor keluar.
 - **Hover biasa dulu** (pengguna: hover lingkaran terasa aneh): kotak berubah ke warna brand dan ikon ke warna hover-nya, dengan transisi 0,3 detik (Dribbble #FFABE7 / ikon #B85098, Behance #0056FF / logo putih). Lingkaran dan `pointer-fill.js` dihapus.
+
+### Gelombang gradasi "Elite digital" saling menyusul (30 Okt 2026, permintaan pengguna)
+- Acuan: "ambitious ideas." di manual.studio. Diukur di sana: huruf menyala bergantian ±65 ms per huruf lalu memudar ±1 detik, dan gelombang baru dipicu saat kursor masuk ke kata berikutnya, berjalan di belakang gelombang sebelumnya. Warna tetap gradasi biru brand (keputusan pengguna).
+- `gradient-wave.js`: gelombang baru tidak lagi menghentikan gelombang yang sedang berjalan. Setiap huruf diambil alih oleh gelombang terbaru saat gelombang itu sampai (dari keadaannya sekarang, tanpa lompatan). Ini juga berlaku untuk "$139M+" di Milestone.
+- `hero-highlight.js`: gelombang dipicu saat kursor masuk ke judul **dan setiap kali kursor pindah ke kata lain** di "Elite digital" (`wordAt`, dari posisi huruf yang sudah diukur).
+- Terukur (opasitas gradasi per huruf, 0–9): kursor di "Elite" lalu ke "digital" → huruf menyala berurutan 999985000000 → 999999873000 → 999999999862 → semua menyala, dan huruf awal mulai memudar (888999…) sementara gelombang kedua masih berjalan.
