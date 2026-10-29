@@ -310,3 +310,12 @@ Revisi (permintaan pengguna):
   - Penyebab: ScrollTrigger pelebaran dibuat dengan halaman yang sudah ter-scroll (posisi dipulihkan setelah refresh), sehingga langsung menjalankan `onUpdate` sebelum `onRefresh` mengukur showreel (`fit` belum ada). Akibatnya muncul `TypeError: Cannot read properties of undefined (reading 'scale')`, dan semua inisialisasi setelahnya (tinta Statement, marquee, dan lainnya) tidak berjalan.
   - Sekarang `measure()` dipanggil sebelum ScrollTrigger dibuat.
   - Diuji: refresh di 15–100% halaman pada homepage, Contact, dan Privacy Policy, tanpa exception. Setelah refresh di Statement, tinta, marquee, dan scroll langsung berjalan.
+- **Tombol Play Showreel tidak overlap lagi** (29 Okt 2026, laporan pengguna):
+  - **Penyebab:**
+    - Tombol hanya diperbarui saat mouse bergerak, sehingga saat halaman di-scroll dengan kursor diam, tombol tertinggal (dan kursor tetap tersembunyi).
+    - Batas geraknya memakai kotak video sebelum di-clip, sehingga tombol bisa masuk ke sisi yang terpotong.
+  - **Sekarang:**
+    - Posisi kursor terakhir disimpan (`pointermove` di window), dan tombol diposisikan ulang juga saat scroll.
+    - Batasnya adalah bagian video yang terlihat (kotak setelah scale dikurangi clip).
+    - Kalau kursor tidak lagi di atas video, `is-following` dilepas dan tombol kembali ke tengah. Kursor keluar dari jendela juga mengembalikannya.
+  - Terukur: kursor diam di (1300, 860) sambil scroll 0 → 705. Tombol tetap di bawah kursor selama video di bawahnya, lalu kembali ke tengah (`is-following` false) begitu bagian bawah video (755) melewati kursor.

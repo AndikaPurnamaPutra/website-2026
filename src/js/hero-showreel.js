@@ -72,7 +72,9 @@ export function initHeroShowreel() {
         radius: 4 * designPx(), // --radius-sm
       };
     };
+    let grown = 0;
     const grow = (progress) => {
+      grown = progress;
       const scale = 1 + (fit.scale - 1) * progress;
       preview.style.transform = `translate3d(${fit.shiftX * progress}px, 0, 0) scale(${scale})`;
       preview.style.clipPath = `inset(${fit.clipY * progress}px ${fit.clipX * progress}px round ${(fit.radius * (1 - progress)) / scale}px)`;
@@ -104,26 +106,56 @@ export function initHeroShowreel() {
     gsap.set(button, { xPercent: -50, yPercent: -50, x: 0, y: 0 });
     const toX = gsap.quickTo(button, "x", { duration: FOLLOW, ease: "power3.out" });
     const toY = gsap.quickTo(button, "y", { duration: FOLLOW, ease: "power3.out" });
-    // Kept inside the video, which may have grown past the showreel box; both
-    // share the same centre.
-    const follow = (event) => {
+
+    // The part of the video that shows: its box once scaled, less the sides
+    // the clip trims off.
+    const visible = () => {
       const box = preview.getBoundingClientRect();
+      const scale = 1 + (fit.scale - 1) * grown;
+      const trimX = fit.clipX * grown * scale;
+      const trimY = fit.clipY * grown * scale;
+      return { left: box.left + trimX, right: box.right - trimX, top: box.top + trimY, bottom: box.bottom - trimY };
+    };
+
+    // The button follows the cursor and stays inside the visible video. It
+    // is also placed again while the page scrolls under a still cursor (it
+    // stayed behind before and overlapped other things), and goes back to
+    // the centre once the cursor is no longer over the video.
+    const cursor = { x: -1, y: -1 };
+    let following = false;
+    const place = () => {
+      const area = visible();
+      const over = cursor.x >= area.left && cursor.x <= area.right && cursor.y >= area.top && cursor.y <= area.bottom;
+      if (over !== following) {
+        following = over;
+        showreel.classList.toggle("is-following", over);
+      }
+      // Offsets from the showreel's centre, where the button sits at rest.
+      const box = showreel.getBoundingClientRect();
+      const centreX = box.left + box.width / 2;
+      const centreY = box.top + box.height / 2;
+      if (!over) {
+        toX(0);
+        toY(0);
+        return;
+      }
       const halfW = button.offsetWidth / 2;
       const halfH = button.offsetHeight / 2;
-      const x = gsap.utils.clamp(box.left + halfW, box.right - halfW, event.clientX);
-      const y = gsap.utils.clamp(box.top + halfH, box.bottom - halfH, event.clientY);
-      toX(x - (box.left + box.width / 2));
-      toY(y - (box.top + box.height / 2));
+      toX(gsap.utils.clamp(area.left + halfW, area.right - halfW, cursor.x) - centreX);
+      toY(gsap.utils.clamp(area.top + halfH, area.bottom - halfH, cursor.y) - centreY);
     };
-    on(showreel, "mouseenter", (event) => {
-      showreel.classList.add("is-following");
-      follow(event);
-    });
-    on(showreel, "mousemove", follow);
-    on(showreel, "mouseleave", () => {
-      showreel.classList.remove("is-following");
-      toX(0);
-      toY(0);
+    on(window, "pointermove", (event) => {
+      if (event.pointerType !== "mouse") return;
+      cursor.x = event.clientX;
+      cursor.y = event.clientY;
+      place();
+    }, { passive: true });
+    on(window, "scroll", place, { passive: true });
+    on(document, "pointerout", (event) => {
+      if (event.relatedTarget) return;
+      cursor.x = -1;
+      cursor.y = -1;
+      place();
     });
   });
 
