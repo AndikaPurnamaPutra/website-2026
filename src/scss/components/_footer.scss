@@ -34,7 +34,9 @@
 .site-footer__coin {
   position: absolute;
   top: fluid(-125);
-  left: fluid(354);
+  // 15px right of Figma's 354 (user decision): the 3D coin there reads further
+  // left than the Figma picture, whose logo sits higher and to the right.
+  left: fluid(369);
   width: fluid(366);
   height: fluid(344);
   max-width: none;

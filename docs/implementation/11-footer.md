@@ -75,3 +75,7 @@ Atas permintaan pengguna, koin berada di **belakang** section Motto: bagian atas
   - **Perbaikan:** patokan rentangnya sekarang akhir `main`, bukan footer itu sendiri. Posisi footer sudah termasuk geserannya, sehingga rentang dimulai terlalu awal dan footer ikut bergerak bersama halaman di sebagian besar rentang. Masalah ini juga ada di versi 25%.
 - Terukur di homepage, Contact, dan Privacy Policy (1440 × 900): logo footer tetap di y 377 pada 100% / 75% / 50% / 25% / 0% sisa jarak, tanpa exception. Koin footer tetap tampil (opacity 1).
 - **Tidak diam penuh** (koreksi pengguna): footer bergerak naik **setengah kecepatan scroll**, sama seperti sstr.tech (`y` dari −50% tinggi footer ke 0, rentang dan patokan tetap). Terukur di homepage dan Contact: logo footer naik 659 → 377 (282px) selama 563px scroll terakhir (50%), tanpa exception.
+
+## Koin footer 15px ke kanan (30 Okt 2026, keputusan pengguna)
+- Terukur: tepi koin 3D di footer sama dengan foto Figma (kiri 405 vs 406, bawah 215 = 215). Tapi karena koin terus berputar pelan pada mukanya, logo "///" berada di sudut lain dan koin terasa lebih ke kiri (pusat berat visual 519 vs 535).
+- Pilihan pengguna B: kotak koin digeser 15px ke kanan (`left: fluid(369)`, Figma 354). Koin 3D dan gambar cadangannya ikut.
