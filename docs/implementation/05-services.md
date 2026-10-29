@@ -198,3 +198,18 @@ Semua versi berikut dicoba lalu dibatalkan oleh pengguna. Batasnya tetap langsun
 - Masukan pengguna: snap terasa "tertahan". Penyebabnya, setelah scroll berhenti browser butuh ±0,3 detik untuk mendeteksinya, lalu halaman ditarik ke langkah terdekat, dan satu gerakan scroll hanya memindahkan satu langkah.
 - Snap dihapus dari What we do dan Motto. Scrub 0,8 detik. Setiap langkah tetap selebar satu layar scroll, tapi dibagi: transisi (panjang 1) + **zona diam** `REST = 0.6` (setengah sebelum transisi pertama, setengah setelah transisi terakhir), sehingga ±40% setiap langkah menahan tampilan langkah itu walaupun scroll berjalan. Posisi timeline dipetakan dengan `stepTime()`. Label `stepN` ada di tengah zona diam (`restTime()`), dan dipakai untuk menjaga langkah saat resize.
 - Terukur di 1440 (posisi dalam layar sejak pin): scroll tetap di tempat (tanpa tarikan). Langkah 0 diam di 0–0,2; kartu berpindah di 0,35–0,65; langkah 1 diam di 0,8–1,1. Layar penuh: 4,5 di tengah, selesai di 4,9.
+
+## Masuk ke pin dengan halus (29 Okt 2026, permintaan pengguna)
+- **Masalah:** section datang dengan kecepatan scroll penuh lalu langsung berhenti saat pin dimulai di `top top`, sehingga terasa tidak seamless.
+- **Sekarang:**
+  - Pin dimulai saat atas section masih 15% layar di bawah atas layar (`top top+=15%`).
+  - Selama 0,3 layar scroll berikutnya, section meluncur naik ke atas sambil melambat. Posisinya mengikuti `−15% × (1 − (1 − t)²)` lewat CSS `translate` dan terikat langsung ke scroll (ScrollTrigger tanpa scrub), sehingga kecepatannya turun dari kecepatan halaman ke 0.
+  - Langkah-langkah kartu dimulai setelah itu (`entryTime` ditambahkan ke `stepTime`/`restTime`), dan pin lebih panjang 0,3 layar.
+  - `translate` dihapus selama ScrollTrigger mengukur (`refreshInit`), supaya pin diukur dari layout.
+- **Terukur** (kecepatan section dibanding scroll, roda mouse): 1,0 → 0,91 → 0,75 → 0,59 → 0,39 → 0,15 → 0, lalu diam di atas.
+- Screenshot langkah 0, langkah di tengah, layar penuh, dan sesudah dilepas sesuai. Refresh di tengah halaman: tanpa exception, dan `translate` tetap −135px.
+- **Keluar juga halus** (permintaan pengguna, sama seperti Motto):
+  - Di 0,4 layar terakhir pin, section naik makin cepat (−0,2 layar × t²), sehingga kecepatannya mencapai kecepatan halaman saat dilepas.
+  - Terukur: 0 → 0,06 → 0,28 → 0,47 → 0,70 → 0,90 → 1,0, lalu tetap 1.
+  - Karena section berakhir 0,35 layar (15% + 20%) lebih tinggi dari tempatnya di layout, section berikutnya (Our Work) ditarik naik sebesar itu (`margin-top`, diatur saat ScrollTrigger mengukur). Jaraknya tetap seperti Figma.
+  - Terukur: setelah dilepas, bawah Services = atas Our Work (jarak 0, sama dengan sebelum perubahan). Selama keluar, celahnya menyempit 38 → 0px dan tertutup latar putih. Refresh di bawah section: tanpa exception.

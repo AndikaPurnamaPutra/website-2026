@@ -37,10 +37,21 @@ export function initServicesScroll() {
   // is easy to stop on. Transitions keep a length of 1; REST is added between
   // them (half before the first, half after the last), ≈40% of each step.
   const REST = 0.6;
-  const stepTime = (n) => n * (1 + REST) + REST / 2;
-  const restTime = (k) => (k === 0 ? REST / 4 : k === steps ? steps * (1 + REST) - REST / 4 : k * (1 + REST));
+  // The entry: the pin starts with the section ENTRY of a screen below the
+  // top, and over the next 2 × ENTRY of scrolling it glides up into place,
+  // slowing from the page's speed to a stop (user: arriving at the pin
+  // stopped it dead, not seamless). The steps come after that stretch.
+  const ENTRY = 0.15; // of the screen height
+  const entryTime = 2 * ENTRY * (1 + REST); // timeline time of the entry
+  // The exit, the same the other way (as in Motto): over the last EXIT of a
+  // screen of the pin the section rises faster and faster, by half that
+  // distance, so it already moves with the page when it is released.
+  const EXIT = 0.4; // of the screen height
+  const stepTime = (n) => entryTime + n * (1 + REST) + REST / 2;
+  const restTime = (k) => entryTime + (k === 0 ? REST / 4 : k === steps ? steps * (1 + REST) - REST / 4 : k * (1 + REST));
 
   section.classList.add("is-enhanced");
+  const cleanups = [];
 
   const activeTop = (active) => (active === 0 ? FIRST_TOP : LATER_TOP);
 
@@ -118,8 +129,8 @@ export function initServicesScroll() {
       onUpdate: drawClips,
       scrollTrigger: {
         trigger: section,
-        start: "top top",
-        end: () => `+=${window.innerHeight * steps}`,
+        start: () => `top top+=${ENTRY * window.innerHeight}`,
+        end: () => `+=${window.innerHeight * (steps + 2 * ENTRY + EXIT)}`,
         pin: true,
         scrub: reduceMotion ? true : 0.8,
         invalidateOnRefresh: true,
@@ -128,6 +139,60 @@ export function initServicesScroll() {
         },
       },
     });
+
+    // The entry glide and the exit, tied straight to the scroll (no scrub
+    // delay): the section rises by ENTRY of a screen easing out (its speed
+    // falls from the page's to 0), and at the end by half of EXIT easing in
+    // (from 0 up to the page's speed). CSS translate, apart from the pin's own
+    // styles; cleared while ScrollTrigger measures, so the pin is measured
+    // from the layout.
+    if (!reduceMotion) {
+      let entered = 0;
+      let leaving = 0;
+      const place = () => {
+        const height = window.innerHeight;
+        const y = -ENTRY * height * (1 - (1 - entered) ** 2) - 0.5 * EXIT * height * leaving ** 2;
+        section.style.translate = `0 ${y}px`;
+      };
+      const glide = (self) => {
+        entered = self.progress;
+        place();
+      };
+      const leave = (self) => {
+        leaving = self.progress;
+        place();
+      };
+      const entry = ScrollTrigger.create({
+        start: () => timeline.scrollTrigger.start,
+        end: () => timeline.scrollTrigger.start + 2 * ENTRY * window.innerHeight,
+        onUpdate: glide,
+        onRefresh: glide,
+      });
+      const exit = ScrollTrigger.create({
+        start: () => timeline.scrollTrigger.end - EXIT * window.innerHeight,
+        end: () => timeline.scrollTrigger.end,
+        onUpdate: leave,
+        onRefresh: leave,
+      });
+      // The section ends up higher than its place in the layout (the entry and
+      // the exit), so the next section is pulled up by as much: the space
+      // between them stays as in Figma. Set while ScrollTrigger measures.
+      const next = () => section.parentElement?.nextElementSibling;
+      const resetGlide = () => {
+        section.style.translate = "";
+        const below = next();
+        if (below) below.style.marginTop = `${-(ENTRY + 0.5 * EXIT) * window.innerHeight}px`;
+      };
+      resetGlide();
+      ScrollTrigger.addEventListener("refreshInit", resetGlide);
+      cleanups.push(() => {
+        ScrollTrigger.removeEventListener("refreshInit", resetGlide);
+        entry.kill();
+        exit.kill();
+        section.style.translate = "";
+        next()?.style.removeProperty("margin-top");
+      });
+    }
 
     // From 2px before the pin (step 0 sits right at its start) until it ends,
     // a 2px dark edge above the section (_services.scss) covers the sub-pixel seam
@@ -179,8 +244,8 @@ export function initServicesScroll() {
       stepTime(steps - 1),
     );
     timeline.addLabel("fullscreen", restTime(steps));
-    // The last rest zone runs to the end of the pin.
-    timeline.to({}, { duration: REST / 2 }, stepTime(steps - 1) + 1);
+    // The last rest zone runs to the end of the pin, the exit included.
+    timeline.to({}, { duration: REST / 2 + EXIT * (1 + REST) }, stepTime(steps - 1) + 1);
   }, section);
 
   const refresh = () => ScrollTrigger.refresh();
@@ -191,6 +256,7 @@ export function initServicesScroll() {
 
   return () => {
     window.removeEventListener("load", refresh);
+    cleanups.forEach((cleanup) => cleanup());
     ctx.revert();
     cards.forEach((card) => card.style.removeProperty("clip-path"));
     section.classList.remove("is-enhanced");
