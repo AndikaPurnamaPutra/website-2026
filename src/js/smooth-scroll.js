@@ -10,6 +10,24 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 // Off with reduced motion and on touch screens (native scrolling there).
 let lenis = null;
 
+// Other modules can take over wheel events (e.g. Motto: one swipe moves at
+// most one step). A filter returning false swallows the event: Lenis ignores
+// it and the browser does not scroll either.
+const wheelFilters = new Set();
+export function addWheelFilter(filter) {
+  wheelFilters.add(filter);
+  return () => wheelFilters.delete(filter);
+}
+const virtualScroll = (data) => {
+  for (const filter of wheelFilters) {
+    if (filter(data) === false) {
+      if (data.event.cancelable) data.event.preventDefault();
+      return false;
+    }
+  }
+  return true;
+};
+
 export function initSmoothScroll() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return () => {};
 
@@ -18,7 +36,7 @@ export function initSmoothScroll() {
   // 0.6 felt too heavy): one wheel tick moves a sixth less and glides a
   // touch longer, so the scroll-tied animations are easier to follow
   // without scrolling in small steps.
-  lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 0.75 });
+  lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 0.75, virtualScroll });
   // For checking in the browser console: window.lenis.
   window.lenis = lenis;
   lenis.on("scroll", ScrollTrigger.update);

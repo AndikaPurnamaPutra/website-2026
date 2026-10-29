@@ -265,3 +265,51 @@ Masuk meluncur ke pin, langkah yang lebih panjang dengan batas kecepatan, zona d
   - Terukur (sudut putar per 10px scroll, flip kalimat 1 → 2): maksimal **13,3° → 4,7°**, dan rentang scroll flip **410 → 640px**.
   - Screenshot langkah, keluar, scroll balik, dan reload: benar, tanpa exception.
 - **Highlight kalimat 3 menunggu lebih lama** (masukan pengguna: terasa langsung muncul): terukur, jarak flip → highlight sama untuk kalimat 2 dan 3 (±600px). Tapi langkah kalimat 3 juga membawa label baru, latar diagonal, dan CTA. Highlight kalimat 3 sekarang dimulai di akhir langkahnya (`delay` 0,85, sebelumnya 0,5).
+
+## Satu proses kira-kira satu gerakan scroll (30 Okt 2026, permintaan pengguna)
+- Pengguna: perubahan tidak boleh langsung beruntun, baik saat maju maupun mundur, dan setiap proses terasa ±1 gerakan scroll (tanpa dikunci).
+- Timeline sekarang dihitung dalam layar scroll:
+  - Zona tenang `DWELL` 0,22 layar (±200px) sebelum dan sesudah setiap perubahan.
+  - Flip `FLIP` 0,38 layar (±340px).
+  - Highlight dipicu di satu titik (berjalan dengan waktunya sendiri).
+  - Sebelum highlight kalimat 3 jedanya 0,35 layar (ada label baru, latar diagonal, dan CTA).
+  - Lalu tahan 0,3 layar dan keluar 0,4 layar.
+- **Hysteresis:** highlight yang sudah berjalan baru mundur setelah scroll naik 0,1 layar (±90px) melewati titiknya, sehingga scroll naik sedikit tidak langsung membatalkannya.
+- Label langkah (`step0`–`step5`) ada di titik-titik tenang, untuk menjaga langkah saat resize.
+- **Terukur** (1440 × 900, posisi dari awal pin, dicek setiap 30px):
+  - **Maju:** kalimat 1 → highlight di 210 → tenang → flip 420–720 → kalimat 2 → highlight di 960 → tenang → flip 1170–1470 → kalimat 3 + CTA → highlight di 1800 → tahan ±260px → keluar.
+  - **Mundur:** highlight 3 hilang di 1680 (120px di atas titik majunya) → flip 1440–1260 → highlight 2 hilang di 840 → flip 690–390 → highlight 1 hilang di 90.
+  - Reload di tengah, lalu scroll ke atas: benar, tanpa exception.
+- **Flip menunggu highlight** (laporan pengguna: highlight belum selesai sudah flip, dan sebaliknya):
+  - Timeline tidak lagi di-scrub oleh ScrollTrigger. Pin hanya menentukan tujuan, dan ticker menggerakkan timeline ke sana dengan halus (`FOLLOW` 3/detik, setara scrub ±1,2 detik).
+  - Selama gelombang highlight masih berjalan, timeline tidak masuk ke flip sesudahnya. Selama highlight masih mundur, timeline tidak mundur ke flip sebelumnya. Setelah itu timeline menyusul.
+  - Titik flip di sekitar setiap highlight disimpan di `toGradient(i, at, before, after)`.
+  - Terukur dengan scroll cepat (0,4 detik):
+    - Maju: highlight 1 selesai di 870 ms, flip mulai di 954 ms.
+    - Mundur dari kalimat 2 ber-highlight: highlight hilang di 589 ms, flip mundur mulai di 1089 ms.
+- **Rem per usapan** (laporan pengguna: satu usapan trackpad langsung sampai flip; pilihan A):
+  - Lewat `addWheelFilter()` di `smooth-scroll.js` (opsi `virtualScroll` Lenis). Setiap usapan baru (jeda > 180 ms, arah berbalik, atau kekuatan naik lagi setelah melemah) mendapat batas: titik tenang berikutnya ke arah usapan (`calm`, toleransi 24px).
+  - Usapan bergerak bebas sampai batas itu, berhenti lembut di sana (`lenis.scrollTo`), dan sisa momentumnya dibuang. Tidak ada luncuran otomatis.
+  - Dimulai dari 0,6 layar sebelum pin. Setelah titik tenang terakhir, scroll bebas ke footer. Keyboard dan layar sentuh tetap scroll biasa.
+  - **Terukur** (usapan trackpad simulasi, sedang dan kencang 3×):
+    - Maju: satu usapan = satu titik (91 → 293 highlight 1 → 837 kalimat 2 → 1035 highlight 2 → 1634 kalimat 3 → 1890 highlight 3).
+    - Mundur: satu usapan = satu titik (1633 → 1038 → 837).
+    - Dari titik terakhir, satu usapan lanjut ke footer.
+    - Roda diputar cepat (12 putaran dalam satu gerakan): berhenti di titik tenang berikutnya.
+    - Reload tanpa exception.
+  - **Rem hanya setelah highlight** (pengguna: perlu 2 usapan per kalimat): titik rem sekarang hanya kalimat 1, 2, dan 3 yang sudah ber-highlight. Satu usapan = flip + highlight satu kalimat. Jeda sebelum dan sesudah highlight tetap ada.
+  - **Magnet setelah usapan** (pengguna: usapan sedang belum sampai ke kalimat berikutnya; pilihan A). Terukur: usapan sedang ±350px, sedangkan jarak antarkalimat ber-highlight ±740px.
+    - Bila roda diam 200 ms dan halaman berhenti di antara dua kalimat (di area rem), halaman meluncur 0,6 detik (ease-out cubic) ke kalimat ber-highlight berikutnya, searah usapan terakhir.
+    - **Terukur:**
+      - Maju: usapan sedang → kalimat 1 (297), usapan ringan → kalimat 2 (1035), usapan sedang → kalimat 3 (1890), usapan kencang → bebas ke footer.
+      - Satu putaran roda dari kalimat 1 → kalimat 2.
+      - Mundur dari area tahan: 1890 → 1035 → 297 → keluar ke atas.
+      - Reload tanpa exception.
+  - **Flip dan highlight terpisah lagi** (pengguna: jangan digabung): rem dan magnet kembali di semua titik tenang. Satu usapan = satu perubahan (flip atau highlight).
+    - **Perbaikan:**
+      - Magnet tidak lagi bekerja bila usapan sudah direm tepat di titik tenang (`onCalm`). Sebelumnya usapan kencang yang berhenti di kalimat 2 polos ikut dilanjutkan ke highlight-nya.
+      - Usapan ke atas dari footer direm mulai 0,6 layar di bawah titik tenang terakhir.
+    - **Terukur** (usapan sedang, ringan, dan kencang bergantian):
+      - Maju: 99 kalimat 1 → 297 highlight 1 → 837 kalimat 2 → 1033 highlight 2 → 1634 kalimat 3 → 1890 highlight 3 → bebas.
+      - Mundur: 2243 → 1897 → 1634 (highlight 3 hilang) → 1035 (kalimat 2).
+      - Satu usapan = satu perubahan di semua kasus. Reload tanpa exception.
