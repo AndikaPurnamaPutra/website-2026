@@ -10,7 +10,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 // its own clock (user decisions), and plays backwards when scrolled back
 // above that point:
 // - icon: its ring is drawn, the solid dot pops up on it in the middle, then
-//   the two split apart along an arc to their Figma places;
+//   the two split apart in a straight line to their Figma places;
 // - folder: its pocket opens from the middle, then the folder rises out of
 //   it and settles with a small bounce.
 // Without JS or with reduced motion the text stays black and the icon and
@@ -106,7 +106,6 @@ export function initStatementInk() {
 
 // The icon's timeline (Figma 1523:3270): ring centred at (21, 31), dot at
 // (45, 21); together they start in the middle of the box, (33, 26).
-const ORBIT = (120 * Math.PI) / 180; // how far they turn round the middle while splitting
 
 function createIcon(svg) {
   if (!svg) return null;
@@ -126,13 +125,10 @@ function createIcon(svg) {
   const state = { draw: 0, pop: 0, apart: 0 };
   const apply = () => {
     ringPath.style.strokeDashoffset = length * (1 - state.draw);
-    // Apart along an arc: the offset grows while it turns back to its place.
-    const angle = (1 - state.apart) * ORBIT;
-    const cos = Math.cos(angle);
-    const sin = Math.sin(angle);
+    // Apart in a straight line, no turning (user decision).
     parts.forEach((part) => {
-      const x = (part.x * cos - part.y * sin) * state.apart;
-      const y = (part.x * sin + part.y * cos) * state.apart;
+      const x = part.x * state.apart;
+      const y = part.y * state.apart;
       // SVG transforms set directly: GSAP's svgOrigin shifts x/y to keep
       // the element in place, which added up over the frames.
       part.el.setAttribute("transform", `translate(${x - part.x} ${y - part.y})${part.extra()}`);
@@ -143,9 +139,10 @@ function createIcon(svg) {
 
   const timeline = gsap.timeline({ paused: true, onUpdate: apply });
   timeline
-    .to(state, { draw: 1, duration: 0.7, ease: "power2.inOut" }, 0)
-    .to(state, { pop: 1, duration: 0.45, ease: "back.out(1.6)" }, 0.55)
-    .to(state, { apart: 1, duration: 0.75, ease: "power3.inOut" }, 0.95);
+    // Slower than first made (user decision): about 2.7s in all.
+    .to(state, { draw: 1, duration: 1.1, ease: "power2.inOut" }, 0)
+    .to(state, { pop: 1, duration: 0.7, ease: "back.out(1.4)" }, 0.85)
+    .to(state, { apart: 1, duration: 1.1, ease: "power3.inOut" }, 1.6);
 
   return {
     play: () => timeline.play(),
@@ -177,13 +174,14 @@ function createFolder(folder) {
     .fromTo(
       pocket,
       { scaleX: 0.3, autoAlpha: 0 },
-      { scaleX: 1, autoAlpha: 1, duration: 0.45, ease: "power3.out", transformOrigin: "50% 50%" },
+      { scaleX: 1, autoAlpha: 1, duration: 0.7, ease: "power3.out", transformOrigin: "50% 50%" },
       0,
     )
     // 55% of the 120px image: its top (6px above the crop) starts below the
     // pocket's opening, so nothing shows before it rises.
-    .fromTo(images, { yPercent: 55 }, { yPercent: 0, duration: 0.85, ease: "back.out(1.4)" }, 0.25)
-    .fromTo(top, { clipPath: "inset(0% 0% 20% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.85, ease: "power2.out" }, 0.25);
+    // Paced like the icon (user decision): about 1.75s in all.
+    .fromTo(images, { yPercent: 55 }, { yPercent: 0, duration: 1.3, ease: "back.out(1.2)" }, 0.45)
+    .fromTo(top, { clipPath: "inset(0% 0% 20% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.3, ease: "power2.out" }, 0.45);
 
   return {
     play: () => timeline.play(),

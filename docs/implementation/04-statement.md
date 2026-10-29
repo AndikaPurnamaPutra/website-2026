@@ -189,3 +189,9 @@ Varian terang tombol (untuk section Motto) dibuat saat section Motto dikerjakan,
   - Sesudah: saku opacity 1, `inset(0%)`, tanpa transform.
   - Scroll balik: kembali ke kondisi awal.
 - **Kertas di dalam folder** (dicoba 28 Okt 2026, dibatalkan pengguna): `folder.png` sempat dipecah menjadi lapisan kertas dan badan folder, supaya kertas terdorong naik sesaat. Dikembalikan ke satu gambar seperti sebelumnya.
+- **Ikon lebih lambat, membelah lurus** (29 Okt 2026, permintaan pengguna):
+  - Orbit 120° dihapus: kedua bagian langsung berpisah dalam garis lurus ke posisi Figma.
+  - Waktu: garis 1,1 detik; solid mulai 0,85 detik (0,7 detik, `back.out(1.4)`); membelah 1,6–2,7 detik (`power3.inOut`). Total ±2,7 detik (sebelumnya ±1,7).
+  - Terukur (setiap ±0,28 detik): garis 129 → 118 → 53 → 5 → 0, lalu membelah `translate(12 −5)` → (10,6 −4,4) → (2,3 −1,0) → 0. Rasio x/y tetap, jadi gerakannya lurus.
+- Dicoba lalu dibatalkan (29 Okt 2026): pemicu ikon di 85% layar dengan tahapan bertumpuk (2,25 / 3,15 / 4,5 detik). Pengguna memilih versi ±2,7 detik di atas.
+- **Folder diselaraskan dengan ikon** (29 Okt 2026): saku 0,45 → 0,7 detik; folder naik 0,85 → 1,3 detik, mulai 0,45 detik, `back.out(1.2)` (sebelumnya 1.4). Total ±1,75 detik (sebelumnya ±1,1).
