@@ -14,14 +14,9 @@
   isolation: isolate;
 }
 
-// Pinned by JS: the section fills the viewport height. While it glides into
-// the pin it is shifted up by --motto-entry (src/js/motto-scroll.js); it is
-// that much taller (the content stays centred in the screen above it), so its
-// own backdrop still reaches the bottom of the screen; JS takes the extra
-// height back from the page on the pin spacer (negative margin).
+// Pinned by JS: the section fills the viewport height.
 .motto.is-enhanced {
-  height: calc(100vh + var(--motto-entry, 0px));
-  padding-bottom: var(--motto-entry, 0px);
+  height: 100vh;
 }
 
 // Section background; JS fades it in at the end of the light → dark change of
@@ -59,10 +54,6 @@
   // Keeps the sticky texture (pulled out of the flow with a negative margin)
   // inside the wrapper; clip, unlike hidden, does not break position: sticky.
   overflow: clip;
-  // Its own layout box, so the Motto pin spacer's negative bottom margin
-  // (src/js/motto-scroll.js) shortens the wrapper instead of passing through
-  // it (margin collapse) and leaving a strip of the wrapper under Motto.
-  display: flow-root;
 }
 
 // Sticks to the screen for the whole wrapper (height 100vh, pulled out of the
@@ -89,17 +80,18 @@
   display: none;
 }
 
-// With the JS entry, Motto starts 350px higher, over Milestone's bottom padding
-// (user decision), so motto 1 arrives sooner after the Milestone text. The
-// overlap is not visible: Motto's background is transparent until Milestone
-// has faded out. The pinned Motto frame itself is unchanged.
+// Motto starts 200px higher, over Milestone's bottom padding (its 200px of
+// empty space), so no large blank area is left below the Milestone text
+// (user). It was 350px, and the hand-over began before Milestone was fully on
+// screen (user: no chance to read it); it now starts once Milestone has been
+// fully in view for a while (src/js/motto-scroll.js). The overlap is not
+// visible: Motto's background is transparent until Milestone has faded out.
+// Milestone stays above Motto, so its text can be selected and clicked; only
+// its content takes the pointer.
 .tone-shift.is-toned .milestone {
-  // Above the (still transparent) Motto it overlaps, so the Milestone text can
-  // be selected and clicked; only its content takes the pointer, and once it
-  // has faded out (hidden) the pointer reaches Motto again.
   position: relative;
   z-index: 1;
-  margin-bottom: fluid(-350);
+  margin-bottom: fluid(-200);
   pointer-events: none;
 }
 
