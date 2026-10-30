@@ -13,6 +13,7 @@ import { initMarquees } from "./marquee.js";
 import { initMilestoneCounter } from "./milestone-counter.js";
 import { initMottoScroll } from "./motto-scroll.js";
 import { initHeader } from "./header.js";
+import { initWorkMenu } from "./work-menu.js";
 import { initFooterForm } from "./footer-form.js";
 import { initFooterReveal } from "./footer-reveal.js";
 import { initSmoothScroll } from "./smooth-scroll.js";
@@ -41,6 +42,7 @@ function initPage() {
   cleanups.push(initInviewVideos());
   // After the services pin so its pin spacer can be measured.
   cleanups.push(initHeader());
+  cleanups.push(initWorkMenu());
   cleanups.push(initFooterForm());
   cleanups.push(initFooterReveal());
   cleanups.push(initBackLink());

@@ -1,5 +1,14 @@
-//- Work dropdown is a placeholder: there is no dropdown design in Figma yet.
-- var workCategories = ["Branding", "UI/UX", "Illustration", "2D/3D", "Graphic Design"]
+//- Work mega menu (Figma "Dropdown - Expand" 1596:442; src/js/work-menu.js).
+//- Links are placeholders until the work pages exist. Card set 1 uses the
+//- Figma pictures, sets 2-4 the Our Work pictures (user decision).
+-
+  var workCategories = [["Case Study", 28], ["Live Development", 20], ["Design Showcase", 28]]
+  var workSets = [
+    ["menu/project-1.jpg", "menu/project-2.jpg", "menu/project-3.jpg"],
+    ["work/wellmo.jpg", "work/papersky.jpg", "work/chainlytics.jpg"],
+    ["work/nexadash.jpg", "work/symata.jpg", "work/kidoo.jpg"],
+    ["work/seafood-sambal.jpg", "work/beyond-boundaries.jpg", "work/wellmo-2.jpg"]
+  ]
 //- "Career" replaced by "Contact" (user decision).
 - var navLinks = [["About", "#"], ["Team", "#"], ["Services", "#"], ["Contact", "contact.html"]]
 
@@ -9,14 +18,31 @@ header.site-header(data-header)
       img(src="assets/images/logo.svg" width="50.25" height="24" alt="")
     nav(aria-label="Main")
       ul.site-nav
-        li.site-nav__item.site-nav__item--dropdown
-          a.site-nav__link(href="#" aria-haspopup="true")
+        li.site-nav__item.site-nav__item--work(data-work-menu)
+          a.site-nav__link(href="#" aria-expanded="false" aria-controls="work-menu")
             | Work
             img(src="assets/icons/chevron-down.svg" width="16" height="16" alt="")
-          ul.site-nav__dropdown
-            each category in workCategories
-              li
-                a.site-nav__dropdown-link(href="#")= category
+          .work-menu#work-menu
+            .work-menu__brand
+              p.work-menu__title Digital#[br]Expertise
+              p.work-menu__copy ©2026  /  One Week Wonders Studio
+            ul.work-menu__links
+              each category in workCategories
+                li
+                  a.work-menu__link(href="#")
+                    span= category[0]
+                    span.work-menu__count= category[1]
+            .work-menu__featured
+              .work-menu__sets
+                each set, k in workSets
+                  .work-menu__set(class=k === 0 ? "is-active" : null aria-hidden=k === 0 ? null : "true")
+                    each image in set
+                      a.work-menu__card(href="#" tabindex=k === 0 ? null : "-1")
+                        img(src=`assets/images/${image}` alt="" loading="lazy")
+                        span.work-menu__badge New
+              .work-menu__dots(role="tablist" aria-label="Featured projects")
+                each set, k in workSets
+                  button.work-menu__dot(type="button" role="tab" aria-selected=k === 0 ? "true" : "false" aria-label=`Projects ${k + 1}`)
         each link in navLinks
           li.site-nav__item
             a.site-nav__link(href=link[1])= link[0]

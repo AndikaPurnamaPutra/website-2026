@@ -55,7 +55,8 @@
 @media (prefers-reduced-motion: reduce) {
   .site-header,
   .site-header__logo img,
-  .site-nav__link img {
+  .site-nav__link img,
+  .site-nav__item--work .site-nav__link img {
     transition: none;
   }
 }
@@ -130,49 +131,202 @@ main {
   }
 }
 
-// Placeholder dropdown (no Figma design yet), built from existing tokens.
-.site-nav__dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  z-index: 10;
-  min-width: 180px;
-  margin-top: 8px;
-  padding: 8px;
-  // Stays dark text on white, also when the header uses the light theme.
-  color: var(--color-ink);
-  background: var(--color-white);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  opacity: 0;
-  visibility: hidden;
+// Work mega menu (Figma "Dropdown - Expand" 1596:442): under the menu bar
+// (y 90 in Figma, 18px below the 72px bar), as wide as the page content.
+// Opened by src/js/work-menu.js (hover, click, keyboard). Stays dark on
+// white, also over the dark sections. Text sizes follow the type scale, the
+// columns and cards the layout scale.
+.site-header__inner {
+  position: relative;
+}
 
-  // Keeps hover alive while the pointer crosses the gap above the panel.
-  &::before {
-    content: "";
-    position: absolute;
-    inset: -8px 0 100%;
+// The panel is placed against the menu bar, not the Work item.
+.site-nav__item--work {
+  position: static;
+
+  // The chevron turns up while the menu is open (user decision).
+  .site-nav__link img {
+    transition:
+      transform 0.3s cubic-bezier(0.33, 1, 0.68, 1),
+      filter 0.4s ease-out;
+  }
+
+  &.is-open .site-nav__link img {
+    transform: rotate(180deg);
   }
 }
 
-.site-nav__item--dropdown:hover .site-nav__dropdown,
-.site-nav__item--dropdown:focus-within .site-nav__dropdown {
-  opacity: 1;
-  visibility: visible;
+.work-menu {
+  position: absolute;
+  top: calc(100% + 42px);
+  right: var(--page-gutter);
+  left: var(--page-gutter);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  color: var(--color-ink);
+  background: var(--color-white);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  visibility: hidden;
+  opacity: 0;
+
+  // Keeps the hover while the pointer crosses the gap above the panel.
+  &::before {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 100%;
+    left: 0;
+    height: 42px;
+  }
 }
 
-.site-nav__dropdown-link {
-  display: block;
-  padding: 8px;
-  font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 0.875rem;
-  line-height: normal;
+.work-menu__brand {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-self: stretch;
+  width: fs(203);
+  margin-right: fluid(125);
+}
+
+.work-menu__title {
+  font-family: var(--font-display);
+  font-size: fs(24);
+  line-height: 1.2;
   letter-spacing: -0.02em;
-  border-radius: var(--radius-sm);
+}
+
+.work-menu__copy {
+  font-size: fs(12);
+  line-height: 1;
+  white-space: pre;
+}
+
+.work-menu__links {
+  display: flex;
+  flex-direction: column;
+  gap: fs(17);
+  align-self: flex-start;
+  margin-right: auto;
+}
+
+.work-menu__link {
+  display: flex;
+  align-items: center;
+  gap: fs(8);
+  font-weight: 500;
+  font-size: fs(14);
+  line-height: normal;
+  transition: opacity 0.3s ease-out;
 
   &:hover,
   &:focus-visible {
-    background: var(--color-surface-muted);
+    opacity: 0.5;
+  }
+}
+
+.work-menu__count {
+  padding: fs(4) fs(10);
+  font-size: fs(10);
+  line-height: normal;
+  background: var(--color-surface-muted);
+  border-radius: 4px;
+}
+
+.work-menu__featured {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+// The sets lie on top of one another; the active one shows.
+.work-menu__sets {
+  display: grid;
+}
+
+.work-menu__set {
+  display: flex;
+  gap: fluid(16);
+  grid-area: 1 / 1;
+  visibility: hidden;
+  opacity: 0;
+
+  // inherit (not visible): the active set must hide with the closed panel,
+  // or its invisible cards still caught the pointer and opened the menu.
+  &.is-active {
+    visibility: inherit;
+    opacity: 1;
+  }
+}
+
+.work-menu__card {
+  position: relative;
+  width: fluid(210);
+  height: fluid(160);
+  overflow: hidden;
+  background: #e8e8e8;
+  border-radius: 4px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  // Dark fade at the top (Figma "Card Header", 43px).
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1;
+    height: fluid(43);
+    background: linear-gradient(#000, rgba(0, 0, 0, 0));
+  }
+
+  &:hover img,
+  &:focus-visible img {
+    transform: scale(1.04);
+  }
+}
+
+.work-menu__badge {
+  position: absolute;
+  top: fluid(12);
+  left: fluid(12);
+  z-index: 2;
+  padding: fs(4) fs(10);
+  font-weight: 500;
+  font-size: fs(8);
+  line-height: normal;
+  background: var(--color-surface-muted);
+  border-radius: var(--radius-pill);
+}
+
+.work-menu__dots {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.work-menu__dot {
+  width: 6px;
+  height: 6px;
+  background: #d9d9d9;
+  border-radius: 4px;
+  opacity: 0.5;
+  transition:
+    background-color 0.3s ease-out,
+    opacity 0.3s ease-out;
+
+  &[aria-selected="true"] {
+    background: var(--color-ink);
+    opacity: 1;
   }
 }
