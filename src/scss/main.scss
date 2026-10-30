@@ -6,6 +6,7 @@
 
 @use "components/header";
 @use "components/cta-button";
+@use "components/glass-button";
 @use "components/work-carousel";
 @use "components/divider";
 @use "components/footer";
@@ -23,3 +24,4 @@
 
 @use "pages/policy";
 @use "pages/contact";
+@use "pages/about";

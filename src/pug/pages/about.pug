@@ -1,0 +1,175 @@
+extends ../layouts/default
+
+//- Figma: "About" 1734:317 (docs/implementation/19-about.md). Built section
+//- by section: Intro, Principles, Gallery, Team.
+block title
+  | About — OWW
+
+block content
+  .about
+    section.about-intro
+      .container
+        h1.about-intro__title.text-heading-42 We Are the Team We Wished#[br]We Could Hire.
+        img.about-intro__photo(src="assets/images/about/team.jpg" width="1360" height="560" alt="The One Week Wonders team together outdoors")
+        .about-intro__body
+          .about-intro__text
+            p.about-intro__lead One Week Wonders is a fast-moving creative team built to eliminate the long meetings and endless alignment meeting that keep great ideas grounded.
+            p.about-intro__note We work right alongside you, turning months of traditional planning into focused, one-week design sprints that deliver high-end websites, sharp visuals, and digital products ready for the real world.
+          //- Calendly comes later (as on Contact); Contact for now.
+          .about-intro__cta
+            a.button.text-18(href="contact.html") Schedule a call
+            p.about-intro__cta-caption Free 15min call
+
+    //- Principles (Figma 1734:383 and "Principles - 1…6" 1678:615 – 1678:660).
+    //- Texts 03–06 are still copies of 01 in Figma, and illustrations 2–6
+    //- are Figma's temporary screenshots (user decision) until the real
+    //- ones exist.
+    -
+      var execution = ["Execution Over Overhead", ["We replace long discovery phases and heavy layers with high-velocity weekly sprints.", "We focus entirely on shipping production-ready work."]]
+      var principles = [
+        execution,
+        ["Frictionless Infrastructure", ["We work inside your ecosystem using Figma, Webflow, and ClickUp. Every file, layer, and component is organized, clean, and immediately ready for your development team."]],
+        execution, execution, execution, execution
+      ]
+
+    //- Board parts and their place in "P-1.3" (Figma 1785:3145), in Figma
+    //- pixels inside the window; src/js/principles-scroll.js plays the
+    //- Motion-01 storyboard from them. B is the card being moved.
+    -
+      var cards = { a: [9, 63], b: [148.35, 109.5], c: [9, 209], d: [145, 63], e: [283, 63], f: [283, 136] }
+      var adds = { 1: [9, 282], 2: [145, 136], 3: [283, 209] }
+
+    mixin cardContent(lit)
+      span.p-board__avatar
+        img(src=`assets/images/about/principles/${lit ? "avatar-lit" : "avatar"}.svg` width="14" height="14" alt="")
+        if lit
+          img.p-board__check(src="assets/images/about/principles/check.svg" width="14" height="14" alt="")
+      span.p-board__bars
+        span.p-board__bar
+        span.p-board__bar.p-board__bar--short
+      span.p-board__tags
+        span.p-board__tag
+        span.p-board__tag
+        span.p-board__tag
+        span.p-board__tag.p-board__tag--end
+
+    section.principles(data-principles data-header-theme="dark")
+      .container.principles__inner
+        .principles__text
+          p.principles__intro Hundreds of products later, we’ve cut the noise. Here are the core principles we design by.
+          .principles__detail
+            ol.principles__numbers
+              each principle, i in principles
+                li
+                  button.principles__number(type="button" class=i === 0 ? "is-active" : null)= String(i + 1).padStart(2, "0")
+            .principles__items
+              each principle, i in principles
+                .principles__item(class=i === 0 ? "is-active" : null)
+                  h2.principles__title (#{principle[0]})
+                  p.principles__description
+                    each line, k in principle[1]
+                      if k
+                        br
+                      = line
+        .principles__figures
+          //- 01: the board, built in HTML so it can move. 1em = one Figma pixel.
+          .principles__figure.p-board.is-active(aria-hidden="true" data-board)
+            img.p-board__glow(src="assets/images/about/principles/glow.svg" width="779" height="1607" alt="")
+            .p-board__window
+              .p-board__bar-top
+                span.p-board__lights
+                  span.p-board__light.p-board__light--red
+                  span.p-board__light.p-board__light--yellow
+                  span.p-board__light.p-board__light--green
+                span.p-board__actions
+                  span.p-board__button
+                    span.p-board__button-label Impot/Export
+                    img(src="assets/images/about/principles/caret.svg" width="8" height="8" alt="")
+                  span.p-board__button.p-board__button--icon
+                    img(src="assets/images/about/principles/dots.svg" width="8" height="8" alt="")
+              img.p-board__line(src="assets/images/about/principles/hline.svg" width="410" height="1" alt="")
+              img.p-board__divider(src="assets/images/about/principles/vline1.svg" width="284" height="1" alt="" style="--x: 136")
+              img.p-board__divider(src="assets/images/about/principles/vline1.svg" width="284" height="1" alt="" style="--x: 271.84")
+              span.p-board__slot
+              each pos, key in adds
+                span.p-board__add(data-add=key style=`--x: ${pos[0]}; --y: ${pos[1]}`)
+                  img(src="assets/images/about/principles/plus.svg" width="8" height="8" alt="")
+              each pos, key in cards
+                span.p-board__card(data-card=key class=key === "b" ? "is-lit" : null style=`--x: ${pos[0]}; --y: ${pos[1]}`)
+                  +cardContent(false)
+                  span.p-board__card-lit
+                    img.p-board__card-glow(src="assets/images/about/principles/cardglow.svg" width="279" height="94" alt="")
+                    +cardContent(true)
+              span.p-board__progress
+                span.p-board__progress-fill
+              span.p-board__percent 40%
+            img.p-board__cursor(src="assets/images/about/principles/cursor.svg" width="27" height="27" alt="")
+          each n in [2, 3, 4, 5, 6]
+            img.principles__figure(src=`assets/images/about/principle-${n}.jpg` width="670" height="420" alt="")
+
+    //- Gallery (Figma 1734:399): five photos placed freely, [x, y, width,
+    //- height] in Figma pixels. "Play Video" is only a label for now (user
+    //- decision: the video comes later).
+    -
+      var photos = [
+        ["gallery-1.jpg", [0, 0, 1130, 636], "The team together in a field below a mountain"],
+        ["gallery-2.jpg", [900, 715.63, 460, 589], "Two team members walking along a garden path"],
+        ["gallery-3.jpg", [0, 988, 805, 411], "Two designers working side by side at a computer"],
+        ["gallery-4.jpg", [0, 1479, 345, 325], "A desk with screens and collectible figures"],
+        ["gallery-5.jpg", [440, 1650, 920, 478], "The team working together on their laptops"]
+      ]
+    section.about-gallery
+      .container
+        .about-gallery__photos
+          each photo, i in photos
+            figure.about-gallery__photo(style=`--x: ${photo[1][0]}; --y: ${photo[1][1]}; --w: ${photo[1][2]}; --h: ${photo[1][3]}`)
+              img(src=`assets/images/about/${photo[0]}` width=photo[1][2] height=photo[1][3] alt=photo[2] loading="lazy")
+              if i === 0
+                span.about-gallery__play.glass-button
+                  span.text-14.text-medium Play Video
+                  img(src="assets/icons/play.svg" width="16" height="16" alt="")
+
+    //- Team (Figma 1734:409). Names and roles as in Figma.
+    -
+      var team = [
+        ["Abi Sa'iidil Mubarok Makhzum", "Video & Motion"],
+        ["Adianto Dwi Utomo", "Lead Developer"],
+        ["Aji Wahyu Izza Novany", "Mid. Developer"],
+        ["Andika Bagas Pratama", "Mid. UIX Designer"],
+        ["Andika Purnama Putra", "Mid. Developer"],
+        ["Anggiat Manuel", "Senior UIX Designer"],
+        ["Anindya Hastari", "Jr. Graphic Designer"],
+        ["Brian Kusuma", "Mid. Developer"],
+        ["Carryl Amalia Putri", "Mid. Illustrator"],
+        ["Dhefry Andirezha", "Lead Illustrator"],
+        ["Dhimas Luqman Hakim", "Project Manager"],
+        ["Dominica Atma Swasti", "Project Manager"],
+        ["Esti Kurniawati", "Mid. Illustrator"],
+        ["Fadhila Rizky Husaini", "Lead UIX Designer"],
+        ["Fajrin Arrahman Bilqisti", "Lead Graphic Designer"],
+        ["Iz Fatimah Asy Syarifah", "Lead Project Manager"],
+        ["Kevin Merico Setiawan", "Mid. UIX Designer"],
+        ["Mirna Kusumawati", "Mid. UIX Designer"],
+        ["Mohammad Ariq Maulana Ibrahim", "Mid. UIX Designer"],
+        ["Muhammad Faiz Abdillah", "Jr. UIX Designer"],
+        ["Muhammad Irfan Afianto", "Lead UIX Designer"],
+        ["Muhammad Izza Recka Putra", "Mid. UIX Designer"],
+        ["Muhammad Khoer Alhabsyi", "Jr. UIX Desiger"],
+        ["Muhammad Ridwan Imam Fajar", "Senior UIX Designer"],
+        ["Nur Vatoni", "Mid. Brand Designer"],
+        ["Putri Monirizki", "Mid. Illustrator"],
+        ["Rifqi Dhia Rahmatullah", "Mid. Illustrator"],
+        ["Rizva Bahrum Isnandi", "3D Animator Designer"],
+        ["Royhan Muhammad Khawarizmi", "Senior UIX Designer"],
+        ["Sigit Setyo Nugroho", "Lead 3D Motion Designer"],
+        ["Tosan Ahmad Garditama", "Senior UIX Designer"],
+        ["Umar Aji Pratama", "Lead UIX Designer"]
+      ]
+    section.about-team
+      .container
+        p.about-team__lead The Engine only works because of the specialists behind the wheel. We don’t pass projects off to interns or hide behind account managers. Everyone assigned to your sprint is an active builder.
+        ul.about-team__list
+          each member in team
+            li.about-team__member
+              span= member[0]
+              span= member[1]
