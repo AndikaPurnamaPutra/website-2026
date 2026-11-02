@@ -1,5 +1,5 @@
 // Preloader v2 (docs/implementation/20-preloader.md; src/js/preloader.js). A
-// black layer over the whole page, above the header, with the logo in the
+// white layer over the whole page, above the header, with the logo in the
 // middle and "2026" below; it lifts off the top of the screen. Only while
 // <html> has is-preloading (set in <head> when JS runs without reduced
 // motion), so without JS the page shows at once.
@@ -16,7 +16,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #000; // Figma 1880:663
+  background: var(--color-white); // white with a dark logo (user; Figma: black)
 }
 
 // Figma 1880:663: 122 × 58.
@@ -37,13 +37,13 @@
 
 .preloader__outline path {
   fill: none;
-  stroke: var(--color-white);
+  stroke: var(--color-ink);
   stroke-width: 1;
   vector-effect: non-scaling-stroke;
 }
 
 .preloader__solid {
-  fill: var(--color-white);
+  fill: var(--color-ink);
   opacity: 0;
 }
 
@@ -54,7 +54,7 @@
   bottom: var(--page-gutter);
   left: 50%;
   overflow: clip;
-  color: var(--color-white);
+  color: var(--color-ink);
   translate: -50% 0;
 
   span {

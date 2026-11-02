@@ -9,10 +9,11 @@ gsap.registerPlugin(DrawSVGPlugin);
 
 // Preloader v2 (docs/implementation/20-preloader.md; Figma 1860:244 →
 // 1880:663 → 1880:803 → 1880:759 → 1880:836), on the homepage:
-// 1. black, with the logo in the middle drawn as an outline as the page loads
-//    (at least MIN_DRAW seconds, so it never just flashes), then filled,
+// 1. white (Figma: black; user), with the logo in the middle drawn as an
+//    outline as the page loads (at least MIN_DRAW seconds, so it never just
+//    flashes), then filled,
 // 2. "2026" rises into view below it,
-// 3. the black layer lifts off the top of the screen, uncovering the hero;
+// 3. the layer lifts off the top of the screen, uncovering the hero;
 //    "preloader:reveal" is sent on document as it starts, so the hero text
 //    rises (src/js/hero-intro.js). The coin shows lower than its place,
 //    The navbar comes down from the top as the curtain leaves it,
