@@ -90,14 +90,26 @@ export function mountCoin(anchors, fallback) {
   // first shows, and a late HDRI recompiles in the middle of it.
   let hdriIn = false;
   let modelIn = false;
+  // With the preloader the coin is already in its place when the page shows
+  // (pushed up with the showreel, src/js/preloader.js), so it skips its
+  // entrance.
+  const skipEntrance = document.documentElement.classList.contains("is-preloading");
+  let compiled = false;
+  const start = () => {
+    if (!compiled || readyAt !== null) return;
+    // The clock starts on the next frame, after the heavy compile one.
+    requestAnimationFrame(() => {
+      readyAt = performance.now() - (skipEntrance ? INTRO * 1000 : 0);
+    });
+  };
   const whenBothIn = () => {
     if (!hdriIn || !modelIn) return;
     renderer.compile(scene, camera);
     renderer.render(scene, camera);
-    // The clock starts on the next frame, after this heavy one.
-    requestAnimationFrame(() => {
-      readyAt = performance.now();
-    });
+    compiled = true;
+    start();
+    // The preloader waits for it (src/js/preloader.js).
+    document.dispatchEvent(new CustomEvent("coin:ready"));
   };
   new RGBELoader().load(
     "assets/models/white-studio-1k.hdr",

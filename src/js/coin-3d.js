@@ -10,7 +10,11 @@ export function initCoin3d() {
   const pictures = Object.values(anchors).filter(Boolean);
   if (!pictures.length || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return () => {};
 
-  const fallback = () => pictures.forEach((picture) => picture.classList.add("is-fallback"));
+  // The pictures instead; the preloader stops waiting for the coin.
+  const fallback = () => {
+    pictures.forEach((picture) => picture.classList.add("is-fallback"));
+    document.dispatchEvent(new CustomEvent("coin:ready"));
+  };
   let cleanup = () => {};
   let cancelled = false;
   const load = () =>

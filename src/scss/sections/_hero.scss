@@ -46,6 +46,31 @@
   min-width: 0;
 }
 
+// One block per line, in the headline and the description
+// (src/js/hero-intro.js raises them after the preloader). They clip only while
+// rising, so descenders stay whole afterwards.
+.hero__line {
+  display: block;
+}
+
+.hero__line-text {
+  display: inline-block;
+}
+
+.hero-intro-mask {
+  overflow: clip;
+}
+
+// The headline's lines are tighter than its letters (line-height 1.1), so
+// the window of each line reaches below it, without moving anything, to keep
+// descenders whole while they rise (user report: cut-off "g"). Downwards
+// only: a top margin too would merge with the line above's and leave the
+// headline taller until the windows go (user report: a jump).
+.hero__line.hero-intro-mask {
+  padding-bottom: 0.25em;
+  margin-bottom: -0.25em;
+}
+
 // Buttons and icons follow the type scale (max 1.2×), not the layout scale,
 // so they stay modest on large screens (user decision); Figma size at 1440.
 .hero__social {

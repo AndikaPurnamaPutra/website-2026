@@ -1,0 +1,25 @@
+//- Preloader v2 (docs/implementation/20-preloader.md; Figma 1860:244 →
+//- 1880:663 → 1880:803 → 1880:759 → 1880:836): black, with the logo in the
+//- middle and "2026" below; it lifts off the page. The logo is drawn twice:
+//- an outline that follows the loading, then a solid fill.
+//- src/js/preloader.js plays it; shown only while <html> has is-preloading
+//- (set in <head>).
+-
+  var logoPaths = [
+    "M22.5123 44.8469C34.9456 44.8469 45.0245 34.8078 45.0245 22.4235C45.0245 10.0393 34.9456 0 22.5123 0C10.0791 0 0 10.0393 0 22.4235C0 34.8078 10.0791 44.8469 22.5123 44.8469Z",
+    "M113.317 0L70.2802 74.2393V74.3679C66.3234 81.1526 60.6471 86.7827 53.8189 90.6956C46.9911 94.6083 39.2513 96.666 31.3741 96.6629H22.4672L35.3755 74.2393L65.5041 22.4492C69.4497 15.6264 75.1301 9.95925 81.9736 6.0183C88.8174 2.07731 96.5824 0.00156903 104.487 0H113.317Z",
+    "M158.723 0L145.738 22.4492L115.687 74.2393V74.3679C111.73 81.1526 106.054 86.7827 99.2257 90.6956C92.3978 94.6083 84.6581 96.666 76.7806 96.6629H67.874L80.7822 74.2393L111.014 22.4492C114.951 15.6415 120.615 9.98406 127.439 6.04397C134.263 2.1039 142.007 0.0196092 149.894 0H158.723Z",
+    "M204.114 0L191.051 22.4492L161.078 74.2393V74.3679C157.121 81.1526 151.445 86.7827 144.617 90.6956C137.789 94.6083 130.049 96.666 122.172 96.6629H113.265L126.173 74.2393L156.302 22.4492C160.247 15.6264 165.928 9.95925 172.771 6.0183C179.615 2.07731 187.38 0.00156903 195.285 0H204.114Z"
+  ]
+
+.preloader(aria-hidden="true" data-preloader)
+  svg.preloader__logo(viewBox="0 0 206 98" fill="none")
+    g.preloader__outline
+      each d in logoPaths
+        path(d=d)
+    g.preloader__solid
+      each d in logoPaths
+        path(d=d)
+  //- In a window, so it can rise into view.
+  p.preloader__year.text-14.text-medium
+    span 2026

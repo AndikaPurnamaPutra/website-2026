@@ -3,7 +3,8 @@ import { createGradientWave } from "./gradient-wave.js";
 
 // Hero headline accent "Elite digital" (reference from the user: the
 // highlight on manual.studio). Black at rest like the rest of the headline; a
-// brand-gradient wave runs through it shortly after load, again when the
+// brand-gradient wave runs through it shortly after load (after the preloader,
+// once the headline has risen: "hero:introduced"), again when the
 // pointer enters the headline and each time it moves onto the other word;
 // waves follow one another (src/js/gradient-wave.js).
 const LOAD_DELAY = 0.8;
@@ -14,7 +15,11 @@ export function initHeroHighlight() {
   if (!accent || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return () => {};
 
   const wave = createGradientWave(accent, "linear-gradient(201deg, var(--gradient-brand-stops))");
-  const onLoad = gsap.delayedCall(LOAD_DELAY, wave.play);
+  const preloading = document.documentElement.classList.contains("is-preloading");
+  const onLoad = gsap.delayedCall(LOAD_DELAY, wave.play).pause();
+  const afterIntro = () => onLoad.restart(true);
+  if (preloading) document.addEventListener("hero:introduced", afterIntro, { once: true });
+  else onLoad.play();
   // A new wave when the pointer comes onto the headline and again each time
   // it moves onto the other word of the accent, so moving across "Elite
   // digital" sends one wave after another (as on manual.studio; user).
@@ -34,6 +39,7 @@ export function initHeroHighlight() {
 
   return () => {
     onLoad.kill();
+    document.removeEventListener("hero:introduced", afterIntro);
     title.removeEventListener("mouseenter", onEnter);
     accent.removeEventListener("mousemove", onMove);
     wave.destroy();
