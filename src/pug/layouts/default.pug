@@ -12,9 +12,14 @@ html(lang="en")
         | OWW
     //- Marks JS as available before the first paint, so styles for the JS
     //- versions (e.g. the Motto lights, hidden until their step) apply at once.
-    script document.documentElement.classList.add("js");
+    script.
+      document.documentElement.classList.add("js");
+    //- The preloader, on the homepage only (user): the page fills both blocks
+    //- (src/pug/pages/index.pug).
+    block preloader-start
     link(rel="stylesheet" href="css/main.css")
   body
+    block preloader
     block header
       include ../partials/header
     main

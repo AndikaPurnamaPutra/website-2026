@@ -1,5 +1,15 @@
 extends ../layouts/default
 
+//- The preloader plays on the homepage only (user). is-preloading shows it
+//- from the first paint (not with reduced motion); src/js/preloader.js
+//- removes it when done.
+block preloader-start
+  script.
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("is-preloading");
+
+block preloader
+  include ../partials/preloader
+
 block title
   | Home — OWW
 

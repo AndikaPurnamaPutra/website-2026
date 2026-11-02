@@ -1,6 +1,8 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import barba from "@barba/core";
+import { initPreloader } from "./preloader.js";
+import { initHeroIntro } from "./hero-intro.js";
 import { initHeroClock } from "./hero-clock.js";
 import { initHeroHighlight } from "./hero-highlight.js";
 import { initHeroShowreel } from "./hero-showreel.js";
@@ -30,6 +32,9 @@ let cleanups = [];
 function initPage() {
   // Initialize page-specific animations here.
   cleanups.push(initSmoothScroll());
+  // After the smooth scroll, which it holds while it plays.
+  cleanups.push(initPreloader());
+  cleanups.push(initHeroIntro());
   cleanups.push(initHeroClock());
   cleanups.push(initHeroHighlight());
   cleanups.push(initHeroShowreel());

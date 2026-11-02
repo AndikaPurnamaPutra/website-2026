@@ -46,6 +46,21 @@
   min-width: 0;
 }
 
+// One block per line, in the headline and the description
+// (src/js/hero-intro.js raises them after the preloader). They clip only while
+// rising, so descenders stay whole afterwards.
+.hero__line {
+  display: block;
+}
+
+.hero__line-text {
+  display: inline-block;
+}
+
+.hero-intro-mask {
+  overflow: clip;
+}
+
 // Buttons and icons follow the type scale (max 1.2×), not the layout scale,
 // so they stay modest on large screens (user decision); Figma size at 1440.
 .hero__social {

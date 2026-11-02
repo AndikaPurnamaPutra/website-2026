@@ -4,13 +4,19 @@ section.hero
 
     .hero__content
       .hero__intro
+        //- One span per line (Figma's lines, here and in the description), so
+        //- src/js/hero-intro.js can raise them one by one after the preloader.
         h1.hero__title.text-display-80
-          //- Black at rest (user decision); src/js/hero-highlight.js runs a
-          //- brand-gradient wave through it on load and on hover.
-          span.hero__title-accent Elite digital
-          |  products
-          br
-          | designed at venture speed
+          span.hero__line
+            span.hero__line-text
+              //- Black at rest (user decision); src/js/hero-highlight.js runs
+              //- a brand-gradient wave through it on load and on hover.
+              span.hero__title-accent Elite digital
+              |  products
+          span.hero__line
+            span.hero__line-text designed at venture
+          span.hero__line
+            span.hero__line-text speed
         ul.hero__social
           li
             a.hero__social-link.hero__social-link--behance(href="https://www.behance.net" target="_blank" rel="noopener" aria-label="Behance")
@@ -23,9 +29,12 @@ section.hero
 
       .hero__info
         p.hero__description.text-14.text-medium
-          | Strategy, visual systems, branding,
-          br
-          | and high-end web design. We define your identity and support your growth at every touchpoint.
+          span.hero__line
+            span.hero__line-text Strategy, visual systems, branding,
+          span.hero__line
+            span.hero__line-text and high-end web design. We define your identity
+          span.hero__line
+            span.hero__line-text and support your growth at every touchpoint.
         .hero__datetime
           p.hero__date.text-14.text-medium(data-hero-date) Wednesday, October 14
           .hero__timezone

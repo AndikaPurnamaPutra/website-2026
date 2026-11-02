@@ -1,0 +1,55 @@
+// Preloader (docs/implementation/20-preloader.md, revision 5; src/js/
+// preloader.js). A black box over the whole page, above the header, with the
+// logo in the middle; it comes down and shrinks onto the hero showreel, which
+// it then fades into. Only while <html> has is-preloading (set in <head> when
+// JS runs without reduced motion), so without JS the page shows at once.
+@use "../abstracts/functions" as *;
+
+.preloader {
+  display: none;
+}
+
+// Its edges are moved by the script (top, right, bottom, left, corners); the
+// showreel's video is moved in while it comes down.
+.is-preloading .preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #000; // Figma 1876:533
+}
+
+.preloader__veil {
+  position: absolute;
+  inset: 0;
+  background: inherit;
+}
+
+// The showreel's play button shows once its video is back.
+.is-preloading .hero__showreel-button {
+  opacity: 0;
+}
+
+// Figma 1860:244: 166 × 79, centred in the box.
+.preloader__logo {
+  position: relative; // above the veil
+  display: block;
+  width: fluid(166);
+  height: auto;
+  overflow: visible;
+}
+
+.preloader__outline path {
+  fill: none;
+  stroke: var(--color-white);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.preloader__solid {
+  fill: var(--color-white);
+  opacity: 0;
+}
