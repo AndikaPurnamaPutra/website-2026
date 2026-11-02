@@ -179,3 +179,6 @@ Figma: 1860:244 → 1880:663 → 1880:803 → 1880:759 → 1880:836. Hitam #000,
 - **Koin hanya fade (pengguna, 2 Nov 2026):** efek membesar dihapus; koin cukup memudar masuk (1,1 dtk `power3.out`) sesaat setelah tirai naik.
 - **Fade koin terlihat (pengguna: "fade belum terlihat", 2 Nov 2026):** fade sebelumnya hampir selesai di balik tirai (tirai membuka dari bawah ke atas, koin baru terbuka ±0,6 dtk setelah tirai naik, dan fade-nya cepat di depan). Sekarang fade mulai 0,55 dtk setelah tirai naik, saat koin sudah terbuka, selama 1,2 dtk dengan `sine.inOut` yang rata.
 - **Warna terbalik (pengguna, 2 Nov 2026):** latar preloader putih, logo dan "2026" hitam (#111, warna teks situs). Figma memakai latar hitam.
+- **Logo dan "2026" menghilang (pengguna, 2 Nov 2026):** seperti preloader "One Week · Wonders Studio" sebelumnya. "2026" naik dan turun huruf per huruf (SplitText), dan logo memipih ke garis tengah (`scaleY` 0, 0,5 dtk `power3.in`) sebelum tirai naik. Tirai naik 2 dtk setelah logo terisi (sebelumnya 1,25).
+- **Logo turun, tanpa memipih (pengguna, 2 Nov 2026):** logo dibungkus jendela (`.preloader__mark`) dan turun hilang ke bawah (0,55 dtk `power2.in`) bersama huruf "2026".
+- **Koin setelah showreel (pengguna, 2 Nov 2026):** fade koin mulai 0,35 dtk setelah showreel mulai naik, yaitu saat showreel sudah terlihat di bawah layar.

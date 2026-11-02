@@ -19,6 +19,12 @@
   background: var(--color-white); // white with a dark logo (user; Figma: black)
 }
 
+// The logo's window: it drops out of view through its bottom
+// (src/js/preloader.js).
+.preloader__mark {
+  overflow: clip;
+}
+
 // Figma 1880:663: 122 × 58.
 .preloader__logo {
   display: block;
