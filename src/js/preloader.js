@@ -45,9 +45,9 @@ const HEADER = 1.2; // s, the navbar down to its place
 const COIN_EDGE = (208 + 0.47 * 420) / 420;
 const HANG_GAP = 40; // Figma px from the coin to the bottom of the screen
 const COIN_WAIT = 6; // s at most for the 3D coin
-// The coin fades in once the showreel has come into view (user), slowly and
+// The coin fades in once the showreel is in its place (user), slowly and
 // evenly so it is seen.
-const COIN_AT = PUSH_AT + 0.35; // s into the lift
+const COIN_AT = PUSH_AT + PUSH; // s into the lift
 const COIN_IN = 1.2; // s
 const SCROLL_KEYS = new Set(["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "]);
 

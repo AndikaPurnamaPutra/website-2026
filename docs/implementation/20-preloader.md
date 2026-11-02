@@ -182,3 +182,4 @@ Figma: 1860:244 → 1880:663 → 1880:803 → 1880:759 → 1880:836. Hitam #000,
 - **Logo dan "2026" menghilang (pengguna, 2 Nov 2026):** seperti preloader "One Week · Wonders Studio" sebelumnya. "2026" naik dan turun huruf per huruf (SplitText), dan logo memipih ke garis tengah (`scaleY` 0, 0,5 dtk `power3.in`) sebelum tirai naik. Tirai naik 2 dtk setelah logo terisi (sebelumnya 1,25).
 - **Logo turun, tanpa memipih (pengguna, 2 Nov 2026):** logo dibungkus jendela (`.preloader__mark`) dan turun hilang ke bawah (0,55 dtk `power2.in`) bersama huruf "2026".
 - **Koin setelah showreel (pengguna, 2 Nov 2026):** fade koin mulai 0,35 dtk setelah showreel mulai naik, yaitu saat showreel sudah terlihat di bawah layar.
+- **Koin setelah showreel selesai (pengguna, 2 Nov 2026):** fade koin mulai saat showreel sampai di tempatnya (1,2 dtk). Dorongan showreel tidak lagi terlihat, karena koin belum tampak selama didorong.
