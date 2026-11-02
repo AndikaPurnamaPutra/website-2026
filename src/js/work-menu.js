@@ -22,7 +22,6 @@ export function initWorkMenu() {
   const sets = [...panel.querySelectorAll(".work-menu__set")];
   const dots = [...panel.querySelectorAll(".work-menu__dot")];
   const featured = panel.querySelector(".work-menu__featured");
-  const header = item.closest("[data-header]");
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const events = new AbortController();
   const on = (target, type, handler) => target.addEventListener(type, handler, { signal: events.signal });
@@ -134,19 +133,13 @@ export function initWorkMenu() {
     if (event.relatedTarget && !item.contains(event.relatedTarget)) setOpen(false);
   });
 
-  // Closed when the menu bar hides, and when the page is scrolled on (the bar
-  // stays while a header link has keyboard focus).
-  const watch = new MutationObserver(() => {
-    if (header.classList.contains("is-hidden")) setOpen(false);
-  });
-  if (header) watch.observe(header, { attributes: true, attributeFilter: ["class"] });
+  // Closed when the page is scrolled on.
   on(window, "scroll", () => {
     if (open && Math.abs(window.scrollY - openedAt) > 40) setOpen(false);
   });
 
   return () => {
     events.abort();
-    watch.disconnect();
     clearTimeout(timer);
     clearTimeout(closeTimer);
     animation?.kill();

@@ -1,6 +1,7 @@
-// Figma: Menu Bar 1611:6986. Fixed solid white bar (dark over dark sections,
-// see src/js/header.js), always visible, same
-// height at the top and while scrolling (24px padding → 72px). Logo, text and
+// Figma: Menu Bar 1611:6986. Fixed bar, same height at the top and while
+// scrolling (24px padding → 72px). Transparent, without Figma's white
+// background and shadow, as on leoparpeix.com and jasminegunarto.com (user
+// decision): only the logo and links float over the page. Logo, text and
 // paddings keep Figma's pixel size at every viewport width (not fluid); only
 // the side edges follow the page content (.container).
 @use "../abstracts/functions" as *;
@@ -12,50 +13,40 @@
   left: 0;
   z-index: 100;
   padding-block: 24px;
-  color: var(--color-ink);
-  background: var(--color-white);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0);
-  // Hides and comes back as one block, slower than before (was 0.4s with a
-  // steep ease-out that covered most of the way in 0.2s: user decision).
-  transition:
-    transform 0.8s cubic-bezier(0.33, 1, 0.68, 1),
-    box-shadow 0.4s ease-out,
-    background-color 0.4s ease-out,
-    color 0.4s ease-out;
+  // Inverts whatever lies behind it, as on leoparpeix.com (user decision):
+  // white logo and links, blended by difference, read dark on white, light
+  // on dark and in opposite colours over pictures.
+  color: var(--color-white);
+  mix-blend-mode: difference;
 
-  // 1px extra so no hairline stays at a fractional height (browser zoom).
-  &.is-hidden {
-    transform: translateY(calc(-100% - 1px));
+  // The Work panel is inside the bar and would be inverted too, so while it
+  // is open the bar is drawn normally: dark, and white over the dark sections
+  // (src/js/header.js).
+  &:has(.site-nav__item--work.is-open) {
+    color: var(--color-ink);
+    mix-blend-mode: normal;
   }
 
-  // Figma shadow, only once the page has left the top. Not while hidden: the
-  // shadow falls below the bar and would stay at the top of the screen.
-  &.is-scrolled:not(.is-hidden) {
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-  }
-
-  // Dark version over What we do and Motto (not in Figma, approved proposal).
-  &.is-dark {
+  &.is-dark:has(.site-nav__item--work.is-open) {
     color: var(--color-white);
-    background: var(--color-ink);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0);
-  }
-
-  &.is-dark .site-header__logo img,
-  &.is-dark .site-nav__link img {
-    filter: brightness(0) invert(1);
   }
 }
 
+// The icons are dark pictures, made white like the text.
 .site-header__logo img,
+.site-header__back img,
 .site-nav__link img {
-  transition: filter 0.4s ease-out;
+  filter: brightness(0) invert(1);
+}
+
+.site-header:has(.site-nav__item--work.is-open):not(.is-dark) {
+  .site-header__logo img,
+  .site-nav__link img {
+    filter: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .site-header,
-  .site-header__logo img,
-  .site-nav__link img,
   .site-nav__item--work .site-nav__link img {
     transition: none;
   }
@@ -146,9 +137,7 @@ main {
 
   // The chevron turns up while the menu is open (user decision).
   .site-nav__link img {
-    transition:
-      transform 0.3s cubic-bezier(0.33, 1, 0.68, 1),
-      filter 0.4s ease-out;
+    transition: transform 0.3s cubic-bezier(0.33, 1, 0.68, 1);
   }
 
   &.is-open .site-nav__link img {
