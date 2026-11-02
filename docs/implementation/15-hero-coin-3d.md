@@ -27,6 +27,7 @@ Pengguna memberikan skrip Three.js mandiri (`~/Downloads/web-coin/main.js` denga
 - **three.js dimuat terpisah:** `hero-coin-3d.js` hanya pemuat (setelah event `load`, `import()`), dan adegan ada di `hero-coin-scene.js`. esbuild memakai `outdir` + `splitting: true` (`gulpfile.js`). `main.js` 1,7 MB → **254 KB** (+ chunk bersama 105 KB). Adegan 3D 1,35 MB dimuat setelah halaman siap.
 - **Total yang dimuat:** sebelumnya ±19,4 MB sekaligus. Sekarang ±360 KB JS di awal, lalu ±3,5 MB untuk koin 3D setelah halaman siap (terukur: JS adegan, HDR, dan GLB mulai di ±345–390 ms, setelah `load` di 352 ms).
 - Kualitas: ukuran dan posisi tetap (tinggi 399px, pusat 878, 580 di 1440; scroll 300 sama dengan sebelumnya). Visual WebP 1024 setara dengan PNG 2048 di ukuran tampil.
+- **Model baru (2 Nov 2026):** `Oww-Pin.glb` dari pengguna (versi terakhir, 17 tekstur, node baru `Circle_Inner-2`) menggantikan model lama, dikompres dengan perintah yang sama: 13,13 MB → **1,33 MB**. Node `Coin-Rot_1/2` tetap ada.
 
 ## Catatan
 - Opsional: `minify: true` di esbuild akan memperkecil lagi (three.js ±1,35 MB → ±0,6 MB). Belum diaktifkan karena mengubah build untuk seluruh JS.
