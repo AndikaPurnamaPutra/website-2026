@@ -16,13 +16,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-white); // white with a dark logo (user; Figma: black)
-}
-
-// The logo's window: it drops out of view through its bottom
-// (src/js/preloader.js).
-.preloader__mark {
-  overflow: clip;
+  background: var(--color-surface-muted); // #f6f6f6, with a dark logo (user; Figma: black)
 }
 
 // Figma 1880:663: 122 × 58.

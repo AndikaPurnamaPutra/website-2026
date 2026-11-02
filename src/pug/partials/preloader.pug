@@ -14,15 +14,13 @@
   ]
 
 .preloader(aria-hidden="true" data-preloader)
-  //- In a window, so it can drop out of view like the year.
-  .preloader__mark
-    svg.preloader__logo(viewBox="0 0 206 98" fill="none")
-      g.preloader__outline
-        each d in logoPaths
-          path(d=d)
-      g.preloader__solid
-        each d in logoPaths
-          path(d=d)
+  svg.preloader__logo(viewBox="0 0 206 98" fill="none")
+    g.preloader__outline
+      each d in logoPaths
+        path(d=d)
+    g.preloader__solid
+      each d in logoPaths
+        path(d=d)
   //- In a window, so it can rise into view.
   p.preloader__year.text-14.text-medium
     span 2026

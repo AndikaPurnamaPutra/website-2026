@@ -14,8 +14,8 @@ gsap.registerPlugin(DrawSVGPlugin, SplitText);
 //    outline as the page loads (at least MIN_DRAW seconds, so it never just
 //    flashes), then filled,
 // 2. "2026" rises into view below it, letter by letter,
-// 3. both go as in the earlier "One Week · Wonders Studio" preloader (user):
-//    the letters drop away one by one, and the logo drops away too,
+// 3. as the curtain starts up, both fade out and blur away, as motto 1 blurs
+//    in (src/js/motto-scroll.js, reversed; user),
 // 4. the layer lifts off the top of the screen, uncovering the hero;
 //    "preloader:reveal" is sent on document as it starts, so the hero text
 //    rises (src/js/hero-intro.js). The coin shows lower than its place,
@@ -40,6 +40,10 @@ const PUSH = 1.6; // s, the showreel up to its place
 const PUSH_AT = 0.35; // s into the lift, the showreel right behind the curtain (user: no delay)
 const HEADER_AT = 1.15; // s into the lift, as the curtain leaves the top
 const HEADER = 1.2; // s, the navbar down to its place
+// The logo and the year blur away as the curtain starts up: motto 1's blur in
+// (src/js/motto-scroll.js: autoAlpha, 12 Figma px, blur 6px), reversed.
+const BLUR_OUT = { autoAlpha: 0, filter: "blur(6px)", duration: 0.6, ease: "power2.in" };
+const BLUR_SHIFT = 12; // Figma px, up with the curtain
 // The coin's lower edge in its picture box (448 × 420: centre at 208, edge
 // 0.47 × 420 below it, as in src/js/coin-scene.js).
 const COIN_EDGE = (208 + 0.47 * 420) / 420;
@@ -159,15 +163,15 @@ export function initPreloader() {
 
   const intro = gsap
     .timeline({ paused: true, onComplete: finish })
-    // Outline → solid, then the year, a breath with both, and both go.
+    // Outline → solid, then the year, and a breath with both.
     .to(solid, { opacity: 1, duration: 0.6, ease: "power2.out" })
     .to(preloader.querySelector(".preloader__outline"), { opacity: 0, duration: 0.6, ease: "power2.out" }, "<")
     .to(split.chars, { yPercent: 0, duration: 0.8, stagger: 0.05, ease: SHOW }, 0.35)
-    .to(split.chars, { yPercent: 110, duration: 0.5, stagger: 0.03, ease: "power2.in" }, 1.45)
-    .to(logo, { yPercent: 110, duration: 0.55, ease: "power2.in" }, 1.5)
     // The curtain lifts off the screen.
-    .addLabel("lift", 2)
+    .addLabel("lift", 1.5)
     .add(() => document.dispatchEvent(new CustomEvent("preloader:reveal")), "lift")
+    // On the year's box: its window would cut the blur.
+    .to([logo, year.parentElement], { ...BLUR_OUT, y: () => -BLUR_SHIFT * designPx() }, "lift")
     .to(preloader, { yPercent: -100, duration: LIFT, ease: MOVE }, "lift")
     .to(coinMotion, { fade: 1, duration: COIN_IN, ease: "sine.inOut" }, `lift+=${COIN_AT}`)
     .to(coin, { opacity: 1, duration: COIN_IN, ease: "sine.inOut" }, "<")
@@ -181,7 +185,7 @@ export function initPreloader() {
   function finish() {
     root.classList.remove("is-preloading");
     split.revert();
-    gsap.set([preloader, logo, header, showreel, coin].filter(Boolean), { clearProps: "transform,opacity" });
+    gsap.set([preloader, logo, year.parentElement, header, showreel, coin].filter(Boolean), { clearProps: "transform,opacity,visibility,filter" });
     coinMotion.fade = 1;
     // The scroll animations were measured with the showreel still pushed
     // down.

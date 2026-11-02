@@ -183,3 +183,5 @@ Figma: 1860:244 → 1880:663 → 1880:803 → 1880:759 → 1880:836. Hitam #000,
 - **Logo turun, tanpa memipih (pengguna, 2 Nov 2026):** logo dibungkus jendela (`.preloader__mark`) dan turun hilang ke bawah (0,55 dtk `power2.in`) bersama huruf "2026".
 - **Koin setelah showreel (pengguna, 2 Nov 2026):** fade koin mulai 0,35 dtk setelah showreel mulai naik, yaitu saat showreel sudah terlihat di bawah layar.
 - **Koin setelah showreel selesai (pengguna, 2 Nov 2026):** fade koin mulai saat showreel sampai di tempatnya (1,2 dtk). Dorongan showreel tidak lagi terlihat, karena koin belum tampak selama didorong.
+- **Latar #f6f6f6 (pengguna, 2 Nov 2026):** latar preloader diganti dari putih ke #f6f6f6 (token `--color-surface-muted`), setelah sempat dicoba #fcfcfc.
+- **Logo dan "2026" memudar dengan blur (pengguna, 2 Nov 2026):** tidak lagi turun. Saat tirai mulai naik, keduanya memudar, menjadi blur 6px, dan bergeser 12px ke atas (0,6 dtk `power2.in`), kebalikan dari motto 1 yang muncul dengan blur di section Motto. Tirai naik 1,5 dtk setelah logo mulai terisi. Jendela logo (`.preloader__mark`) dihapus.
