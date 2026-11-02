@@ -13,12 +13,11 @@ let lenis = null;
 export function initSmoothScroll() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return () => {};
 
-  // First matched to the references (drone.riotters.com, leoparpeix.com:
-  // lerp 0.085, wheelMultiplier 0.9). Made a little heavier (user decision,
-  // 0.6 felt too heavy): one wheel tick moves a sixth less and glides a
-  // touch longer, so the scroll-tied animations are easier to follow
-  // without scrolling in small steps.
-  lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 0.75 });
+  // Matched to the references (user decision; 0.08 / 0.75 felt too heavy):
+  // leoparpeix.com lerp 0.085, drone.riotters.com 0.1 with wheelMultiplier
+  // 0.8, sstr.tech 0.1 with 1, jasminegunarto.com a fast-starting 3s glide
+  // with 1. Here as sstr.tech, in the middle of them.
+  lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1 });
   // For checking in the browser console: window.lenis.
   window.lenis = lenis;
   lenis.on("scroll", ScrollTrigger.update);
