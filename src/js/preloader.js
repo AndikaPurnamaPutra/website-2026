@@ -19,8 +19,8 @@ gsap.registerPlugin(DrawSVGPlugin);
 // 4. right behind it, the showreel comes up from below the screen; the coin
 //    hangs, whole, just above the bottom of the screen until the showreel
 //    reaches it, and is pushed up with it to its own place (user; the 3D coin
-//    follows the coin picture, src/js/coin-scene.js). It sways while it
-//    hangs and turns over once as it is pushed (src/js/coin-motion.js).
+//    follows the coin picture, src/js/coin-scene.js). It fades in as the
+//    curtain lifts.
 // The scroll is held meanwhile. Only while <html> has is-preloading (set in
 // <head>, not with reduced motion).
 const MIN_DRAW = 0.9; // s
@@ -41,6 +41,10 @@ const HEADER = 1.2; // s, the navbar down to its place
 const COIN_EDGE = (208 + 0.47 * 420) / 420;
 const HANG_GAP = 40; // Figma px from the coin to the bottom of the screen
 const COIN_WAIT = 6; // s at most for the 3D coin
+// The coin fades in once the curtain has uncovered it (the curtain opens the
+// screen from the bottom up), slowly and evenly so it is seen (user).
+const COIN_AT = 0.55; // s into the lift
+const COIN_IN = 1.2; // s
 const SCROLL_KEYS = new Set(["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "]);
 
 export function initPreloader() {
@@ -134,15 +138,16 @@ export function initPreloader() {
   const overlap = reel ? Math.max(0, coinEdge - reel.top) : 0; // in the design
   const carryCoin = () => {
     const pushedBy = gsap.getProperty(showreel, "y");
-    gsap.set(coin, { y: Math.min(hang, (pushedBy * hang) / (hang + overlap || 1)) });
+    if (coin) gsap.set(coin, { y: Math.min(hang, (pushedBy * hang) / (hang + overlap || 1)) });
   };
   gsap.set(year, { yPercent: 110, visibility: "visible" });
   gsap.set(header, { yPercent: -100 });
   gsap.set(showreel, { y: below });
   gsap.set(coin, { y: hang });
-  // The 3D coin sways while it hangs and turns over once as it is pushed
-  // (user; src/js/coin-scene.js).
-  Object.assign(coinMotion, { hang, sway: 0 });
+  // The coin fades in as the curtain lifts (user); the 3D coin takes its fade
+  // from src/js/coin-motion.js.
+  coinMotion.fade = 0;
+  gsap.set(coin, { opacity: 0 });
 
   const intro = gsap
     .timeline({ paused: true, onComplete: finish })
@@ -154,18 +159,19 @@ export function initPreloader() {
     .addLabel("lift", 1.25)
     .add(() => document.dispatchEvent(new CustomEvent("preloader:reveal")), "lift")
     .to(preloader, { yPercent: -100, duration: LIFT, ease: MOVE }, "lift")
-    .to(coinMotion, { sway: 1, duration: 0.8, ease: "sine.out" }, "lift")
+    .to(coinMotion, { fade: 1, duration: COIN_IN, ease: "sine.inOut" }, `lift+=${COIN_AT}`)
+    .to(coin, { opacity: 1, duration: COIN_IN, ease: "sine.inOut" }, "<")
     // The showreel comes up from below right behind it, with no delay (user),
     // pushing the coin.
-    .to(showreel, { y: 0, duration: PUSH, ease: MOVE, onUpdate: coin ? carryCoin : null }, `lift+=${PUSH_AT}`)
+    .to(showreel, { y: 0, duration: PUSH, ease: MOVE, onUpdate: carryCoin }, `lift+=${PUSH_AT}`)
     // The navbar comes down from the top as the curtain leaves it (user; the
     // top of the screen is the last part it uncovers).
     .to(header, { yPercent: 0, duration: HEADER, ease: SHOW }, `lift+=${HEADER_AT}`);
 
   function finish() {
     root.classList.remove("is-preloading");
-    gsap.set([preloader, year, header, showreel, coin].filter(Boolean), { clearProps: "transform" });
-    Object.assign(coinMotion, { hang: 0, sway: 0 });
+    gsap.set([preloader, year, header, showreel, coin].filter(Boolean), { clearProps: "transform,opacity" });
+    coinMotion.fade = 1;
     // The scroll animations were measured with the showreel still pushed
     // down.
     ScrollTrigger.refresh();
