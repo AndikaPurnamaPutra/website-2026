@@ -3,6 +3,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 import { stopSmoothScroll, startSmoothScroll } from "./smooth-scroll.js";
 import { designPx } from "./design-px.js";
+import { coinMotion } from "./coin-motion.js";
 
 gsap.registerPlugin(DrawSVGPlugin);
 
@@ -13,18 +14,28 @@ gsap.registerPlugin(DrawSVGPlugin);
 // 2. "2026" rises into view below it,
 // 3. the black layer lifts off the top of the screen, uncovering the hero;
 //    "preloader:reveal" is sent on document as it starts, so the hero text
-//    rises (src/js/hero-intro.js). The coin shows lower than its place, with
-//    no showreel yet,
-// 4. then the showreel comes up from below the screen to its place; the coin
+//    rises (src/js/hero-intro.js). The coin shows lower than its place,
+//    The navbar comes down from the top as the curtain leaves it,
+// 4. right behind it, the showreel comes up from below the screen; the coin
 //    hangs, whole, just above the bottom of the screen until the showreel
 //    reaches it, and is pushed up with it to its own place (user; the 3D coin
-//    follows the coin picture, src/js/coin-scene.js).
+//    follows the coin picture, src/js/coin-scene.js). It sways while it
+//    hangs and turns over once as it is pushed (src/js/coin-motion.js).
 // The scroll is held meanwhile. Only while <html> has is-preloading (set in
 // <head>, not with reduced motion).
 const MIN_DRAW = 0.9; // s
-const LIFT = 1.25; // s, the black layer off the screen
-const PUSH = 1.25; // s, the showreel up to its place
-const PUSH_AT = 0.85; // of the lift, when the showreel starts up (user: not too late)
+// One rhythm for the whole entrance (user: smooth, seamless, enjoyable):
+// the big movements (curtain, showreel) start and settle gently (MOVE),
+// what appears (logo, year, navbar, and the hero text in
+// src/js/hero-intro.js) eases out softly (SHOW); each step starts before the
+// last one ends.
+const MOVE = "power3.inOut";
+const SHOW = "power3.out";
+const LIFT = 1.5; // s, the curtain off the screen
+const PUSH = 1.6; // s, the showreel up to its place
+const PUSH_AT = 0.35; // s into the lift, the showreel right behind the curtain (user: no delay)
+const HEADER_AT = 1.15; // s into the lift, as the curtain leaves the top
+const HEADER = 1.2; // s, the navbar down to its place
 // The coin's lower edge in its picture box (448 × 420: centre at 208, edge
 // 0.47 × 420 below it, as in src/js/coin-scene.js).
 const COIN_EDGE = (208 + 0.47 * 420) / 420;
@@ -40,6 +51,7 @@ export function initPreloader() {
   const outline = preloader.querySelectorAll(".preloader__outline path");
   const solid = preloader.querySelector(".preloader__solid");
   const year = preloader.querySelector(".preloader__year span");
+  const header = document.querySelector("[data-header]");
   const showreel = document.querySelector(".hero__showreel");
   const coin = document.querySelector(".hero__coin");
 
@@ -93,6 +105,7 @@ export function initPreloader() {
     { drawSVG: "0%" },
     { drawSVG: "100%", duration: 1, ease: "none", stagger: 0.12, paused: true },
   );
+  gsap.set(preloader.querySelector(".preloader__outline"), { visibility: "visible" });
   const start = performance.now();
   let shown = 0;
   const follow = () => {
@@ -123,27 +136,36 @@ export function initPreloader() {
     const pushedBy = gsap.getProperty(showreel, "y");
     gsap.set(coin, { y: Math.min(hang, (pushedBy * hang) / (hang + overlap || 1)) });
   };
-  gsap.set(year, { yPercent: 110 });
+  gsap.set(year, { yPercent: 110, visibility: "visible" });
+  gsap.set(header, { yPercent: -100 });
   gsap.set(showreel, { y: below });
   gsap.set(coin, { y: hang });
+  // The 3D coin sways while it hangs and turns over once as it is pushed
+  // (user; src/js/coin-scene.js).
+  Object.assign(coinMotion, { hang, sway: 0 });
 
   const intro = gsap
     .timeline({ paused: true, onComplete: finish })
-    // Outline → solid, then the year.
-    .to(solid, { opacity: 1, duration: 0.45, ease: "power2.out" })
-    .to(preloader.querySelector(".preloader__outline"), { opacity: 0, duration: 0.45, ease: "power2.out" }, "<")
-    .to(year, { yPercent: 0, duration: 0.55, ease: "power3.out" }, ">-0.2")
-    // Off the screen, then the showreel pushes the coin up.
-    .addLabel("lift", "+=0.3")
+    // Outline → solid, then the year, and a breath with both.
+    .to(solid, { opacity: 1, duration: 0.6, ease: "power2.out" })
+    .to(preloader.querySelector(".preloader__outline"), { opacity: 0, duration: 0.6, ease: "power2.out" }, "<")
+    .to(year, { yPercent: 0, duration: 0.8, ease: SHOW }, 0.35)
+    // The curtain lifts off the screen.
+    .addLabel("lift", 1.25)
     .add(() => document.dispatchEvent(new CustomEvent("preloader:reveal")), "lift")
-    .to(preloader, { yPercent: -100, duration: LIFT, ease: "power3.inOut" }, "lift")
-    // As it is nearly off (the coin alone for a moment, no showreel yet, user),
-    // the showreel comes up from below.
-    .to(showreel, { y: 0, duration: PUSH, ease: "power2.inOut", onUpdate: coin ? carryCoin : null }, `lift+=${LIFT * PUSH_AT}`);
+    .to(preloader, { yPercent: -100, duration: LIFT, ease: MOVE }, "lift")
+    .to(coinMotion, { sway: 1, duration: 0.8, ease: "sine.out" }, "lift")
+    // The showreel comes up from below right behind it, with no delay (user),
+    // pushing the coin.
+    .to(showreel, { y: 0, duration: PUSH, ease: MOVE, onUpdate: coin ? carryCoin : null }, `lift+=${PUSH_AT}`)
+    // The navbar comes down from the top as the curtain leaves it (user; the
+    // top of the screen is the last part it uncovers).
+    .to(header, { yPercent: 0, duration: HEADER, ease: SHOW }, `lift+=${HEADER_AT}`);
 
   function finish() {
     root.classList.remove("is-preloading");
-    gsap.set([preloader, year, showreel, coin].filter(Boolean), { clearProps: "transform" });
+    gsap.set([preloader, year, header, showreel, coin].filter(Boolean), { clearProps: "transform" });
+    Object.assign(coinMotion, { hang: 0, sway: 0 });
     // The scroll animations were measured with the showreel still pushed
     // down.
     ScrollTrigger.refresh();

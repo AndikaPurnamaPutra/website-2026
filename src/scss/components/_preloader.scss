@@ -27,6 +27,14 @@
   overflow: visible;
 }
 
+// Hidden until the script has set them up (emptied to be drawn, moved
+// down to rise; src/js/preloader.js), so they do not show for a moment
+// first.
+.preloader__outline,
+.preloader__year span {
+  visibility: hidden;
+}
+
 .preloader__outline path {
   fill: none;
   stroke: var(--color-white);

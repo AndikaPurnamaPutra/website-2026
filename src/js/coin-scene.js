@@ -4,6 +4,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUniformsLib.js";
+import { coinMotion } from "./coin-motion.js";
 
 // The 3D coin, choreographed with the scroll (approved concept, references:
 // thewatch.60fps.fr, drone.riotters.com, sstr.tech): one coin on a fixed
@@ -48,6 +49,12 @@ const DROP = 0.6; // screens the coin travels down while it arrives in the foote
 const INTRO = 2.4; // s: the entrance on load
 const INTRO_DROP = 0.35; // screens it comes down from, above its place
 const INTRO_SCALE = 0.35; // size it starts from, growing to its own
+// After the preloader (src/js/coin-motion.js): it sways while it hangs, and
+// turns over once, landing face on, as the showreel pushes it to its place
+// (user decision).
+const SWAY_TIME = 1.8; // s for one sway
+const SWAY_TILT = 0.18; // rad
+const SWAY_BOB = 0.02; // of the picture box height, up and down
 
 const clamp = (t) => Math.min(1, Math.max(0, t));
 const inOut = (t) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
@@ -212,11 +219,16 @@ export function mountCoin(anchors, fallback) {
         // while the scroll slowly turns it over (half a flip); fades out
         // behind the showreel.
         const turn = sine(span(s, 0, 1.1));
+        // The preloader's hang: the share of the way still to be pushed up
+        // (the coin picture is moved, so `at` already follows it).
+        const left = coinMotion.hang ? clamp(gsap.getProperty(anchors.hero, "y") / coinMotion.hang) : 0;
+        const wave = Math.sin((performance.now() / 1000 / SWAY_TIME) * Math.PI * 2);
+        const sway = coinMotion.sway * left;
         return {
           x: at.x,
-          y: top - screen * INTRO_DROP * (1 - enter) + scroll * HERO_DOWN,
+          y: top - screen * INTRO_DROP * (1 - enter) + scroll * HERO_DOWN + wave * sway * SWAY_BOB * at.box.height,
           zoom: at.zoom * (INTRO_SCALE + (1 - INTRO_SCALE) * enter),
-          tilt: FLIP * turn + FLIP * (1 - enter),
+          tilt: FLIP * turn + FLIP * (1 - enter) + 2 * FLIP * left + wave * sway * SWAY_TILT,
           opacity: span(intro, 0, 0.25) * (1 - span(s, 0.95, 1.2)),
         };
       }
