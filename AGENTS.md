@@ -200,6 +200,7 @@ For each section:
 - Branches:
   - `main`: production. Vercel deploys it to the live site. Only finished, approved work.
   - `dev`: daily work. Every task is committed and pushed here (Vercel makes a preview deployment).
+  - `preloader/v1`, `preloader/v2`, …: one branch per preloader version, made from `dev`, each with its own Vercel preview. The chosen version is merged into `dev` (after confirmation); the others are deleted or kept as an archive.
 - Commit each completed task separately on `dev`, with a clear message.
 - **Always ask the user for confirmation before committing and pushing.** After a task is finished and verified, summarize the changes and the proposed commit message, then wait for explicit approval.
 - **Merge `dev` into `main` only when the user says the work is final**, and ask for confirmation before merging and pushing `main`.
