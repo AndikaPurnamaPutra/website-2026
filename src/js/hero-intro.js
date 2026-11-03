@@ -11,9 +11,9 @@ import gsap from "gsap";
 // clip only while the text rises. Only on a page load with the preloader.
 const DELAY = 0.6; // s after the curtain starts up, as it uncovers the headline
 // The same soft ease-out as what appears in the preloader (src/js/preloader.js).
-const RISE = { yPercent: 200, duration: 1.3, ease: "power3.out" };
-const LINE_GAP = 0.15; // s between the headline lines
-const PART_GAP = 0.1; // s between the other parts
+const RISE = { yPercent: 200, duration: 1, ease: "power3.out" }; // as REVEAL there
+const LINE_GAP = 0.12; // s between the headline lines
+const PART_GAP = 0.07; // s between the other parts
 
 export function initHeroIntro() {
   const hero = document.querySelector(".hero");

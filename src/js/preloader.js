@@ -39,7 +39,10 @@ const SHOW = "power3.out";
 const LIFT = 1.5; // s, the curtain off the screen
 const PUSH = 1.6; // s, the showreel up to its place
 const PUSH_AT = 0.35; // s into the lift, the showreel right behind the curtain (user: no delay)
-const HEADER_AT = 1.15; // s into the lift, as the curtain leaves the top
+// What appears takes REVEAL seconds (the line below the logo, the hero text
+// in src/js/hero-intro.js), so all of it moves alike.
+const REVEAL = 1;
+const HEADER_AT = 1.1; // s into the lift, as the curtain leaves the top
 const HEADER = 1.2; // s, the navbar down to its place
 // The logo and the year blur away as the curtain starts up: motto 1's blur in
 // (src/js/motto-scroll.js: autoAlpha, 12 Figma px, blur 6px), reversed.
@@ -50,10 +53,15 @@ const BLUR_SHIFT = 12; // Figma px, up with the curtain
 const COIN_EDGE = (208 + 0.47 * 420) / 420;
 const HANG_GAP = 40; // Figma px from the coin to the bottom of the screen
 const COIN_WAIT = 6; // s at most for the 3D coin
-// The coin fades in once the showreel is in its place (user), slowly and
-// evenly so it is seen.
-const COIN_AT = PUSH_AT + PUSH; // s into the lift
-const COIN_IN = 1.2; // s
+// The coin fades in after the showreel has shown (user), as it settles, so
+// it is not a step of its own; slowly and evenly, never at once (user: a
+// quick ease-out looked harsh).
+const COIN_AT = PUSH_AT + PUSH * 0.6; // s into the lift
+const COIN_IN = 1.4; // s
+const COIN_EASE = "sine.inOut";
+// The page is free to scroll once the showreel is in its place; the last
+// reveals (navbar, coin, hero text) carry on.
+const SETTLED = PUSH_AT + PUSH; // s into the lift
 const SCROLL_KEYS = new Set(["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "]);
 
 export function initPreloader() {
@@ -168,31 +176,44 @@ export function initPreloader() {
     // Outline → solid, then the year, and a breath with both.
     .to(solid, { opacity: 1, duration: 0.6, ease: "power2.out" })
     .to(preloader.querySelector(".preloader__outline"), { opacity: 0, duration: 0.6, ease: "power2.out" }, "<")
-    .to(split.chars, { yPercent: 0, duration: 0.8, stagger: 0.012, ease: SHOW }, 0.35)
+    .to(split.chars, { yPercent: 0, duration: REVEAL, stagger: 0.012, ease: SHOW }, 0.35)
     // The curtain lifts off the screen.
-    .addLabel("lift", 1.65)
+    .addLabel("lift", 1.8)
     .add(() => document.dispatchEvent(new CustomEvent("preloader:reveal")), "lift")
     // On the year's box: its window would cut the blur.
     .to([logo, year.parentElement], { ...BLUR_OUT, y: () => -BLUR_SHIFT * designPx() }, "lift")
     .to(preloader, { yPercent: -100, duration: LIFT, ease: MOVE }, "lift")
-    .to(coinMotion, { fade: 1, duration: COIN_IN, ease: "sine.inOut" }, `lift+=${COIN_AT}`)
-    .to(coin, { opacity: 1, duration: COIN_IN, ease: "sine.inOut" }, "<")
+    .to(coinMotion, { fade: 1, duration: COIN_IN, ease: COIN_EASE }, `lift+=${COIN_AT}`)
+    .to(coin, { opacity: 1, duration: COIN_IN, ease: COIN_EASE }, "<")
+    .add(settle, `lift+=${SETTLED}`)
     // The showreel comes up from below right behind it, with no delay (user),
     // pushing the coin.
     .to(showreel, { y: 0, duration: PUSH, ease: MOVE, onUpdate: carryCoin }, `lift+=${PUSH_AT}`)
-    // The navbar comes down from the top as the curtain leaves it (user; the
-    // top of the screen is the last part it uncovers).
+    // The navbar comes down from the top, whole, as the curtain leaves it
+    // (the last part it uncovers; user, after trying it word by word and
+    // blurring in).
     .to(header, { yPercent: 0, duration: HEADER, ease: SHOW }, `lift+=${HEADER_AT}`);
 
-  function finish() {
+  // The showreel is in its place: the preloader goes and the page scrolls.
+  let settled = false;
+  function settle() {
+    if (settled) return;
+    settled = true;
     root.classList.remove("is-preloading");
     split.revert();
-    gsap.set([preloader, logo, year.parentElement, header, showreel, coin].filter(Boolean), { clearProps: "transform,opacity,visibility,filter" });
-    coinMotion.fade = 1;
+    gsap.set([preloader, logo, year.parentElement, showreel].filter(Boolean), { clearProps: "transform,opacity,visibility,filter" });
     // The scroll animations were measured with the showreel still pushed
     // down.
     ScrollTrigger.refresh();
     release();
+  }
+
+  // Every reveal is done.
+  function finish() {
+    settle();
+    gsap.set(header, { clearProps: "transform" });
+    if (coin) gsap.set(coin, { clearProps: "transform,opacity" });
+    coinMotion.fade = 1;
   }
 
   return () => {
@@ -201,6 +222,6 @@ export function initPreloader() {
     document.removeEventListener("coin:ready", coinDone);
     draw.kill();
     intro.kill();
-    if (root.classList.contains("is-preloading")) finish();
+    finish();
   };
 }
