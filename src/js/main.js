@@ -7,6 +7,7 @@ import { initHeroClock } from "./hero-clock.js";
 import { initHeroHighlight } from "./hero-highlight.js";
 import { initHeroShowreel } from "./hero-showreel.js";
 import { initStatementInk } from "./statement-ink.js";
+import { initPageTheme } from "./page-theme.js";
 import { initCoin3d } from "./coin-3d.js";
 import { initServicesScroll } from "./services-scroll.js";
 import { initInviewVideos } from "./inview-videos.js";
@@ -52,6 +53,8 @@ function initPage() {
   cleanups.push(initInviewVideos());
   // After the services pin so its pin spacer can be measured.
   cleanups.push(initHeader());
+  // After the pins above Our Work (Services), which move it down.
+  cleanups.push(initPageTheme());
   cleanups.push(initWorkMenu());
   cleanups.push(initFooterForm());
   cleanups.push(initFooterReveal());

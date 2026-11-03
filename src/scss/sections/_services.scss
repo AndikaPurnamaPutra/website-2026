@@ -1,9 +1,12 @@
 // Figma: Section-03 1523:3292 (static) and storyboard 1516:2229 (scroll steps).
 @use "../abstracts/functions" as *;
 
+// Follows the page theme (docs/implementation/21-page-theme.md): light as it
+// comes up, dark from the switch on (src/js/page-theme.js), as the coming
+// section on revelatio.studio; dark as in Figma without JS.
 .services {
-  color: var(--color-white);
-  background: var(--color-ink);
+  color: var(--theme-fg);
+  background: var(--theme-bg);
 }
 
 .services__inner {
@@ -23,7 +26,7 @@
 // the pinned layer can sit a fraction of a pixel below the top of the screen
 // and leave a light seam there. A 2px dark edge above it covers that.
 .services.is-pinned {
-  box-shadow: 0 -2px 0 var(--color-ink);
+  box-shadow: 0 -2px 0 var(--theme-bg);
 }
 
 .services__label {
@@ -66,7 +69,11 @@
   gap: fs(32);
   width: fluid(345);
   padding: fs(20);
-  background: var(--color-glass);
+  // A touch of the text colour in the page's background: #f6f6f6 on light,
+  // about Figma's dark glass (#1b1b1b) on dark, and always moving with the
+  // page in the switch, never lighter or darker than it on the way (user: two
+  // crossfading backgrounds glowed in the middle).
+  background: color-mix(in srgb, var(--theme-bg), var(--theme-fg) 4%);
   border-radius: var(--radius-sm);
   -webkit-backdrop-filter: blur(var(--blur-glass));
   backdrop-filter: blur(var(--blur-glass));
@@ -106,7 +113,7 @@
     position: absolute;
     inset: -0.25px 0 auto;
     height: 0.5px;
-    background: var(--color-divider-dark);
+    background: var(--theme-divider);
   }
 }
 
@@ -122,7 +129,7 @@
   align-items: center;
   height: fs(24);
   padding-inline: fs(10);
-  border: 1px solid var(--color-border-dark);
+  border: 1px solid var(--theme-border);
   border-radius: var(--radius-sm);
   font-family: var(--font-body);
   font-size: fs(14);
@@ -138,7 +145,7 @@
   z-index: 5;
   width: fluid(373);
   height: fluid(72);
-  background: linear-gradient(to bottom, var(--color-ink), rgba(17, 17, 17, 0));
+  background: linear-gradient(to bottom, var(--theme-bg), color-mix(in srgb, var(--theme-bg), transparent 100%));
   -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
   opacity: 0;

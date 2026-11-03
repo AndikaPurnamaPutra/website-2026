@@ -206,6 +206,9 @@ export function initPreloader() {
     // src/js/hero-showreel.js), then the scroll animations, measured with the
     // showreel still pushed down, are measured again.
     document.dispatchEvent(new CustomEvent("preloader:settled"));
+    // That pin is made after the triggers below it: put them back in page
+    // order (by their refreshPriority) before measuring.
+    ScrollTrigger.sort();
     ScrollTrigger.refresh();
     release();
   }

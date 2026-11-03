@@ -12,6 +12,11 @@ const FIRST_TOP = 98; // active card top in frame 1
 const LATER_TOP = 88; // active card top from frame 2 on
 const PREVIOUS_GAP = 12; // card that moved up ends 12px above the active card (Figma: 76 → 88)
 const RADIUS = 4; // --radius-sm (Figma 4px, layout scale)
+// The exit, the same the other way (as in Motto): over the last EXIT of a
+// screen of the pin the section rises faster and faster, by half that
+// distance, so it already moves with the page when it is released. The page
+// turns light as it starts (src/js/page-theme.js).
+export const EXIT = 0.4; // of the screen height
 // Deck cards are scaled from their top edge and placed so their visible strip
 // (the clipped title area) always ends `peek` px below the active card, as in
 // Figma (16px and 32px), whatever the cards' heights. Text-sized: type scale.
@@ -50,14 +55,12 @@ export function initServicesScroll() {
   const FOLLOW = 14; // how fast they close the gap (per second)
   // The entry: the pin starts with the section ENTRY of a screen below the
   // top, and over the next 2 × ENTRY of scrolling it glides up into place,
-  // slowing from the page's speed to a stop (user: arriving at the pin
-  // stopped it dead, not seamless). The steps come after that stretch.
-  const ENTRY = 0.15; // of the screen height
+  // slowing from the page's speed to a stop. Off for now (0): with the page
+  // turning dark as it comes up, the slowing read as being pushed up (user,
+  // 3 Nov 2026); it had been added as arriving at the pin felt abrupt.
+  // The steps come after that stretch.
+  const ENTRY = 0; // of the screen height (was 0.15)
   const entryTime = 2 * ENTRY * U; // timeline time of the entry
-  // The exit, the same the other way (as in Motto): over the last EXIT of a
-  // screen of the pin the section rises faster and faster, by half that
-  // distance, so it already moves with the page when it is released.
-  const EXIT = 0.4; // of the screen height
   const stepTime = (n) => entryTime + n * (1 + REST) + REST / 2;
   const restTime = (k) => entryTime + (k === 0 ? REST / 4 : k === steps ? steps * (1 + REST) - REST / 4 : k * (1 + REST));
 
@@ -147,6 +150,7 @@ export function initServicesScroll() {
     // reload further down) it is placed there at once.
     let target = 0;
     const pin = ScrollTrigger.create({
+      id: "services",
       trigger: section,
       start: () => `top top+=${ENTRY * window.innerHeight}`,
       end: () => `+=${window.innerHeight * (steps * STEP_SCREENS + 2 * ENTRY + EXIT)}`,
