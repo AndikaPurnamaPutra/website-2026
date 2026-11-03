@@ -10,6 +10,20 @@
   color: var(--color-ink);
 }
 
+// A dark layer over the footer while it comes up from behind the section
+// above, fading as it does, so it turns from dark to light (reference from
+// the user: sstr.tech, whose layer starts at 50%). src/js/footer-reveal.js
+// sets --footer-shade; none without it.
+.site-footer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: var(--color-ink);
+  opacity: var(--footer-shade, 0);
+  pointer-events: none;
+}
+
 .site-footer__inner {
   position: relative;
   max-width: calc(var(--container) + 2 * var(--page-gutter));
