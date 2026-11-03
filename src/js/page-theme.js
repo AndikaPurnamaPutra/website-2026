@@ -13,36 +13,58 @@ import { EXIT } from "./services-scroll.js";
 // Two marks rather than one range: a range starting above the Services pin
 // would not take that pin's length into its end.
 const DARK_AT = "top 85%"; // the Services' top
+// Motto overlaps Milestone's bottom, so at 85% Milestone was still being
+// read; the page turns dark once Milestone has quite faded out (it fades
+// while Motto's top goes from about 71% to 37% of the screen,
+// src/js/motto-scroll.js; user): at 40% its last trace turned over too, a
+// flicker.
+const MOTTO_DARK_AT = "top 37%";
 const LIGHT_AT = "top 50%"; // Our Work's top, if Services is not pinned
 
 export function initPageTheme() {
   const services = document.querySelector("[data-services]");
   const ourWork = document.querySelector(".our-work");
-  if (!services || !ourWork) return () => {};
+  const motto = document.querySelector("[data-motto]");
+  const toned = motto?.closest(".tone-shift");
 
-  let dark;
-  let light;
+  // Dark stretches: each from one mark to another.
+  const ranges = [];
+  let night;
   const update = () => {
-    if (!dark || !light) return;
-    document.body.classList.toggle("is-dark", dark.progress > 0 && light.progress === 0);
+    const dark = ranges.some(({ from, to }) => from.progress > 0 && to.progress === 0);
+    document.body.classList.toggle("is-dark", dark);
+    // The Motto wrapper stays dark from its switch on (src/scss/sections/_motto.scss).
+    if (night) toned.classList.toggle("is-night", night.progress > 0);
   };
-  const mark = (trigger, start) =>
-    ScrollTrigger.create({ trigger, start, end: "max", onToggle: update, onRefresh: update });
-  dark = mark(services, DARK_AT);
-  const pin = ScrollTrigger.getById("services");
-  light = pin
-    ? ScrollTrigger.create({
-        start: () => pin.end - EXIT * window.innerHeight,
-        end: "max",
-        onToggle: update,
-        onRefresh: update,
-      })
-    : mark(ourWork, LIGHT_AT);
+  const mark = (vars) => ScrollTrigger.create({ end: "max", onToggle: update, onRefresh: update, ...vars });
+
+  if (services && ourWork) {
+    const pin = ScrollTrigger.getById("services");
+    ranges.push({
+      from: mark({ trigger: services, start: DARK_AT }),
+      to: pin ? mark({ start: () => pin.end - EXIT * window.innerHeight }) : mark({ trigger: ourWork, start: LIGHT_AT }),
+    });
+  }
+  // Milestone → Motto (user): Milestone stays on light and fades out, then
+  // the page turns dark and motto 1 blurs in; light again as Motto's pin
+  // ends and the footer starts to show below it. Motto keeps its own dark
+  // backdrop, so it stays dark meanwhile.
+  if (motto && toned) {
+    const mottoPin = ScrollTrigger.getById("motto");
+    night = mark({ trigger: motto, start: MOTTO_DARK_AT });
+    ranges.push({
+      from: night,
+      to: mottoPin ? mark({ start: () => mottoPin.end }) : mark({ trigger: toned, start: "bottom bottom" }),
+    });
+  }
   update();
 
   return () => {
-    dark.kill();
-    light.kill();
+    ranges.forEach(({ from, to }) => {
+      from.kill();
+      to.kill();
+    });
     document.body.classList.remove("is-dark");
+    toned?.classList.remove("is-night");
   };
 }

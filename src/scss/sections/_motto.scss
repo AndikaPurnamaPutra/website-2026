@@ -44,8 +44,12 @@
   visibility: hidden;
 }
 
-// Milestone + Motto wrapper (src/pug/pages/index.pug). JS darkens its
-// background and fades in its texture while Motto scrolls in.
+// Milestone + Motto wrapper (src/pug/pages/index.pug). It takes the page
+// theme's background, which turns dark as Motto comes in
+// (src/js/page-theme.js), and from then on stays dark on its own (is-night),
+// also once the page turns light again for the footer: it hides the footer,
+// which comes up from behind it (src/js/footer-reveal.js). Its texture fades
+// in with the dark.
 .tone-shift {
   position: relative;
   // Above the footer, so the footer coin passes behind the Motto section.
@@ -72,6 +76,27 @@
   opacity: 0;
   mix-blend-mode: screen;
   pointer-events: none;
+  transition: opacity var(--theme-switch);
+}
+
+.tone-shift.is-toned {
+  background-color: var(--theme-bg);
+}
+
+.tone-shift.is-night {
+  background-color: var(--color-ink);
+  transition: background-color var(--theme-switch);
+}
+
+.tone-shift.is-night .tone-shift__texture {
+  opacity: 0.1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tone-shift__texture,
+  .tone-shift.is-night {
+    transition: none;
+  }
 }
 
 // Without the JS entry (no JS or reduced motion) the section keeps its own

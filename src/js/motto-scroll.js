@@ -27,7 +27,6 @@ export function initMottoScroll() {
   const milestone = wrapper?.querySelector(".milestone__inner");
   const backdrop = section.querySelector(".motto__backdrop");
   const label = section.querySelector(".motto__label");
-  const wrapperTexture = wrapper?.querySelector(".tone-shift__texture");
   const lines = [...section.querySelectorAll(".motto__line")];
   const ellipse = section.querySelector(".motto__ellipse");
   const labelTexts = [...section.querySelectorAll(".motto__label-text")];
@@ -149,6 +148,7 @@ export function initMottoScroll() {
     // reload further down) it is placed there at once.
     let target = 0;
     const pin = ScrollTrigger.create({
+      id: "motto", // the page turns light again at its end (src/js/page-theme.js)
       trigger: section,
       start: "top top",
       end: () => `+=${window.innerHeight * length}`,
@@ -358,14 +358,15 @@ export function initMottoScroll() {
       });
     }
 
-    // Entry (before the pin): full-screen light → dark on the wrapper.
+    // Entry (before the pin). The wrapper turns dark with the page theme, at
+    // once as Motto comes in (src/js/page-theme.js), its texture with it
+    // (_motto.scss); here, with the scroll, Milestone leaves, the section's
+    // backdrop comes in and motto 1 blurs in.
     // Start values are set here, not with fromTo: ScrollTrigger's refresh
     // reverts fromTo starts that lie ahead of the playhead. Motto 1 blurs in on
     // the lines box, so no line is driven by two timelines (the flips own them).
     if (!reduceMotion && wrapper) {
       wrapper.classList.add("is-toned");
-      gsap.set(wrapper, { backgroundColor: "#ffffff" });
-      gsap.set(wrapperTexture, { opacity: 0 });
       gsap.set(backdrop, { autoAlpha: 0 });
       gsap.set(linesBox, { autoAlpha: 0, y: () => 12 * designPx(), filter: "blur(6px)" });
       gsap.set(label, { autoAlpha: 0, y: () => 8 * designPx() });
@@ -383,12 +384,13 @@ export function initMottoScroll() {
         // light (no dark text over grey), the background darkens slowly, and
         // motto 1 comes in while it does, so the space never reads as empty.
         .to(milestone, { autoAlpha: 0, y: () => -40 * designPx(), duration: 0.45, ease: "sine.inOut" }, 0.05)
-        .to(wrapper, { backgroundColor: "#111111", duration: 0.7 }, 0.25)
-        .to(wrapperTexture, { opacity: 0.1, duration: 0.7 }, 0.25)
         .to(backdrop, { autoAlpha: 1, duration: 0.15 }, 0.85)
         // Motto 1 blurs in while the section scrolls in (it is complete before
-        // the pin), as the background turns dark.
-        .to(linesBox, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.5, ease: "power2.out" }, 0.38);
+        // the pin), once the page has turned dark (Motto's top at 37%,
+        // src/js/page-theme.js; timeline time t is Motto's top at 75% − t ×
+        // 75%): white on the light page, it was unseen, then popped into view
+        // at the switch (user: a flicker).
+        .to(linesBox, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.45, ease: "power2.out" }, 0.52);
 
       // The label follows once motto 1 has settled in the center, i.e. when the
       // section pins. It plays on its own clock (the reader rests on step 0
