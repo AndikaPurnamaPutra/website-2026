@@ -104,6 +104,14 @@
   height: 100%;
   max-width: none;
   object-fit: cover;
+  // Hover (not in Figma; user asked for one): the picture grows a little
+  // within its frame.
+  transition: transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.work-card__link:hover .work-card__image,
+.work-card__link:focus-visible .work-card__image {
+  transform: scale(1.06);
 }
 
 // Extra crop inside the box (inline width/height/left/top from Figma).
@@ -117,7 +125,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .work-carousel__arrow {
+  .work-carousel__arrow,
+  .work-card__image {
     transition: none;
   }
 }

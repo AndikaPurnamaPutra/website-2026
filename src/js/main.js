@@ -12,6 +12,7 @@ import { initCoin3d } from "./coin-3d.js";
 import { initServicesScroll } from "./services-scroll.js";
 import { initInviewVideos } from "./inview-videos.js";
 import { initWorkCarousels } from "./work-carousel.js";
+import { initOurWorkIntro } from "./our-work-intro.js";
 import { initMarquees } from "./marquee.js";
 import { initMilestoneCounter } from "./milestone-counter.js";
 import { initMottoScroll } from "./motto-scroll.js";
@@ -43,6 +44,7 @@ function initPage() {
   cleanups.push(initStatementInk());
   cleanups.push(initServicesScroll());
   cleanups.push(initWorkCarousels());
+  cleanups.push(initOurWorkIntro());
   cleanups.push(initMarquees());
   cleanups.push(initMilestoneCounter());
   cleanups.push(initMottoScroll());
