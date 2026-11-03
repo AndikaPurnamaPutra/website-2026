@@ -11,11 +11,15 @@ import { startSmoothScroll, stopSmoothScroll } from "./smooth-scroll.js";
 // dark backdrop and plays with sound; ×, a click on the backdrop or Esc close
 // it, and it shrinks back to the showreel. While the page scrolls, the video
 // grows from the first scroll until it fills the screen with the showreel
-// centred, then scrolls on: no hold, no automatic steps (user decisions).
+// centred, stays there a moment, then scrolls on (user decisions; reference
+// revelatio.studio: each scroll shows at once, no stretch without effect).
 const FOLLOW = 0.6; // also the glide back to the centre
 const OPEN = 0.5;
 const CLOSE = 0.4;
 const SCREEN = 0.9; // share of the screen the video may take
+// Once it fills the screen (centred), it stays there for HOLD screens of
+// scrolling (as revelatio.studio's TV; user).
+const HOLD = 0.5;
 const SCROLL_KEYS = [" ", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End"];
 
 export function initHeroShowreel() {
@@ -95,6 +99,26 @@ export function initHeroShowreel() {
       },
       onUpdate: (self) => grow(self.progress),
     });
+    // Then held full screen. A pin keeps the styles its element had when it
+    // was made, so with the preloader (which moves the showreel) it is made
+    // once that is over ("preloader:settled", src/js/preloader.js, which then
+    // measures the page again); measured before the triggers further down,
+    // which it moves. Its video plays on meanwhile (data-inview-area on the
+    // hero, src/js/inview-videos.js).
+    const hold = () =>
+      ctx.add(() =>
+        ScrollTrigger.create({
+          trigger: showreel,
+          start: "center center",
+          end: `+=${HOLD * 100}%`,
+          pin: true,
+          refreshPriority: 1,
+        }),
+      );
+    if (document.documentElement.classList.contains("is-preloading")) {
+      document.addEventListener("preloader:settled", hold, { once: true });
+      listeners.push(() => document.removeEventListener("preloader:settled", hold));
+    } else hold();
     preview.style.borderRadius = "0";
     listeners.push(() => {
       preview.style.transform = "";

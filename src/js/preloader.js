@@ -202,8 +202,10 @@ export function initPreloader() {
     root.classList.remove("is-preloading");
     split.revert();
     gsap.set([preloader, logo, year.parentElement, showreel].filter(Boolean), { clearProps: "transform,opacity,visibility,filter" });
-    // The scroll animations were measured with the showreel still pushed
-    // down.
+    // What waits for the showreel to be in its place (its hold,
+    // src/js/hero-showreel.js), then the scroll animations, measured with the
+    // showreel still pushed down, are measured again.
+    document.dispatchEvent(new CustomEvent("preloader:settled"));
     ScrollTrigger.refresh();
     release();
   }
