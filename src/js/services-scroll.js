@@ -6,12 +6,18 @@ import { designPx, typePx } from "./design-px.js";
 // Each scroll step makes the next service card active and swaps the image;
 // the last step expands the image to fill the section.
 // Timing, easing and scroll distance are not in Figma (approved proposal).
+// Text comes in as the hero text (src/js/hero-intro.js; user): as the section
+// arrives, its label, the first card, the titles of the cards behind it rise
+// and the first image opens like a curtain; at each step, the card coming to
+// the front draws its line, then its tags and text rise. On their own clock
+// (1s, power3.out), back when scrolled back up.
 
 // Card geometry in Figma pixels (1440px frame).
 const FIRST_TOP = 98; // active card top in frame 1
 const LATER_TOP = 88; // active card top from frame 2 on
 const PREVIOUS_GAP = 12; // card that moved up ends 12px above the active card (Figma: 76 → 88)
 const RADIUS = 4; // --radius-sm (Figma 4px, layout scale)
+const RISE = 200; // % of its height the text rises from (as the hero text)
 // The exit, the same the other way (as in Motto): over the last EXIT of a
 // screen of the pin the section rises faster and faster, by half that
 // distance, so it already moves with the page when it is released. The page
@@ -132,6 +138,8 @@ export function initServicesScroll() {
   const clearMedia = () => gsap.set(media, { clearProps: "inset,top,right,bottom,left,borderRadius" });
 
   const ctx = gsap.context(() => {
+    // Plays the card text at the steps reached (set further down).
+    let cue = () => {};
     cards.forEach((card, i) => {
       gsap.set(card, { ...stateVars(i, 0), zIndex: cardState(i, 0).zIndex, transformOrigin: "50% 0%" });
       gsap.set(clips[i], clipVars(i, 0));
@@ -142,7 +150,10 @@ export function initServicesScroll() {
       paused: true,
       // sine.inOut: a gentle curve, so the middle of each move does not rush.
       defaults: { duration: 1, ease: reduceMotion ? "steps(1)" : "sine.inOut" },
-      onUpdate: drawClips,
+      onUpdate: () => {
+        drawClips();
+        cue(false);
+      },
     });
 
     // The pin sets where the timeline should be (target); the ticker below
@@ -167,6 +178,7 @@ export function initServicesScroll() {
         // scrolling back up left the first line hidden (user report).
         timeline.time(0).invalidate().time(target);
         if (timeline.time() < stepTime(steps - 1)) clearMedia();
+        cue(true);
       },
     });
     const follow = (time, deltaMs) => {
@@ -288,10 +300,71 @@ export function initServicesScroll() {
     timeline.addLabel("fullscreen", restTime(steps));
     // The last rest zone runs to the end of the pin, the exit included.
     timeline.to({}, { duration: REST / 2 + EXIT * U }, stepTime(steps - 1) + 1);
+    // The text coming in (not with reduced motion: it stays in place).
+    if (!reduceMotion) {
+      // Up from 200% below in a window of its own: a clip whose bottom edge
+      // comes up as much as the element does, so no wrapper is needed.
+      const rise = (els, vars) =>
+        gsap.fromTo(
+          els,
+          { yPercent: RISE, clipPath: `inset(-20% -20% ${RISE}% -20%)` },
+          { yPercent: 0, clipPath: "inset(-20% -20% 0% -20%)", duration: 1, ease: "power3.out", ...vars },
+        );
+      const parts = cards.map((card) => ({
+        title: card.querySelector(".services__card-title"),
+        divider: card.querySelector(".services__card-divider"),
+        tags: [...card.querySelectorAll(".services__tag")],
+        text: card.querySelector(".services__card-text"),
+      }));
+      // A card's line drawn from the left, then its tags, then its text.
+      const reveal = ({ divider, tags, text }) =>
+        gsap
+          .timeline({ paused: true })
+          .fromTo(divider, { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power3.out", transformOrigin: "0% 50%" }, 0)
+          .add(rise(tags, { stagger: 0.05 }), 0.05)
+          .add(rise(text), 0.15);
+      const reveals = parts.map(reveal);
+
+      // As the section arrives (its top at 60% of the screen).
+      const entry = gsap
+        .timeline({ paused: true })
+        .add(rise(label), 0)
+        .fromTo(
+          images[0],
+          { clipPath: "inset(100% 0% 0% 0%)", scale: 1.08 },
+          { clipPath: "inset(0% 0% 0% 0%)", scale: 1, duration: 1.2, ease: "power3.inOut" },
+          0,
+        )
+        // The first card's title and those peeking from the deck behind it.
+        .add(rise(parts.slice(0, 3).map(({ title }) => title), { stagger: 0.06 }), 0.1)
+        .add(reveals[0].paused(false), 0.25);
+      ScrollTrigger.create({
+        trigger: section,
+        start: "top 60%",
+        onEnter: () => entry.play(),
+        onLeaveBack: () => entry.reverse(),
+        // Opened or reloaded further down: in place at once.
+        onRefresh: (self) => entry.progress(self.progress > 0 ? 1 : 0).pause(),
+      });
+
+      // At each step, once its card is halfway to the front.
+      const shown = cards.map(() => false);
+      cue = (instant) => {
+        const time = timeline.time();
+        for (let k = 1; k < cards.length; k++) {
+          const want = time >= stepTime(k - 1) + 0.5;
+          if (instant) reveals[k].progress(want ? 1 : 0).pause();
+          else if (want !== shown[k]) want ? reveals[k].play() : reveals[k].reverse();
+          shown[k] = want;
+        }
+      };
+    }
+
     // The pin may have measured before the steps were added: place the
     // timeline for the current scroll now that it is complete.
     target = pin.progress * timeline.duration();
     timeline.time(target);
+    cue(true);
   }, section);
 
   const refresh = () => ScrollTrigger.refresh();
