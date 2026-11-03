@@ -29,6 +29,10 @@ export function initFooterReveal() {
         end: () => `+=${footer.offsetHeight}`,
         scrub: true,
         invalidateOnRefresh: true,
+        // Measured after the pins above (Services, Motto, the showreel), which
+        // lengthen the page: measured before them, it ended about 7,500px too
+        // early and the footer no longer came up from behind.
+        refreshPriority: -1,
       },
     },
   );
