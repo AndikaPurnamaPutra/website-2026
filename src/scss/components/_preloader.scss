@@ -20,10 +20,12 @@
 }
 
 // 113.5 × 54 at 1440 (user: a little smaller than Figma 1880:663's 122 × 58;
-// the logo is 206 : 98).
+// the logo is 206 : 98). On the type scale, as the line below it: it grows
+// slower than the layout on wide screens (1.2× at most), so it does not look
+// large there (user).
 .preloader__logo {
   display: block;
-  width: fluid(113.5);
+  width: fs(113.5);
   height: auto;
   overflow: visible;
 }
