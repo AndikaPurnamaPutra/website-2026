@@ -8,7 +8,9 @@
   gap: var(--space-40);
   max-width: var(--container-narrow);
   margin-inline: auto;
-  padding-block: fluid(220);
+  // Figma: 220 above too; closer to the showreel, so the text comes in as it
+  // leaves rather than after an empty screen (user).
+  padding-block: fluid(120) fluid(220);
 }
 
 .statement__content {
@@ -41,19 +43,17 @@
   white-space: nowrap;
 }
 
-// Ink with the scroll (src/js/statement-ink.js): ink | soft edge | grey,
-// 220% of the piece's width, moved from the grey end (100%) to the ink end
-// (0%). The grey is lighter than the Milestone sentence's (0.4), for the
-// large text, as in the reference.
-// Inked in the page theme's text colour, so it turns over with the page
-// (src/js/page-theme.js) when Services comes up.
-.is-inked {
-  background-image: linear-gradient(90deg, var(--theme-fg) 45%, rgba(0, 0, 0, 0.2) 55%);
-  background-size: 220% 100%;
-  background-position: 100% 0;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+// Its words light up one by one, grey to the page theme's text colour, while
+// the section is held (src/js/statement-ink.js), so they turn over with the
+// page (src/js/page-theme.js). The grey is lighter than the Milestone
+// sentence's (0.4), for the large text.
+.statement__text.is-lighting .statement__word {
+  color: color-mix(in srgb, var(--theme-fg) 20%, transparent);
+  transition: color 0.35s ease;
+
+  &.is-lit {
+    color: var(--theme-fg);
+  }
 }
 
 .statement__line--1 {

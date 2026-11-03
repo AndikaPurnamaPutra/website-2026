@@ -5,6 +5,9 @@ import gsap from "gsap";
 // (Motto / .policy / .contact paint above it), it moves up at half the
 // scroll speed, as measured on sstr.tech (not still, not pulled).
 const LAG = 0.5; // share of the scroll the footer stays behind
+// A dark layer over it fades as it comes up, from dark to light (as on
+// sstr.tech; src/scss/components/_footer.scss).
+const SHADE = 0.5;
 
 export function initFooterReveal() {
   const footer = document.querySelector(".site-footer");
@@ -19,9 +22,10 @@ export function initFooterReveal() {
   const above = footer.previousElementSibling;
   const tween = gsap.fromTo(
     footer,
-    { y: () => -LAG * footer.offsetHeight },
+    { y: () => -LAG * footer.offsetHeight, "--footer-shade": SHADE },
     {
       y: 0,
+      "--footer-shade": 0,
       ease: "none",
       scrollTrigger: {
         trigger: above,
@@ -40,6 +44,6 @@ export function initFooterReveal() {
   return () => {
     tween.scrollTrigger?.kill();
     tween.kill();
-    gsap.set(footer, { clearProps: "transform" });
+    gsap.set(footer, { clearProps: "transform,--footer-shade" });
   };
 }

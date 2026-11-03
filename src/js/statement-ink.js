@@ -1,106 +1,127 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
 
-// Statement text: grey that turns black with the scroll, flowing from left to
-// right through the lines like ink with a soft edge (reference from the user:
-// drone.riotters.com; same gradient technique as the Milestone sentence, but
-// tied to the scroll and back to grey when scrolling up). The icon and the
-// folder keep their colours.
-// Once the blue icon and the folder are well in view, each comes to life on
-// its own clock (user decisions), and plays backwards when scrolled back
-// above that point:
-// - icon: its ring is drawn, the solid dot pops up on it in the middle, then
-//   the two split apart in a straight line to their Figma places;
-// - folder: its pocket opens from the middle, then the folder rises out of
-//   it and settles with a small bounce.
-// Without JS or with reduced motion the text stays black and the icon and
-// folder as in Figma.
+gsap.registerPlugin(SplitText);
+
+// Statement (user: after the hero it felt empty and plain; reference
+// revelatio.studio, whose list of cities is held while its words light up):
+// - the eyebrow rises into view as the hero text does (src/js/hero-intro.js),
+//   as it comes up the screen;
+// - once the text is centred, the section is held there for LENGTH screens
+//   of scrolling, and its words light up one by one with the scroll, grey to
+//   black (each eases over 0.35s, src/scss/sections/_statement.scss);
+// - the blue icon and the folder come to life as the word before each lights
+//   up, each on its own clock (icon: ring drawn, dot pops up, the two split
+//   apart; folder: pocket opens, folder rises out with a small bounce);
+// - once every word is lit, the "Schedule a call" button rises as the hero
+//   text, then the section moves on.
+// All of it goes back when scrolled back up. Without JS or with reduced
+// motion the text stays black, and the icon, folder and button as in Figma.
+const RISE = 200; // % of its height the eyebrow and the button rise from
+const LENGTH = 1.2; // screens of scrolling the section is held for
+const WORDS = 0.8; // share of the hold over which the words light up
+const BUTTON_AT = WORDS; // the button rises as the last word lights up (user)
+
 export function initStatementInk() {
   const text = document.querySelector(".statement__text");
   if (!text || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return () => {};
+  const statement = text.closest(".statement");
 
-  // The text pieces in reading order: lines with only text, or the text
-  // parts of lines that also hold the icon or the folder.
+  // The text pieces in reading order: the text parts of lines that also hold
+  // the icon or the folder, or the whole text of a line, put in a span first
+  // (a line is a flex box: its words split straight into it lost the spaces
+  // between them); split into words.
+  const wrapped = [];
   const pieces = [...text.querySelectorAll(".statement__line")].flatMap((line) => {
     const parts = [...line.querySelectorAll(":scope > span:not(.statement__folder)")];
-    return parts.length ? parts : [line];
+    if (parts.length) return parts;
+    const inner = document.createElement("span");
+    inner.append(...line.childNodes);
+    line.append(inner);
+    wrapped.push(inner);
+    return [inner];
   });
-  pieces.forEach((piece) => piece.classList.add("is-inked"));
+  const splits = pieces.map((piece) => SplitText.create(piece, { type: "words", wordsClass: "statement__word" }));
+  const words = splits.flatMap((split) => split.words);
+  text.classList.add("is-lighting");
 
-  // Each piece takes its share of the scroll by its width, so the ink moves
-  // at an even pace across all the lines.
-  let widths = [];
-  let total = 1;
-  const measure = () => {
-    widths = pieces.map((piece) => piece.offsetWidth);
-    total = widths.reduce((sum, width) => sum + width, 0) || 1;
-  };
-  const paint = (progress) => {
-    let start = 0;
-    pieces.forEach((piece, i) => {
-      const local = Math.min(1, Math.max(0, (progress * total - start) / widths[i]));
-      piece.style.backgroundPositionX = `${(1 - local) * 100}%`;
-      start += widths[i];
+  // Rising into a window of their own: a clip whose bottom edge comes up as
+  // much as the element does, so it stays at the element's own place and no
+  // wrapper is needed (the button is shared with Motto). 1s, power3.out, as
+  // the hero text.
+  const riseOf = (el) =>
+    el &&
+    gsap.fromTo(
+      el,
+      { yPercent: RISE, clipPath: `inset(-20% -20% ${RISE}% -20%)` },
+      { yPercent: 0, clipPath: "inset(-20% -20% 0% -20%)", duration: 1, ease: "power3.out", paused: true },
+    );
+  const eyebrow = statement.querySelector(".statement__eyebrow");
+  const eyebrowRise = riseOf(eyebrow);
+  const eyebrowTrigger =
+    eyebrowRise &&
+    ScrollTrigger.create({
+      trigger: eyebrow,
+      start: "top 85%",
+      onEnter: () => eyebrowRise.play(),
+      onLeaveBack: () => eyebrowRise.reverse(),
+      // Opened or reloaded further down: in place at once.
+      onRefresh: (self) => eyebrowRise.progress(self.progress > 0 ? 1 : 0).pause(),
     });
-  };
+  const button = statement.querySelector(".cta__button");
+  const buttonRise = riseOf(button);
 
-  // The icon and the folder start on their own cue, once each is well up in
-  // view (its centre at 70% of the screen; the text before it is ink by
-  // then): cued by the ink, the icon ran while the text was still near the
-  // bottom, and its ring was drawn before anyone looked (user report).
-  const pieceTriggers = [
+  // The icon and the folder, each cued by the last word before it.
+  const cued = [
     [text.querySelector(".statement__icon"), createIcon],
     [text.querySelector(".statement__folder"), createFolder],
   ].flatMap(([el, create]) => {
     const piece = el && create(el);
     if (!piece) return [];
-    const trigger = ScrollTrigger.create({
-      trigger: el,
-      start: "center 70%",
-      onEnter: () => piece.play(),
-      onLeaveBack: () => piece.reverse(),
-      // Opened or reloaded further down: shown as in Figma at once.
-      onRefresh: (self) => piece.progress(self.progress > 0 ? 1 : 0),
+    const before = splits[pieces.indexOf(el.previousElementSibling)];
+    return [{ piece, after: before ? words.indexOf(before.words.at(-1)) + 1 : 0, on: false }];
+  });
+  let buttonOn = false;
+
+  // Where the hold is: words lit, the icon and folder cued, the button.
+  // `instant` places them at once (a refresh, or a reload further down).
+  const place = (progress, instant) => {
+    const lit = Math.round(Math.min(1, progress / WORDS) * words.length);
+    words.forEach((word, i) => word.classList.toggle("is-lit", i < lit));
+    cued.forEach((item) => {
+      const on = lit >= item.after;
+      if (instant) item.piece.progress(on ? 1 : 0);
+      else if (on !== item.on) on ? item.piece.play() : item.piece.reverse();
+      item.on = on;
     });
-    return [{ piece, trigger }];
-  });
+    const on = progress >= BUTTON_AT;
+    if (buttonRise) {
+      if (instant) buttonRise.progress(on ? 1 : 0).pause();
+      else if (on !== buttonOn) on ? buttonRise.play() : buttonRise.reverse();
+    }
+    buttonOn = on;
+  };
 
-  // The ink follows the scroll softly (like the reference, where every
-  // letter fades on its own), so a fast scroll does not make it jump.
-  const ink = { progress: 0 };
-  const follow = gsap.quickTo(ink, "progress", {
-    duration: 0.6,
-    ease: "power3.out",
-    onUpdate: () => paint(ink.progress),
-  });
-
-  // From the text coming in near the bottom of the screen to the text
-  // centred, so it reads all black where it is read (user decision). About
-  // 510px of scrolling at 1440 x 900, close to the reference (530px).
-  const trigger = ScrollTrigger.create({
+  // Held from the text centred on the screen.
+  const hold = ScrollTrigger.create({
     trigger: text,
-    start: "top 90%",
-    end: "center center",
-    onRefresh: (self) => {
-      measure();
-      ink.progress = self.progress;
-      follow(self.progress, self.progress);
-      paint(self.progress);
-    },
-    onUpdate: (self) => follow(self.progress),
+    start: "center center",
+    end: () => `+=${LENGTH * window.innerHeight}`,
+    pin: statement,
+    onUpdate: (self) => place(self.progress, false),
+    onRefresh: (self) => place(self.progress, true),
   });
 
   return () => {
-    trigger.kill();
-    gsap.killTweensOf(ink);
-    pieceTriggers.forEach(({ piece, trigger: pieceTrigger }) => {
-      pieceTrigger.kill();
-      piece.revert();
-    });
-    pieces.forEach((piece) => {
-      piece.classList.remove("is-inked");
-      piece.style.backgroundPositionX = "";
-    });
+    hold.kill();
+    eyebrowTrigger?.kill();
+    [eyebrowRise, buttonRise].forEach((rise) => rise?.kill());
+    gsap.set([eyebrow, button].filter(Boolean), { clearProps: "transform,clipPath" });
+    cued.forEach(({ piece }) => piece.revert());
+    text.classList.remove("is-lighting");
+    splits.forEach((split) => split.revert());
+    wrapped.forEach((inner) => inner.replaceWith(...inner.childNodes));
   };
 }
 
