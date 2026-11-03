@@ -19,6 +19,9 @@ gsap.registerPlugin(SplitText);
 // All of it goes back when scrolled back up. Without JS or with reduced
 // motion the text stays black, and the icon, folder and button as in Figma.
 const RISE = 200; // % of its height the eyebrow and the button rise from
+// % of its height their window reaches below them, so descenders (g, p, y)
+// are not cut (user report).
+const DESCENT = 25;
 const LENGTH = 1.2; // screens of scrolling the section is held for
 const WORDS = 0.8; // share of the hold over which the words light up
 const BUTTON_AT = WORDS; // the button rises as the last word lights up (user)
@@ -54,8 +57,8 @@ export function initStatementInk() {
     el &&
     gsap.fromTo(
       el,
-      { yPercent: RISE, clipPath: `inset(-20% -20% ${RISE}% -20%)` },
-      { yPercent: 0, clipPath: "inset(-20% -20% 0% -20%)", duration: 1, ease: "power3.out", paused: true },
+      { yPercent: RISE, clipPath: `inset(-20% -20% ${RISE - DESCENT}% -20%)` },
+      { yPercent: 0, clipPath: `inset(-20% -20% ${-DESCENT}% -20%)`, duration: 1, ease: "power3.out", paused: true },
     );
   const eyebrow = statement.querySelector(".statement__eyebrow");
   const eyebrowRise = riseOf(eyebrow);

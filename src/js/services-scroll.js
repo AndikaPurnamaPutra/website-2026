@@ -7,13 +7,14 @@ import { designPx, typePx } from "./design-px.js";
 // the last step expands the image to fill the section.
 // Timing, easing and scroll distance are not in Figma (approved proposal).
 // Text comes in as the hero text (src/js/hero-intro.js; user): as the section
-// arrives, the first image, dimmed since the page turned dark, lights up ("lights off, then the stage lights up"; user: shape effects felt
-// overdone, text alone flat), the cards rise into place and their text and
-// the label rise; at each step, the card coming to
-// the front draws its line, then its tags and text rise. On their own clock
-// (1s, power3.out), back when scrolled back up. The step images open as a
-// curtain from the bottom, with no zoom (user: a zoom with every curtain was
-// too much; that version is kept on the branch services-media/zoom).
+// arrives, the first image, dimmed since the page turned dark, lights up
+// ("lights off, then the stage lights up"; user: no blur), the cards rise
+// into place and their text and the label rise; at each step, the card
+// coming to the front draws its line, then its tags and text rise. On their
+// own clock (1s, power3.out), back when scrolled back up. The images open as
+// a curtain from the bottom with depth, after floema.com's collections (user;
+// a zoom with every curtain was too much: that version is kept on the branch
+// services-media/zoom).
 
 // Card geometry in Figma pixels (1440px frame).
 const FIRST_TOP = 98; // active card top in frame 1
@@ -21,7 +22,17 @@ const LATER_TOP = 88; // active card top from frame 2 on
 const PREVIOUS_GAP = 12; // card that moved up ends 12px above the active card (Figma: 76 → 88)
 const RADIUS = 4; // --radius-sm (Figma 4px, layout scale)
 const RISE = 200; // % of its height the text rises from (as the hero text)
+const DESCENT = 25; // % of its height its window reaches below it, for descenders
 const CARD_RISE = 40; // Figma px the cards rise from as the section arrives
+// Images (as floema.com's collections, measured; user): straight with the
+// scroll, linear, one curtain running into the next with no pause; a new one
+// is revealed from the bottom while its picture rises from RAISE % below, more
+// slowly than the curtain's edge, and the one it covers keeps rising, by
+// LEAVE %, growing by GROW. No dimming. See
+// docs/implementation/22-services-images.md.
+const RAISE = 15;
+const LEAVE = 10;
+const GROW = 0.03;
 // The exit, the same the other way (as in Motto): over the last EXIT of a
 // screen of the pin the section rises faster and faster, by half that
 // distance, so it already moves with the page when it is released. The page
@@ -55,7 +66,7 @@ export function initServicesScroll() {
   const REST = 0.18;
   // Each step takes one screen of scrolling; U is the timeline time of one
   // screen of scrolling.
-  const STEP_SCREENS = 1;
+  const STEP_SCREENS = 1.1; // per step (user: 1.5 took too much scrolling, 0.8 left too little time to read the card; floema: ±2.3)
   const U = (1 + REST) / STEP_SCREENS;
   // The cards follow the (already smooth) Lenis scroll closely, and only a
   // very fast scroll meets the speed limit: one move (1 of timeline time) in
@@ -160,6 +171,10 @@ export function initServicesScroll() {
       },
     });
 
+    // The images, on their own timeline with the same clock, set straight
+    // from the scroll (linear: as floema.com).
+    const flow = gsap.timeline({ paused: true, defaults: { ease: reduceMotion ? "steps(1)" : "none" } });
+
     // The pin sets where the timeline should be (target); the ticker below
     // moves it there, with the speed limit. On a refresh (load, resize, a
     // reload further down) it is placed there at once.
@@ -174,6 +189,8 @@ export function initServicesScroll() {
       onUpdate: (self) => {
         target = self.progress * timeline.duration();
         if (reduceMotion) timeline.time(target);
+        // The images straight with the scroll (no speed limit, no delay).
+        flow.time(target);
       },
       onRefresh: (self) => {
         target = self.progress * timeline.duration();
@@ -181,6 +198,7 @@ export function initServicesScroll() {
         // timeline was (e.g. a line already flipped away), they were wrong, and
         // scrolling back up left the first line hidden (user report).
         timeline.time(0).invalidate().time(target);
+        flow.time(0).invalidate().time(target);
         if (timeline.time() < stepTime(steps - 1)) clearMedia();
         cue(true);
       },
@@ -280,12 +298,23 @@ export function initServicesScroll() {
         timeline.to(clips[i], clipVars(i, active), at);
       });
       // The new image is revealed from the bottom like a curtain over the
-      // previous one (no half-transparent overlap), with no zoom (user).
-      timeline.fromTo(
+      // previous one (no half-transparent overlap), on the image timeline
+      // (flow): from the end of the last curtain to the start of the next, so
+      // one runs into the other; its picture comes up more slowly than the
+      // curtain's edge, and the previous one keeps rising and grows a little.
+      const from = at - REST / 2;
+      const span = 1 + REST;
+      flow.fromTo(
         images[active],
-        { autoAlpha: 1, clipPath: "inset(100% 0% 0% 0%)" },
-        { clipPath: "inset(0% 0% 0% 0%)", ease: reduceMotion ? "steps(1)" : "sine.inOut" },
-        at,
+        { autoAlpha: 1, yPercent: RAISE, clipPath: "inset(100% 0% 0% 0%)" },
+        { yPercent: 0, clipPath: "inset(0% 0% 0% 0%)", duration: span },
+        from,
+      );
+      flow.fromTo(
+        images[active - 1],
+        { yPercent: 0, scale: 1 },
+        { yPercent: -LEAVE, scale: 1 + GROW, duration: span, immediateRender: false },
+        from,
       );
       if (active === 1) {
         timeline.to(fade, { autoAlpha: 1 }, at);
@@ -307,12 +336,14 @@ export function initServicesScroll() {
     // The text coming in (not with reduced motion: it stays in place).
     if (!reduceMotion) {
       // Up from 200% below in a window of its own: a clip whose bottom edge
-      // comes up as much as the element does, so no wrapper is needed.
+      // comes up as much as the element does, so no wrapper is needed. The
+      // window reaches DESCENT below the box, so descenders (g, p, y) are not
+      // cut (user report).
       const rise = (els, vars) =>
         gsap.fromTo(
           els,
-          { yPercent: RISE, clipPath: `inset(-20% -20% ${RISE}% -20%)` },
-          { yPercent: 0, clipPath: "inset(-20% -20% 0% -20%)", duration: 1, ease: "power3.out", ...vars },
+          { yPercent: RISE, clipPath: `inset(-20% -20% ${RISE - DESCENT}% -20%)` },
+          { yPercent: 0, clipPath: `inset(-20% -20% ${-DESCENT}% -20%)`, duration: 1, ease: "power3.out", ...vars },
         );
       const parts = cards.map((card) => ({
         title: card.querySelector(".services__card-title"),
@@ -334,8 +365,9 @@ export function initServicesScroll() {
       const entry = gsap
         .timeline({ paused: true })
         // The first image lights up, as a light turned up slowly: brightness
-        // only (user: a blur looked odd).
-        .fromTo(images[0], { filter: "brightness(0.4)" }, { filter: "brightness(1)", duration: 1.4, ease: "sine.inOut" }, 0)
+        // only (user: a blur looked odd). The step images come in as on
+        // floema.com (above).
+        .fromTo(images[0], { filter: "brightness(0.3)" }, { filter: "brightness(1)", duration: 1.4, ease: "sine.inOut" }, 0)
         // The card and the deck behind it rise into place. translate and
         // filter, as the step timeline owns their transform and opacity.
         .fromTo(
@@ -370,10 +402,13 @@ export function initServicesScroll() {
       };
     }
 
+    // Same length as the step timeline, so the same time fits both.
+    flow.set({}, {}, timeline.duration());
     // The pin may have measured before the steps were added: place the
     // timeline for the current scroll now that it is complete.
     target = pin.progress * timeline.duration();
     timeline.time(target);
+    flow.time(target);
     cue(true);
   }, section);
 
