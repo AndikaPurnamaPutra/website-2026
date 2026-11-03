@@ -19,10 +19,11 @@
   background: var(--color-surface-muted); // #f6f6f6, with a dark logo (user; Figma: black)
 }
 
-// Figma 1880:663: 122 × 58.
+// 113.5 × 54 at 1440 (user: a little smaller than Figma 1880:663's 122 × 58;
+// the logo is 206 : 98).
 .preloader__logo {
   display: block;
-  width: fluid(122);
+  width: fluid(113.5);
   height: auto;
   overflow: visible;
 }
