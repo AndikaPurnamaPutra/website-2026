@@ -1,6 +1,6 @@
 // Preloader v2 (docs/implementation/20-preloader.md; src/js/preloader.js). A
 // white layer over the whole page, above the header, with the logo in the
-// middle and "2026" below; it lifts off the top of the screen. Only while
+// middle and "©2026 / One Week Wonders Studio" below; it lifts off the top of the screen. Only while
 // <html> has is-preloading (set in <head> when JS runs without reduced
 // motion), so without JS the page shows at once.
 @use "../abstracts/functions" as *;
@@ -55,6 +55,7 @@
   left: 50%;
   overflow: clip;
   color: var(--color-ink);
+  white-space: pre; // the double spaces round the slash, as in the hero
   translate: -50% 0;
 
   span {

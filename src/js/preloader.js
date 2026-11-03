@@ -13,7 +13,8 @@ gsap.registerPlugin(DrawSVGPlugin, SplitText);
 // 1. white (Figma: black; user), with the logo in the middle drawn as an
 //    outline as the page loads (at least MIN_DRAW seconds, so it never just
 //    flashes), then filled,
-// 2. "2026" rises into view below it, letter by letter,
+// 2. "©2026 / One Week Wonders Studio" rises into view below it, letter by
+//    letter,
 // 3. as the curtain starts up, both fade out and blur away, as motto 1 blurs
 //    in (src/js/motto-scroll.js, reversed; user),
 // 4. the layer lifts off the top of the screen, uncovering the hero;
@@ -65,7 +66,8 @@ export function initPreloader() {
   const logo = preloader.querySelector(".preloader__logo");
   const year = preloader.querySelector(".preloader__year span");
   // The year's letters rise and drop one by one, each in its own window.
-  const split = SplitText.create(year, { type: "chars", mask: "chars" });
+  // reduceWhiteSpace off keeps the double spaces round the slash.
+  const split = SplitText.create(year, { type: "chars", mask: "chars", reduceWhiteSpace: false });
   const header = document.querySelector("[data-header]");
   const showreel = document.querySelector(".hero__showreel");
   const coin = document.querySelector(".hero__coin");
@@ -166,9 +168,9 @@ export function initPreloader() {
     // Outline → solid, then the year, and a breath with both.
     .to(solid, { opacity: 1, duration: 0.6, ease: "power2.out" })
     .to(preloader.querySelector(".preloader__outline"), { opacity: 0, duration: 0.6, ease: "power2.out" }, "<")
-    .to(split.chars, { yPercent: 0, duration: 0.8, stagger: 0.05, ease: SHOW }, 0.35)
+    .to(split.chars, { yPercent: 0, duration: 0.8, stagger: 0.012, ease: SHOW }, 0.35)
     // The curtain lifts off the screen.
-    .addLabel("lift", 1.5)
+    .addLabel("lift", 1.65)
     .add(() => document.dispatchEvent(new CustomEvent("preloader:reveal")), "lift")
     // On the year's box: its window would cut the blur.
     .to([logo, year.parentElement], { ...BLUR_OUT, y: () => -BLUR_SHIFT * designPx() }, "lift")
