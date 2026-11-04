@@ -23,26 +23,31 @@ header.site-header(data-header)
             | Work
             img(src="assets/icons/chevron-down.svg" width="16" height="16" alt="")
           .work-menu#work-menu
-            .work-menu__brand
-              p.work-menu__title Digital#[br]Expertise
-              p.work-menu__copy ©2026  /  One Week Wonders Studio
-            ul.work-menu__links
-              each category in workCategories
-                li
-                  a.work-menu__link(href="#")
-                    span= category[0]
-                    span.work-menu__count= category[1]
-            .work-menu__featured
-              .work-menu__sets
-                each set, k in workSets
-                  .work-menu__set(class=k === 0 ? "is-active" : null aria-hidden=k === 0 ? null : "true")
-                    each image in set
-                      a.work-menu__card(href="#" tabindex=k === 0 ? null : "-1")
-                        img(src=`assets/images/${image}` alt="" loading="lazy")
-                        span.work-menu__badge New
-              .work-menu__dots(role="tablist" aria-label="Featured projects")
-                each set, k in workSets
-                  button.work-menu__dot(type="button" role="tab" aria-selected=k === 0 ? "true" : "false" aria-label=`Projects ${k + 1}`)
+            //- Its background, on a layer of its own: grows from a small box
+            //- under Work as the panel opens (src/js/work-menu.js).
+            span.work-menu__bg(aria-hidden="true")
+            //- The content, shown through the background's shape as it grows.
+            .work-menu__content
+              .work-menu__brand
+                p.work-menu__title Digital#[br]Expertise
+                p.work-menu__copy ©2026  /  One Week Wonders Studio
+              ul.work-menu__links
+                each category in workCategories
+                  li
+                    a.work-menu__link(href="#")
+                      span= category[0]
+                      span.work-menu__count= category[1]
+              .work-menu__featured
+                .work-menu__sets
+                  each set, k in workSets
+                    .work-menu__set(class=k === 0 ? "is-active" : null aria-hidden=k === 0 ? null : "true")
+                      each image in set
+                        a.work-menu__card(href="#" tabindex=k === 0 ? null : "-1")
+                          img(src=`assets/images/${image}` alt="" loading="lazy")
+                          span.work-menu__badge New
+                .work-menu__dots(role="tablist" aria-label="Featured projects")
+                  each set, k in workSets
+                    button.work-menu__dot(type="button" role="tab" aria-selected=k === 0 ? "true" : "false" aria-label=`Projects ${k + 1}`)
         each link in navLinks
           li.site-nav__item
             a.site-nav__link(href=link[1])= link[0]

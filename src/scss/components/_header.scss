@@ -159,26 +159,40 @@ main {
   top: calc(100% + 42px);
   right: var(--page-gutter);
   left: var(--page-gutter);
+  padding: 16px;
+  color: var(--color-ink);
+  // Its background is the layer below, so it can grow from a small box with
+  // its shadow (src/js/work-menu.js); the content is drawn above it.
+  isolation: isolate;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.work-menu__content {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
-  color: var(--color-ink);
+}
+
+.work-menu__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background: var(--color-white);
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  visibility: hidden;
-  opacity: 0;
+}
 
-  // Keeps the hover while the pointer crosses the gap above the panel.
-  &::before {
-    content: "";
-    position: absolute;
-    right: 0;
-    bottom: 100%;
-    left: 0;
-    height: 42px;
-  }
+// Keeps the hover while the pointer crosses the gap above the panel; on the
+// Work item rather than the panel, whose content is clipped while it grows
+// (src/js/work-menu.js). Only while the panel shows.
+.site-nav__item--work.is-shown::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: var(--page-gutter);
+  left: var(--page-gutter);
+  height: 42px;
 }
 
 .work-menu__brand {
