@@ -31,15 +31,28 @@
   gap: var(--space-16);
 }
 
-// 101px rows in Figma include the 1px bottom line, so it is drawn with an
-// inset shadow instead of a border (no extra height).
+// 101px rows in Figma include the 1px bottom line, so it is drawn inside the
+// row (no extra height), as a line of its own so it can be drawn from the
+// left as the section comes in (--line, src/js/milestone-counter.js).
 .milestone__row {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding-block: var(--space-24);
-  // The row line (#f0f0f0 on white), in the page theme (src/js/page-theme.js).
-  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--theme-bg), var(--theme-fg) 6%);
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    // The row line (#f0f0f0 on white), in the page theme (src/js/page-theme.js).
+    background: color-mix(in srgb, var(--theme-bg), var(--theme-fg) 6%);
+    transform: scaleX(var(--line, 1));
+    transform-origin: 0 50%;
+  }
 }
 
 .milestone__value {
