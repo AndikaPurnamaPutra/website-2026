@@ -62,7 +62,9 @@ const BLUR_SHIFT = 12; // Figma px, up with the curtain
 // 0.47 × 420 below it, as in src/js/coin-scene.js).
 const COIN_EDGE = (208 + 0.47 * 420) / 420;
 const HANG_GAP = 40; // Figma px from the coin to the bottom of the screen
-const COIN_WAIT = 6; // s at most for the 3D coin
+// The page opens MAX_WAIT seconds after it was opened even if an asset is
+// still loading (user decision).
+const MAX_WAIT = 20; // s
 // The coin fades in after the showreel has shown (user), as it settles, so
 // it is not a step of its own; slowly and evenly, never at once (user: a
 // quick ease-out looked harsh).
@@ -107,32 +109,48 @@ export function initPreloader() {
     startSmoothScroll();
   };
 
-  // Loading progress: the images loaded with the page, the web fonts, the
-  // window load and the 3D coin (it loads after the window load and must be
-  // in before it is pushed up: "coin:ready", src/js/coin-scene.js and
-  // src/js/coin-3d.js; at most COIN_WAIT seconds). Lazy images load later,
-  // on their own.
-  const pending = [...document.images].filter((img) => img.loading !== "lazy" && !img.complete);
-  const total = pending.length + 2 + (coin ? 1 : 0);
+  // Loading progress: everything the page shows (user: really wait until all
+  // of it is in): every image, the lazy ones loaded now too; the videos until
+  // they can play through (not fully downloaded; user decision), on touch
+  // screens until their first frame (iOS may load no more before playing);
+  // the web fonts; the window load; and the 3D coin (it loads after the
+  // window load and must be in before it is pushed up: "coin:ready",
+  // src/js/coin-scene.js and src/js/coin-3d.js). An asset that fails counts
+  // as in, and after MAX_WAIT seconds the page opens anyway.
   let loaded = 0;
-  const done = () => {
-    loaded += 1;
+  const once = (target, events) => {
+    let counted = false;
+    const count = () => {
+      if (counted) return;
+      counted = true;
+      loaded += 1;
+    };
+    events.forEach((type) => target.addEventListener(type, count, { once: true }));
+    return count;
   };
-  pending.forEach((img) => {
-    img.addEventListener("load", done, { once: true });
-    img.addEventListener("error", done, { once: true });
+  const images = [...document.images];
+  images.forEach((img) => {
+    if (img.loading === "lazy") img.loading = "eager";
   });
-  (document.fonts?.ready ?? Promise.resolve()).then(done);
-  if (document.readyState === "complete") done();
-  else window.addEventListener("load", done, { once: true });
-  let coinIn = false;
-  const coinDone = () => {
-    if (coinIn) return;
-    coinIn = true;
-    done();
-  };
-  const coinWait = coin ? gsap.delayedCall(COIN_WAIT, coinDone) : null;
-  if (coin) document.addEventListener("coin:ready", coinDone, { once: true });
+  const pending = images.filter((img) => !img.complete);
+  const touch = window.matchMedia("(pointer: coarse)").matches;
+  const videoReady = touch ? 2 : 4; // HAVE_CURRENT_DATA / HAVE_ENOUGH_DATA
+  const videos = [...document.querySelectorAll("video[data-inview-video]")].filter((video) => video.readyState < videoReady);
+  const total = pending.length + videos.length + 2 + (coin ? 1 : 0);
+  pending.forEach((img) => once(img, ["load", "error"]));
+  videos.forEach((video) => {
+    const count = once(video, [touch ? "loadeddata" : "canplaythrough", "error"]);
+    // A source that fails reports it on the <source>, not on the video.
+    video.querySelectorAll("source").forEach((source) => source.addEventListener("error", count, { once: true }));
+    video.preload = "auto";
+  });
+  const pageLoaded = once(window, ["load"]);
+  if (document.readyState === "complete") pageLoaded();
+  (document.fonts?.ready ?? Promise.resolve()).then(once(document, []));
+  const coinDone = coin ? once(document, ["coin:ready"]) : null;
+  // Counted from the opening of the page (performance.now), not from this
+  // script, which may itself come in late on a slow connection.
+  const maxWait = gsap.delayedCall(Math.max(0, MAX_WAIT - performance.now() / 1000), () => (loaded = total));
 
   // The outline heads for the progress at a smoothly changing pace (see
   // DRAW_HOLD above).
@@ -234,8 +252,8 @@ export function initPreloader() {
 
   return () => {
     gsap.ticker.remove(follow);
-    coinWait?.kill();
-    document.removeEventListener("coin:ready", coinDone);
+    maxWait.kill();
+    if (coinDone) document.removeEventListener("coin:ready", coinDone);
     draw.kill();
     intro.kill();
     finish();

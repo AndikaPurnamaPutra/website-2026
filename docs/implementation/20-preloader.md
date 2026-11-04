@@ -191,3 +191,44 @@ Figma: 1860:244 → 1880:663 → 1880:803 → 1880:759 → 1880:836. Hitam #000,
 - **Fade koin lebih halus (pengguna: "sangat kasar", 3 Nov 2026):** 1,4 dtk `sine.inOut`, mulai saat showreel 60% jalan (sebelumnya 0,9 dtk `power3.out` yang melonjak di awal).
 - **Navbar dengan blur (pengguna memilih B, 3 Nov 2026):** navbar per kata terasa aneh untuk teks sekecil itu. Sekarang seluruh navbar memudar masuk dari blur 6px menjadi tajam sambil turun 12px ke tempatnya (1 dtk `power3.out`), kebalikan dari logo preloader yang hilang dengan blur.
 - **Navbar kembali blok dari atas (pengguna, 3 Nov 2026):** per kata dan blur terasa aneh. Navbar turun dari atas sebagai satu blok (1,2 dtk `power3.out`), mulai 1,1 dtk setelah tirai naik.
+
+- **Outline logo mulus (pengguna: "putus-putus", 4 Nov 2026):** outline tidak lagi mengikuti progres per aset, yang membuatnya melesat lalu berhenti berulang kali. Selama loading, outline mengikuti kurva waktu yang terus melambat tapi tidak pernah berhenti (sampai 90% logo, konstanta 2 dtk). Begitu semua aset selesai, outline mempercepat sampai penuh. Kecepatannya berubah halus, dan seluruh logo tetap paling cepat 0,9 dtk.
+
+
+## Menunggu semua aset (rencana, 4 Nov 2026)
+
+**Tujuan:** preloader benar-benar menunggu sampai semua aset homepage selesai dimuat, baru tirai naik.
+
+**Keputusan pengguna:**
+- Video ditunggu sampai siap diputar lancar (`canplaythrough`), bukan sampai terunduh penuh.
+- Batas waktu 20 dtk. Setelah itu halaman tetap dibuka. Aset yang gagal (error) langsung dihitung selesai.
+
+**Yang ditunggu:**
+- Semua gambar, termasuk 12 gambar `lazy`: selama preloader tampil, gambar itu dimuat langsung (`loading="eager"`).
+- Video ber-`data-inview-video` (showreel, 2 video Services): `preload` diubah ke `auto`, lalu ditunggu sampai `canplaythrough`. Video lightbox memakai file yang sama dengan showreel, jadi tidak dihitung terpisah.
+- Web font dan window load, seperti sekarang.
+- Koin 3D: batas 6 dtk dihapus, diganti batas umum 20 dtk.
+
+**Tetap sama:** outline logo tetap mengikuti progres loading (paling cepat 0,9 dtk). Animasi setelah loading juga tetap.
+
+**File:** `src/js/preloader.js`. Branch `preloader/load-all`, dibuat dari `motto/v1`.
+
+**Langkah:**
+- [x] Gambar lazy dimuat langsung saat preloading, dan ikut dihitung.
+- [x] Video: `preload="auto"`, tunggu `canplaythrough`.
+- [x] Batas umum 20 dtk menggantikan batas koin 6 dtk.
+- [x] Build. Cek di Chrome dengan jaringan diperlambat:
+  - [x] tirai baru naik setelah semua aset selesai;
+  - [x] di jaringan sangat lambat, tirai naik di 20 dtk;
+  - [x] tidak ada error.
+
+**Catatan:**
+- Di layar sentuh, video dihitung selesai saat frame pertamanya siap (`loadeddata`), karena Safari di iPhone kadang tidak memuat lebih jauh sebelum video diputar.
+- Batas 20 dtk dihitung sejak halaman dibuka, bukan sejak script berjalan.
+
+**Hasil:**
+| Jaringan | Tirai naik | Saat itu |
+|---|---|---|
+| Cepat | 4,2 dtk | semua aset selesai |
+| ±20 Mbit/s | 11,5 dtk | semua aset selesai |
+| ±2,4 Mbit/s | 22,6 dtk | batas 20 dtk + logo selesai; 6 gambar dan 2 video belum selesai |
