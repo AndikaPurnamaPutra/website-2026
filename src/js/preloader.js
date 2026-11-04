@@ -29,6 +29,16 @@ gsap.registerPlugin(DrawSVGPlugin, SplitText);
 // The scroll is held meanwhile. Only while <html> has is-preloading (set in
 // <head>, not with reduced motion).
 const MIN_DRAW = 0.9; // s
+// The outline is drawn at a pace that changes smoothly (user: following the
+// loading progress, it rushed, stopped, jumped and stopped again as assets
+// came in one by one): while loading it follows a curve of time that slows
+// down but never stops, up to DRAW_HOLD of the logo; once everything is in
+// it speeds up to the end. Never faster than the whole logo in MIN_DRAW; its
+// speed eases up and down (DRAW_EASE per second).
+const DRAW_HOLD = 0.9;
+const CREEP = 2; // s, the curve's time constant (57% in 2s, 78% in 4s)
+const DRAW_PULL = 2.5; // per second, how strongly it heads for its goal
+const DRAW_EASE = 4; // per second, how quickly its speed follows
 // One rhythm for the whole entrance (user: smooth, seamless, enjoyable):
 // the big movements (curtain, showreel) start and settle gently (MOVE),
 // what appears (logo, year, navbar, and the hero text in
@@ -124,7 +134,8 @@ export function initPreloader() {
   const coinWait = coin ? gsap.delayedCall(COIN_WAIT, coinDone) : null;
   if (coin) document.addEventListener("coin:ready", coinDone, { once: true });
 
-  // The outline follows the progress, eased, and never faster than MIN_DRAW.
+  // The outline heads for the progress at a smoothly changing pace (see
+  // DRAW_HOLD above).
   const draw = gsap.fromTo(
     outline,
     { drawSVG: "0%" },
@@ -133,11 +144,16 @@ export function initPreloader() {
   gsap.set(preloader.querySelector(".preloader__outline"), { visibility: "visible" });
   const start = performance.now();
   let shown = 0;
-  const follow = () => {
+  let speed = 0; // share of the logo per second
+  const follow = (time, deltaMs) => {
+    const dt = Math.min(deltaMs / 1000, 0.1);
     const elapsed = (performance.now() - start) / 1000;
-    const target = Math.min(loaded / total, elapsed / MIN_DRAW);
-    shown += (target - shown) * Math.min(1, 0.12 * gsap.ticker.deltaRatio());
-    if (target >= 1 && shown > 0.995) {
+    const goal = loaded >= total ? 1 : DRAW_HOLD * (1 - Math.exp(-elapsed / CREEP));
+    const wanted = gsap.utils.clamp(0, 1 / MIN_DRAW, (goal - shown) * DRAW_PULL);
+    speed += (wanted - speed) * Math.min(1, dt * DRAW_EASE);
+    // Not held at the goal (a stop at once); a little past it, it slows down.
+    shown = Math.min(1, shown + speed * dt);
+    if (loaded >= total && shown > 0.995) {
       shown = 1;
       gsap.ticker.remove(follow);
       intro.play();
