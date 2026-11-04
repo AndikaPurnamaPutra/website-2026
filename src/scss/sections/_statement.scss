@@ -170,6 +170,12 @@ body.is-dark .statement {
   .cta__button:focus-visible {
     border-color: var(--color-white);
   }
+
+  // The arrow is a dark picture: made white, like the menu bar's icons
+  // (it was not seen on dark; user).
+  .cta__icon img {
+    filter: brightness(0) invert(1);
+  }
 }
 
 @keyframes statement-cta-swap-light {
