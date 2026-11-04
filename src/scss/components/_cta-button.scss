@@ -57,6 +57,9 @@
   img {
     flex-shrink: 0;
     width: fs(32);
+    // Its full size while the box opens and closes: limited to the box (the
+    // reset's max-width: 100%), it was squeezed flat (user).
+    max-width: none;
     height: fs(32);
     margin-left: fs(8);
     // Figma flips the "down-right" arrow vertically, so it points up-right.
