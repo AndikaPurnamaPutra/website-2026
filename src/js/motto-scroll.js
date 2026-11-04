@@ -1,6 +1,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { designPx } from "./design-px.js";
+import { getSmoothScroll } from "./smooth-scroll.js";
 
 // Pinned Motto + CTA section (Figma storyboard 1527:4259, flow from the user):
 // entry: the Milestone + Motto wrapper turns from light to dark across the whole
@@ -17,6 +18,10 @@ import { designPx } from "./design-px.js";
 // The glow from below follows one smoothed journey (see lightPath).
 // Timing and easing are not in Figma (approved proposal).
 
+// One gesture, one step (see the wheel steps below).
+const QUIET = 180; // ms without wheel events that ends a gesture
+const FLIP_GLIDE = 0.8; // s for a flip (1.1 as sstr.tech felt too slow; user)
+const HIGHLIGHT_GLIDE = 0.4; // s for a step to a highlight
 
 export function initMottoScroll() {
   const section = document.querySelector("[data-motto]");
@@ -356,6 +361,139 @@ export function initMottoScroll() {
         onUpdate: exit,
         onRefresh: exit,
       });
+    }
+
+    // One gesture, one step (user; as sstr.tech's section_webgl and About
+    // Principles, src/js/principles-scroll.js): on the wheel, inside the pin,
+    // each new gesture glides the page to the next stop, so a highlight or a
+    // flip always plays in full on its own clock, however small or strong the
+    // scroll (following the scroll, a small one left a flip half done, a
+    // quick one ran past the next step). The stops lie just before and after
+    // each change; the last one at the start of the exit, past the hold.
+    // Touch screens and the keyboard scroll freely.
+    // Seamless (user): a gesture during a glide or a highlight is not lost
+    // but kept, and its step follows at once (one at most; the rest of a
+    // gesture is swallowed); the steps ease in and out (sine, as sstr.tech's).
+    // In and out is the reader's own scroll, as everywhere else (user: a
+    // glide of its own there, into the first stop and on to the footer, felt
+    // odd): a swipe into the section is carried on by the smooth scroll and
+    // held softly at the first stop (from above) or the last (from below), as
+    // in About Principles; after the last stop the page scrolls on freely, the
+    // content rising with it.
+    if (!reduceMotion) {
+      const stops = [calm[0], flip1, flip1 + FLIP, flip2, flip2 + FLIP, length - EXIT];
+      const placeOf = (time) => pin.start + (time / length) * (pin.end - pin.start);
+      const sineInOut = (t) => -(Math.cos(Math.PI * t) - 1) / 2;
+      let glideEnd = 0;
+      let stepped = false;
+      let lastWheel = 0;
+      let lastStrength = 0;
+      let queued = 0; // direction of a kept gesture
+      let entry = null; // { target, limit, direction } while scrolling into the section
+      const glide = (top, duration, easing) => {
+        const lenis = getSmoothScroll();
+        entry = null;
+        // Timed here rather than by Lenis' onComplete, which an interrupted
+        // glide may never call.
+        glideEnd = performance.now() + duration * 1000;
+        if (lenis) lenis.scrollTo(top, { duration, easing, force: true });
+        else window.scrollTo({ top, behavior: "smooth" });
+      };
+      const busy = () => performance.now() < glideEnd || gradients.some((g) => g.wave.isActive());
+      const scrollNow = () => getSmoothScroll()?.targetScroll ?? window.scrollY;
+
+      // The step from the current place in that direction; false above the
+      // first stop going up and past the last going down (the page scrolls on
+      // freely).
+      const step = (direction) => {
+        const from = scrollNow();
+        const places = stops.map(placeOf);
+        // The next stop that way (the current one if between two).
+        const near = places.findIndex((place) => Math.abs(place - from) < 2);
+        const next =
+          near >= 0
+            ? near + direction
+            : direction > 0
+              ? places.findIndex((place) => place > from)
+              : places.findLastIndex((place) => place < from);
+        if (next < 0 || next >= stops.length) return false;
+        // Between stops 1 and 2, and 3 and 4, lies a flip; the other steps are
+        // a short move past a highlight's point (the wave plays on its own
+        // clock).
+        const before = near >= 0 ? near : next - direction;
+        glide(places[next], Math.min(before, next) % 2 === 1 ? FLIP_GLIDE : HIGHLIGHT_GLIDE, sineInOut);
+        return true;
+      };
+      // The wheel's own scroll, held back at the entry's limit.
+      const carry = (delta) => {
+        const lenis = getSmoothScroll();
+        const distance = delta * (lenis?.options.wheelMultiplier ?? 1);
+        entry.target = entry.direction > 0 ? Math.min(entry.target + distance, entry.limit) : Math.max(entry.target + distance, entry.limit);
+        if (lenis) lenis.scrollTo(entry.target, { force: true });
+        else window.scrollTo(0, entry.target);
+      };
+      // A kept gesture, once the step before it has finished.
+      const playQueued = () => {
+        if (!queued || busy()) return;
+        const direction = queued;
+        queued = 0;
+        const from = scrollNow();
+        if (from >= pin.start && from <= pin.end) step(direction);
+      };
+      gsap.ticker.add(playQueued);
+
+      const onWheel = (event) => {
+        if (event.ctrlKey || !event.deltaY) return; // pinch zoom
+        const now = performance.now();
+        const strength = Math.abs(event.deltaY);
+        const quiet = now - lastWheel >= QUIET;
+        const stronger = strength > 8 && strength > lastStrength * 1.5;
+        lastWheel = now;
+        lastStrength = strength;
+        const swallow = () => {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        };
+        const sameGesture = !quiet && !stronger;
+        const direction = Math.sign(event.deltaY);
+        if (busy()) {
+          // A new gesture is kept for when this step has finished.
+          if (!sameGesture) queued = direction;
+          stepped = true;
+          return swallow();
+        }
+        // The rest of the swipe that came into the section.
+        if (entry && sameGesture && direction === entry.direction) {
+          swallow();
+          return carry(event.deltaY);
+        }
+        if (stepped && sameGesture) return swallow();
+        stepped = false;
+        entry = null;
+
+        const from = scrollNow();
+        const to = from + event.deltaY * (getSmoothScroll()?.options.wheelMultiplier ?? 1);
+        if (from >= pin.start && from <= pin.end) {
+          if (!step(direction)) return;
+          swallow();
+          stepped = true;
+        } else if ((from < pin.start && to >= pin.start) || (from > pin.end && to <= pin.end)) {
+          // Into the section: held at the first stop (from above) or the last
+          // (from below).
+          swallow();
+          stepped = true;
+          const places = stops.map(placeOf);
+          entry = { target: from, limit: direction > 0 ? places[0] : places.at(-1), direction };
+          carry(event.deltaY);
+        }
+      };
+      window.addEventListener("wheel", onWheel, { passive: false, capture: true });
+      const cleanupResize = cleanupListeners;
+      cleanupListeners = () => {
+        cleanupResize();
+        window.removeEventListener("wheel", onWheel, { capture: true });
+        gsap.ticker.remove(playQueued);
+      };
     }
 
     // Entry (before the pin). The wrapper turns dark with the page theme, at
