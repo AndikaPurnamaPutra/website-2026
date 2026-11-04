@@ -1,20 +1,19 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
-import { SplitText } from "gsap/SplitText";
 import { stopSmoothScroll, startSmoothScroll } from "./smooth-scroll.js";
 import { designPx } from "./design-px.js";
 import { coinMotion } from "./coin-motion.js";
 
-gsap.registerPlugin(DrawSVGPlugin, SplitText);
+gsap.registerPlugin(DrawSVGPlugin);
 
 // Preloader v2 (docs/implementation/20-preloader.md; Figma 1860:244 →
 // 1880:663 → 1880:803 → 1880:759 → 1880:836), on the homepage:
 // 1. white (Figma: black; user), with the logo in the middle drawn as an
 //    outline as the page loads (at least MIN_DRAW seconds, so it never just
 //    flashes), then filled,
-// 2. "©2026 / One Week Wonders Studio" rises into view below it, letter by
-//    letter,
+// 2. "©2026 / One Week Wonders Studio" rises into view below it, whole, as
+//    the hero text,
 // 3. as the curtain starts up, both fade out and blur away, as motto 1 blurs
 //    in (src/js/motto-scroll.js, reversed; user),
 // 4. the layer lifts off the top of the screen, uncovering the hero;
@@ -52,6 +51,7 @@ const PUSH_AT = 0.35; // s into the lift, the showreel right behind the curtain 
 // What appears takes REVEAL seconds (the line below the logo, the hero text
 // in src/js/hero-intro.js), so all of it moves alike.
 const REVEAL = 1;
+const RISE = 200; // % of its height the line below the logo rises from, as the hero text
 const HEADER_AT = 1.1; // s into the lift, as the curtain leaves the top
 const HEADER = 1.2; // s, the navbar down to its place
 // The logo and the year blur away as the curtain starts up: motto 1's blur in
@@ -85,9 +85,9 @@ export function initPreloader() {
   const solid = preloader.querySelector(".preloader__solid");
   const logo = preloader.querySelector(".preloader__logo");
   const year = preloader.querySelector(".preloader__year span");
-  // The year's letters rise and drop one by one, each in its own window.
-  // reduceWhiteSpace off keeps the double spaces round the slash.
-  const split = SplitText.create(year, { type: "chars", mask: "chars", reduceWhiteSpace: false });
+  // The line below the logo rises whole in its window (.preloader__year,
+  // overflow: clip), as the hero text and every other text on the site
+  // (user: letter by letter, it was out of step with them).
   const header = document.querySelector("[data-header]");
   const showreel = document.querySelector(".hero__showreel");
   const coin = document.querySelector(".hero__coin");
@@ -195,7 +195,7 @@ export function initPreloader() {
     const pushedBy = gsap.getProperty(showreel, "y");
     if (coin) gsap.set(coin, { y: Math.min(hang, (pushedBy * hang) / (hang + overlap || 1)) });
   };
-  gsap.set(split.chars, { yPercent: 110 });
+  gsap.set(year, { yPercent: RISE });
   gsap.set(year, { visibility: "visible" });
   gsap.set(header, { yPercent: -100 });
   gsap.set(showreel, { y: below });
@@ -210,7 +210,7 @@ export function initPreloader() {
     // Outline → solid, then the year, and a breath with both.
     .to(solid, { opacity: 1, duration: 0.6, ease: "power2.out" })
     .to(preloader.querySelector(".preloader__outline"), { opacity: 0, duration: 0.6, ease: "power2.out" }, "<")
-    .to(split.chars, { yPercent: 0, duration: REVEAL, stagger: 0.012, ease: SHOW }, 0.35)
+    .to(year, { yPercent: 0, duration: REVEAL, ease: SHOW }, 0.35)
     // The curtain lifts off the screen.
     .addLabel("lift", 1.8)
     .add(() => document.dispatchEvent(new CustomEvent("preloader:reveal")), "lift")
@@ -234,8 +234,7 @@ export function initPreloader() {
     if (settled) return;
     settled = true;
     root.classList.remove("is-preloading");
-    split.revert();
-    gsap.set([preloader, logo, year.parentElement, showreel].filter(Boolean), { clearProps: "transform,opacity,visibility,filter" });
+    gsap.set([preloader, logo, year, year.parentElement, showreel].filter(Boolean), { clearProps: "transform,opacity,visibility,filter" });
     // The scroll animations were measured with the showreel still pushed
     // down.
     ScrollTrigger.refresh();
