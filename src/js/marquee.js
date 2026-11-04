@@ -5,7 +5,9 @@ import { designPx } from "./design-px.js";
 // data-marquee-speed sets another speed:
 // - Trusted Clients testimonials (approved proposal, not in Figma): to the
 //   left, keep moving on hover (user decision); data-marquee="scroll": pushed
-//   by the page scroll as the Contact gallery (user).
+//   by the page scroll as the Contact gallery, 1.5× as much
+//   (data-marquee-push; user: a little faster), easing towards 1500 px/s
+//   (data-marquee-max, so a hard swipe does not fling it).
 // - Contact gallery, data-marquee="pause scroll", 60 px/s (user decisions):
 //   - "pause": its own movement stops while hovered or keyboard-focused;
 //     the scroll still pushes it (user decision).
@@ -14,7 +16,8 @@ import { designPx } from "./design-px.js";
 //     of the last scroll.
 // Static (Figma layout) with reduced motion.
 const SPEED = 40; // Figma px per second
-const SCROLL_PUSH = 1; // marquee px per scrolled px
+const SCROLL_PUSH = 1; // marquee px per scrolled px, unless data-marquee-push sets another
+const KNEE = 0.6; // share of data-marquee-max up to which the push is not softened
 const EASE = 6; // how fast the speed follows a change (per second)
 // Larger steps are jumps (scroll restored after a reload, anchors), not a
 // scroll gesture: they do not push the marquee.
@@ -23,6 +26,20 @@ const MAX_STEP = 120;
 function initMarquee(marquee) {
   const options = (marquee.dataset.marquee || "").split(" ");
   const baseSpeed = Number(marquee.dataset.marqueeSpeed) || SPEED;
+  const push = Number(marquee.dataset.marqueePush) || SCROLL_PUSH;
+  // Figma px per second it tends to, if data-marquee-max is set (a hard swipe
+  // would otherwise fling it): the push is as it is up to KNEE of it, then
+  // eases towards it without ever hitting it (a hard limit felt like a brake;
+  // user).
+  const max = Number(marquee.dataset.marqueeMax) || Infinity;
+  const soften = (value) => {
+    if (max === Infinity) return value;
+    const limit = max * designPx();
+    const knee = limit * KNEE;
+    const size = Math.abs(value);
+    if (size <= knee) return value;
+    return Math.sign(value) * (knee + (limit - knee) * Math.tanh((size - knee) / (limit - knee)));
+  };
   const track = marquee.querySelector("[data-marquee-track]");
   const originals = [...track.children];
 
@@ -56,7 +73,7 @@ function initMarquee(marquee) {
     let target = own();
     if (options.includes("scroll") && scrolled !== 0 && Math.abs(scrolled) < MAX_STEP && dt > 0) {
       direction = scrolled > 0 ? -1 : 1;
-      target = own() - (scrolled / dt) * SCROLL_PUSH;
+      target = soften(own() - (scrolled / dt) * push);
     }
     speed += (target - speed) * Math.min(1, dt * EASE);
     x = gsap.utils.wrap(-loop, 0, x + speed * dt);
