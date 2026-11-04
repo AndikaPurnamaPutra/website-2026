@@ -34,3 +34,4 @@ Sama dengan `our-work/v1`, tanpa geseran galeri saat scroll: deretan karya diam 
 - Kartu di opsi 2, revisi 2 (pengguna: bagus tapi terlalu heboh): gambar memudar masuk sambil terbuka sedikit dari bawah (15%), judul cukup memudar masuk, jeda 0,08 dtk, 1,2 dtk `power2.out`.
 - Kartu di opsi 2, revisi 3 (pengguna: versi tirai lebih baik, sedikit diperhalus): tirai penuh dari bawah 1,6 dtk `power2.inOut`, gambar di dalamnya ikut naik pelan dari 8% (seperti gambar Services), judul naik 100% (lebih pendek) setelah gambar sebagian besar terbuka, jeda 0,1 dtk.
 - Revisi 4 (pengguna: kartu muncul terlalu pelan): tirai dan gambar 1,1 dtk (sebelumnya 1,6), jeda 0,08 dtk, judul mulai di 0,6 dtk.
+- Tombol "More Work" tanpa animasi (pengguna, 4 Nov 2026).

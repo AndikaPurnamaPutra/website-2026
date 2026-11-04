@@ -101,16 +101,14 @@ export function initOurWorkIntro() {
     );
   });
 
-  // The "More Work" button.
-  const button = section.querySelector(".button");
-  if (button) play(button, gsap.timeline().add(rise(button)));
+  // The "More Work" button stays as it is, no animation (user).
 
   return () => {
     parts.forEach(({ timeline, trigger }) => {
       trigger.kill();
       timeline.progress(1).kill();
     });
-    gsap.set(section.querySelectorAll(".our-work__eyebrow, .our-work__category, .divider, .work-carousel__title, .work-carousel__arrow, .work-card__media, .work-card__title, .work-card__image, .button"), {
+    gsap.set(section.querySelectorAll(".our-work__eyebrow, .our-work__category, .divider, .work-carousel__title, .work-carousel__arrow, .work-card__media, .work-card__title, .work-card__image"), {
       clearProps: "transform,clipPath,translate",
     });
     split?.revert();
