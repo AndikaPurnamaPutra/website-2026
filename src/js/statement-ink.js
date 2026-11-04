@@ -16,7 +16,7 @@ gsap.registerPlugin(SplitText);
 // - the blue icon and the folder come to life as the ink reaches the letter
 //   before each, each on its own clock (icon: ring drawn, dot pops up, the two split
 //   apart; folder: pocket opens, folder rises out with a small bounce);
-// - once the ink is through, the "Schedule a call" button rises as the hero
+// - as the ink reaches the last word, the "Schedule a call" button rises as the hero
 //   text, then the section moves on.
 // All of it goes back when scrolled back up. Without JS or with reduced
 // motion the text stays black, and the icon, folder and button as in Figma.
@@ -26,7 +26,6 @@ const RISE = 200; // % of its height the eyebrow and the button rise from
 const DESCENT = 25;
 const LENGTH = 1.8; // screens of scrolling the section is held for (1.2: the ink ran too fast; user)
 const WORDS = 0.8; // share of the hold over which the ink flows through
-const BUTTON_AT = WORDS; // the button rises as the ink is through (user)
 // The ink's soft edge, in letters, and its colours as shares of the text
 // colour: the grey, a lighter grey halfway, then the text colour (as
 // drone.riotters.com: #c7cccb → #eaeced → #24363f).
@@ -66,6 +65,11 @@ export function initStatementInk() {
   const inkOf = (flow, i) => gsap.utils.clamp(0, 1, (flow * span - i) / SOFT);
   const shade = (ink) => (ink < 0.5 ? GREY + (LIGHT - GREY) * ink * 2 : LIGHT + (1 - LIGHT) * (ink - 0.5) * 2);
   const shown = chars.map(() => -1);
+  // The button rises as the ink reaches the last word (user: once the ink was
+  // through, it came a little late), so it comes with the end of the
+  // sentence.
+  const lastWord = splits.at(-1).words.at(-1);
+  const buttonAt = (chars.indexOf(lastWord.querySelector(".statement__char")) / span) * WORDS;
 
   // Rising into a window of their own: a clip whose bottom edge comes up as
   // much as the element does, so it stays at the element's own place and no
@@ -122,7 +126,7 @@ export function initStatementInk() {
       else if (on !== item.on) on ? item.piece.play() : item.piece.reverse();
       item.on = on;
     });
-    const on = progress >= BUTTON_AT;
+    const on = progress >= buttonAt;
     if (buttonRise) {
       if (instant) buttonRise.progress(on ? 1 : 0).pause();
       else if (on !== buttonOn) on ? buttonRise.play() : buttonRise.reverse();
