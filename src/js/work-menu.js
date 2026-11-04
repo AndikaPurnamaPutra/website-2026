@@ -186,7 +186,9 @@ export function initWorkMenu() {
           { clipPath: "inset(0% 0% 0% 0%)", duration: IN, ease: "power3.out", stagger: 0.08 },
           CONTENT_AT,
         )
-        .fromTo(pictures, { scale: 1.15 }, { scale: 1, duration: IN + 0.2, ease: "power3.out", stagger: 0.08 }, "<")
+        // Its inline scale is cleared after, or it held off the hover's
+        // (_header.scss).
+        .fromTo(pictures, { scale: 1.15 }, { scale: 1, duration: IN + 0.2, ease: "power3.out", stagger: 0.08, clearProps: "transform" }, "<")
         .fromTo([...badges, dotsBox], { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3, ease: "power1.out", stagger: 0.04 }, "<+=0.3");
     } else {
       // The content fades, and the panel shrinks back into the small box,
