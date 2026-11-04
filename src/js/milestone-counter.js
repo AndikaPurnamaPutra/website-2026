@@ -126,6 +126,10 @@ export function initMilestoneCounter() {
   // Hidden until then.
   const numbers = values.map((el) => el.querySelector(".milestone__number"));
   gsap.set(numbers, { autoAlpha: 0 });
+  // A gradient (ink | soft edge | grey) clipped to the text is moved across
+  // it, so the text is not split and keeps its kerning (_milestone.scss).
+  lead.classList.add("is-sweeping");
+  gsap.set(lead, { backgroundPosition: "100% 0%" });
 
   // One timeline per row, as it comes up the screen: its value turns, its
   // line draws and its label rises; then the value is text again (the wave on
