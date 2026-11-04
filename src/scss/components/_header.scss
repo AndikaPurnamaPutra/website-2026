@@ -22,19 +22,20 @@
   transition: transform 0.8s cubic-bezier(0.33, 1, 0.68, 1);
 
   // 1px extra so no hairline stays at a fractional height (browser zoom).
-  &.is-hidden:not(:has(:focus-visible, .site-nav__item--work.is-open)) {
+  &.is-hidden:not(:has(:focus-visible, .site-nav__item--work.is-shown)) {
     transform: translateY(calc(-100% - 1px));
   }
 
   // The Work panel is inside the bar and would be inverted too, so while it
-  // is open the bar is drawn normally: dark, and white over the dark sections
-  // (src/js/header.js).
-  &:has(.site-nav__item--work.is-open) {
+  // shows (open, and until it has faded out: inverted as it faded, the white
+  // panel turned black; user) the bar is drawn normally: dark, and white over
+  // the dark sections (src/js/header.js, src/js/work-menu.js).
+  &:has(.site-nav__item--work.is-shown) {
     color: var(--color-ink);
     mix-blend-mode: normal;
   }
 
-  &.is-dark:has(.site-nav__item--work.is-open) {
+  &.is-dark:has(.site-nav__item--work.is-shown) {
     color: var(--color-white);
   }
 }
@@ -46,7 +47,7 @@
   filter: brightness(0) invert(1);
 }
 
-.site-header:has(.site-nav__item--work.is-open):not(.is-dark) {
+.site-header:has(.site-nav__item--work.is-shown):not(.is-dark) {
   .site-header__logo img,
   .site-nav__link img {
     filter: none;

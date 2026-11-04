@@ -86,16 +86,23 @@ export function initWorkMenu() {
     openedAt = window.scrollY;
     trigger.setAttribute("aria-expanded", String(open));
     item.classList.toggle("is-open", open);
+    // is-shown lasts until the panel has faded out: the bar is drawn
+    // normally while it shows (_header.scss).
+    const hidden = () => {
+      if (!open) item.classList.remove("is-shown");
+    };
+    if (open) item.classList.add("is-shown");
     animation?.kill();
     if (reduceMotion) {
       gsap.set(panel, { autoAlpha: open ? 1 : 0 });
+      hidden();
     } else if (open) {
       animation = gsap
         .timeline()
         .fromTo(panel, { autoAlpha: 0, y: -8 }, { autoAlpha: 1, y: 0, duration: OPEN, ease: "power2.out" })
         .fromTo(parts, { autoAlpha: 0, y: 6 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: "power3.out", stagger: 0.05 }, 0.08);
     } else {
-      animation = gsap.to(panel, { autoAlpha: 0, y: -4, duration: CLOSE, ease: "power1.in" });
+      animation = gsap.to(panel, { autoAlpha: 0, y: -4, duration: CLOSE, ease: "power1.in", onComplete: hidden });
     }
     schedule();
   };
@@ -143,6 +150,7 @@ export function initWorkMenu() {
     clearTimeout(timer);
     clearTimeout(closeTimer);
     animation?.kill();
+    item.classList.remove("is-open", "is-shown");
     gsap.set([panel, ...parts, ...sets, ...sets.flatMap((set) => [...set.children])], { clearProps: "all" });
   };
 }
