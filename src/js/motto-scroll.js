@@ -505,6 +505,12 @@ export function initMottoScroll() {
     // the lines box, so no line is driven by two timelines (the flips own them).
     if (!reduceMotion && wrapper) {
       wrapper.classList.add("is-toned");
+      // The wrapper darkens with the scroll here, over the screen left empty
+      // by Milestone (user: the page theme's switch, 0.35s on its own clock,
+      // turned the whole empty screen from white to black at once, a
+      // flicker); the page theme switches behind it meanwhile, unseen.
+      const tokens = getComputedStyle(document.documentElement);
+      gsap.set(wrapper, { backgroundColor: tokens.getPropertyValue("--color-white").trim() });
       gsap.set(backdrop, { autoAlpha: 0 });
       gsap.set(linesBox, { autoAlpha: 0, y: () => 12 * designPx(), filter: "blur(6px)" });
       gsap.set(label, { autoAlpha: 0, y: () => 8 * designPx() });
@@ -522,6 +528,7 @@ export function initMottoScroll() {
         // light (no dark text over grey), the background darkens slowly, and
         // motto 1 comes in while it does, so the space never reads as empty.
         .to(milestone, { autoAlpha: 0, y: () => -40 * designPx(), duration: 0.45, ease: "sine.inOut" }, 0.05)
+        .to(wrapper, { backgroundColor: tokens.getPropertyValue("--color-ink").trim(), duration: 0.35 }, 0.4)
         .to(backdrop, { autoAlpha: 1, duration: 0.15 }, 0.85)
         // Motto 1 blurs in while the section scrolls in (it is complete before
         // the pin), once the page has turned dark (Motto's top at 37%,
