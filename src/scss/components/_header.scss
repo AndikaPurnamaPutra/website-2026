@@ -18,6 +18,13 @@
   // on dark and in opposite colours over pictures.
   color: var(--color-white);
   mix-blend-mode: difference;
+  // Slides away over Services and Motto (src/js/header.js), as it used to.
+  transition: transform 0.8s cubic-bezier(0.33, 1, 0.68, 1);
+
+  // 1px extra so no hairline stays at a fractional height (browser zoom).
+  &.is-hidden:not(:has(:focus-visible, .site-nav__item--work.is-open)) {
+    transform: translateY(calc(-100% - 1px));
+  }
 
   // The Work panel is inside the bar and would be inverted too, so while it
   // is open the bar is drawn normally: dark, and white over the dark sections
@@ -47,6 +54,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .site-header,
   .site-nav__item--work .site-nav__link img {
     transition: none;
   }
