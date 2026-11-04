@@ -27,9 +27,14 @@ export const EXIT = 0.4; // of the screen height
 const QUIET = 180; // ms without wheel events that ends a gesture
 const FLIP_GLIDE = 0.65; // s for a flip (1.1 as sstr.tech, then 0.8, felt slow; user)
 const HIGHLIGHT_GLIDE = 0.4; // s for a step to a highlight
-// The next gesture counts once a step is this far through (waiting for its
-// very end, a gesture near it was lost and Motto felt long; user).
-const READY = 0.8;
+// The next gesture counts once a step is this far through (at its end, then
+// at 80%, many gestures were lost: at an ordinary pace 11 for 5 steps, and
+// Motto felt long; user).
+const READY = 0.6;
+// Within this share of the screen of a stop counts as on it (the swipe into
+// the section came to rest 39px short of the first stop, and the next gesture
+// was spent getting there, with nothing happening).
+const NEAR = 0.05;
 
 export function initMottoScroll() {
   const section = document.querySelector("[data-motto]");
@@ -424,7 +429,7 @@ export function initMottoScroll() {
         const from = scrollNow();
         const places = stops.map(placeOf);
         // The next stop that way (the current one if between two).
-        const near = places.findIndex((place) => Math.abs(place - from) < 2);
+        const near = places.findIndex((place) => Math.abs(place - from) < NEAR * window.innerHeight);
         const next =
           near >= 0
             ? near + direction
