@@ -18,6 +18,11 @@ import { getSmoothScroll } from "./smooth-scroll.js";
 // The glow from below follows one smoothed journey (see lightPath).
 // Timing and easing are not in Figma (approved proposal).
 
+// The exit: over the last 0.4 of a screen the content rises faster and
+// faster until it moves with the page as the section releases. The page
+// turns light as it starts (src/js/page-theme.js).
+export const EXIT = 0.4; // of the screen height
+
 // One gesture, one step (see the wheel steps below).
 const QUIET = 180; // ms without wheel events that ends a gesture
 const FLIP_GLIDE = 0.8; // s for a flip (1.1 as sstr.tech felt too slow; user)
@@ -55,9 +60,6 @@ export function initMottoScroll() {
   // A highlight played on the way down only reverses once the scroll is back
   // this far above its point, so a small scroll up does not undo it at once.
   const HYSTERESIS = 0.1;
-  // The exit: over the last 0.4 of a screen the content rises faster and
-  // faster until it moves with the page as the section releases.
-  const EXIT = 0.4; // of the screen height
   // After the last highlight ("One Week Wonders Studio™") the frame holds for
   // about one scroll (0.3 of a screen) before the exit (user decision).
   const HOLD = 0.3; // of the screen height

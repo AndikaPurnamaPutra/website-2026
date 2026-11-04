@@ -1,5 +1,6 @@
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { EXIT } from "./services-scroll.js";
+import { EXIT as MOTTO_EXIT } from "./motto-scroll.js";
 
 // Page theme (docs/implementation/21-page-theme.md; reference from the user:
 // revelatio.studio): the page, every section with it (Services is light as
@@ -46,15 +47,19 @@ export function initPageTheme() {
     });
   }
   // Milestone → Motto (user): Milestone stays on light and fades out, then
-  // the page turns dark and motto 1 blurs in; light again as Motto's pin
-  // ends and the footer starts to show below it. Motto keeps its own dark
-  // backdrop, so it stays dark meanwhile.
+  // the page turns dark and motto 1 blurs in; light again as Motto's exit
+  // starts, while Motto still covers the whole screen, so the footer comes up
+  // light. Turned as Motto's pin ended, the footer showed dark at first and
+  // then turned light under the scroll (and dark again going up; user: it
+  // jerked). Motto keeps its own dark backdrop, so it stays dark meanwhile.
   if (motto && toned) {
     const mottoPin = ScrollTrigger.getById("motto");
     night = mark({ trigger: motto, start: MOTTO_DARK_AT });
     ranges.push({
       from: night,
-      to: mottoPin ? mark({ start: () => mottoPin.end }) : mark({ trigger: toned, start: "bottom bottom" }),
+      to: mottoPin
+        ? mark({ start: () => mottoPin.end - MOTTO_EXIT * window.innerHeight })
+        : mark({ trigger: toned, start: "bottom bottom" }),
     });
   }
   update();
