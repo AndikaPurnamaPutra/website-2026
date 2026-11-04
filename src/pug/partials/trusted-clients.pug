@@ -44,7 +44,8 @@ section.trusted
     hr.divider
 
   //- Without JS the row sits centered like Figma; JS duplicates it into a marquee.
-  .trusted__marquee(data-marquee)
+  //- "scroll": the page scroll pushes it faster, as the Contact gallery (user).
+  .trusted__marquee(data-marquee="scroll")
     ul.trusted__track(data-marquee-track)
       each item, i in testimonials
         li.testimonial-card(class=item.noise ? "testimonial-card--noise" : null)

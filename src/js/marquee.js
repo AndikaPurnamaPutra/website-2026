@@ -4,7 +4,8 @@ import { designPx } from "./design-px.js";
 // Endless marquees moved on GSAP's ticker, 40 Figma px per second unless
 // data-marquee-speed sets another speed:
 // - Trusted Clients testimonials (approved proposal, not in Figma): to the
-//   left, keep moving on hover (user decision).
+//   left, keep moving on hover (user decision); data-marquee="scroll": pushed
+//   by the page scroll as the Contact gallery (user).
 // - Contact gallery, data-marquee="pause scroll", 60 px/s (user decisions):
 //   - "pause": its own movement stops while hovered or keyboard-focused;
 //     the scroll still pushes it (user decision).
