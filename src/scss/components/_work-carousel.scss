@@ -130,3 +130,24 @@
     transition: none;
   }
 }
+
+// "View Project" beside the pointer over the cards (src/js/work-cursor.js):
+// the showreel button's glass, smaller and flatter (user: as large as the
+// showreel button it was nearly round; "View" at 12px, too small; at 14px,
+// too large), with a little dark behind it so its white text reads on light
+// pictures too.
+.work-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 90;
+  padding: fs(6) fs(12);
+  font-weight: 500;
+  font-size: fs(13);
+  background: rgba(17, 17, 17, 0.3);
+  pointer-events: none;
+
+  span {
+    line-height: 1.2;
+  }
+}
