@@ -25,8 +25,11 @@ export const EXIT = 0.4; // of the screen height
 
 // One gesture, one step (see the wheel steps below).
 const QUIET = 180; // ms without wheel events that ends a gesture
-const FLIP_GLIDE = 0.8; // s for a flip (1.1 as sstr.tech felt too slow; user)
+const FLIP_GLIDE = 0.65; // s for a flip (1.1 as sstr.tech, then 0.8, felt slow; user)
 const HIGHLIGHT_GLIDE = 0.4; // s for a step to a highlight
+// The next gesture counts once a step is this far through (waiting for its
+// very end, a gesture near it was lost and Motto felt long; user).
+const READY = 0.8;
 
 export function initMottoScroll() {
   const section = document.querySelector("[data-motto]");
@@ -51,7 +54,7 @@ export function initMottoScroll() {
   //   motto 1 → highlight → flip → highlight → flip + CTA → highlight → hold.
   // At 900px high: DWELL ≈200px of stillness before and after each change,
   // a flip over FLIP ≈340px, a highlight fired at a point (it plays on its
-  // own clock, ≈0.8s).
+  // own clock, ≈0.6s).
   const DWELL = 0.22;
   const FLIP = 0.38;
   // Motto 3 comes with the new label, the diagonal background and the CTA,
@@ -215,14 +218,15 @@ export function initMottoScroll() {
     };
 
     // Letters change from white to the gradient one after another, left to
-    // right. Unlike the flips, this plays on its own clock (≈0.8s) once the
+    // right. Unlike the flips, this plays on its own clock (≈0.6s) once the
     // scroll passes its point, and plays back when scrolling up past it (less
     // HYSTERESIS), so the wave has the same tempo however one scrolls.
     const gradients = [];
     // before/after: where the flips next to it end and start (the timeline
     // waits there while the wave runs, see follow below).
     const toGradient = (i, at, before, after) => {
-      const each = { duration: 0.35, ease: "power1.out", stagger: { amount: 0.45 } };
+      // ≈0.6s in all (0.8 felt long; user).
+      const each = { duration: 0.3, ease: "power1.out", stagger: { amount: 0.3 } };
       const wave = gsap
         .timeline({ paused: true })
         .to(charGradient[i], { opacity: 1, ...each }, 0)
@@ -397,11 +401,12 @@ export function initMottoScroll() {
         entry = null;
         // Timed here rather than by Lenis' onComplete, which an interrupted
         // glide may never call.
-        glideEnd = performance.now() + duration * 1000;
+        glideEnd = performance.now() + duration * 1000 * READY;
         if (lenis) lenis.scrollTo(top, { duration, easing, force: true });
         else window.scrollTo({ top, behavior: "smooth" });
       };
-      const busy = () => performance.now() < glideEnd || gradients.some((g) => g.wave.isActive());
+      const busy = () =>
+        performance.now() < glideEnd || gradients.some((g) => g.wave.isActive() && (g.wave.reversed() ? 1 - g.wave.progress() : g.wave.progress()) < READY);
       const scrollNow = () => getSmoothScroll()?.targetScroll ?? window.scrollY;
 
       // The step from the current place in that direction; false above the
