@@ -2,6 +2,8 @@
 // 1516:2442 / 1516:2468. Transition timing is not in Figma (0.3s proposed).
 @use "../abstracts/functions" as *;
 
+$button-sweep: 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+
 .cta {
   display: flex;
   flex-direction: column;
@@ -28,8 +30,69 @@
   border-radius: var(--radius-sm);
 }
 
+// On its own ("More Work", "Send email"): on hover it turns into an outline
+// with dark text, its dark fill swept off to the right and the text changing
+// colour just where the sweep passes (user's pick of the hover trials). The
+// fill (a layer of its own) and the light and dark copies of the text
+// (src/pug/mixins/cta-button.pug) are all cut by one moving edge, a clip
+// with the same timing, so the colour changes exactly at the fill's edge, and
+// the fill stays within the button's round corners (scaled, they were
+// squeezed and its edge fell out of step with the text; user). The outline
+// is an inset line, so nothing moves.
 .button {
+  position: relative;
+  isolation: isolate;
   display: inline-block;
+  color: transparent;
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--color-ink);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--color-ink);
+    // The button's own round corners; the sweep's edge is straight (rounded
+    // too, it left notches against the outline; user).
+    border-radius: inherit;
+    clip-path: inset(0 0 0 0);
+    transition: clip-path $button-sweep;
+  }
+}
+
+.button__light,
+.button__ink {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transition: clip-path $button-sweep;
+}
+
+.button__light {
+  color: var(--color-white);
+  clip-path: inset(0 0 0 0);
+}
+
+.button__ink {
+  color: var(--color-ink);
+  clip-path: inset(0 100% 0 0);
+}
+
+.button:hover,
+.button:focus-visible {
+  &::before {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  .button__light {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  .button__ink {
+    clip-path: inset(0 0 0 0);
+  }
 }
 
 // Small variant: "Send email" in the footer (Figma 1574:1234, Inter Medium
@@ -137,6 +200,9 @@
   .cta__button,
   .cta__icon,
   .cta__caption,
+  .button::before,
+  .button__light,
+  .button__ink,
   .cta.is-open :is(.cta__button, .cta__icon, .cta__caption) {
     transition: none;
   }

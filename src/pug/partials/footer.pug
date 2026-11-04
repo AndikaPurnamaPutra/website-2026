@@ -21,7 +21,8 @@ footer.site-footer
     form.site-footer__form(action="mailto:owwstudio@gmail.com" method="get" data-footer-form)
       label.site-footer__label(for="footer-company") Get in Touch
       input#footer-company.site-footer__input(type="text" name="subject" placeholder="Your company name" autocomplete="organization" required)
-      button.button.button--small(type="submit") Send email
+      button.button.button--small(type="submit")
+        +buttonText("Send email")
 
     nav.site-footer__columns(aria-label="Footer")
       each column in columns
