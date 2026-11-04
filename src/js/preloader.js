@@ -174,6 +174,7 @@ export function initPreloader() {
     if (loaded >= total && shown > 0.995) {
       shown = 1;
       gsap.ticker.remove(follow);
+      placeForPush();
       intro.play();
     }
     draw.progress(shown);
@@ -185,12 +186,25 @@ export function initPreloader() {
   // touches its lower edge, a little slower than the showreel, so that edge
   // slides over the coin's lower part (behind the showreel in the design) as
   // both reach their places.
-  const reel = showreel?.getBoundingClientRect();
-  const below = reel ? Math.max(0, window.innerHeight - reel.top) : 0;
-  const box = coin?.getBoundingClientRect();
-  const coinEdge = box ? box.top + box.height * COIN_EDGE : 0;
-  const hang = box ? Math.min(below, Math.max(0, window.innerHeight - HANG_GAP * designPx() - coinEdge)) : 0;
-  const overlap = reel ? Math.max(0, coinEdge - reel.top) : 0; // in the design
+  // Only with the page at its top: reloaded further down (the scroll is kept,
+  // src/js/scroll-memory.js) the showreel was pushed up from a screen below,
+  // and its growth (src/js/hero-showreel.js), measured while it was pushed,
+  // jumped as it was measured again (user: the showreel jerked). Placed as
+  // the curtain is about to lift, once the scroll is back where it was (the
+  // curtain hides it until then).
+  let hang = 0;
+  let overlap = 0;
+  const placeForPush = () => {
+    if (window.scrollY > 0) return;
+    const reel = showreel?.getBoundingClientRect();
+    const below = reel ? Math.max(0, window.innerHeight - reel.top) : 0;
+    const box = coin?.getBoundingClientRect();
+    const coinEdge = box ? box.top + box.height * COIN_EDGE : 0;
+    hang = box ? Math.min(below, Math.max(0, window.innerHeight - HANG_GAP * designPx() - coinEdge)) : 0;
+    overlap = reel ? Math.max(0, coinEdge - reel.top) : 0; // in the design
+    gsap.set(showreel, { y: below });
+    gsap.set(coin, { y: hang });
+  };
   const carryCoin = () => {
     const pushedBy = gsap.getProperty(showreel, "y");
     if (coin) gsap.set(coin, { y: Math.min(hang, (pushedBy * hang) / (hang + overlap || 1)) });
@@ -198,8 +212,6 @@ export function initPreloader() {
   gsap.set(year, { yPercent: RISE });
   gsap.set(year, { visibility: "visible" });
   gsap.set(header, { yPercent: -100 });
-  gsap.set(showreel, { y: below });
-  gsap.set(coin, { y: hang });
   // The coin fades in as the curtain lifts (user); the 3D coin takes its fade
   // from src/js/coin-motion.js.
   coinMotion.fade = 0;
@@ -235,9 +247,14 @@ export function initPreloader() {
     settled = true;
     root.classList.remove("is-preloading");
     gsap.set([preloader, logo, year, year.parentElement, showreel].filter(Boolean), { clearProps: "transform,opacity,visibility,filter" });
-    // The scroll animations were measured with the showreel still pushed
-    // down.
-    ScrollTrigger.refresh();
+    // The scroll animations of the showreel (and the coin) were measured with
+    // it still pushed down: measured again, only those. A refresh of every
+    // scroll animation took 100–250ms right here, while the hero text, the
+    // navbar and the coin were still moving, which then jerked (user).
+    const moved = [showreel, coin].filter(Boolean);
+    ScrollTrigger.getAll().forEach((trigger) => {
+      if (moved.some((el) => el === trigger.trigger || el.contains(trigger.trigger))) trigger.refresh();
+    });
     release();
   }
 
