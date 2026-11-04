@@ -371,9 +371,10 @@ export function initMottoScroll() {
     // quick one ran past the next step). The stops lie just before and after
     // each change; the last one at the start of the exit, past the hold.
     // Touch screens and the keyboard scroll freely.
-    // Seamless (user): a gesture during a glide or a highlight is not lost
-    // but kept, and its step follows at once (one at most; the rest of a
-    // gesture is swallowed); the steps ease in and out (sine, as sstr.tech's).
+    // A gesture during a glide or a highlight is swallowed, as on sstr.tech,
+    // so each step needs a gesture of its own (user: kept and played after,
+    // a flip sometimes followed a highlight on its own, inconsistent); the
+    // steps ease in and out (sine, as sstr.tech's).
     // In and out is the reader's own scroll, as everywhere else (user: a
     // glide of its own there, into the first stop and on to the footer, felt
     // odd): a swipe into the section is carried on by the smooth scroll and
@@ -388,7 +389,6 @@ export function initMottoScroll() {
       let stepped = false;
       let lastWheel = 0;
       let lastStrength = 0;
-      let queued = 0; // direction of a kept gesture
       let entry = null; // { target, limit, direction } while scrolling into the section
       const glide = (top, duration, easing) => {
         const lenis = getSmoothScroll();
@@ -432,15 +432,6 @@ export function initMottoScroll() {
         if (lenis) lenis.scrollTo(entry.target, { force: true });
         else window.scrollTo(0, entry.target);
       };
-      // A kept gesture, once the step before it has finished.
-      const playQueued = () => {
-        if (!queued || busy()) return;
-        const direction = queued;
-        queued = 0;
-        const from = scrollNow();
-        if (from >= pin.start && from <= pin.end) step(direction);
-      };
-      gsap.ticker.add(playQueued);
 
       const onWheel = (event) => {
         if (event.ctrlKey || !event.deltaY) return; // pinch zoom
@@ -457,8 +448,6 @@ export function initMottoScroll() {
         const sameGesture = !quiet && !stronger;
         const direction = Math.sign(event.deltaY);
         if (busy()) {
-          // A new gesture is kept for when this step has finished.
-          if (!sameGesture) queued = direction;
           stepped = true;
           return swallow();
         }
@@ -492,7 +481,6 @@ export function initMottoScroll() {
       cleanupListeners = () => {
         cleanupResize();
         window.removeEventListener("wheel", onWheel, { capture: true });
-        gsap.ticker.remove(playQueued);
       };
     }
 
