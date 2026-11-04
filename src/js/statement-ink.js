@@ -9,12 +9,14 @@ gsap.registerPlugin(SplitText);
 // - the eyebrow rises into view as the hero text does (src/js/hero-intro.js),
 //   as it comes up the screen;
 // - once the text is centred, the section is held there for LENGTH screens
-//   of scrolling, and its words light up one by one with the scroll, grey to
-//   black (each eases over 0.35s, src/scss/sections/_statement.scss);
-// - the blue icon and the folder come to life as the word before each lights
-//   up, each on its own clock (icon: ring drawn, dot pops up, the two split
+//   of scrolling, and ink flows through it letter by letter with the scroll,
+//   as on drone.riotters.com (user: word by word it was rough; measured on
+//   the site): each letter turns from the grey to a lighter grey and on to
+//   black, over a soft edge of SOFT letters (_statement.scss);
+// - the blue icon and the folder come to life as the ink reaches the letter
+//   before each, each on its own clock (icon: ring drawn, dot pops up, the two split
 //   apart; folder: pocket opens, folder rises out with a small bounce);
-// - once every word is lit, the "Schedule a call" button rises as the hero
+// - once the ink is through, the "Schedule a call" button rises as the hero
 //   text, then the section moves on.
 // All of it goes back when scrolled back up. Without JS or with reduced
 // motion the text stays black, and the icon, folder and button as in Figma.
@@ -22,9 +24,15 @@ const RISE = 200; // % of its height the eyebrow and the button rise from
 // % of its height their window reaches below them, so descenders (g, p, y)
 // are not cut (user report).
 const DESCENT = 25;
-const LENGTH = 1.2; // screens of scrolling the section is held for
-const WORDS = 0.8; // share of the hold over which the words light up
-const BUTTON_AT = WORDS; // the button rises as the last word lights up (user)
+const LENGTH = 1.8; // screens of scrolling the section is held for (1.2: the ink ran too fast; user)
+const WORDS = 0.8; // share of the hold over which the ink flows through
+const BUTTON_AT = WORDS; // the button rises as the ink is through (user)
+// The ink's soft edge, in letters, and its colours as shares of the text
+// colour: the grey, a lighter grey halfway, then the text colour (as
+// drone.riotters.com: #c7cccb → #eaeced → #24363f).
+const SOFT = 12; // 8 as drone.riotters.com ran too fast at this size (user)
+const GREY = 0.2;
+const LIGHT = 0.08;
 
 export function initStatementInk() {
   const text = document.querySelector(".statement__text");
@@ -34,7 +42,7 @@ export function initStatementInk() {
   // The text pieces in reading order: the text parts of lines that also hold
   // the icon or the folder, or the whole text of a line, put in a span first
   // (a line is a flex box: its words split straight into it lost the spaces
-  // between them); split into words.
+  // between them); split into words (kept whole on a line) and letters.
   const wrapped = [];
   const pieces = [...text.querySelectorAll(".statement__line")].flatMap((line) => {
     const parts = [...line.querySelectorAll(":scope > span:not(.statement__folder)")];
@@ -45,9 +53,19 @@ export function initStatementInk() {
     wrapped.push(inner);
     return [inner];
   });
-  const splits = pieces.map((piece) => SplitText.create(piece, { type: "words", wordsClass: "statement__word" }));
-  const words = splits.flatMap((split) => split.words);
+  const splits = pieces.map((piece) =>
+    SplitText.create(piece, { type: "words, chars", wordsClass: "statement__word", charsClass: "statement__char" }),
+  );
+  const chars = splits.flatMap((split) => split.chars);
   text.classList.add("is-lighting");
+
+  // A letter's ink: 0 grey, 0.5 the lighter grey, 1 the text colour; letter
+  // i starts at i / (count + SOFT) of the flow and takes SOFT letters' worth
+  // of it, so the last one is through at its end.
+  const span = chars.length + SOFT;
+  const inkOf = (flow, i) => gsap.utils.clamp(0, 1, (flow * span - i) / SOFT);
+  const shade = (ink) => (ink < 0.5 ? GREY + (LIGHT - GREY) * ink * 2 : LIGHT + (1 - LIGHT) * (ink - 0.5) * 2);
+  const shown = chars.map(() => -1);
 
   // Rising into a window of their own: a clip whose bottom edge comes up as
   // much as the element does, so it stays at the element's own place and no
@@ -75,7 +93,7 @@ export function initStatementInk() {
   const button = statement.querySelector(".cta__button");
   const buttonRise = riseOf(button);
 
-  // The icon and the folder, each cued by the last word before it.
+  // The icon and the folder, each cued by the last letter before it.
   const cued = [
     [text.querySelector(".statement__icon"), createIcon],
     [text.querySelector(".statement__folder"), createFolder],
@@ -83,17 +101,23 @@ export function initStatementInk() {
     const piece = el && create(el);
     if (!piece) return [];
     const before = splits[pieces.indexOf(el.previousElementSibling)];
-    return [{ piece, after: before ? words.indexOf(before.words.at(-1)) + 1 : 0, on: false }];
+    return [{ piece, after: before ? chars.indexOf(before.chars.at(-1)) : -1, on: false }];
   });
   let buttonOn = false;
 
-  // Where the hold is: words lit, the icon and folder cued, the button.
+  // Where the hold is: the ink, the icon and folder cued, the button.
   // `instant` places them at once (a refresh, or a reload further down).
   const place = (progress, instant) => {
-    const lit = Math.round(Math.min(1, progress / WORDS) * words.length);
-    words.forEach((word, i) => word.classList.toggle("is-lit", i < lit));
+    const flow = Math.min(1, progress / WORDS);
+    chars.forEach((char, i) => {
+      const ink = inkOf(flow, i);
+      if (ink === shown[i]) return;
+      shown[i] = ink;
+      char.style.setProperty("--ink", shade(ink).toFixed(3));
+    });
     cued.forEach((item) => {
-      const on = lit >= item.after;
+      // As the ink is through the letter before it.
+      const on = item.after < 0 ? flow > 0 : inkOf(flow, item.after) >= 1;
       if (instant) item.piece.progress(on ? 1 : 0);
       else if (on !== item.on) on ? item.piece.play() : item.piece.reverse();
       item.on = on;

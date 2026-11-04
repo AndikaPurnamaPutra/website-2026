@@ -43,17 +43,13 @@
   white-space: nowrap;
 }
 
-// Its words light up one by one, grey to the page theme's text colour, while
-// the section is held (src/js/statement-ink.js), so they turn over with the
-// page (src/js/page-theme.js). The grey is lighter than the Milestone
-// sentence's (0.4), for the large text.
-.statement__text.is-lighting .statement__word {
-  color: color-mix(in srgb, var(--theme-fg) 20%, transparent);
-  transition: color 0.35s ease;
-
-  &.is-lit {
-    color: var(--theme-fg);
-  }
+// Ink flows through it letter by letter while the section is held: each
+// letter's share of the page theme's text colour (--ink: grey, a lighter grey,
+// then the text colour) is set with the scroll (src/js/statement-ink.js), so
+// it turns over with the page (src/js/page-theme.js). The grey (0.2) is
+// lighter than the Milestone sentence's (0.4), for the large text.
+.statement__text.is-lighting .statement__char {
+  color: color-mix(in srgb, var(--theme-fg) calc(var(--ink, 0.2) * 100%), transparent);
 }
 
 .statement__line--1 {
