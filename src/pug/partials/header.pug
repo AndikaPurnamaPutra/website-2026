@@ -20,7 +20,7 @@ header.site-header(data-header)
       ul.site-nav
         li.site-nav__item.site-nav__item--work(data-work-menu)
           a.site-nav__link(href="#" aria-expanded="false" aria-controls="work-menu")
-            | Work
+            +textRoll("Work")
             img(src="assets/icons/chevron-down.svg" width="16" height="16" alt="")
           .work-menu#work-menu
             //- Its background, on a layer of its own: grows from a small box
@@ -35,7 +35,7 @@ header.site-header(data-header)
                 each category in workCategories
                   li
                     a.work-menu__link(href="#")
-                      span= category[0]
+                      +textRoll(category[0])
                       span.work-menu__count= category[1]
               .work-menu__featured
                 .work-menu__sets
@@ -50,4 +50,5 @@ header.site-header(data-header)
                     button.work-menu__dot(type="button" role="tab" aria-selected=k === 0 ? "true" : "false" aria-label=`Projects ${k + 1}`)
         each link in navLinks
           li.site-nav__item
-            a.site-nav__link(href=link[1])= link[0]
+            a.site-nav__link(href=link[1])
+              +textRoll(link[0])

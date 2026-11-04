@@ -30,7 +30,8 @@ footer.site-footer
           ul.site-footer__links
             each link in column.links
               li
-                a.site-footer__link(href=link[1])= link[0]
+                a.site-footer__link(href=link[1])
+                  +textRoll(link[0])
 
     p.site-footer__about
       | Agency with incredible design and development expertise.
@@ -43,4 +44,5 @@ footer.site-footer
       ul.site-footer__legal
         each item in legal
           li
-            a.site-footer__link(href=item[1])= item[0]
+            a.site-footer__link(href=item[1])
+              +textRoll(item[0])

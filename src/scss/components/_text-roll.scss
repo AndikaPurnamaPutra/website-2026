@@ -1,0 +1,37 @@
+// A link's text rolls up on hover (or keyboard focus) and a copy comes in
+// from below, the copy a moment later (src/pug/mixins/text-roll.pug), as on
+// jasminegunarto.com (user). Their 0.8s with a slow start felt late (user):
+// 0.5s (as the Work panel opens) on the menu bar's ease-out, so it moves at
+// once. The window is one line of the text itself (1lh) and SPARE more above
+// and below, taken back with negative margins, so the text keeps its size
+// and place and its descenders are not cut (at a line height of 1, "y" in
+// Privacy Policy was). Used in the menu bar, the Work panel and the footer,
+// in place of dimming.
+$spare: 0.2em;
+
+.text-roll {
+  display: block;
+  height: calc(1lh + #{2 * $spare});
+  margin-block: -$spare;
+  overflow: clip;
+
+  > span {
+    display: block;
+    padding-block: $spare;
+    transition: transform 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+  }
+
+  > span + span {
+    transition-delay: 0.04s;
+  }
+}
+
+:is(:hover, :focus-visible) > .text-roll > span {
+  transform: translateY(-100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-roll > span {
+    transition: none;
+  }
+}

@@ -136,14 +136,12 @@
   white-space: nowrap;
 }
 
-// Hover is not in Figma (approved proposal): links dim to 50%.
+// Hover is not in Figma: the text rolls up (_text-roll.scss), as in the menu
+// bar (user; it dimmed to 50%). Inline-block, so the roll's block sits in the
+// line.
 .site-footer__link {
-  transition: opacity 0.3s ease-out;
-
-  &:hover,
-  &:focus-visible {
-    opacity: 0.5;
-  }
+  display: inline-block;
+  vertical-align: top;
 }
 
 .site-footer__about {
@@ -184,10 +182,4 @@
 .site-footer__legal {
   display: flex;
   gap: var(--space-16);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .site-footer__link {
-    transition: none;
-  }
 }
