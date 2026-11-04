@@ -292,7 +292,15 @@ export function initMottoScroll() {
       ScrollTrigger.removeEventListener("refresh", refreshLight);
     };
 
-    timeline.eventCallback("onUpdate", syncGradients);
+    // The CTA opens (frame, arrow, caption, as on hover) as it has come in
+    // with motto 3, and closes again going back up (user). A little before
+    // the step's end: the timeline eases towards it and never quite reaches
+    // it.
+    const ctaOpenAt = flip2 + 0.8 * FLIP;
+    timeline.eventCallback("onUpdate", () => {
+      syncGradients();
+      cta.classList.toggle("is-open", timeline.time() >= ctaOpenAt);
+    });
 
     // The whole line turns like one flip-clock card: out to the top, in from
     // below. Sine curves spread the turn over the whole move; the power3
@@ -557,6 +565,7 @@ export function initMottoScroll() {
     glyphs.forEach((glyph) => glyph.remove());
     gsap.set(content, { clearProps: "transform" });
     section.classList.remove("is-enhanced");
+    cta.classList.remove("is-open");
     wrapper?.classList.remove("is-toned");
   };
 }
