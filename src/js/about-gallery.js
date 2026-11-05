@@ -22,10 +22,18 @@ import { designPx } from "./design-px.js";
 // a picture coming into colour, and before that a blur coming into focus).
 // The layout stays as in Figma. With reduced motion the photos stay still.
 const LAG = 0.5; // s
-const OPEN_AT = "30%"; // 45% felt a little fast (user)
-const ZOOM_FROM = 1.35;
+const OPEN_AT = "40%"; // 45% felt a little fast, 30% too long (user)
+const ZOOM_FROM = 1.28; // 1.35 settled too long (user)
 // Kept larger than its frame, to leave room for the picture to move.
 const ZOOM = 1.2;
+// The photos (their frames) follow the mouse a little, the small ones
+// further, as nearer (user: the photos moving as the mouse moves, not the
+// pictures in them; a picture following the pointer, as telhaclarke.com.au's
+// All Work, was dropped): Figma pixels, from the middle of the screen to its
+// edge; on the CSS `translate`, apart from the scroll's transform.
+const MOUSE = { large: [22, 14], small: [38, 24] }; // half of it was too faint (user)
+const MOUSE_FOLLOW = 1.2; // s
+const PLAY_FOLLOW = 0.6; // s, as the showreel button
 // rise: frame, Figma pixels up and down from its place; sink: picture, % of
 // the frame up and down from the middle (the reference's 80px of an 834px
 // card and 48px of a 427px one, about a tenth).
@@ -60,5 +68,85 @@ export function initAboutGallery() {
     });
   });
 
-  return () => ctx.revert();
+  // The mouse, on all the photos at once; mouse only. shift: -1 to 1.
+  const depths = photos.map((_, i) => (PHOTOS[i % PHOTOS.length] === SMALL ? MOUSE.small : MOUSE.large));
+  const shift = { x: 0, y: 0 };
+  const draw = () => {
+    const px = designPx();
+    photos.forEach((photo, i) => {
+      const [dx, dy] = depths[i];
+      photo.style.translate = `${shift.x * dx * px}px ${shift.y * dy * px}px`;
+    });
+  };
+  const toX = gsap.quickTo(shift, "x", { duration: MOUSE_FOLLOW, ease: "power3.out", onUpdate: draw });
+  const toY = gsap.quickTo(shift, "y", { duration: MOUSE_FOLLOW, ease: "power3.out", onUpdate: draw });
+  const events = new AbortController();
+  window.addEventListener(
+    "pointermove",
+    (event) => {
+      if (event.pointerType !== "mouse") return;
+      toX(-((event.clientX / window.innerWidth) * 2 - 1));
+      toY(-((event.clientY / window.innerHeight) * 2 - 1));
+    },
+    { passive: true, signal: events.signal },
+  );
+
+  // "Play Video" follows the cursor over its photo, which hides the system
+  // cursor, and glides back to the centre as the cursor leaves, as the hero
+  // showreel's button (src/js/hero-showreel.js; user). Kept inside the photo.
+  const play = document.querySelector(".about-gallery__play");
+  const playPhoto = play?.closest(".about-gallery__photo");
+  const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  if (play && fine) {
+    gsap.set(play, { xPercent: -50, yPercent: -50, x: 0, y: 0 });
+    const playX = gsap.quickTo(play, "x", { duration: PLAY_FOLLOW, ease: "power3.out" });
+    const playY = gsap.quickTo(play, "y", { duration: PLAY_FOLLOW, ease: "power3.out" });
+    const cursor = { x: -1, y: -1 };
+    const place = () => {
+      const box = playPhoto.getBoundingClientRect();
+      const over = cursor.x >= box.left && cursor.x <= box.right && cursor.y >= box.top && cursor.y <= box.bottom;
+      playPhoto.classList.toggle("is-following", over);
+      if (!over) {
+        playX(0);
+        playY(0);
+        return;
+      }
+      const halfW = play.offsetWidth / 2;
+      const halfH = play.offsetHeight / 2;
+      playX(gsap.utils.clamp(box.left + halfW, box.right - halfW, cursor.x) - (box.left + box.width / 2));
+      playY(gsap.utils.clamp(box.top + halfH, box.bottom - halfH, cursor.y) - (box.top + box.height / 2));
+    };
+    window.addEventListener(
+      "pointermove",
+      (event) => {
+        if (event.pointerType !== "mouse") return;
+        cursor.x = event.clientX;
+        cursor.y = event.clientY;
+        place();
+      },
+      { passive: true, signal: events.signal },
+    );
+    window.addEventListener("scroll", place, { passive: true, signal: events.signal });
+    document.addEventListener(
+      "pointerout",
+      (event) => {
+        if (event.relatedTarget) return;
+        cursor.x = cursor.y = -1;
+        place();
+      },
+      { signal: events.signal },
+    );
+  }
+
+  return () => {
+    events.abort();
+    if (play) {
+      gsap.killTweensOf(play);
+      gsap.set(play, { clearProps: "transform" });
+      playPhoto.classList.remove("is-following");
+    }
+    gsap.killTweensOf(shift);
+    photos.forEach((photo) => (photo.style.translate = ""));
+    ctx.revert();
+  };
 }

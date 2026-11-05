@@ -21,6 +21,7 @@ import { initMottoScroll } from "./motto-scroll.js";
 import { initPrinciplesScroll } from "./principles-scroll.js";
 import { initAboutGallery } from "./about-gallery.js";
 import { initAboutIntro } from "./about-intro.js";
+import { initAboutTeam } from "./about-team.js";
 import { initHeader } from "./header.js";
 import { initWorkMenu } from "./work-menu.js";
 import { initFooterForm } from "./footer-form.js";
@@ -59,6 +60,7 @@ function initPage() {
   // After the Principles pin, so its pin spacer is measured.
   cleanups.push(initAboutGallery());
   cleanups.push(initAboutIntro());
+  cleanups.push(initAboutTeam());
   // After the pinned sections so their pin spacers exist.
   cleanups.push(initInviewVideos());
   // After the services pin so its pin spacer can be measured.
