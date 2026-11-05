@@ -79,8 +79,12 @@ Found:
 - [x] Images: JPG/PNG 9.3 MB → WebP 3.5 MB (46 files, at most 2000px,
       quality 80; built by `sharp`, sources unchanged); no broken image or
       404 on any page; CLS unchanged.
-- [ ] Videos: weight before / after; the preloader's wait on an ordinary
-      connection before / after.
+- [x] Videos: re-encoded once with ffmpeg (ffmpeg-static, not in the
+      project): H.264, at most 1920px (brand-strategy 1600px, crf 29 to keep
+      its grain), 30 fps, faststart, no sound but the pop-up's. A muted
+      preview for the hero; the pop-up keeps the full showreel. Home's videos
+      24 MB → 8.6 MB (the pop-up's 2.5 MB only when played); the preloader's
+      wait at ≈20 Mbit/s 11.5 s → 7.6 s.
 - [ ] Lighthouse after: 90+ in each category, or the gap explained.
 - [ ] Nothing changed visually (screenshots before / after).
 
@@ -93,7 +97,11 @@ Found:
 | Contact | 77 / 92 / 96 / 100 | 82 / 92 / 93 / 100 | 3.9 s | 5.1 MB |
 | Privacy Policy, Terms | 98 / 100 / 96 / 100 | 73 / 100 / 96 / 100 | 5.0 s | 4.3 MB |
 
-Left: the videos on Home (step 5); the 3D coin (≈3.4 MB: model, light map
+After step 5, Home: desktop 80 / 92 / 96 / 100, mobile 47 / 92 / 96 / 100,
+LCP (mobile) 8.6 s, 13.5 MB (Lighthouse moves ±8 points between runs on this
+page: the preloader and the 3D coin).
+
+Left: the 3D coin (≈3.4 MB: model, light map
 and three.js) loads on every page for the footer coin, also where the footer
 is far below; to load it only as the footer comes near is a further step
 (not planned yet).

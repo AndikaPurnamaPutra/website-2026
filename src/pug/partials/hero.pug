@@ -45,10 +45,11 @@ section.hero(data-inview-area)
             span.hero__time(data-hero-time) 03:38PM
 
     .hero__showreel
-      //- Muted looping video (the file has audio; it stays muted). The poster is
+      //- Muted looping preview: a light copy of the showreel without sound
+      //- (AGENTS.md §15); the pop-up below plays the full one. The poster is
       //- its first frame. src/js/inview-videos.js plays it only while on screen.
       video.hero__showreel-image(poster="assets/images/hero/showreel-poster.webp" muted loop playsinline preload="metadata" aria-label="Showreel preview" data-inview-video)
-        source(src="assets/images/hero/showreel.mp4" type="video/mp4")
+        source(src="assets/images/hero/showreel-preview.mp4" type="video/mp4")
       button.hero__showreel-button.glass-button(type="button")
         span.text-14.text-medium Play Showreel
         img(src="assets/icons/play.svg" width="16" height="16" alt="")
