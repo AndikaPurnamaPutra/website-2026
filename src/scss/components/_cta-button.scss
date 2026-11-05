@@ -135,7 +135,7 @@ $button-sweep: 0.5s cubic-bezier(0.33, 1, 0.68, 1);
 // have no hover to show it.
 .cta__caption {
   line-height: 1.7;
-  opacity: 0.5;
+  opacity: 0.6; // as .text-muted (contrast)
 }
 
 .cta__button:hover,

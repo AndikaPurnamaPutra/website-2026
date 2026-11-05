@@ -112,8 +112,11 @@
   font-weight: 500;
 }
 
+// Secondary text: 60% of the text colour (#707070 on white, 4.9:1), not
+// Figma's 50% (#888, 3.5:1), which is below the WCAG AA minimum of 4.5:1 for
+// small text (user decision; AGENTS.md §15).
 .text-muted {
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
 .text-gradient {

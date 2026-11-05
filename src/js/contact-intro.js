@@ -55,8 +55,10 @@ function setUp(page) {
       { clipPath: "inset(0% 0% 0% 0%)", duration: OPEN, ease: "power2.inOut", ...vars },
     );
 
-  const heading = SplitText.create(page.querySelector(".contact__heading h1"), { type: "lines" });
-  const lead = SplitText.create(page.querySelector(".contact__lead"), { type: "lines" });
+  // Split into whole lines, which screen readers read as they are, so no
+  // labels (SplitText's sat on the paragraph, where they are not allowed).
+  const heading = SplitText.create(page.querySelector(".contact__heading h1"), { type: "lines", aria: "none" });
+  const lead = SplitText.create(page.querySelector(".contact__lead"), { type: "lines", aria: "none" });
   const cta = [...page.querySelectorAll(".contact__cta > *")];
   const card = page.querySelector(".contact-form");
   // Its title, and the rest of its content but what is hidden.

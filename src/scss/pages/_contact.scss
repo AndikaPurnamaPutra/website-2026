@@ -35,7 +35,7 @@ $site-px: clamp(calc(1280px / 1440), calc(100vw / 1440), calc(2560px / 1440));
 $color-line: #cacaca;
 $color-error: #fc0000; // error underline and message (Figma 1611:5344)
 $color-required: #ff0000; // "*" after required labels
-$color-hint: #888888;
+$color-hint: #6c6c6c; // Figma #888, darker for contrast (4.7:1 on #f6f6f6; user)
 $color-file: #344054; // file type label and upload percentage
 $color-track: #eaecf0;
 $color-done: #29df00;
@@ -120,7 +120,7 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
   font-weight: 500;
   font-size: fs(14);
   line-height: calc(24 / 14);
-  opacity: 0.5;
+  opacity: 0.6; // as .text-muted (contrast)
 }
 
 .contact__office {
@@ -173,7 +173,7 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
 .contact__address {
   font-size: fs(14);
   line-height: calc(22 / 14);
-  opacity: 0.5;
+  opacity: 0.6; // as .text-muted (contrast)
 }
 
 .contact__note {
@@ -731,7 +731,7 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
   font-weight: 500;
   font-size: fs(13);
   line-height: calc(22 / 13);
-  opacity: 0.5;
+  opacity: 0.6; // as .text-muted (contrast)
 
   a {
     text-decoration: underline;
