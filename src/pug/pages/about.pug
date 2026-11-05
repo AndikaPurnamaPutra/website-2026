@@ -61,7 +61,8 @@ block content
     section.principles(data-principles data-header-theme="dark")
       .container.principles__inner
         .principles__text
-          p.principles__intro Hundreds of products later, we’ve cut the noise. Here are the core principles we design by.
+          //- The section's heading; each principle's title under it (h3).
+          h2.principles__intro Hundreds of products later, we’ve cut the noise. Here are the core principles we design by.
           .principles__detail
             ol.principles__numbers
               each principle, i in principles
@@ -70,7 +71,7 @@ block content
             .principles__items
               each principle, i in principles
                 .principles__item(class=i === 0 ? "is-active" : null)
-                  h2.principles__title (#{principle[0]})
+                  h3.principles__title (#{principle[0]})
                   p.principles__description
                     each line, k in principle[1]
                       if k
@@ -124,6 +125,8 @@ block content
         ["gallery-5.webp", [440, 1650, 920, 478], "The team working together on their laptops"]
       ]
     section.about-gallery
+      //- No title in Figma: one for screen readers and search engines only.
+      h2.visually-hidden Gallery
       .container
         .about-gallery__photos
           each photo, i in photos
@@ -171,6 +174,7 @@ block content
         ["Umar Aji Pratama", "Lead UIX Designer"]
       ]
     section.about-team
+      h2.visually-hidden Our team
       .container
         p.about-team__lead The Engine only works because of the specialists behind the wheel. We don’t pass projects off to interns or hide behind account managers. Everyone assigned to your sprint is an active builder.
         ul.about-team__list

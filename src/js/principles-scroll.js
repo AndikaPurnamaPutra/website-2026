@@ -189,9 +189,11 @@ export function initPrinciplesScroll() {
         { clipPath: "inset(0% 0% 0% 0%)", scale: 1, duration: CURTAIN, ease: "power3.out" },
         0.2,
       );
+    // Started by the intro itself coming up the screen (by the section's top,
+    // the intro was still below the screen and its rise was missed; user).
     entranceTrigger = ScrollTrigger.create({
-      trigger: section,
-      start: "top 70%",
+      trigger: section.querySelector(".principles__intro"),
+      start: "top 85%",
       once: true,
       onEnter: () => entrance.play(),
       onRefresh: (self) => self.progress > 0 && entrance.progress(1),
