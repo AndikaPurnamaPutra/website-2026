@@ -10,11 +10,11 @@ import { getSmoothScroll } from "./smooth-scroll.js";
 //         clock once the step is reached), the ellipse rises;
 // step 2: the line flips to motto 2;   step 3: "believers." turns gradient;
 // step 4: flip to motto 3 and to the CTA label, the glow fades out, Get a
-//         Quote appears;
-// step 5: the whole motto turns gradient; in the short rest after it the
-//         content starts to rise, faster and faster, so it is already moving
-//         with the page when the section releases (user: the long hold before
-//         the footer felt stuck, then let go all at once).
+//         Quote appears; motto 3 stays white (user: no highlight there, so
+//         no step for one); from there the content rises, faster and faster,
+//         so it is already moving with the page when the section releases
+//         (user: the long hold before the footer felt stuck, then let go all
+//         at once).
 // The glow from below follows one smoothed journey (see lightPath).
 // Timing and easing are not in Figma (approved proposal).
 
@@ -62,25 +62,21 @@ export function initMottoScroll() {
   // own clock, ≈0.6s).
   const DWELL = 0.22;
   const FLIP = 0.38;
-  // Motto 3 comes with the new label, the diagonal background and the CTA,
-  // so its highlight waits a little longer (user: it came at once).
-  const DWELL_MOTTO3 = 0.35;
   // A highlight played on the way down only reverses once the scroll is back
   // this far above its point, so a small scroll up does not undo it at once.
   const HYSTERESIS = 0.1;
-  // After the last highlight ("One Week Wonders Studio™") the frame holds for
-  // about one scroll (0.3 of a screen) before the exit (user decision).
-  const HOLD = 0.3; // of the screen height
   const highlight1 = DWELL;
   const flip1 = highlight1 + DWELL;
   const highlight2 = flip1 + FLIP + DWELL;
   const flip2 = highlight2 + DWELL;
-  const highlight3 = flip2 + FLIP + DWELL_MOTTO3;
-  // Timeline length: the steps, the hold and the exit.
-  const length = highlight3 + DWELL + HOLD + EXIT;
+  // Motto 3 in place; the exit starts there (its highlight and the hold
+  // after it were dropped, user).
+  const motto3 = flip2 + FLIP;
+  // Timeline length: the steps and the exit.
+  const length = motto3 + EXIT;
   // Calm points (resize keeps the reader on the nearest one): before and
   // after each change.
-  const calm = [highlight1 / 2, highlight1 + DWELL / 2, flip1 + FLIP + DWELL / 2, highlight2 + DWELL / 2, flip2 + FLIP + DWELL_MOTTO3 / 2, highlight3 + DWELL / 2];
+  const calm = [highlight1 / 2, highlight1 + DWELL / 2, flip1 + FLIP + DWELL / 2, highlight2 + DWELL / 2, motto3];
   const smooth = reduceMotion ? "steps(1)" : "power2.inOut";
   const linesBox = section.querySelector(".motto__lines");
   const content = section.querySelector(".motto__inner");
@@ -324,11 +320,8 @@ export function initMottoScroll() {
     timeline.to(diagonal, { autoAlpha: 1, duration: FLIP }, flip2);
     timeline.to(cta, { autoAlpha: 1, y: 0, duration: 0.6 * FLIP }, flip2 + 0.4 * FLIP);
 
-    toGradient(2, highlight3, flip2 + FLIP, length - EXIT);
-
-    // The calm after the last highlight, the hold and the exit run to the end
-    // of the pin (the exit is below).
-    timeline.to({}, { duration: length - highlight3 }, highlight3);
+    // The exit runs to the end of the pin (below).
+    timeline.to({}, { duration: length - motto3 }, motto3);
 
     // Moves the timeline towards the scroll, softly (like a 0.7s scrub; 1.2s
     // felt heavy, user), but
@@ -380,7 +373,7 @@ export function initMottoScroll() {
     // flip always plays in full on its own clock, however small or strong the
     // scroll (following the scroll, a small one left a flip half done, a
     // quick one ran past the next step). The stops lie just before and after
-    // each change; the last one at the start of the exit, past the hold.
+    // each change; the last one, motto 3 in place, at the start of the exit.
     // Touch screens and the keyboard scroll freely.
     // A gesture during a glide or a highlight is swallowed, as on sstr.tech,
     // so each step needs a gesture of its own (user: kept and played after,
@@ -393,7 +386,7 @@ export function initMottoScroll() {
     // in About Principles; after the last stop the page scrolls on freely, the
     // content rising with it.
     if (!reduceMotion) {
-      const stops = [calm[0], flip1, flip1 + FLIP, flip2, flip2 + FLIP, length - EXIT];
+      const stops = [calm[0], flip1, flip1 + FLIP, flip2, motto3];
       const placeOf = (time) => pin.start + (time / length) * (pin.end - pin.start);
       const sineInOut = (t) => -(Math.cos(Math.PI * t) - 1) / 2;
       let glideEnd = 0;
