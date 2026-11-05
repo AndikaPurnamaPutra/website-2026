@@ -9,6 +9,9 @@ import { build as esbuildBuild } from "esbuild";
 const { src, dest, watch, series, parallel } = gulp;
 const sass = gulpSass(dartSass);
 const server = browserSync.create();
+// `gulp build` (npm run build, Vercel) makes the production site: compressed
+// CSS and no source maps (AGENTS.md §15). `gulp` (development) keeps them.
+const production = process.argv.includes("build");
 
 const paths = {
   dist: "dist",
@@ -31,9 +34,9 @@ export const html = () =>
     .pipe(dest(paths.dist));
 
 export const styles = () =>
-  src(paths.stylesEntry, { sourcemaps: true })
-    .pipe(sass().on("error", sass.logError))
-    .pipe(dest(`${paths.dist}/css`, { sourcemaps: "." }))
+  src(paths.stylesEntry, { sourcemaps: !production })
+    .pipe(sass({ style: production ? "compressed" : "expanded" }).on("error", sass.logError))
+    .pipe(dest(`${paths.dist}/css`, { sourcemaps: production ? false : "." }))
     .pipe(server.stream());
 
 export const scripts = () =>
@@ -45,7 +48,7 @@ export const scripts = () =>
     outdir: `${paths.dist}/js`,
     splitting: true,
     minify: true,
-    sourcemap: true,
+    sourcemap: !production,
     format: "esm",
   });
 

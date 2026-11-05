@@ -21,6 +21,10 @@ html(lang="en")
     //- The preloader, on the homepage only (user): the page fills both blocks
     //- (src/pug/pages/index.pug).
     block preloader-start
+    //- The fonts of the first screen (the headings, the menu), fetched with the
+    //- page rather than once the CSS is read (AGENTS.md §15).
+    link(rel="preload" href="assets/fonts/GeneralSans-Regular.woff2" as="font" type="font/woff2" crossorigin)
+    link(rel="preload" href="assets/fonts/Inter-Medium.woff2" as="font" type="font/woff2" crossorigin)
     link(rel="stylesheet" href="css/main.css")
   body
     block preloader
