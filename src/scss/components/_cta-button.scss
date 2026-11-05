@@ -130,11 +130,12 @@ $button-sweep: 0.5s cubic-bezier(0.33, 1, 0.68, 1);
   }
 }
 
-// Space is always reserved so the layout does not shift on hover.
+// Always shown, faint (user; Figma's interaction frames show it on hover
+// only, its Motto frame shows it): it tells why to click, and touch screens
+// have no hover to show it.
 .cta__caption {
   line-height: 1.7;
-  opacity: 0;
-  transition: opacity 0.3s ease-out;
+  opacity: 0.5;
 }
 
 .cta__button:hover,
@@ -145,11 +146,6 @@ $button-sweep: 0.5s cubic-bezier(0.33, 1, 0.68, 1);
     width: fs(48);
     opacity: 1;
   }
-}
-
-.cta__button:hover + .cta__caption,
-.cta__button:focus-visible + .cta__caption {
-  opacity: 0.5;
 }
 
 // Light variant on dark sections (Figma 1527:4247): white on dark. It opens
@@ -174,7 +170,6 @@ $button-sweep: 0.5s cubic-bezier(0.33, 1, 0.68, 1);
 @media (prefers-reduced-motion: reduce) {
   .cta__button,
   .cta__icon,
-  .cta__caption,
   .button::before,
   .button__light,
   .button__ink {
