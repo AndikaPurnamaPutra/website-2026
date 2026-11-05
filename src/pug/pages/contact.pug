@@ -149,7 +149,7 @@ block content
 
     //- Endless marquee pushed by the scroll, stops on hover (src/js/marquee.js,
     //- user decisions).
-    .contact-gallery(data-marquee="pause scroll" data-marquee-speed="60")
+    .contact-gallery(data-marquee="pause scroll" data-marquee-speed="75" data-marquee-push="1.5" data-marquee-max="1500")
       .contact-gallery__track(data-marquee-track)
         each item, i in gallery
           a.contact-gallery__item(href="#" style=`--w: ${item.size[0]}; --h: ${item.size[1]}`)

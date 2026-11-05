@@ -9,7 +9,9 @@ import { designPx } from "./design-px.js";
 //   by the page scroll as the Contact gallery, 1.5× as much
 //   (data-marquee-push; user: a little faster), easing towards 1500 px/s
 //   (data-marquee-max, so a hard swipe does not fling it).
-// - Contact gallery, data-marquee="pause scroll", 60 px/s (user decisions):
+// - Contact gallery, data-marquee="pause scroll", 75 px/s (60 felt slow for
+//   large pictures; user), pushed by the scroll as the testimonials (1.5×,
+//   easing towards 1500 px/s):
 //   - "pause": its own movement stops while hovered or keyboard-focused;
 //     the scroll still pushes it (user decision).
 //   - "scroll": the page scroll pushes it: down → to the left, up → to the
