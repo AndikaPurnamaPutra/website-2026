@@ -61,8 +61,9 @@ block content
         .contact__office
           img.contact__office-image(src="assets/images/contact/office.webp" width="210" height="122" alt="")
           .contact__office-info
-            a.contact__office-link(href=mapsUrl target="_blank" rel="noopener")
-              | Office HQ
+            //- Its hover: src/js/contact-office.js and _contact.scss.
+            a.contact__office-link(href=mapsUrl target="_blank" rel="noopener" data-office-link)
+              span.contact__office-text Office HQ
               span.contact__office-arrow
                 img(src="assets/icons/arrow-down-right.svg" width="9.5" height="9.5" alt="")
             p.contact__address
@@ -139,7 +140,8 @@ block content
         img.contact-form__turnstile(src="assets/images/contact/turnstile-placeholder.webp" width="297" height="63" alt="")
 
         .contact-form__submit-row
-          button.contact-form__submit(type="submit")
+          //- data-label: the light copy its hover sweeps in (_contact.scss).
+          button.contact-form__submit(type="submit" data-label="Submit")
             span(data-submit-label) Submit
             img.contact-form__submit-check(src="assets/icons/check.svg" width="20" height="20" alt="" hidden)
           p.contact-form__privacy Your details are safe with us. By sending this, you agree to our #[a(href="privacy-policy.html") Privacy Policy].

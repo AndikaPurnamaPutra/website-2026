@@ -273,6 +273,7 @@ export function initContactForm() {
       if (control !== again) control.disabled = sent;
     });
     submitLabel.textContent = sent ? "Submitted" : "Submit";
+    submit.dataset.label = submitLabel.textContent; // its hover's copy
     submitCheck.hidden = !sent;
     again.hidden = !sent;
   };
