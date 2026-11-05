@@ -26,11 +26,13 @@ html(lang="en")
     link(rel="preload" href="assets/fonts/GeneralSans-Regular.woff2" as="font" type="font/woff2" crossorigin)
     link(rel="preload" href="assets/fonts/Inter-Medium.woff2" as="font" type="font/woff2" crossorigin)
     link(rel="stylesheet" href="css/main.css")
-  body
+  //- Barba (src/js/page-transition.js): the body holds the pages, <main> is
+  //- the part swapped; the navbar and the footer stay.
+  body(data-barba="wrapper")
     block preloader
     block header
       include ../partials/header
-    main
+    main(data-barba="container" data-barba-namespace=namespace || "page")
       block content
     include ../partials/footer
     script(type="module" src="js/main.js")

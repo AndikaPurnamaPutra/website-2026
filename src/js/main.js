@@ -1,6 +1,5 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import barba from "@barba/core";
 import { initPreloader } from "./preloader.js";
 import { initHeroIntro } from "./hero-intro.js";
 import { initHeroClock } from "./hero-clock.js";
@@ -32,16 +31,19 @@ import { initContactForm } from "./contact-form.js";
 import { initContactIntro } from "./contact-intro.js";
 import { initContactOffice } from "./contact-office.js";
 import { initScrollMemory } from "./scroll-memory.js";
+import { initPageTransitions } from "./page-transition.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
 let cleanups = [];
 
-function initPage() {
-  // Initialize page-specific animations here.
-  cleanups.push(initSmoothScroll());
+// Set up again for each page shown by a page transition (src/js/page-
+// transition.js), and torn down before it leaves. The smooth scroll stays for
+// the whole visit; the preloader and the scroll memory are for the first
+// page only (`first`).
+function initPage(first) {
   // After the smooth scroll, which it holds while it plays.
-  cleanups.push(initPreloader());
+  if (first) cleanups.push(initPreloader());
   cleanups.push(initHeroIntro());
   cleanups.push(initHeroClock());
   cleanups.push(initHeroHighlight());
@@ -75,7 +77,7 @@ function initPage() {
   cleanups.push(initContactIntro());
   cleanups.push(initContactOffice());
   // Last, so every pin spacer exists before the scroll position is restored.
-  cleanups.push(initScrollMemory());
+  if (first) cleanups.push(initScrollMemory());
 }
 
 function destroyPage() {
@@ -84,4 +86,6 @@ function destroyPage() {
   cleanups = [];
 }
 
-initPage();
+initSmoothScroll();
+initPage(true);
+initPageTransitions({ setUp: () => initPage(false), tearDown: destroyPage });
