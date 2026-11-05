@@ -52,8 +52,15 @@ export function initStatementInk() {
     wrapped.push(inner);
     return [inner];
   });
+  // Screen readers get the sentence whole, from a hidden copy; the split
+  // pieces are hidden from them (SplitText's own labels sat on plain spans,
+  // which screen readers may ignore: Lighthouse, AGENTS.md §15).
+  const reading = document.createElement("span");
+  reading.className = "visually-hidden";
+  reading.textContent = pieces.map((piece) => piece.textContent.trim()).join(" ");
+  text.prepend(reading);
   const splits = pieces.map((piece) =>
-    SplitText.create(piece, { type: "words, chars", wordsClass: "statement__word", charsClass: "statement__char" }),
+    SplitText.create(piece, { type: "words, chars", wordsClass: "statement__word", charsClass: "statement__char", aria: "hidden" }),
   );
   const chars = splits.flatMap((split) => split.chars);
   text.classList.add("is-lighting");
@@ -155,6 +162,7 @@ export function initStatementInk() {
     cued.forEach(({ piece }) => piece.revert());
     text.classList.remove("is-lighting");
     splits.forEach((split) => split.revert());
+    reading.remove();
     wrapped.forEach((inner) => inner.replaceWith(...inner.childNodes));
   };
 }

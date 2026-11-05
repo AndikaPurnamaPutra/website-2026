@@ -87,3 +87,15 @@ button {
     transition: none;
   }
 }
+
+// Read by screen readers, not shown (e.g. a sentence split into letters for
+// an effect, src/js/statement-ink.js).
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
