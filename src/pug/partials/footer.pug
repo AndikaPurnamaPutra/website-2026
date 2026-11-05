@@ -20,9 +20,10 @@ footer.site-footer
 
     form.site-footer__form(action="mailto:owwstudio@gmail.com" method="get" data-footer-form)
       label.site-footer__label(for="footer-email") Get in Touch
-      //- The visitor's email (user; it was the company name). Named "subject"
+      //- The visitor's email (user; it was the company name), shown as an
+      //- example address (user's pick). Named "subject"
       //- so the form's own mailto: (without JS) puts it in the subject.
-      input#footer-email.site-footer__input(type="email" name="subject" placeholder="Your email" autocomplete="email" required)
+      input#footer-email.site-footer__input(type="email" name="subject" placeholder="you@company.com" autocomplete="email" required)
       button.button.button--small(type="submit")
         +buttonText("Send email")
 
