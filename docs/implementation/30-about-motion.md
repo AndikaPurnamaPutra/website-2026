@@ -64,7 +64,9 @@ warna. Perlu masukan pengguna; kemungkinan interaksi hover pada label
 - [x] 1. Intro: build, urutan frame di browser (judul naik, foto terbuka dari
       bawah, teks di bawah foto naik saat di-scroll), muat ulang di tengah
       halaman tetap di posisinya, tanpa error.
-- [ ] 2. Tim: build, scroll dan hover dicek di browser, tanpa error.
+- [x] 2. Tim: build; lead naik, garis tiap baris tergambar dari kiri dan
+      nama/peran naik saat masuk layar (sekali); hover meredupkan baris lain
+      ke 30%; dicek di browser, tanpa error.
 - [x] 3. Principles: scroll bebas tanpa kunci; pergantian teks dan tirai
       ilustrasi dicek per frame (tirai mulai di frame yang sama dengan
       pergantian); pin 0,8 layar per prinsip, 5,2 layar termasuk keluar; teks 1,15 dtk, tirai 1,1 dtk (lebih cepat terasa terlalu cepat, 0,85 / 1,3 / 1,25 sedikit berat; pengguna);
