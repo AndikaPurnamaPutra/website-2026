@@ -137,11 +137,8 @@ $button-sweep: 0.5s cubic-bezier(0.33, 1, 0.68, 1);
   transition: opacity 0.3s ease-out;
 }
 
-// .is-open: opened by the page (Motto's, as its step comes in,
-// src/js/motto-scroll.js).
 .cta__button:hover,
-.cta__button:focus-visible,
-.cta.is-open .cta__button {
+.cta__button:focus-visible {
   border-color: var(--color-ink);
 
   .cta__icon {
@@ -151,38 +148,16 @@ $button-sweep: 0.5s cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 .cta__button:hover + .cta__caption,
-.cta__button:focus-visible + .cta__caption,
-.cta.is-open .cta__caption {
+.cta__button:focus-visible + .cta__caption {
   opacity: 0.5;
 }
 
-// Opened by the page (Motto): one after another and softer than on hover
-// (user: at the hover's 0.3s all at once it felt stiff; at 0.8s in all, too
-// slow): the frame, the arrow box opening on the site's ease-out, then the
-// caption, ≈0.5s in all. Closing stays quick.
-.cta.is-open {
-  .cta__button {
-    transition: border-color 0.3s ease;
-  }
-
-  .cta__icon {
-    transition:
-      width 0.45s cubic-bezier(0.33, 1, 0.68, 1) 0.05s,
-      opacity 0.3s ease-out 0.1s;
-  }
-
-  .cta__caption {
-    transition: opacity 0.3s ease-out 0.2s;
-  }
-}
-
 // Light variant on dark sections (Figma 1527:4247): white on dark. It opens
-// on hover as the others do, and as Motto's step brings it in (user; Figma
-// shows it open).
+// on hover only, as the others do (user; Figma shows it open; opened by the
+// scroll as its step came in, it was dropped).
 .cta--light {
   .cta__button:hover,
-  .cta__button:focus-visible,
-  &.is-open .cta__button {
+  .cta__button:focus-visible {
     border-color: var(--color-white);
   }
 
@@ -202,8 +177,7 @@ $button-sweep: 0.5s cubic-bezier(0.33, 1, 0.68, 1);
   .cta__caption,
   .button::before,
   .button__light,
-  .button__ink,
-  .cta.is-open :is(.cta__button, .cta__icon, .cta__caption) {
+  .button__ink {
     transition: none;
   }
 }
