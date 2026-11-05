@@ -205,3 +205,29 @@ For each section:
 - **Always ask the user for confirmation before committing and pushing.** After a task is finished and verified, summarize the changes and the proposed commit message, then wait for explicit approval.
 - **Merge `dev` into `main` only when the user says the work is final**, and ask for confirmation before merging and pushing `main`.
 - Run the build before committing. Never commit `node_modules/` or `dist/`.
+
+
+## 15. SEO and Performance
+
+Apply these to every page, new or changed. Where a page does not meet them yet, list the gaps in its implementation plan.
+
+### SEO
+
+- Each page has a unique `<title>` and a meta description (about 150–160 characters), in the page's own words.
+- Each page has Open Graph and Twitter Card tags (title, description, image 1200 × 630, URL) and a canonical URL.
+- One `h1` per page; headings in order (no skipped levels); `lang` set on `html`.
+- Every image has an `alt`: describe it, or `alt=""` when it is decorative.
+- Links have descriptive text or an `aria-label` (not "click here").
+- The site has a favicon, `robots.txt` and `sitemap.xml`; new pages are added to the sitemap.
+- Add structured data (schema.org, JSON-LD) where it fits, e.g. the studio as an Organization.
+- Do not hide text that should be indexed behind JavaScript only; the page must make sense without JS.
+
+### Performance
+
+- Images: serve modern formats (WebP or AVIF) at sizes that match their display (`srcset` / `sizes`); set `width` and `height` to avoid layout shifts; lazy-load images below the first screen.
+- Videos: compress them; use a light preview version where a large file is not needed; set a poster.
+- Fonts: WOFF2 with `font-display: swap`; preload the fonts used in the first screen.
+- Scripts and styles: minified for production; no source maps shipped to production; load heavy parts (such as the 3D coin) only when needed.
+- Animations: animate `transform`, `opacity` and `clip-path`; avoid animating layout properties; respect `prefers-reduced-motion`.
+- Do not add a dependency or an asset without considering its weight.
+- Check new or changed pages with Lighthouse (or an equivalent) and report the scores; aim for 90+ in Performance, Accessibility, Best Practices and SEO, and explain any gap.
