@@ -396,9 +396,12 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
     cursor: inherit;
   }
 
+  // Chosen, the text turns medium; the ::after copy (medium, unseen) keeps
+  // the chip that wide from the start, so it does not grow (user).
   span {
     display: block;
     padding: fs(10) fs(16);
+    text-align: center;
     font-size: fs(16);
     line-height: 1;
     letter-spacing: -0.04em;
@@ -412,6 +415,15 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
       color 0.2s ease-out,
       background-size 0.35s cubic-bezier(0.33, 1, 0.68, 1),
       border-color 0.2s ease-out;
+  }
+
+  span::after {
+    content: attr(data-text);
+    display: block;
+    height: 0;
+    overflow: hidden;
+    font-weight: 500;
+    visibility: hidden;
   }
 
   input:checked + span {

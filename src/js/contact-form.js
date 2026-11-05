@@ -137,11 +137,27 @@ export function initContactForm() {
     if (event.relatedTarget && !select.contains(event.relatedTarget)) closePanel(false);
   });
 
-  // Project Type shows Turnaround with its own options.
+  // Project Type shows Turnaround with its own options; unchosen, it goes.
   on(form, "change", (event) => {
     if (event.target.name !== "type") return;
-    turnaround.hidden = false;
-    fillOptions(event.target.value);
+    turnaround.hidden = !event.target.checked;
+    closePanel(false);
+    if (event.target.checked) fillOptions(event.target.value);
+    else setValue("");
+  });
+
+  // Budget and Type chips are unchosen with a second click (user), as the
+  // Scope ones. Whether it was chosen is read before the click chooses it.
+  let wasChosen = null;
+  on(form, "pointerdown", (event) => {
+    const input = event.target;
+    wasChosen = input.type === "radio" && input.checked ? input : null;
+  });
+  on(form, "click", (event) => {
+    if (event.target !== wasChosen) return;
+    wasChosen.checked = false;
+    wasChosen.dispatchEvent(new Event("change", { bubbles: true }));
+    wasChosen = null;
   });
 
   // Message counter

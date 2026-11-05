@@ -44,7 +44,7 @@ block content
         each option in options
           label.contact-form__chip
             input(type=type name=name value=option)
-            span= option
+            span(data-text=option)= option
 
   section.contact
     .container.contact__inner
