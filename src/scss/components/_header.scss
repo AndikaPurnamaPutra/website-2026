@@ -1,5 +1,5 @@
 // Figma: Menu Bar 1611:6986. Fixed bar, same height at the top and while
-// scrolling (24px padding → 72px). Transparent, without Figma's white
+// scrolling (20px padding → 64px; Figma 24px → 72px). Transparent, without Figma's white
 // background and shadow, as on leoparpeix.com and jasminegunarto.com (user
 // decision): only the logo and links float over the page. Logo, text and
 // paddings keep Figma's size at every viewport width (not fluid), in rem so
@@ -13,7 +13,7 @@
   right: 0;
   left: 0;
   z-index: 100;
-  padding-block: 1.5rem; // 24px
+  padding-block: 1.25rem; // 20px (Figma 24px; user)
   // Inverts whatever lies behind it, as on leoparpeix.com (user decision):
   // white logo and links, blended by difference, read dark on white, light
   // on dark and in opposite colours over pictures.
@@ -173,7 +173,7 @@ main {
 
 .work-menu {
   position: absolute;
-  top: calc(100% + 2.625rem); // 42px: 18px below the bar
+  top: calc(100% + 2.375rem); // 38px: 18px below the bar
   right: var(--page-gutter);
   left: var(--page-gutter);
   padding: 16px;
