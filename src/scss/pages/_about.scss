@@ -183,11 +183,13 @@
   line-height: calc(22 / 14);
 }
 
+// Clips the illustration that settles from a little larger as it is revealed.
 .principles__figures {
   position: relative;
   flex-shrink: 0;
   width: fluid(670);
   height: fluid(420);
+  overflow: hidden;
 }
 
 .principles__figure {

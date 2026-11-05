@@ -65,10 +65,12 @@ warna. Perlu masukan pengguna; kemungkinan interaksi hover pada label
       bawah, teks di bawah foto naik saat di-scroll), muat ulang di tengah
       halaman tetap di posisinya, tanpa error.
 - [ ] 2. Tim: build, scroll dan hover dicek di browser, tanpa error.
-- [ ] 3. Principles: scroll bebas tanpa kunci; pergantian teks dan tirai
-      ilustrasi dicek per frame; panjang pin diukur; waktu frame saat scroll
-      (target 60 fps); masuk dan keluar section mulus; klik angka; reduced
-      motion; tanpa error.
+- [x] 3. Principles: scroll bebas tanpa kunci; pergantian teks dan tirai
+      ilustrasi dicek per frame (tirai mulai di frame yang sama dengan
+      pergantian); pin 0,8 layar per prinsip, 5,2 layar termasuk keluar; teks 1,15 dtk, tirai 1,1 dtk (lebih cepat terasa terlalu cepat, 0,85 / 1,3 / 1,25 sedikit berat; pengguna);
+      waktu frame saat scroll 16,7 ms (60 fps, papan 01 tidak perlu diubah);
+      keluar naik 180 px bersama halaman; scroll balik, klik angka, muat ulang
+      di tengah; tanpa error.
 - [ ] 4. Galeri: sesuai masukan.
 - [ ] Lighthouse About tidak turun (sekarang desktop 89 / 96 / 96 / 100).
 

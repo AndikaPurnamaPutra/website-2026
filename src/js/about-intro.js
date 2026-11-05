@@ -16,19 +16,27 @@ gsap.registerPlugin(SplitText);
 // with reduced motion.
 const RISE = 200; // % of its height text rises from
 const DESCENT = 25; // % of its height its window reaches below it (g, p, y)
-const LINE_GAP = 0.12; // s between the title's lines
-const PART_GAP = 0.07; // s between the other parts
-const PHOTO_AT = 0.15; // s after the title starts, the photo opens
-const PHOTO_IN = 0.9; // s it takes
+const LINE_GAP = 0.15; // s between the title's lines
+const PART_GAP = 0.09; // s between the other parts
+const TEXT_IN = 1.25; // s text takes to rise (1 was a little too fast; user)
+const PHOTO_AT = 0.2; // s after the title starts, the photo opens
+const PHOTO_IN = 1.2; // s it takes (0.9 was a little too fast; user)
+const WAIT = 1500; // ms at most for the photo before it plays
 
 export function initAboutIntro() {
   const intro = document.querySelector(".about-intro");
   if (!intro || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return () => {};
 
-  // Split once the web fonts are in, so the lines break where they are set.
+  // Split once the web fonts are in, so the lines break where they are set;
+  // and started once the team photo is loaded and decoded, so the browser
+  // is not still drawing it while it opens (it stuttered; user). Not waiting
+  // longer than WAIT for the photo.
   let cleanup = () => {};
   let cancelled = false;
-  (document.fonts?.ready ?? Promise.resolve()).then(() => {
+  const picture = intro.querySelector(".about-intro__photo img");
+  const decoded = picture?.decode?.().catch(() => {}) ?? Promise.resolve();
+  const photoReady = Promise.race([decoded, new Promise((resolve) => setTimeout(resolve, WAIT))]);
+  Promise.all([document.fonts?.ready, photoReady]).then(() => {
     if (!cancelled) cleanup = setUp(intro);
   });
   return () => {
@@ -42,7 +50,7 @@ function setUp(intro) {
     gsap.fromTo(
       els,
       { yPercent: RISE, clipPath: `inset(-20% -20% ${RISE - DESCENT}% -20%)` },
-      { yPercent: 0, clipPath: `inset(-20% -20% ${-DESCENT}% -20%)`, duration: 1, ease: "power3.out", ...vars },
+      { yPercent: 0, clipPath: `inset(-20% -20% ${-DESCENT}% -20%)`, duration: TEXT_IN, ease: "power3.out", ...vars },
     );
 
   const title = SplitText.create(intro.querySelector(".about-intro__title"), { type: "lines", aria: "none" });
@@ -94,7 +102,7 @@ function setUp(intro) {
     start: "top 90%",
     once: true,
     onEnter: () => {
-      const after = PHOTO_AT + 0.4 - tl.time();
+      const after = PHOTO_AT + 0.5 - tl.time();
       wait = gsap.delayedCall(Math.max(0, after), () => bodyIn.play());
     },
   });
