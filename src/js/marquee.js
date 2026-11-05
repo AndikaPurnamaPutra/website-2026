@@ -63,11 +63,13 @@ function initMarquee(marquee) {
   let speed = 0; // px per second, negative = to the left
   let direction = -1;
   let held = false;
+  let checkHeld = () => {};
   let lastScroll = window.scrollY;
   const setX = gsap.quickSetter(track, "x", "px");
 
   const tick = (time, deltaMs) => {
     const dt = Math.min(deltaMs / 1000, 0.1);
+    checkHeld();
     const scroll = window.scrollY;
     const scrolled = scroll - lastScroll;
     lastScroll = scroll;
@@ -90,14 +92,13 @@ function initMarquee(marquee) {
   };
 
   const events = new AbortController();
-  const on = (type, handler) => marquee.addEventListener(type, handler, { signal: events.signal });
   if (options.includes("pause")) {
+    // Held while the pointer is on an item, not on the marquee's whole box
+    // (its empty space below the shorter items held it too; user), read
+    // every frame, as the items also slide out from under a still pointer.
     // Keyboard focus also holds it; focus left by a click does not.
-    const keyboardFocus = () => marquee.querySelector(":focus-visible") !== null;
-    on("pointerenter", () => (held = true));
-    on("pointerleave", () => (held = keyboardFocus()));
-    on("focusin", (event) => (held = event.target.matches(":focus-visible") || marquee.matches(":hover")));
-    on("focusout", () => requestAnimationFrame(() => (held = keyboardFocus() || marquee.matches(":hover"))));
+    const items = [...track.children];
+    checkHeld = () => (held = items.some((item) => item.matches(":hover")) || marquee.querySelector(":focus-visible") !== null);
   }
 
   gsap.ticker.add(tick);
