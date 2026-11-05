@@ -11,7 +11,8 @@ import { designPx, typePx } from "./design-px.js";
 // ("lights off, then the stage lights up"; user: no blur), the cards rise
 // into place and their text and the label rise; at each step, the card
 // coming to the front draws its line, then its tags and text rise. On their
-// own clock (1s, power3.out), back when scrolled back up. The images open as
+// own clock (1s, power3.out); the arrival once (as About and Contact; user),
+// each step's back when scrolled back up. The images open as
 // a curtain from the bottom with depth, after floema.com's collections (user;
 // a zoom with every curtain was too much: that version is kept on the branch
 // services-media/zoom).
@@ -396,10 +397,11 @@ export function initServicesScroll() {
       ScrollTrigger.create({
         trigger: section,
         start: "top 60%",
+        // Once (as About and Contact; user): it stays when scrolled back up.
+        once: true,
         onEnter: () => entry.play(),
-        onLeaveBack: () => entry.reverse(),
         // Opened or reloaded further down: in place at once.
-        onRefresh: (self) => entry.progress(self.progress > 0 ? 1 : 0).pause(),
+        onRefresh: (self) => self.progress > 0 && entry.progress(1),
       });
 
       // At each step, once its card is halfway to the front.

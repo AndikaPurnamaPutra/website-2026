@@ -11,8 +11,8 @@ gsap.registerPlugin(SplitText);
 // cards. The project cards come in one after another from the left: each
 // picture opens from the bottom within its frame while the picture itself
 // settles up into place (as the Services images), then its title rises a
-// little (user: the full curtain was right, made a touch calmer). Each part plays on its own clock as it comes up the screen and goes
-// back when scrolled back up. Not with
+// little (user: the full curtain was right, made a touch calmer). Each part plays on its own clock as it comes up the screen, once
+// (as About and Contact; user). Not with
 // reduced motion: all is in place.
 // Option 2 (branch our-work/v2): no drift of the rows with the scroll (it is
 // on our-work/v1); the rows stay in place.
@@ -52,10 +52,11 @@ export function initOurWorkIntro() {
       trigger: ScrollTrigger.create({
         trigger,
         start: START,
+        // Once (as About and Contact; user): it stays when scrolled back up.
+        once: true,
         onEnter: () => timeline.play(),
-        onLeaveBack: () => timeline.reverse(),
         // Opened or reloaded further down: in place at once.
-        onRefresh: (self) => timeline.progress(self.progress > 0 ? 1 : 0).pause(),
+        onRefresh: (self) => self.progress > 0 && timeline.progress(1),
       }),
     });
   };

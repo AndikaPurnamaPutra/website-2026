@@ -18,7 +18,7 @@ gsap.registerPlugin(SplitText);
 //    from the paragraph grey, with the scroll (reference from the user:
 //    drone.riotters.com; like the Statement text), back to grey going up.
 // Around it, in the site's words (user): the eyebrow and the headline's lines
-// rise as the hero text (src/js/hero-intro.js), back when scrolled back up;
+// rise as the hero text (src/js/hero-intro.js), once (as About and Contact; user);
 // with the odometer, each row's line draws from the left and its label rises.
 // Without JS or with reduced motion the final values are shown, in black.
 const RISE = 200; // % of its height text rises from
@@ -59,10 +59,11 @@ export function initMilestoneCounter() {
   const introTrigger = ScrollTrigger.create({
     trigger: section.querySelector(".milestone__intro"),
     start: "top 85%",
+    // Once (as About and Contact; user): it stays when scrolled back up.
+    once: true,
     onEnter: () => intro.play(),
-    onLeaveBack: () => intro.reverse(),
     // Opened or reloaded further down: in place at once.
-    onRefresh: (self) => intro.progress(self.progress > 0 ? 1 : 0).pause(),
+    onRefresh: (self) => self.progress > 0 && intro.progress(1),
   });
 
   const rows = [...root.querySelectorAll(".milestone__row")];

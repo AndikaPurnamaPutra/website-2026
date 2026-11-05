@@ -18,7 +18,8 @@ gsap.registerPlugin(SplitText);
 //   apart; folder: pocket opens, folder rises out with a small bounce);
 // - as the ink reaches the last word, the "Schedule a call" button rises as the hero
 //   text, then the section moves on.
-// All of it goes back when scrolled back up. Without JS or with reduced
+// All of it goes back when scrolled back up, but the eyebrow's rise, which
+// plays once (as About and Contact; user). Without JS or with reduced
 // motion the text stays black, and the icon, folder and button as in Figma.
 const RISE = 200; // % of its height the eyebrow and the button rise from
 // % of its height their window reaches below them, so descenders (g, p, y)
@@ -96,10 +97,11 @@ export function initStatementInk() {
     ScrollTrigger.create({
       trigger: eyebrow,
       start: "top 85%",
+      // Once (as About and Contact; user): it stays when scrolled back up.
+      once: true,
       onEnter: () => eyebrowRise.play(),
-      onLeaveBack: () => eyebrowRise.reverse(),
       // Opened or reloaded further down: in place at once.
-      onRefresh: (self) => eyebrowRise.progress(self.progress > 0 ? 1 : 0).pause(),
+      onRefresh: (self) => self.progress > 0 && eyebrowRise.progress(1),
     });
   // The button and, right after it, its caption (always shown now; it sat
   // there before the button came, without moving; user).

@@ -10,7 +10,7 @@ gsap.registerPlugin(SplitText);
 // another, left to right and row by row, "and hundred more..." rises after
 // them, the line draws from the left and the testimonials fade in (their
 // marquee moves as before, src/js/marquee.js). Each part plays on its own
-// clock as it comes up the screen and goes back when scrolled back up. Not
+// clock as it comes up the screen, once (as About and Contact; user). Not
 // with reduced motion: all is in place.
 // Nothing more (user: calm, as a pause after Services and Our Work; a
 // spotlight over the logos and a lit middle testimonial were tried).
@@ -46,10 +46,11 @@ export function initTrustedIntro() {
       trigger: ScrollTrigger.create({
         trigger,
         start: START,
+        // Once (as About and Contact; user): it stays when scrolled back up.
+        once: true,
         onEnter: () => timeline.play(),
-        onLeaveBack: () => timeline.reverse(),
         // Opened or reloaded further down: in place at once.
-        onRefresh: (self) => timeline.progress(self.progress > 0 ? 1 : 0).pause(),
+        onRefresh: (self) => self.progress > 0 && timeline.progress(1),
       }),
     });
   };
