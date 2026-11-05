@@ -45,6 +45,13 @@
   border-radius: var(--radius-sm);
 }
 
+// Over the pictures, pointing at the service in view (services.pug).
+.services__link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
 .services__image {
   position: absolute;
   inset: 0;

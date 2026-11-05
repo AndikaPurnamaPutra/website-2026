@@ -56,6 +56,16 @@ export function initServicesScroll() {
   const media = section.querySelector(".services__media");
   const fade = section.querySelector(".services__fade");
   const label = section.querySelector(".services__label");
+  // The link over the pictures goes to the service in view.
+  const link = section.querySelector("[data-services-link]");
+  const targets = link ? JSON.parse(link.dataset.servicesLink) : [];
+  const pointLink = (index) => {
+    const [href, title] = targets[index] ?? [];
+    if (!href || link.getAttribute("href") === href && link.dataset.index === String(index)) return;
+    link.dataset.index = index;
+    link.setAttribute("href", href);
+    link.setAttribute("aria-label", `View ${title}`);
+  };
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const steps = cards.length; // service changes + final fullscreen step
   // No snap (user decision): each step has a short rest zone where the frame
@@ -168,6 +178,9 @@ export function initServicesScroll() {
       onUpdate: () => {
         drawClips();
         cue(false);
+        // The service in view: the last whose step is halfway through.
+        const time = timeline.time();
+        pointLink(cards.reduce((active, _, k) => (k > 0 && time >= stepTime(k - 1) + 0.5 ? k : active), 0));
       },
     });
 
