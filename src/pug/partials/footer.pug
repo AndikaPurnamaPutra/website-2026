@@ -19,8 +19,10 @@ footer.site-footer
     img.site-footer__coin(src="assets/images/hero/coin.png" width="366" height="344" alt="")
 
     form.site-footer__form(action="mailto:owwstudio@gmail.com" method="get" data-footer-form)
-      label.site-footer__label(for="footer-company") Get in Touch
-      input#footer-company.site-footer__input(type="text" name="subject" placeholder="Your company name" autocomplete="organization" required)
+      label.site-footer__label(for="footer-email") Get in Touch
+      //- The visitor's email (user; it was the company name). Named "subject"
+      //- so the form's own mailto: (without JS) puts it in the subject.
+      input#footer-email.site-footer__input(type="email" name="subject" placeholder="Your email" autocomplete="email" required)
       button.button.button--small(type="submit")
         +buttonText("Send email")
 
