@@ -10,8 +10,9 @@ block preloader-start
 block preloader
   include ../partials/preloader
 
-block title
-  | Home — OWW
+block meta
+  +pageMeta("Home — OWW", "One Week Wonders Studio™ is a design and development agency in Yogyakarta, Indonesia, crafting brand identities, websites, apps and AI-powered products.", "")
+  +organizationData
 
 block content
   include ../partials/hero

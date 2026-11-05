@@ -4,8 +4,8 @@ extends ../layouts/default
 //- decision); subsection 3.2 appears twice there, shown once (user decision).
 //- Item types: see src/pug/mixins/policy.pug.
 
-block title
-  | Terms of Service — OWW
+block meta
+  +pageMeta("Terms of Service — OWW", "The terms that apply when you use the One Week Wonders Studio™ website and when you work with us on a project.", "terms-of-service.html")
 
 block header
   include ../partials/header-back

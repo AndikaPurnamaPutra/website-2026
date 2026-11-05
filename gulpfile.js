@@ -19,6 +19,8 @@ const paths = {
   scripts: "src/js/**/*.js",
   scriptsEntry: "src/js/main.js",
   assets: "src/assets/**/*",
+  // Files served from the site's root (favicon, robots.txt).
+  static: "src/static/**/*",
 };
 
 export const clean = () => rm(paths.dist, { recursive: true, force: true });
@@ -51,6 +53,8 @@ export const scripts = () =>
 export const assets = () =>
   src(paths.assets, { encoding: false }).pipe(dest(`${paths.dist}/assets`));
 
+export const statics = () => src(paths.static, { encoding: false }).pipe(dest(paths.dist));
+
 const reload = (done) => {
   server.reload();
   done();
@@ -66,8 +70,9 @@ const watchFiles = () => {
   watch(paths.styles, styles);
   watch(paths.scripts, series(scripts, reload));
   watch(paths.assets, series(assets, reload));
+  watch(paths.static, series(statics, reload));
 };
 
-export const build = series(clean, parallel(html, styles, scripts, assets));
+export const build = series(clean, parallel(html, styles, scripts, assets, statics));
 
 export default series(build, serve, watchFiles);

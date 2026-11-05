@@ -1,15 +1,19 @@
 include ../mixins/cta-button
 include ../mixins/work-carousel
 include ../mixins/policy
+include ../mixins/page-meta
 
 doctype html
 html(lang="en")
   head
     meta(charset="utf-8")
     meta(name="viewport" content="width=device-width, initial-scale=1")
-    title
-      block title
-        | OWW
+    //- Each page gives its title and description (src/pug/mixins/page-meta.pug).
+    block meta
+      +pageMeta("One Week Wonders Studio", "One Week Wonders Studio™ is a design and development agency in Yogyakarta, Indonesia.", "")
+    link(rel="icon" href="favicon.svg" type="image/svg+xml")
+    link(rel="apple-touch-icon" href="assets/images/meta/apple-touch-icon.png")
+    meta(name="theme-color" content="#ffffff")
     //- Marks JS as available before the first paint, so styles for the JS
     //- versions (e.g. the Motto lights, hidden until their step) apply at once.
     script.

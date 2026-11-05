@@ -5,8 +5,8 @@ extends ../layouts/default
 //- Each section is a list of groups (8px apart); the items of a group are 2px
 //- apart. Item types: p (lines; "" = empty line), sub (bold subheading),
 //- ul / ol (items of [bold label, text]), html (paragraph with inline markup).
-block title
-  | Privacy Policy — OWW
+block meta
+  +pageMeta("Privacy Policy — OWW", "How One Week Wonders Studio™ collects, uses and protects the personal information you share with us through our website and services.", "privacy-policy.html")
 
 block header
   include ../partials/header-back
