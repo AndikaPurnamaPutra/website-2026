@@ -2,8 +2,9 @@
 // scrolling (24px padding → 72px). Transparent, without Figma's white
 // background and shadow, as on leoparpeix.com and jasminegunarto.com (user
 // decision): only the logo and links float over the page. Logo, text and
-// paddings keep Figma's pixel size at every viewport width (not fluid); only
-// the side edges follow the page content (.container).
+// paddings keep Figma's size at every viewport width (not fluid), in rem so
+// they grow with the visitor's browser font size, as the text does (16px =
+// 1rem; user); only the side edges follow the page content (.container).
 @use "../abstracts/functions" as *;
 
 .site-header {
@@ -12,7 +13,7 @@
   right: 0;
   left: 0;
   z-index: 100;
-  padding-block: 24px;
+  padding-block: 1.5rem; // 24px
   // Inverts whatever lies behind it, as on leoparpeix.com (user decision):
   // white logo and links, blended by difference, read dark on white, light
   // on dark and in opposite colours over pictures.
@@ -83,7 +84,7 @@ main {
 .site-header__back {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   justify-self: start;
   font-family: var(--font-body);
   font-weight: 500;
@@ -92,8 +93,8 @@ main {
   letter-spacing: -0.02em;
 
   img {
-    width: 20px;
-    height: 20px;
+    width: 1.25rem;
+    height: 1.25rem;
   }
 }
 
@@ -101,15 +102,15 @@ main {
   display: block;
 
   img {
-    width: 50.25px;
-    height: 24px;
+    width: 3.140625rem; // 50.25 × 24px
+    height: 1.5rem;
   }
 }
 
 .site-nav {
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 2.5rem;
 }
 
 .site-nav__item {
@@ -140,8 +141,8 @@ main {
   letter-spacing: -0.02em;
 
   img {
-    width: 16px;
-    height: 16px;
+    width: 1rem;
+    height: 1rem;
   }
 }
 
@@ -172,7 +173,7 @@ main {
 
 .work-menu {
   position: absolute;
-  top: calc(100% + 42px);
+  top: calc(100% + 2.625rem); // 42px: 18px below the bar
   right: var(--page-gutter);
   left: var(--page-gutter);
   padding: 16px;
@@ -208,7 +209,7 @@ main {
   top: 100%;
   right: var(--page-gutter);
   left: var(--page-gutter);
-  height: 42px;
+  height: 2.625rem;
 }
 
 .work-menu__brand {
