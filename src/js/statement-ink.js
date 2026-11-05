@@ -75,12 +75,12 @@ export function initStatementInk() {
   // much as the element does, so it stays at the element's own place and no
   // wrapper is needed (the button is shared with Motto). 1s, power3.out, as
   // the hero text.
-  const riseOf = (el) =>
+  const riseOf = (el, vars) =>
     el &&
     gsap.fromTo(
       el,
       { yPercent: RISE, clipPath: `inset(-20% -20% ${RISE - DESCENT}% -20%)` },
-      { yPercent: 0, clipPath: `inset(-20% -20% ${-DESCENT}% -20%)`, duration: 1, ease: "power3.out", paused: true },
+      { yPercent: 0, clipPath: `inset(-20% -20% ${-DESCENT}% -20%)`, duration: 1, ease: "power3.out", paused: true, ...vars },
     );
   const eyebrow = statement.querySelector(".statement__eyebrow");
   const eyebrowRise = riseOf(eyebrow);
@@ -94,8 +94,11 @@ export function initStatementInk() {
       // Opened or reloaded further down: in place at once.
       onRefresh: (self) => eyebrowRise.progress(self.progress > 0 ? 1 : 0).pause(),
     });
+  // The button and, right after it, its caption (always shown now; it sat
+  // there before the button came, without moving; user).
   const button = statement.querySelector(".cta__button");
-  const buttonRise = riseOf(button);
+  const caption = statement.querySelector(".cta__caption");
+  const buttonRise = riseOf([button, caption].filter(Boolean), { stagger: 0.08 });
 
   // The icon and the folder, each cued by the last letter before it.
   const cued = [
@@ -148,7 +151,7 @@ export function initStatementInk() {
     hold.kill();
     eyebrowTrigger?.kill();
     [eyebrowRise, buttonRise].forEach((rise) => rise?.kill());
-    gsap.set([eyebrow, button].filter(Boolean), { clearProps: "transform,clipPath" });
+    gsap.set([eyebrow, button, caption].filter(Boolean), { clearProps: "transform,clipPath" });
     cued.forEach(({ piece }) => piece.revert());
     text.classList.remove("is-lighting");
     splits.forEach((split) => split.revert());
