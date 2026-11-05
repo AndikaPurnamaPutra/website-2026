@@ -1,4 +1,6 @@
-import { rm } from "node:fs/promises";
+import { rm, mkdir, glob } from "node:fs/promises";
+import { dirname, relative } from "node:path";
+import sharp from "sharp";
 import gulp from "gulp";
 import pug from "gulp-pug";
 import gulpSass from "gulp-sass";
@@ -56,6 +58,25 @@ export const scripts = () =>
 export const assets = () =>
   src(paths.assets, { encoding: false }).pipe(dest(`${paths.dist}/assets`));
 
+// Pictures served as WebP (AGENTS.md §15): each JPG/PNG in src/assets/images
+// is written next to its copy in dist as .webp, at most 2000px on its longer
+// side (the largest any picture is shown, at 2× on a 1440 screen), so the
+// templates use .webp while the sources stay as delivered. PNGs that must
+// stay PNG (the link preview and touch icon in images/meta) are left as they
+// are.
+const IMAGE_MAX = 2000;
+export const images = async () => {
+  for await (const file of glob("src/assets/images/**/*.{jpg,jpeg,png}")) {
+    if (file.includes("/meta/")) continue;
+    const out = `${paths.dist}/assets/images/${relative("src/assets/images", file).replace(/\.(jpe?g|png)$/i, ".webp")}`;
+    await mkdir(dirname(out), { recursive: true });
+    await sharp(file)
+      .resize({ width: IMAGE_MAX, height: IMAGE_MAX, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 80 })
+      .toFile(out);
+  }
+};
+
 export const statics = () => src(paths.static, { encoding: false }).pipe(dest(paths.dist));
 
 const reload = (done) => {
@@ -72,10 +93,10 @@ const watchFiles = () => {
   watch(paths.pug, series(html, reload));
   watch(paths.styles, styles);
   watch(paths.scripts, series(scripts, reload));
-  watch(paths.assets, series(assets, reload));
+  watch(paths.assets, series(assets, images, reload));
   watch(paths.static, series(statics, reload));
 };
 
-export const build = series(clean, parallel(html, styles, scripts, assets, statics));
+export const build = series(clean, parallel(html, styles, scripts, assets, statics), images);
 
 export default series(build, serve, watchFiles);

@@ -59,7 +59,7 @@ block content
             p.contact__cta-caption Free 15min call
 
         .contact__office
-          img.contact__office-image(src="assets/images/contact/office.jpg" width="210" height="122" alt="")
+          img.contact__office-image(src="assets/images/contact/office.webp" width="210" height="122" alt="")
           .contact__office-info
             a.contact__office-link(href=mapsUrl target="_blank" rel="noopener")
               | Office HQ
@@ -136,7 +136,7 @@ block content
 
         .contact-form__divider
         //- Placeholder until Cloudflare Turnstile is set up (user decision).
-        img.contact-form__turnstile(src="assets/images/contact/turnstile-placeholder.png" width="297" height="63" alt="")
+        img.contact-form__turnstile(src="assets/images/contact/turnstile-placeholder.webp" width="297" height="63" alt="")
 
         .contact-form__submit-row
           button.contact-form__submit(type="submit")
@@ -154,6 +154,6 @@ block content
         each item, i in gallery
           a.contact-gallery__item(href="#" style=`--w: ${item.size[0]}; --h: ${item.size[1]}`)
             span.contact-gallery__media
-              img(src=`assets/images/contact/gallery-${i + 1}.jpg` width=item.size[0] height=item.size[1] alt="")
+              img(src=`assets/images/contact/gallery-${i + 1}.webp` width=item.size[0] height=item.size[1] alt="" loading="lazy")
             span.contact-gallery__title.text-13
               span= item.title

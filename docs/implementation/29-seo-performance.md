@@ -75,12 +75,28 @@ Found:
 - [x] Baseline scores recorded.
 - [x] SEO basics on every page; descriptions approved by the user (SEO 100,
       Best Practices 96 on every page, desktop).
-- [ ] No source maps in `dist/` after `npm run build`.
-- [ ] Images: total weight and largest file before / after; no layout shift.
+- [x] No source maps in `dist/` after `npm run build` (css + js 5 MB → 1.06 MB).
+- [x] Images: JPG/PNG 9.3 MB → WebP 3.5 MB (46 files, at most 2000px,
+      quality 80; built by `sharp`, sources unchanged); no broken image or
+      404 on any page; CLS unchanged.
 - [ ] Videos: weight before / after; the preloader's wait on an ordinary
       connection before / after.
 - [ ] Lighthouse after: 90+ in each category, or the gap explained.
 - [ ] Nothing changed visually (screenshots before / after).
+
+## After steps 2–4 (5 Nov 2026)
+
+| Page | Desktop | Mobile | LCP (mobile) | Weight |
+|---|---|---|---|---|
+| Home | 88 / 92 / 96 / 100 | 50 / 92 / 96 / 100 | 10.7 s | 20.4 MB |
+| About | 90 / 96 / 96 / 100 | 66 / 96 / 96 / 100 | 13.8 s | 6.2 MB |
+| Contact | 77 / 92 / 96 / 100 | 82 / 92 / 93 / 100 | 3.9 s | 5.1 MB |
+| Privacy Policy, Terms | 98 / 100 / 96 / 100 | 73 / 100 / 96 / 100 | 5.0 s | 4.3 MB |
+
+Left: the videos on Home (step 5); the 3D coin (≈3.4 MB: model, light map
+and three.js) loads on every page for the footer coin, also where the footer
+is far below; to load it only as the footer comes near is a further step
+(not planned yet).
 
 ## Open
 

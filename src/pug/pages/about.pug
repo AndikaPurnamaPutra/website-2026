@@ -10,7 +10,7 @@ block content
     section.about-intro
       .container
         h1.about-intro__title.text-heading-42 We Are the Team We Wished#[br]We Could Hire.
-        img.about-intro__photo(src="assets/images/about/team.jpg" width="1360" height="560" alt="The One Week Wonders team together outdoors")
+        img.about-intro__photo(src="assets/images/about/team.webp" width="1360" height="560" alt="The One Week Wonders team together outdoors")
         .about-intro__body
           .about-intro__text
             p.about-intro__lead One Week Wonders is a fast-moving creative team built to eliminate the long meetings and endless alignment meeting that keep great ideas grounded.
@@ -106,18 +106,18 @@ block content
               span.p-board__percent 40%
             img.p-board__cursor(src="assets/images/about/principles/cursor.svg" width="27" height="27" alt="")
           each n in [2, 3, 4, 5, 6]
-            img.principles__figure(src=`assets/images/about/principle-${n}.jpg` width="670" height="420" alt="")
+            img.principles__figure(src=`assets/images/about/principle-${n}.webp` width="670" height="420" alt="" loading="lazy")
 
     //- Gallery (Figma 1734:399): five photos placed freely, [x, y, width,
     //- height] in Figma pixels. "Play Video" is only a label for now (user
     //- decision: the video comes later).
     -
       var photos = [
-        ["gallery-1.jpg", [0, 0, 1130, 636], "The team together in a field below a mountain"],
-        ["gallery-2.jpg", [900, 715.63, 460, 589], "Two team members walking along a garden path"],
-        ["gallery-3.jpg", [0, 988, 805, 411], "Two designers working side by side at a computer"],
-        ["gallery-4.jpg", [0, 1479, 345, 325], "A desk with screens and collectible figures"],
-        ["gallery-5.jpg", [440, 1650, 920, 478], "The team working together on their laptops"]
+        ["gallery-1.webp", [0, 0, 1130, 636], "The team together in a field below a mountain"],
+        ["gallery-2.webp", [900, 715.63, 460, 589], "Two team members walking along a garden path"],
+        ["gallery-3.webp", [0, 988, 805, 411], "Two designers working side by side at a computer"],
+        ["gallery-4.webp", [0, 1479, 345, 325], "A desk with screens and collectible figures"],
+        ["gallery-5.webp", [440, 1650, 920, 478], "The team working together on their laptops"]
       ]
     section.about-gallery
       .container

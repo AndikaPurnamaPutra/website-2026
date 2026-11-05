@@ -3,7 +3,7 @@
 //- src/js/inview-videos.js).
 section.hero(data-inview-area)
   .container.hero__inner
-    img.hero__coin(src="assets/images/hero/coin.png" width="448" height="420" alt="")
+    img.hero__coin(src="assets/images/hero/coin.webp" width="448" height="420" alt="")
 
     .hero__content
       .hero__intro
@@ -47,7 +47,7 @@ section.hero(data-inview-area)
     .hero__showreel
       //- Muted looping video (the file has audio; it stays muted). The poster is
       //- its first frame. src/js/inview-videos.js plays it only while on screen.
-      video.hero__showreel-image(poster="assets/images/hero/showreel-poster.jpg" muted loop playsinline preload="metadata" aria-label="Showreel preview" data-inview-video)
+      video.hero__showreel-image(poster="assets/images/hero/showreel-poster.webp" muted loop playsinline preload="metadata" aria-label="Showreel preview" data-inview-video)
         source(src="assets/images/hero/showreel.mp4" type="video/mp4")
       button.hero__showreel-button.glass-button(type="button")
         span.text-14.text-medium Play Showreel
@@ -60,7 +60,7 @@ section.hero(data-inview-area)
   .showreel-lightbox(data-showreel-lightbox role="dialog" aria-modal="true" aria-label="Showreel" aria-hidden="true")
     .showreel-lightbox__backdrop
     .showreel-lightbox__stage
-      video.showreel-lightbox__video(poster="assets/images/hero/showreel-poster.jpg" controls playsinline preload="none")
+      video.showreel-lightbox__video(poster="assets/images/hero/showreel-poster.webp" controls playsinline preload="none")
         source(src="assets/images/hero/showreel.mp4" type="video/mp4")
     button.showreel-lightbox__close(type="button" aria-label="Close")
       svg(width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true")
