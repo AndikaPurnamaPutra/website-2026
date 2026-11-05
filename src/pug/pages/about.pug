@@ -10,7 +10,11 @@ block content
     section.about-intro
       .container
         h1.about-intro__title.text-heading-42 We Are the Team We Wished#[br]We Could Hire.
-        img.about-intro__photo(src="assets/images/about/team.webp" width="1360" height="560" alt="The One Week Wonders team together outdoors")
+        //- Its frame opens as the picture rises in it (src/js/about-intro.js).
+        //- The picture is taller than the frame (more of Figma's original
+        //- photo above Figma's crop), so it can move in it as the page scrolls.
+        .about-intro__photo
+          img(src="assets/images/about/team.webp" width="1360" height="728" alt="The One Week Wonders team together outdoors")
         .about-intro__body
           .about-intro__text
             p.about-intro__lead One Week Wonders is a fast-moving creative team built to eliminate the long meetings and endless alignment meeting that keep great ideas grounded.
