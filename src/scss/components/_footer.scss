@@ -1,6 +1,7 @@
 // Figma: Footer 1574:1193 (1440 × 563). Positions are Figma px from the frame's
 // top-left; the inner box is the 1440 frame, centered on wider screens.
 @use "../abstracts/functions" as *;
+@use "../abstracts/breakpoints" as *;
 
 // No background of its own (the page is white): the 3D coin's fixed layer
 // sits below the page content and must show through the footer
@@ -145,8 +146,18 @@
   transition: opacity 0.3s ease-out;
 }
 
-.site-footer:has(:is(.site-footer__links, .site-footer__legal):hover, .site-footer__link:focus-visible)
-  li:not(:hover, :has(.site-footer__link:focus-visible))
+// With a mouse only: on a touch screen a tapped link would stay "hovered" and
+// leave the others dimmed.
+@media (hover: hover) {
+  .site-footer:has(:is(.site-footer__links, .site-footer__legal):hover)
+    li:not(:hover)
+    > .site-footer__link {
+    opacity: 0.3;
+  }
+}
+
+.site-footer:has(.site-footer__link:focus-visible)
+  li:not(:has(.site-footer__link:focus-visible))
   > .site-footer__link {
   opacity: 0.3;
 }
@@ -189,6 +200,135 @@
 .site-footer__legal {
   display: flex;
   gap: var(--space-16);
+}
+
+// Tablet and phones (plan 32; no Figma): the parts in rows instead of
+// their Figma places. Tablet: logo, then the form beside the three columns,
+// then the line about the studio and the bottom row as on the desktop.
+// Phones: one column (form, then Social media and Navigation side by side,
+// Contact below them, the line about the studio, Privacy and Terms above the
+// copyright). The coin, smaller, still comes out from under the section
+// above, on the right.
+@include below-laptop {
+  .site-footer__inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "logo logo"
+      "form columns"
+      "about about"
+      "bottom bottom";
+    column-gap: fluid(40);
+    row-gap: fluid(48);
+    height: auto;
+    padding: fluid(40) var(--page-gutter);
+  }
+
+  .site-footer__logo,
+  .site-footer__form,
+  .site-footer__columns,
+  .site-footer__about,
+  .site-footer__bottom {
+    position: static;
+  }
+
+  .site-footer__logo {
+    grid-area: logo;
+    justify-self: start;
+  }
+
+  .site-footer__form {
+    grid-area: form;
+    width: 100%;
+    max-width: fluid(300);
+  }
+
+  .site-footer__columns {
+    grid-area: columns;
+    gap: fluid(32);
+  }
+
+  .site-footer__links {
+    font-size: fs(18);
+  }
+
+  .site-footer__about {
+    grid-area: about;
+    width: auto;
+    max-width: fluid(548);
+    font-size: fs(18);
+  }
+
+  .site-footer__bottom {
+    grid-area: bottom;
+  }
+
+  .site-footer__coin {
+    top: fluid(-100);
+    right: var(--page-gutter);
+    left: auto;
+    width: fluid(214);
+    height: fluid(201);
+  }
+}
+
+@include mobile {
+  .site-footer__inner {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "logo"
+      "form"
+      "columns"
+      "about"
+      "bottom";
+    row-gap: fluid(40);
+  }
+
+  .site-footer__form {
+    max-width: none;
+  }
+
+  // Social media and Navigation side by side, Contact (the long email) under
+  // them across the width.
+  .site-footer__columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: fluid(32) fluid(20);
+  }
+
+  .site-footer__column:last-child {
+    grid-column: 1 / -1;
+  }
+
+  // Taller rows, to tap.
+  .site-footer__links {
+    gap: fs(10);
+  }
+
+  .site-footer__about {
+    max-width: none;
+  }
+
+  // Privacy and Terms above the copyright; no line.
+  .site-footer__bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: fs(16);
+  }
+
+  .site-footer__legal {
+    order: -1;
+  }
+
+  .site-footer__line {
+    display: none;
+  }
+
+  .site-footer__coin {
+    top: fluid(-64);
+    width: fluid(150);
+    height: fluid(141);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
