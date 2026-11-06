@@ -3,7 +3,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 import { stopSmoothScroll, startSmoothScroll } from "./smooth-scroll.js";
 import { designPx } from "./design-px.js";
-import { coinMotion } from "./coin-motion.js";
+import { coinMotion, COIN_IN, COIN_EASE } from "./coin-motion.js";
 
 gsap.registerPlugin(DrawSVGPlugin);
 
@@ -69,8 +69,6 @@ const MAX_WAIT = 20; // s
 // it is not a step of its own; slowly and evenly, never at once (user: a
 // quick ease-out looked harsh).
 const COIN_AT = PUSH_AT + PUSH * 0.6; // s into the lift
-const COIN_IN = 1.4; // s
-const COIN_EASE = "sine.inOut";
 // The page is free to scroll once the showreel is in its place; the last
 // reveals (navbar, coin, hero text) carry on.
 const SETTLED = PUSH_AT + PUSH; // s into the lift
