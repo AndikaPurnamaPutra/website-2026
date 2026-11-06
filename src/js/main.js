@@ -23,6 +23,7 @@ import { initAboutIntro } from "./about-intro.js";
 import { initAboutTeam } from "./about-team.js";
 import { initHeader } from "./header.js";
 import { initWorkMenu } from "./work-menu.js";
+import { initMobileMenu } from "./mobile-menu.js";
 import { initFooterForm } from "./footer-form.js";
 import { initFooterReveal } from "./footer-reveal.js";
 import { initSmoothScroll } from "./smooth-scroll.js";
@@ -70,6 +71,7 @@ function initPage(first) {
   // After the pins above Our Work (Services), which move it down.
   cleanups.push(initPageTheme());
   cleanups.push(initWorkMenu());
+  cleanups.push(initMobileMenu());
   cleanups.push(initFooterForm());
   cleanups.push(initFooterReveal());
   cleanups.push(initBackLink());

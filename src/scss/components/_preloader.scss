@@ -4,6 +4,7 @@
 // <html> has is-preloading (set in <head> when JS runs without reduced
 // motion), so without JS the page shows at once.
 @use "../abstracts/functions" as *;
+@use "../abstracts/breakpoints" as *;
 
 .preloader {
   display: none;
@@ -28,6 +29,17 @@
   width: fs(113.5);
   height: auto;
   overflow: visible;
+
+  // On phones and tablets the type scale is the browser's size, so 113.5px
+  // would be as large as on a desktop, nearly a third of a phone (user):
+  // 84 × 40 on phones, 100 × 48 on tablets (plan 32).
+  @include tablet {
+    width: fs(100);
+  }
+
+  @include mobile {
+    width: fs(84);
+  }
 }
 
 // Hidden until the script has set them up (emptied to be drawn, moved

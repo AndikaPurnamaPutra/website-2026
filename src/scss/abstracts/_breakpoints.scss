@@ -1,0 +1,48 @@
+// Breakpoints (docs/implementation/32-responsive.md), desktop first: the
+// styles as written are the desktop (Figma 1440); these add the rest.
+//   mobile  < 744        phones (frame 390)
+//   tablet  744–1023     iPad mini to iPad Pro 11" (frame 834)
+//   laptop  1024–1279    the desktop, tightened
+//   desktop ≥ 1280       Figma
+// Plus a short screen (phones turned sideways) and touch screens, whatever
+// the width.
+$tablet: 744px;
+$laptop: 1024px;
+$desktop: 1280px;
+
+@mixin mobile {
+  @media (max-width: #{$tablet - 0.02px}) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: $tablet) and (max-width: #{$laptop - 0.02px}) {
+    @content;
+  }
+}
+
+// Mobile and tablet.
+@mixin below-laptop {
+  @media (max-width: #{$laptop - 0.02px}) {
+    @content;
+  }
+}
+
+@mixin laptop {
+  @media (min-width: $laptop) and (max-width: #{$desktop - 0.02px}) {
+    @content;
+  }
+}
+
+@mixin short {
+  @media (max-height: 499.98px) {
+    @content;
+  }
+}
+
+@mixin touch {
+  @media (hover: none) {
+    @content;
+  }
+}

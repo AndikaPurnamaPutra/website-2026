@@ -6,6 +6,7 @@
 // they grow with the visitor's browser font size, as the text does (16px =
 // 1rem; user); only the side edges follow the page content (.container).
 @use "../abstracts/functions" as *;
+@use "../abstracts/breakpoints" as *;
 
 .site-header {
   position: fixed;
@@ -362,5 +363,151 @@ main {
   &[aria-selected="true"] {
     background: var(--color-ink);
     opacity: 1;
+  }
+}
+
+// Phones (< 744; plan 32, references bramvanvugt.com, telhaclarke.com.au,
+// art-yakushev.com): the links move into a menu of their own, opened by
+// "Menu" on the right of the bar (text, as the site; it rolls to "Close").
+// The menu is a dark panel coming down from the top as a curtain, with the
+// links large, rising one after another, and the contact and social links
+// of the footer below (src/js/mobile-menu.js). Tablet and up keep the bar.
+.site-header__menu-toggle {
+  display: none;
+}
+
+.mobile-menu {
+  display: none;
+}
+
+@include mobile {
+  .site-nav {
+    display: none;
+  }
+
+  .site-header__inner {
+    align-items: center;
+  }
+
+  // 44px to tap, the text where the links were.
+  .site-header__menu-toggle {
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+    margin-block: -0.625rem;
+    padding: 0;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 0.875rem;
+    line-height: normal;
+    letter-spacing: -0.02em;
+    color: inherit;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+
+  // Menu and Close in one line's window; the open menu shows Close.
+  .site-header__menu-label {
+    display: grid;
+    overflow: hidden;
+
+    span {
+      grid-area: 1 / 1;
+      transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    span + span {
+      transform: translateY(100%);
+    }
+  }
+
+  .site-header.is-menu-open {
+    // Drawn normally over the dark panel: white.
+    color: var(--color-white);
+    mix-blend-mode: normal;
+    transform: none;
+
+    .site-header__menu-label span:first-child {
+      transform: translateY(-100%);
+    }
+
+    .site-header__menu-label span + span {
+      transform: none;
+    }
+  }
+
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    display: block;
+    overflow-y: auto;
+    color: var(--color-white);
+    background: var(--color-ink);
+    overscroll-behavior: contain;
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  .mobile-menu__inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: fluid(48);
+    min-height: 100%;
+    padding: fluid(120) var(--page-gutter) fluid(40);
+  }
+
+  .mobile-menu__links li {
+    // Each link rises in its own window.
+    overflow: hidden;
+  }
+
+  // The page you are on shows in full, the others dimmed (as the hover on
+  // the desktop links); none dimmed on a page not in the menu (Home).
+  .mobile-menu__links:has([aria-current="page"]) .mobile-menu__link:not([aria-current="page"]) {
+    opacity: 0.4;
+  }
+
+  .mobile-menu__link {
+    display: block;
+    font-family: var(--font-display);
+    font-size: fs(48); // as .text-display-48
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+
+    span {
+      display: block;
+    }
+  }
+
+  .mobile-menu__info {
+    display: flex;
+    flex-direction: column;
+    gap: fs(16);
+    font-weight: 500;
+    font-size: fs(14);
+    line-height: calc(22 / 14);
+  }
+
+  .mobile-menu__list a {
+    display: inline-block;
+    padding-block: fs(4);
+    opacity: 0.6; // as .text-muted (contrast)
+  }
+
+  .mobile-menu__list--row {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: fs(16);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header__menu-label span {
+    transition: none;
   }
 }

@@ -1,11 +1,14 @@
 // Design tokens from Figma (WEBSITE-2026, Homepage 1523:3214).
 // See docs/design-system.md for sources and confirmation status.
 @use "../abstracts/functions" as *;
+@use "../abstracts/breakpoints" as *;
 
 :root {
-  // One Figma pixel. Scales with the viewport from 1280px (0.889x)
-  // to 2560px (1.778x); exactly 1px at the 1440px design width.
-  --px: clamp(calc(1280px / 1440), calc(100vw / 1440), calc(2560px / 1440));
+  // One Figma pixel. Scales with the viewport from 1024px (0.711x)
+  // to 2560px (1.778x); exactly 1px at the 1440px design width. Below 1280px
+  // (laptop) the desktop is tightened; tablet and mobile have their own
+  // frames (below).
+  --px: clamp(calc(1024px / 1440), calc(100vw / 1440), calc(2560px / 1440));
 
   // One Figma pixel for type (and sizes that wrap text). Same as --px up to
   // 1440px; above it grows slower: 1x at 1440px → 1.2x at 2560px and wider.
@@ -80,6 +83,28 @@
   --theme-border: var(--color-border-strong);
   --theme-switch-time: 0.35s; // as revelatio.studio (checked on the site)
   --theme-switch: var(--theme-switch-time) ease;
+}
+
+// Tablet and mobile (docs/implementation/32-responsive.md): one design pixel
+// of their own frame (834 and 390 wide), so fluid() keeps working with
+// values measured in that frame. Type stays at the visitor's browser size
+// (1rem = 16px), not scaled with the screen.
+@include tablet {
+  :root {
+    --px: calc(100vw / 834);
+    --type-px: 0.0625rem;
+    --page-gutter: #{fluid(32)};
+  }
+}
+
+@include mobile {
+  :root {
+    // 320–480px wide as 320–480 frame pixels; wider phones (sideways,
+    // folding) keep the 480 size.
+    --px: clamp(calc(320px / 390), calc(100vw / 390), calc(480px / 390));
+    --type-px: 0.0625rem;
+    --page-gutter: #{fluid(20)};
+  }
 }
 
 // Dark theme: the page while the Services section is in view; Services

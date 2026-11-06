@@ -1,11 +1,12 @@
 //- Figma: Footer 1574:1193 (homepage 1574:796). Shared by all pages via the layout.
 //- Without JS the form opens a mailto: link; src/js/footer-form.js builds a
 //- cleaner subject line.
+include site-links
 -
   var columns = [
-    { title: "Social media", links: [["Instagram", "#"], ["Linkedin", "#"], ["Dribbble", "https://dribbble.com"], ["Behance", "https://www.behance.net"]] },
+    { title: "Social media", links: socialLinks },
     { title: "Navigation", links: [["Works", "#"], ["About", "about.html"], ["Team", "#"], ["Services", "#"], ["Contact", "contact.html"], ["Blog", "#"]] },
-    { title: "Contact", links: [["owwstudio@gmail.com", "mailto:owwstudio@gmail.com"], ["+62 878 869 785 4", "tel:+628788697854"]] }
+    { title: "Contact", links: contactLinks }
   ]
   //- "Career" replaced by "Contact" (user decision).
   //- "Terms & Conditions" renamed and "Legal" removed (user decision).

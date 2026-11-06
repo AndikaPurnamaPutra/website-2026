@@ -51,3 +51,25 @@ header.site-header(data-header)
         each link in navLinks
           li.site-nav__item
             a.site-nav__link(href=link[1])= link[0]
+    //- Phones (< 744): the links are in a menu of their own (below; plan 32).
+    button.site-header__menu-toggle(type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle)
+      span.site-header__menu-label
+        span Menu
+        span(aria-hidden="true") Close
+
+//- The phone menu (src/js/mobile-menu.js): outside the bar, which inverts
+//- what is behind it. Work leads to its page (no cards on phones). Below
+//- the links, the social links only (user: no email, phone or button).
+include site-links
+.mobile-menu#mobile-menu(data-mobile-menu hidden)
+  nav.mobile-menu__inner(aria-label="Menu")
+    ul.mobile-menu__links
+      each link in [["Work", "#"]].concat(navLinks)
+        li
+          a.mobile-menu__link(href=link[1])
+            span= link[0]
+    .mobile-menu__info
+      ul.mobile-menu__list.mobile-menu__list--row
+        each link in socialLinks
+          li
+            a(href=link[1])= link[0]
