@@ -614,6 +614,32 @@
   }
 }
 
+// The photo beside the cursor over a row (src/js/about-team.js).
+.about-team__preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  width: fs(220);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: fluid(4);
+  pointer-events: none;
+
+  img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    visibility: hidden;
+
+    &.is-shown {
+      visibility: visible;
+    }
+  }
+}
+
 // While the pointer is over the list (its gaps included, so moving down it
 // does not flash them back), every other row dims, as the navbar and footer
 // links (user).
