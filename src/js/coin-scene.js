@@ -4,7 +4,8 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUniformsLib.js";
-import { coinMotion } from "./coin-motion.js";
+import { coinMotion, COIN_IN, COIN_EASE } from "./coin-motion.js";
+import { movedWithinSite } from "./page-transition.js";
 
 // The 3D coin, choreographed with the scroll (approved concept, references:
 // thewatch.60fps.fr, drone.riotters.com, sstr.tech): one coin on a fixed
@@ -93,14 +94,18 @@ export function mountCoin(anchors, fallback) {
   let modelIn = false;
   // With the preloader the coin is already in its place when the page shows
   // (pushed up with the showreel, src/js/preloader.js), so it skips its
-  // entrance.
-  const skipEntrance = document.documentElement.classList.contains("is-preloading");
+  // entrance. After a page transition too, and fades in there as after the
+  // preloader (user: its drop and flip there was another coin).
+  const arrived = movedWithinSite() && !!anchors.hero;
+  const skipEntrance = document.documentElement.classList.contains("is-preloading") || arrived;
+  if (arrived) coinMotion.fade = 0;
   let compiled = false;
   const start = () => {
     if (!compiled || readyAt !== null) return;
     // The clock starts on the next frame, after the heavy compile one.
     requestAnimationFrame(() => {
       readyAt = performance.now() - (skipEntrance ? INTRO * 1000 : 0);
+      if (arrived) gsap.to(coinMotion, { fade: 1, duration: COIN_IN, ease: COIN_EASE });
     });
   };
   const whenBothIn = () => {
@@ -351,5 +356,9 @@ export function mountCoin(anchors, fallback) {
     document.removeEventListener("pointerout", onPointerOut);
     renderer.dispose();
     stage.remove();
+    if (arrived) {
+      gsap.killTweensOf(coinMotion);
+      coinMotion.fade = 1;
+    }
   };
 }
