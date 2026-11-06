@@ -6,12 +6,39 @@ import { designPx, typePx } from "./design-px.js";
 // Each scroll step makes the next service card active and swaps the image;
 // the last step expands the image to fill the section.
 // Timing, easing and scroll distance are not in Figma (approved proposal).
+// Text comes in as the hero text (src/js/hero-intro.js; user): as the section
+// arrives, the first image, dimmed since the page turned dark, lights up
+// ("lights off, then the stage lights up"; user: no blur), the cards rise
+// into place and their text and the label rise; at each step, the card
+// coming to the front draws its line, then its tags and text rise. On their
+// own clock (1s, power3.out); the arrival once (as About and Contact; user),
+// each step's back when scrolled back up. The images open as
+// a curtain from the bottom with depth, after floema.com's collections (user;
+// a zoom with every curtain was too much: that version is kept on the branch
+// services-media/zoom).
 
 // Card geometry in Figma pixels (1440px frame).
 const FIRST_TOP = 98; // active card top in frame 1
 const LATER_TOP = 88; // active card top from frame 2 on
 const PREVIOUS_GAP = 12; // card that moved up ends 12px above the active card (Figma: 76 → 88)
 const RADIUS = 4; // --radius-sm (Figma 4px, layout scale)
+const RISE = 200; // % of its height the text rises from (as the hero text)
+const DESCENT = 25; // % of its height its window reaches below it, for descenders
+const CARD_RISE = 40; // Figma px the cards rise from as the section arrives
+// Images (as floema.com's collections, measured; user): straight with the
+// scroll, linear, one curtain running into the next with no pause; a new one
+// is revealed from the bottom while its picture rises from RAISE % below, more
+// slowly than the curtain's edge, and the one it covers keeps rising, by
+// LEAVE %, growing by GROW. No dimming. See
+// docs/implementation/22-services-images.md.
+const RAISE = 15;
+const LEAVE = 10;
+const GROW = 0.03;
+// The exit, the same the other way (as in Motto): over the last EXIT of a
+// screen of the pin the section rises faster and faster, by half that
+// distance, so it already moves with the page when it is released. The page
+// turns light as it starts (src/js/page-theme.js).
+export const EXIT = 0.4; // of the screen height
 // Deck cards are scaled from their top edge and placed so their visible strip
 // (the clipped title area) always ends `peek` px below the active card, as in
 // Figma (16px and 32px), whatever the cards' heights. Text-sized: type scale.
@@ -30,6 +57,16 @@ export function initServicesScroll() {
   const media = section.querySelector(".services__media");
   const fade = section.querySelector(".services__fade");
   const label = section.querySelector(".services__label");
+  // The link over the pictures goes to the service in view.
+  const link = section.querySelector("[data-services-link]");
+  const targets = link ? JSON.parse(link.dataset.servicesLink) : [];
+  const pointLink = (index) => {
+    const [href, title] = targets[index] ?? [];
+    if (!href || link.getAttribute("href") === href && link.dataset.index === String(index)) return;
+    link.dataset.index = index;
+    link.setAttribute("href", href);
+    link.setAttribute("aria-label", `View ${title}`);
+  };
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const steps = cards.length; // service changes + final fullscreen step
   // No snap (user decision): each step has a short rest zone where the frame
@@ -40,7 +77,7 @@ export function initServicesScroll() {
   const REST = 0.18;
   // Each step takes one screen of scrolling; U is the timeline time of one
   // screen of scrolling.
-  const STEP_SCREENS = 1;
+  const STEP_SCREENS = 1.1; // per step (user: 1.5 took too much scrolling, 0.8 left too little time to read the card; floema: ±2.3)
   const U = (1 + REST) / STEP_SCREENS;
   // The cards follow the (already smooth) Lenis scroll closely, and only a
   // very fast scroll meets the speed limit: one move (1 of timeline time) in
@@ -50,14 +87,12 @@ export function initServicesScroll() {
   const FOLLOW = 14; // how fast they close the gap (per second)
   // The entry: the pin starts with the section ENTRY of a screen below the
   // top, and over the next 2 × ENTRY of scrolling it glides up into place,
-  // slowing from the page's speed to a stop (user: arriving at the pin
-  // stopped it dead, not seamless). The steps come after that stretch.
-  const ENTRY = 0.15; // of the screen height
+  // slowing from the page's speed to a stop. Off for now (0): with the page
+  // turning dark as it comes up, the slowing read as being pushed up (user,
+  // 3 Nov 2026); it had been added as arriving at the pin felt abrupt.
+  // The steps come after that stretch.
+  const ENTRY = 0; // of the screen height (was 0.15)
   const entryTime = 2 * ENTRY * U; // timeline time of the entry
-  // The exit, the same the other way (as in Motto): over the last EXIT of a
-  // screen of the pin the section rises faster and faster, by half that
-  // distance, so it already moves with the page when it is released.
-  const EXIT = 0.4; // of the screen height
   const stepTime = (n) => entryTime + n * (1 + REST) + REST / 2;
   const restTime = (k) => entryTime + (k === 0 ? REST / 4 : k === steps ? steps * (1 + REST) - REST / 4 : k * (1 + REST));
 
@@ -129,6 +164,8 @@ export function initServicesScroll() {
   const clearMedia = () => gsap.set(media, { clearProps: "inset,top,right,bottom,left,borderRadius" });
 
   const ctx = gsap.context(() => {
+    // Plays the card text at the steps reached (set further down).
+    let cue = () => {};
     cards.forEach((card, i) => {
       gsap.set(card, { ...stateVars(i, 0), zIndex: cardState(i, 0).zIndex, transformOrigin: "50% 0%" });
       gsap.set(clips[i], clipVars(i, 0));
@@ -139,14 +176,25 @@ export function initServicesScroll() {
       paused: true,
       // sine.inOut: a gentle curve, so the middle of each move does not rush.
       defaults: { duration: 1, ease: reduceMotion ? "steps(1)" : "sine.inOut" },
-      onUpdate: drawClips,
+      onUpdate: () => {
+        drawClips();
+        cue(false);
+        // The service in view: the last whose step is halfway through.
+        const time = timeline.time();
+        pointLink(cards.reduce((active, _, k) => (k > 0 && time >= stepTime(k - 1) + 0.5 ? k : active), 0));
+      },
     });
+
+    // The images, on their own timeline with the same clock, set straight
+    // from the scroll (linear: as floema.com).
+    const flow = gsap.timeline({ paused: true, defaults: { ease: reduceMotion ? "steps(1)" : "none" } });
 
     // The pin sets where the timeline should be (target); the ticker below
     // moves it there, with the speed limit. On a refresh (load, resize, a
     // reload further down) it is placed there at once.
     let target = 0;
     const pin = ScrollTrigger.create({
+      id: "services",
       trigger: section,
       start: () => `top top+=${ENTRY * window.innerHeight}`,
       end: () => `+=${window.innerHeight * (steps * STEP_SCREENS + 2 * ENTRY + EXIT)}`,
@@ -155,6 +203,8 @@ export function initServicesScroll() {
       onUpdate: (self) => {
         target = self.progress * timeline.duration();
         if (reduceMotion) timeline.time(target);
+        // The images straight with the scroll (no speed limit, no delay).
+        flow.time(target);
       },
       onRefresh: (self) => {
         target = self.progress * timeline.duration();
@@ -162,7 +212,9 @@ export function initServicesScroll() {
         // timeline was (e.g. a line already flipped away), they were wrong, and
         // scrolling back up left the first line hidden (user report).
         timeline.time(0).invalidate().time(target);
+        flow.time(0).invalidate().time(target);
         if (timeline.time() < stepTime(steps - 1)) clearMedia();
+        cue(true);
       },
     });
     const follow = (time, deltaMs) => {
@@ -259,13 +311,24 @@ export function initServicesScroll() {
         timeline.to(card, stateVars(i, active), at);
         timeline.to(clips[i], clipVars(i, active), at);
       });
-      // The new image is revealed from the bottom like a curtain, settling from
-      // a slight zoom, over the previous image (no half-transparent overlap).
-      timeline.fromTo(
+      // The new image is revealed from the bottom like a curtain over the
+      // previous one (no half-transparent overlap), on the image timeline
+      // (flow): from the end of the last curtain to the start of the next, so
+      // one runs into the other; its picture comes up more slowly than the
+      // curtain's edge, and the previous one keeps rising and grows a little.
+      const from = at - REST / 2;
+      const span = 1 + REST;
+      flow.fromTo(
         images[active],
-        { autoAlpha: 1, clipPath: "inset(100% 0% 0% 0%)", scale: 1.08 },
-        { clipPath: "inset(0% 0% 0% 0%)", scale: 1, ease: reduceMotion ? "steps(1)" : "sine.inOut" },
-        at,
+        { autoAlpha: 1, yPercent: RAISE, clipPath: "inset(100% 0% 0% 0%)" },
+        { yPercent: 0, clipPath: "inset(0% 0% 0% 0%)", duration: span },
+        from,
+      );
+      flow.fromTo(
+        images[active - 1],
+        { yPercent: 0, scale: 1 },
+        { yPercent: -LEAVE, scale: 1 + GROW, duration: span, immediateRender: false },
+        from,
       );
       if (active === 1) {
         timeline.to(fade, { autoAlpha: 1 }, at);
@@ -284,10 +347,84 @@ export function initServicesScroll() {
     timeline.addLabel("fullscreen", restTime(steps));
     // The last rest zone runs to the end of the pin, the exit included.
     timeline.to({}, { duration: REST / 2 + EXIT * U }, stepTime(steps - 1) + 1);
+    // The text coming in (not with reduced motion: it stays in place).
+    if (!reduceMotion) {
+      // Up from 200% below in a window of its own: a clip whose bottom edge
+      // comes up as much as the element does, so no wrapper is needed. The
+      // window reaches DESCENT below the box, so descenders (g, p, y) are not
+      // cut (user report).
+      const rise = (els, vars) =>
+        gsap.fromTo(
+          els,
+          { yPercent: RISE, clipPath: `inset(-20% -20% ${RISE - DESCENT}% -20%)` },
+          { yPercent: 0, clipPath: `inset(-20% -20% ${-DESCENT}% -20%)`, duration: 1, ease: "power3.out", ...vars },
+        );
+      const parts = cards.map((card) => ({
+        title: card.querySelector(".services__card-title"),
+        divider: card.querySelector(".services__card-divider"),
+        tags: [...card.querySelectorAll(".services__tag")],
+        text: card.querySelector(".services__card-text"),
+      }));
+      // A card's line drawn from the left, then its tags, then its text.
+      const reveal = ({ divider, tags, text }) =>
+        gsap
+          .timeline({ paused: true })
+          .fromTo(divider, { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power3.out", transformOrigin: "0% 50%" }, 0)
+          .add(rise(tags, { stagger: 0.05 }), 0.05)
+          .add(rise(text), 0.15);
+      const reveals = parts.map(reveal);
+
+      // As the section arrives (its top at 60% of the screen; the page turned
+      // dark at 85%, src/js/page-theme.js).
+      const entry = gsap
+        .timeline({ paused: true })
+        // The first image lights up, as a light turned up slowly: brightness
+        // only (user: a blur looked odd). The step images come in as on
+        // floema.com (above).
+        .fromTo(images[0], { filter: "brightness(0.3)" }, { filter: "brightness(1)", duration: 1.4, ease: "sine.inOut" }, 0)
+        // The card and the deck behind it rise into place. translate and
+        // filter, as the step timeline owns their transform and opacity.
+        .fromTo(
+          cards.slice(0, 3),
+          { translate: () => `0 ${CARD_RISE * designPx()}px`, filter: "opacity(0)" },
+          { translate: "0 0px", filter: "opacity(1)", duration: 1, ease: "power3.out", stagger: 0.08 },
+          0.05,
+        )
+        .add(rise(label), 0.15)
+        // The first card's title and those peeking from the deck behind it.
+        .add(rise(parts.slice(0, 3).map(({ title }) => title), { stagger: 0.06 }), 0.25)
+        .add(reveals[0].paused(false), 0.4);
+      ScrollTrigger.create({
+        trigger: section,
+        start: "top 60%",
+        // Once (as About and Contact; user): it stays when scrolled back up.
+        once: true,
+        onEnter: () => entry.play(),
+        // Opened or reloaded further down: in place at once.
+        onRefresh: (self) => self.progress > 0 && entry.progress(1),
+      });
+
+      // At each step, once its card is halfway to the front.
+      const shown = cards.map(() => false);
+      cue = (instant) => {
+        const time = timeline.time();
+        for (let k = 1; k < cards.length; k++) {
+          const want = time >= stepTime(k - 1) + 0.5;
+          if (instant) reveals[k].progress(want ? 1 : 0).pause();
+          else if (want !== shown[k]) want ? reveals[k].play() : reveals[k].reverse();
+          shown[k] = want;
+        }
+      };
+    }
+
+    // Same length as the step timeline, so the same time fits both.
+    flow.set({}, {}, timeline.duration());
     // The pin may have measured before the steps were added: place the
     // timeline for the current scroll now that it is complete.
     target = pin.progress * timeline.duration();
     timeline.time(target);
+    flow.time(target);
+    cue(true);
   }, section);
 
   const refresh = () => ScrollTrigger.refresh();

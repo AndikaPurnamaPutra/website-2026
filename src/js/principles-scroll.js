@@ -1,22 +1,33 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
 import { getSmoothScroll } from "./smooth-scroll.js";
 
-// About: Principles (Figma 1734:383; plan: docs/implementation/19-about.md).
-// The section is pinned while the page scrolls on, and each part of that
-// scroll shows one principle: its number lights up, its title and text
-// change (fading and moving a little in the scroll direction) and its
-// illustration fades in. The changes run on their own clock, so they do not
-// stutter with the scroll. One swipe moves one principle, and the numbers
-// glide to theirs.
+gsap.registerPlugin(SplitText);
+
+// About: Principles (Figma 1734:383; plans: docs/implementation/19-about.md,
+// 30-about-motion.md). In step with Services on the homepage (user: the
+// swipe-per-principle hold felt heavy, long and stuck): the section is pinned
+// and scrolls freely, and each part of that scroll shows one principle. As
+// one is reached, on its own clock: its number lights up, the old title and
+// text rise out and the new ones rise in line by line (as the Services
+// cards), and its illustration is revealed over the last one like a curtain
+// from the bottom (from the top when scrolling back), settling from a little
+// larger. As the section comes up, its text rises and illustration 01 opens
+// (as Services' entrance). Over the last EXIT of a screen the section rises, faster and
+// faster, so it already moves with the page when it is released (as
+// Services). A number click glides to its principle.
 // Illustration 01 plays the Motion-01 storyboard once (Figma 1781:1671,
 // about 4.5s) whenever principle 01 comes into view, and stops on its last
 // step (user decision). With reduced motion the changes are instant and the
 // board shows its last step.
-const STEP = 0.7; // screen heights of scrolling per principle
-const GLIDE = 0.9; // s, from one principle to the next
-const QUIET = 180; // ms without wheel events that ends a gesture
-const ENTRY_RUN = 0.06; // screen heights a swipe may carry on into the hold
+const STEP = 0.8; // screen heights of scrolling per principle (0.7, held, felt long; free: 0.5 and 0.75 a little too fast, 0.85 a little heavy; user)
+const EXIT = 0.4; // of the screen height, as Services
+const RISE = 200; // % of its height text rises from (as the hero text)
+const DESCENT = 25; // % of its height its window reaches below it (g, p, y)
+const TEXT_IN = 1.15; // s (1, as the Services cards' text, a little too fast; 1.3 a little heavy; user)
+const TEXT_OUT = 0.4; // s the old text takes to rise out
+const CURTAIN = 1.1; // s an illustration takes to be revealed (0.9 a little too fast, 1.25 a little heavy; user)
 
 export function initPrinciplesScroll() {
   const section = document.querySelector("[data-principles]");
@@ -32,11 +43,41 @@ export function initPrinciplesScroll() {
   if (story && reduceMotion) story.play = story.reset = story.finish;
   const count = items.length;
   const listeners = new AbortController();
+  const cleanups = [];
   let current = 0;
+  // The entrance (below), once the text is split.
+  let entrance = null;
+  let entranceTrigger = null;
+  // Each item's title and text in lines (once the web fonts are in, below).
+  let lines = items.map(() => []);
 
-  // Shows principle `next`: at once, or with the fades.
+  // Each line in a window that reaches a little below it, as the hero text.
+  const lineIn = (els, direction) =>
+    gsap.fromTo(
+      els,
+      { yPercent: RISE * direction, clipPath: `inset(-20% -20% ${RISE - DESCENT}% -20%)` },
+      {
+        yPercent: 0,
+        clipPath: `inset(-20% -20% ${-DESCENT}% -20%)`,
+        duration: TEXT_IN,
+        ease: "power3.out",
+        stagger: 0.07,
+        overwrite: true,
+      },
+    );
+  const lineOut = (els, direction) =>
+    gsap.to(els, {
+      yPercent: -RISE * direction,
+      clipPath: `inset(${RISE - DESCENT}% -20% -20% -20%)`,
+      duration: TEXT_OUT,
+      ease: "power2.in",
+      overwrite: true,
+    });
+
+  // Shows principle `next`: at once, or with the rises and the curtain.
   const show = (next, animate) => {
     const direction = next >= current ? 1 : -1;
+    const previous = current;
     const changed = next !== current;
     current = next;
     numbers.forEach((number, i) => {
@@ -45,33 +86,150 @@ export function initPrinciplesScroll() {
     });
     items.forEach((item, i) => item.setAttribute("aria-hidden", String(i !== next)));
     if (!animate || reduceMotion) {
-      gsap.killTweensOf([...items, ...figures]);
-      gsap.set(items, { autoAlpha: (i) => (i === next ? 1 : 0), y: 0 });
-      gsap.set(figures, { autoAlpha: (i) => (i === next ? 1 : 0) });
+      gsap.killTweensOf(items);
+      gsap.set(items, { autoAlpha: (i) => (i === next ? 1 : 0) });
+      // Not while the entrance is still to play (it holds 01's lines and
+      // illustration at their start, and its tweens are kept).
+      if (entrance && entrance.progress() < 1) {
+        gsap.set(figures, { autoAlpha: (i) => (i === next ? 1 : 0), zIndex: 0 });
+        return;
+      }
+      gsap.killTweensOf([...figures, ...lines.flat()]);
+      gsap.set(lines.flat(), { clearProps: "transform,clipPath" });
+      gsap.set(figures, { autoAlpha: (i) => (i === next ? 1 : 0), zIndex: 0, clearProps: "clipPath,scale" });
       return;
     }
     if (!changed) return;
-    const others = (list) => list.filter((_, i) => i !== next);
-    gsap.to(others(items), { autoAlpha: 0, y: -12 * direction, duration: 0.3, ease: "power2.in", overwrite: true });
-    gsap.set(items[next], { autoAlpha: 0, y: 12 * direction, overwrite: true });
-    gsap.to(items[next], { autoAlpha: 1, y: 0, duration: 0.5, delay: 0.2, ease: "power3.out" });
-    gsap.to(others(figures), { autoAlpha: 0, duration: 0.4, ease: "power1.out", overwrite: true });
-    gsap.to(figures[next], { autoAlpha: 1, duration: 0.5, ease: "power1.out", overwrite: true });
+
+    // The text: the old lines rise out, then the new ones rise in.
+    const old = items[previous];
+    gsap.killTweensOf(items);
+    if (lines[previous].length) {
+      lineOut(lines[previous], direction);
+      gsap.set(old, { autoAlpha: 0, delay: TEXT_OUT });
+    } else gsap.set(old, { autoAlpha: 0 });
+    gsap.set(items.filter((_, i) => i !== next && i !== previous), { autoAlpha: 0 });
+    gsap.set(items[next], { autoAlpha: 1 });
+    if (lines[next].length) lineIn(lines[next], direction).delay(TEXT_OUT * 0.6);
+
+    // The illustration: revealed over the one in view, the others hidden.
+    figures.forEach((figure, i) => {
+      if (i === next || i === previous) return;
+      gsap.killTweensOf(figure);
+      gsap.set(figure, { autoAlpha: 0, zIndex: 0 });
+    });
+    gsap.set(figures[previous], { zIndex: 1 });
+    const from = direction > 0 ? "inset(100% 0% 0% 0%)" : "inset(0% 0% 100% 0%)";
+    gsap.fromTo(
+      figures[next],
+      { autoAlpha: 1, zIndex: 2, clipPath: from, scale: 1.06 },
+      {
+        clipPath: "inset(0% 0% 0% 0%)",
+        scale: 1,
+        duration: CURTAIN,
+        ease: "power3.out",
+        overwrite: true,
+        onComplete: () => {
+          if (current !== next) return;
+          gsap.set(figures.filter((_, i) => i !== next), { autoAlpha: 0, zIndex: 0 });
+        },
+      },
+    );
     if (next === 0) story?.play();
   };
 
-  const indexAt = (progress) => Math.min(count - 1, Math.floor(progress * count));
+  const indexAt = (progress) => gsap.utils.clamp(0, count - 1, Math.floor(progress * count));
+  // The part of the pin that shows the principles (before the exit).
+  const showLength = () => count * STEP * window.innerHeight;
 
   // Centred on screen (the section is at least a screen tall), then held for
-  // one STEP of scrolling per principle.
+  // one STEP of scrolling per principle and the exit.
   const pin = ScrollTrigger.create({
     trigger: section,
     pin: true,
     start: "center center",
-    end: () => `+=${count * STEP * window.innerHeight}`,
-    onUpdate: (self) => show(indexAt(self.progress), true),
-    onRefresh: (self) => show(indexAt(self.progress), false),
+    end: () => `+=${showLength() + EXIT * window.innerHeight}`,
+    invalidateOnRefresh: true,
+    onUpdate: (self) => show(indexAt((self.scroll() - self.start) / showLength()), true),
+    onRefresh: (self) => show(indexAt((self.scroll() - self.start) / showLength()), false),
   });
+
+  // Split once the web fonts are in, so the lines break where they are set.
+  let cancelled = false;
+  let splits = [];
+  if (!reduceMotion) {
+    (document.fonts?.ready ?? Promise.resolve()).then(() => {
+      if (cancelled) return;
+      splits = items.map((item) =>
+        SplitText.create(item.querySelectorAll(".principles__title, .principles__description"), {
+          type: "lines",
+          aria: "none",
+        }),
+      );
+      lines = splits.map((split) => split.lines);
+      const introSplit = SplitText.create(section.querySelector(".principles__intro"), { type: "lines", aria: "none" });
+      splits.push(introSplit);
+      setUpEntrance(introSplit.lines);
+    });
+  }
+
+  // The entrance, as Services (user: it had none): as the section comes up,
+  // the intro's lines rise, then the numbers and principle 01's title and
+  // text, and its illustration opens from the bottom. Once, as the About
+  // intro and Contact (user); shown at once when opened further down.
+  const setUpEntrance = (introLines) => {
+    entrance = gsap
+      .timeline({ paused: true })
+      .add(lineIn(introLines, 1), 0)
+      .add(lineIn(numbers, 1), 0.3)
+      .add(lineIn(lines[0], 1), 0.4)
+      .fromTo(
+        figures[0],
+        { clipPath: "inset(100% 0% 0% 0%)", scale: 1.06 },
+        { clipPath: "inset(0% 0% 0% 0%)", scale: 1, duration: CURTAIN, ease: "power3.out" },
+        0.2,
+      );
+    // Started by the intro itself coming up the screen (by the section's top,
+    // the intro was still below the screen and its rise was missed; user).
+    entranceTrigger = ScrollTrigger.create({
+      trigger: section.querySelector(".principles__intro"),
+      start: "top 85%",
+      once: true,
+      onEnter: () => entrance.play(),
+      onRefresh: (self) => self.progress > 0 && entrance.progress(1),
+    });
+    if (entranceTrigger.progress > 0 || entranceTrigger.scroll() > entranceTrigger.start) entrance.progress(1);
+  };
+
+  // The exit, as Services: over the last EXIT of a screen the section rises
+  // by half of it, faster and faster (from 0 up to the page's speed). CSS
+  // translate, apart from the pin's own styles; the next section is pulled up
+  // by as much, so the space between them stays as in Figma.
+  if (!reduceMotion) {
+    const leave = (self) => {
+      section.style.translate = `0 ${-0.5 * EXIT * window.innerHeight * self.progress ** 2}px`;
+    };
+    const exit = ScrollTrigger.create({
+      start: () => pin.end - EXIT * window.innerHeight,
+      end: () => pin.end,
+      onUpdate: leave,
+      onRefresh: leave,
+    });
+    const next = () => section.parentElement?.nextElementSibling;
+    const reset = () => {
+      section.style.translate = "";
+      const below = next();
+      if (below) below.style.marginTop = `${-0.5 * EXIT * window.innerHeight}px`;
+    };
+    reset();
+    ScrollTrigger.addEventListener("refreshInit", reset);
+    cleanups.push(() => {
+      ScrollTrigger.removeEventListener("refreshInit", reset);
+      exit.kill();
+      section.style.translate = "";
+      next()?.style.removeProperty("margin-top");
+    });
+  }
 
   // The storyboard starts once the section is well in view, and is set back
   // to its first step when scrolled back above that point. Opened or
@@ -86,106 +244,32 @@ export function initPrinciplesScroll() {
       onRefresh: (self) => (self.progress > 0 ? story.finish() : story.reset()),
     });
 
-  // One swipe or turn of the wheel moves exactly one principle (user
-  // decision: a free scroll often skipped one). While the section is held,
-  // wheel events are caught before Lenis: the first one of a gesture glides
-  // the page to the middle of the next principle's part of the pin.
-  // Everything waits during the glide; after it, the rest of that gesture is
-  // ignored: a trackpad's inertia (events that keep coming, weaker and
-  // weaker) or a wheel kept turning. A new gesture is a wheel that was still
-  // for QUIET, or events that suddenly grow stronger (a new swipe during the
-  // inertia, which can last 1–2s: waiting for it to end blocked every new
-  // swipe, user report). Scrolling on from 06, or back from 01, leaves the
-  // section as usual.
-  // Scrolling into the section is the wheel's own smooth scroll, which may
-  // carry on ENTRY_RUN into the hold (where nothing moves): the section
-  // slows a little as it arrives and is held while still moving gently.
-  // Tried before (user reports): a glide on entry (the speed changed at
-  // once), stopping exactly at the hold (braked, "too soft"), and the swipe
-  // carrying on up to 90% of 01's part (held at full speed, "a little
-  // rough").
-  // Touch screens and the keyboard scroll freely.
-  const part = () => (pin.end - pin.start) / count;
-  const placeOf = (i) => pin.start + (i + 0.5) * part();
-  let glideEnd = 0;
-  let stepped = false;
-  let lastWheel = 0;
-  let lastStrength = 0;
-  let entry = null; // { target, limit, direction } while scrolling into the section
-  const goTo = (i, duration = GLIDE) => {
-    const top = placeOf(i);
-    const lenis = getSmoothScroll();
-    entry = null;
-    // Timed here rather than by Lenis' onComplete, which a stopped or
-    // interrupted glide may never call (and everything would wait forever).
-    glideEnd = performance.now() + (reduceMotion ? 0 : duration * 1000);
-    if (lenis) lenis.scrollTo(top, { duration, force: true });
-    else window.scrollTo({ top, behavior: reduceMotion ? "auto" : "smooth" });
-  };
-  // The wheel's own scroll (Lenis' easing and wheel multiplier), held back
-  // at the entry's limit.
-  const carry = (delta) => {
-    const lenis = getSmoothScroll();
-    const step = delta * (lenis?.options.wheelMultiplier ?? 1);
-    entry.target = entry.direction > 0 ? Math.min(entry.target + step, entry.limit) : Math.max(entry.target + step, entry.limit);
-    if (lenis) lenis.scrollTo(entry.target, { force: true });
-    else window.scrollTo(0, entry.target);
-  };
-  const onWheel = (event) => {
-    if (event.ctrlKey || !event.deltaY) return; // pinch zoom
-    const now = performance.now();
-    const strength = Math.abs(event.deltaY);
-    const quiet = now - lastWheel >= QUIET;
-    const stronger = strength > 8 && strength > lastStrength * 1.5;
-    lastWheel = now;
-    lastStrength = strength;
-    const swallow = () => {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-    };
-    if (now < glideEnd) return swallow();
-    const sameGesture = !quiet && !stronger;
-    // The rest of the swipe that came into the section.
-    if (entry && sameGesture && Math.sign(event.deltaY) === entry.direction) {
-      swallow();
-      return carry(event.deltaY);
-    }
-    if (stepped && sameGesture) return swallow();
-    stepped = false;
-    entry = null;
-
-    const lenis = getSmoothScroll();
-    const from = lenis ? lenis.targetScroll : window.scrollY;
-    const to = from + event.deltaY * (lenis?.options.wheelMultiplier ?? 1);
-    const direction = Math.sign(event.deltaY);
-    if (from >= pin.start && from <= pin.end) {
-      const i = indexAt((from - pin.start) / (pin.end - pin.start)) + direction;
-      if (i < 0 || i >= count) return;
-      swallow();
-      stepped = true;
-      goTo(i);
-    } else if ((from < pin.start && to >= pin.start) || (from > pin.end && to <= pin.end)) {
-      swallow();
-      stepped = true;
-      const run = ENTRY_RUN * window.innerHeight;
-      const limit = direction > 0 ? pin.start + run : pin.end - run;
-      entry = { target: from, limit, direction };
-      carry(event.deltaY);
-    }
-  };
-  window.addEventListener("wheel", onWheel, { passive: false, capture: true, signal: listeners.signal });
-
-  // A number glides to its principle.
+  // A number glides to the middle of its principle's part of the pin.
   numbers.forEach((number, i) =>
-    number.addEventListener("click", () => goTo(i, 1.2), { signal: listeners.signal }),
+    number.addEventListener(
+      "click",
+      () => {
+        const top = pin.start + (i + 0.5) * STEP * window.innerHeight;
+        const lenis = getSmoothScroll();
+        if (lenis) lenis.scrollTo(top, { duration: reduceMotion ? 0 : 1.2 });
+        else window.scrollTo({ top, behavior: reduceMotion ? "auto" : "smooth" });
+      },
+      { signal: listeners.signal },
+    ),
   );
 
   return () => {
+    cancelled = true;
     listeners.abort();
+    cleanups.forEach((cleanup) => cleanup());
     pin.kill();
+    entrance?.kill();
+    entranceTrigger?.kill();
     storyTrigger?.kill();
     story?.revert();
-    gsap.killTweensOf([...items, ...figures]);
+    gsap.killTweensOf([...items, ...figures, ...lines.flat()]);
+    gsap.set(numbers, { clearProps: "transform,clipPath" });
+    splits.forEach((split) => split.revert());
     gsap.set([...items, ...figures], { clearProps: "all" });
     numbers.forEach((number) => number.removeAttribute("aria-current"));
   };

@@ -44,7 +44,9 @@ section.trusted
     hr.divider
 
   //- Without JS the row sits centered like Figma; JS duplicates it into a marquee.
-  .trusted__marquee(data-marquee)
+  //- "scroll": the page scroll pushes it faster, as the Contact gallery, and
+  //- 1.5× as much, easing towards 1500 Figma px/s on a hard swipe (user).
+  .trusted__marquee(data-marquee="scroll" data-marquee-speed="55" data-marquee-push="1.5" data-marquee-max="1500")
     ul.trusted__track(data-marquee-track)
       each item, i in testimonials
         li.testimonial-card(class=item.noise ? "testimonial-card--noise" : null)
@@ -56,7 +58,7 @@ section.trusted
             img.testimonial-card__logo(src=`assets/images/testimonials/${item.logo.file}` alt=item.company style=`--w: ${item.logo.w}; --h: ${item.logo.h};` class=item.logo.flip ? "testimonial-card__logo--flip" : null)
           p.testimonial-card__quote!= item.quote
           .testimonial-card__author
-            img.testimonial-card__avatar(src=`assets/images/testimonials/avatar-${i + 1}.png` alt="")
+            img.testimonial-card__avatar(src=`assets/images/testimonials/avatar-${i + 1}.webp` alt="")
             span.testimonial-card__person
               span.testimonial-card__name= item.name
               span.testimonial-card__role= item.role

@@ -4,6 +4,29 @@
 // 24px lines), so they are written as px ratios.
 @use "../abstracts/functions" as *;
 
+// A dark line drawn from the left over the light one on hover and focus
+// (user: more feel; it turned dark at once). 0.5px, as the line (Figma).
+// Both lines are background layers (a border paints over the background and
+// hid the dark one); the border stays, clear, for the error's red.
+@mixin drawn-line {
+  background:
+    linear-gradient(var(--color-ink), var(--color-ink)) 0 100% / 0% 0.5px no-repeat,
+    linear-gradient($color-line, $color-line) 0 100% / 100% 0.5px no-repeat;
+  background-origin: border-box;
+  border-bottom-color: transparent;
+  transition:
+    background-size 0.45s cubic-bezier(0.33, 1, 0.68, 1),
+    border-color 0.2s ease-out;
+}
+
+@mixin drawn-line-on {
+  background-size: 100% 0.5px, 100% 0.5px;
+}
+
+@mixin drawn-line-off {
+  background-size: 0% 0.5px, 100% 0.5px;
+}
+
 // The site's layout scale (--px in base/_tokens.scss), for the parts that
 // keep growing with the screen here: the header space, the side gutters and
 // the gallery.
@@ -12,7 +35,11 @@ $site-px: clamp(calc(1280px / 1440), calc(100vw / 1440), calc(2560px / 1440));
 $color-line: #cacaca;
 $color-error: #fc0000; // error underline and message (Figma 1611:5344)
 $color-required: #ff0000; // "*" after required labels
-$color-hint: #888888;
+// The submit's sweep, as the site's plain button (_cta-button.scss).
+$submit-sweep: 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+// The Office HQ link's hover, on the same curve.
+$office-ease: 0.45s cubic-bezier(0.33, 1, 0.68, 1);
+$color-hint: #6c6c6c; // Figma #888, darker for contrast (4.7:1 on #f6f6f6; user)
 $color-file: #344054; // file type label and upload percentage
 $color-track: #eaecf0;
 $color-done: #29df00;
@@ -97,7 +124,7 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
   font-weight: 500;
   font-size: fs(14);
   line-height: calc(24 / 14);
-  opacity: 0.5;
+  opacity: 0.6; // as .text-muted (contrast)
 }
 
 .contact__office {
@@ -130,13 +157,30 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
   line-height: calc(22 / 14);
 }
 
-// ArrowDownRight from Figma, flipped to point up-right as in the design.
+// Its hover (user): a line is drawn from the left under "Office HQ" (as the
+// form's lines) and goes off to the right as the pointer leaves; the arrow
+// flies out to the top right and back in from the bottom left, and the other
+// way round as the pointer leaves (classes from src/js/contact-office.js).
+// Its box stays light (dark, it was too much; user).
+.contact__office-text {
+  background: linear-gradient(var(--color-ink), var(--color-ink)) 100% 100% / 0% 1px no-repeat;
+  transition: background-size $office-ease;
+}
+
+.contact__office-link:is(:hover, :focus-visible) .contact__office-text {
+  background-position: 0 100%;
+  background-size: 100% 1px;
+}
+
+// ArrowDownRight from Figma, flipped to point up-right as in the design;
+// moved with `translate`, so its flip (transform) stays.
 .contact__office-arrow {
   display: flex;
   align-items: center;
   justify-content: center;
   width: fs(20);
   height: fs(20);
+  overflow: hidden;
   background: var(--color-surface-muted);
   border-radius: fluid(4);
 
@@ -147,10 +191,64 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
   }
 }
 
+.contact__office-link.is-going .contact__office-arrow img {
+  animation: contact-arrow-go 0.5s linear;
+}
+
+.contact__office-link.is-coming .contact__office-arrow img {
+  animation: contact-arrow-back 0.5s linear;
+}
+
+// Out to the top right, then in from the bottom left. It stuttered (user):
+// it slowed down at the box's edge and jumped across while still in sight.
+// Now it speeds up on the way out (ease-in), is swapped once it is right out
+// of the box (160%, unseen), and slows into place (ease-out). The way out is
+// short (35%), so the distance does not show (150% felt too far; no fade).
+$office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
+
+@keyframes contact-arrow-go {
+  0% {
+    animation-timing-function: $office-arrow-out;
+  }
+
+  35% {
+    translate: 160% -160%;
+  }
+
+  35.01% {
+    translate: -160% 160%;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  100% {
+    translate: 0 0;
+  }
+}
+
+// The way back: out to the bottom left, then in from the top right.
+@keyframes contact-arrow-back {
+  0% {
+    animation-timing-function: $office-arrow-out;
+  }
+
+  35% {
+    translate: -160% 160%;
+  }
+
+  35.01% {
+    translate: 160% -160%;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  100% {
+    translate: 0 0;
+  }
+}
+
 .contact__address {
   font-size: fs(14);
   line-height: calc(22 / 14);
-  opacity: 0.5;
+  opacity: 0.6; // as .text-muted (contrast)
 }
 
 .contact__note {
@@ -158,9 +256,16 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
   line-height: calc(22 / 13);
   color: $color-hint;
 
+  // Underlined (Figma). On hover it dims to 60%, text and line, as the
+  // footer's links (user's pick).
   a {
     color: var(--color-ink);
     text-decoration: underline;
+    transition: opacity 0.3s ease-out;
+  }
+
+  a:is(:hover, :focus-visible) {
+    opacity: 0.6;
   }
 }
 
@@ -233,7 +338,7 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
   border-bottom: 0.5px solid $color-line;
   border-radius: 0;
   outline: none;
-  transition: border-color 0.2s ease-out;
+  @include drawn-line;
 
   &::placeholder {
     font-weight: 400;
@@ -246,10 +351,10 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
     height: calc(#{fs(32)} + 0.5px);
   }
 
-  // Figma 1611:1972: the line turns dark on hover.
+  // Figma 1611:1972: the line turns dark on hover; drawn from the left.
   &:hover,
   &:focus-visible {
-    border-bottom-color: var(--color-ink);
+    @include drawn-line-on;
   }
 
   // Disabled after sending: keep the text, faded (Figma 1611:5825).
@@ -257,7 +362,7 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
     -webkit-text-fill-color: currentColor;
     opacity: 1;
     color: rgba(17, 17, 17, 0.2);
-    border-bottom-color: $color-line;
+    @include drawn-line-off;
   }
 }
 
@@ -265,6 +370,7 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
 .is-invalid .contact-form__input,
 .is-invalid .contact-form__select-button {
   border-bottom-color: $color-error;
+  @include drawn-line-off;
 
   &::placeholder {
     opacity: 0;
@@ -290,26 +396,42 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
     cursor: inherit;
   }
 
+  // Chosen, the text turns medium; the ::after copy (medium, unseen) keeps
+  // the chip that wide from the start, so it does not grow (user).
   span {
     display: block;
     padding: fs(10) fs(16);
+    text-align: center;
     font-size: fs(16);
     line-height: 1;
     letter-spacing: -0.04em;
     white-space: nowrap;
     border: 1px solid $color-line;
     border-radius: fluid(4);
+    // Chosen, its dark fill rises from the bottom (user: more feel; as the
+    // site's pictures open), the text turning light as it passes.
+    background: linear-gradient(var(--color-ink), var(--color-ink)) 0 100% / 100% 0% no-repeat;
     transition:
       color 0.2s ease-out,
-      background-color 0.2s ease-out,
+      background-size 0.35s cubic-bezier(0.33, 1, 0.68, 1),
       border-color 0.2s ease-out;
+  }
+
+  span::after {
+    content: attr(data-text);
+    display: block;
+    height: 0;
+    overflow: hidden;
+    font-weight: 500;
+    visibility: hidden;
   }
 
   input:checked + span {
     font-weight: 500;
     color: var(--color-white);
-    background: var(--color-ink);
+    background-size: 100% 100%;
     border-color: var(--color-ink);
+    transition-delay: 0.08s, 0s, 0s;
   }
 
   input:focus-visible + span {
@@ -322,7 +444,7 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
   }
 
   input:checked:disabled + span {
-    background: #cfcfcf;
+    background-image: linear-gradient(#cfcfcf, #cfcfcf);
     border-color: #cfcfcf;
   }
 }
@@ -386,17 +508,17 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
   padding-bottom: fs(12);
   text-align: left;
   border-bottom: 0.5px solid $color-line;
-  transition: border-color 0.2s ease-out;
+  @include drawn-line;
 
   &:hover,
   &:focus-visible {
-    border-bottom-color: var(--color-ink);
+    @include drawn-line-on;
     outline: none;
   }
 
   &:disabled {
     cursor: default;
-    border-bottom-color: $color-line;
+    @include drawn-line-off;
   }
 
   img {
@@ -438,6 +560,22 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
   background: var(--color-white);
   border-radius: fluid(8);
   box-shadow: $shadow-card;
+  // Opens with a short drop and fade, and closes back (user: more feel);
+  // shown and hidden with the hidden attribute (src/js/contact-form.js).
+  transition:
+    opacity 0.25s ease-out,
+    translate 0.35s cubic-bezier(0.33, 1, 0.68, 1),
+    display 0.35s allow-discrete;
+
+  &[hidden] {
+    opacity: 0;
+    translate: 0 #{fs(-8)};
+  }
+
+  @starting-style {
+    opacity: 0;
+    translate: 0 #{fs(-8)};
+  }
 }
 
 .contact-form__option-list {
@@ -645,7 +783,13 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
 
 // Outline in idle, dark on hover (Figma 1611:5630), light grey with a green
 // check once sent (1611:5825). Always 44px tall.
+// Its hover is the site's plain button's turned round (user: in step with
+// it, inverted): a dark copy with light text (its data-label) sweeps in from
+// the left over the whole button with the plain button's timing, so the
+// colours change just at its edge. (A dark fill under the text hid it; a
+// layer blending by difference gave pure black, light grey text and a seam.)
 .contact-form__submit {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -659,15 +803,24 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
   color: var(--color-ink);
   border: 1px solid var(--color-ink);
   border-radius: fluid(4);
-  transition:
-    color 0.2s ease-out,
-    background-color 0.2s ease-out,
-    border-color 0.2s ease-out;
 
-  &:hover:enabled,
-  &:focus-visible {
+  &::after {
+    content: attr(data-label);
+    position: absolute;
+    inset: -1px;
+    display: grid;
+    place-items: center;
     color: var(--color-white);
     background: var(--color-ink);
+    border-radius: inherit;
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path $submit-sweep;
+    pointer-events: none;
+  }
+
+  &:hover:enabled::after,
+  &:focus-visible::after {
+    clip-path: inset(0 0 0 0);
   }
 
   &:disabled {
@@ -675,7 +828,12 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
     background: var(--color-surface-muted);
     border-color: var(--color-surface-muted);
     cursor: default;
+
+    &::after {
+      content: none;
+    }
   }
+
 }
 
 .contact-form__submit-check {
@@ -687,10 +845,17 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
   font-weight: 500;
   font-size: fs(13);
   line-height: calc(22 / 13);
-  opacity: 0.5;
+  color: $color-hint; // grey as the hints (was opacity, so the link can go dark)
 
+  // Underlined (Figma). The text is grey already, so on hover the link turns
+  // dark instead of dimming as the email does (dimmer, it would be too faint).
   a {
     text-decoration: underline;
+    transition: color 0.3s ease-out;
+  }
+
+  a:is(:hover, :focus-visible) {
+    color: var(--color-ink);
   }
 }
 
@@ -784,15 +949,47 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .contact__office-link .contact__office-arrow img {
+    animation: none !important;
+  }
+
+  .contact__office-text {
+    transition: none !important;
+  }
+
+  .contact__note a,
+  .contact-form__privacy a {
+    animation: none !important;
+    transition: none !important;
+  }
+
   .contact-form__input,
   .contact-form__chip span,
   .contact-form__tip,
   .contact-form__select-button,
   .contact-form__option,
+  .contact-form__options,
   .contact-form__dropzone,
   .contact-form__submit,
+  .contact-form__submit::after,
   .contact-gallery__media img,
   .contact-gallery__title span {
     transition: none !important;
+  }
+}
+
+// Entrance (src/js/contact-intro.js): hidden from the first paint until the
+// script has set it up, so it does not show whole and then vanish (it did on
+// a slower connection). Shown anyway after 3s if the script never comes.
+@media (prefers-reduced-motion: no-preference) {
+  .js:not(.is-contact-ready) :is(.contact__intro, .contact-form, .contact__office) {
+    visibility: hidden;
+    animation: contact-fallback 0s 3s forwards;
+  }
+}
+
+@keyframes contact-fallback {
+  to {
+    visibility: visible;
   }
 }

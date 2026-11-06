@@ -43,16 +43,13 @@
   white-space: nowrap;
 }
 
-// Its words light up one by one, grey to black, while the section is held
-// (src/js/statement-ink.js). The grey is lighter than the Milestone
-// sentence's (0.4), for the large text.
-.statement__text.is-lighting .statement__word {
-  color: rgba(0, 0, 0, 0.2);
-  transition: color 0.35s ease;
-
-  &.is-lit {
-    color: var(--color-ink);
-  }
+// Ink flows through it letter by letter while the section is held: each
+// letter's share of the page theme's text colour (--ink: grey, a lighter grey,
+// then the text colour) is set with the scroll (src/js/statement-ink.js), so
+// it turns over with the page (src/js/page-theme.js). The grey (0.2) is
+// lighter than the Milestone sentence's (0.4), for the large text.
+.statement__text.is-lighting .statement__char {
+  color: color-mix(in srgb, var(--theme-fg) calc(var(--ink, 0.2) * 100%), transparent);
 }
 
 .statement__line--1 {
@@ -143,4 +140,62 @@
 .statement__folder-crop--top {
   top: 0;
   height: fs(70);
+}
+
+// Its button turns over with the page theme too (dark on light, light on
+// dark), without passing through the page's grey, where it melted into it,
+// or swapping in sight (user): it fades out, swaps unseen and fades back in,
+// within the page's switch. One animation per theme, so each switch replays.
+.statement .cta {
+  animation: statement-cta-swap-light var(--theme-switch-time) ease;
+}
+
+body.is-dark .statement .cta {
+  animation-name: statement-cta-swap-dark;
+}
+
+.statement .cta__label {
+  transition:
+    color 0s calc(var(--theme-switch-time) * 0.4),
+    background-color 0s calc(var(--theme-switch-time) * 0.4);
+}
+
+body.is-dark .statement {
+  .cta__label {
+    color: var(--color-ink);
+    background: var(--color-white);
+  }
+
+  .cta__button:hover,
+  .cta__button:focus-visible {
+    border-color: var(--color-white);
+  }
+
+  // The arrow is a dark picture: made white, like the menu bar's icons
+  // (it was not seen on dark; user).
+  .cta__icon img {
+    filter: brightness(0) invert(1);
+  }
+}
+
+@keyframes statement-cta-swap-light {
+  40% {
+    opacity: 0;
+  }
+}
+
+@keyframes statement-cta-swap-dark {
+  40% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .statement .cta {
+    animation: none;
+  }
+
+  .statement .cta__label {
+    transition: none;
+  }
 }

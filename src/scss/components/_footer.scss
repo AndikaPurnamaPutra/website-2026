@@ -136,14 +136,19 @@
   white-space: nowrap;
 }
 
-// Hover is not in Figma (approved proposal): links dim to 50%.
+// Hover is not in Figma: focus on the hovered link, as in the menu bar
+// (user): while the pointer is over a list of links (its gaps included, so
+// moving down it does not flash them back), every other footer link dims.
+// Keyboard focus too. (The hovered link itself dimmed to 50% before; a text
+// roll was tried and dropped.)
 .site-footer__link {
   transition: opacity 0.3s ease-out;
+}
 
-  &:hover,
-  &:focus-visible {
-    opacity: 0.5;
-  }
+.site-footer:has(:is(.site-footer__links, .site-footer__legal):hover, .site-footer__link:focus-visible)
+  li:not(:hover, :has(.site-footer__link:focus-visible))
+  > .site-footer__link {
+  opacity: 0.3;
 }
 
 .site-footer__about {

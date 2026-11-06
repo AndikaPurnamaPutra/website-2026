@@ -1,6 +1,6 @@
 //- CTA button from Figma (Contact CTA 1523:3282).
-//- Idle shows the label only; hover/focus reveals the frame, arrow and caption.
-//- variant "light" (Motto, Figma 1527:4247) is always open, white on dark.
+//- Idle shows the label and caption; hover/focus reveals the frame and arrow.
+//- variant "light" (Motto, Figma 1527:4247) is white on dark.
 mixin ctaButton(label, href, caption, variant)
   .cta(class=variant ? `cta--${variant}` : null)
     a.cta__button(href=href)
@@ -9,3 +9,11 @@ mixin ctaButton(label, href, caption, variant)
         img(src=variant === "light" ? "assets/icons/arrow-circle-white.svg" : "assets/icons/arrow-circle.svg" width="32" height="32" alt="")
     if caption
       p.cta__caption.text-14.text-medium= caption
+
+//- The plain button's text ("More Work", "Send email"): the text, and a light
+//- and a dark copy over it that the hover's sweep swaps (_cta-button.scss).
+//- The copies are hidden from screen readers.
+mixin buttonText(text)
+  | #{text}
+  span.button__light(aria-hidden="true")= text
+  span.button__ink(aria-hidden="true")= text

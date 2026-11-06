@@ -10,8 +10,9 @@ block preloader-start
 block preloader
   include ../partials/preloader
 
-block title
-  | Home — OWW
+block meta
+  +pageMeta("Home — OWW", "One Week Wonders Studio™ is a design and development agency in Yogyakarta, Indonesia, crafting brand identities, websites, apps and AI-powered products.", "")
+  +organizationData
 
 block content
   include ../partials/hero
@@ -24,6 +25,6 @@ block content
   .tone-shift(data-tone-shift)
     //- Screen-sized texture that stays in view across the wrapper, so the dark
     //- background and its texture arrive together over the whole screen.
-    img.tone-shift__texture(src="assets/images/motto/texture.jpg" alt="")
+    img.tone-shift__texture(src="assets/images/motto/texture.webp" alt="")
     include ../partials/milestone
     include ../partials/motto

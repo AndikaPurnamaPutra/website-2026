@@ -17,13 +17,37 @@
   padding-bottom: fluid(200);
 }
 
+// Entrance (src/js/about-intro.js): hidden from the first paint until the
+// script has set it up, so it does not show whole and then vanish. Shown
+// anyway after 3s if the script never comes.
+@media (prefers-reduced-motion: no-preference) {
+  .js:not(.is-about-ready) :is(.about-intro__title, .about-intro__photo, .about-intro__body) {
+    visibility: hidden;
+    animation: about-fallback 0s 3s forwards;
+  }
+}
+
+@keyframes about-fallback {
+  to {
+    visibility: visible;
+  }
+}
+
+// Its picture is 30% taller than the frame, the whole width of the photo
+// with more of it above (no zoom; user), so it can move in it as the page
+// scrolls (src/js/about-intro.js; as telhaclarke.com.au, user).
 .about-intro__photo {
-  display: block;
-  width: 100%;
-  height: auto;
+  aspect-ratio: 1360 / 560;
   margin-top: fluid(55);
+  overflow: hidden;
   // Figma rounds only the left corners (4px).
   border-radius: fluid(4) 0 0 fluid(4);
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
 }
 
 .about-intro__body {
@@ -68,7 +92,7 @@
   font-weight: 500;
   font-size: fs(14);
   line-height: calc(24 / 14);
-  opacity: 0.5;
+  opacity: 0.6; // as .text-muted (contrast)
 }
 
 // Principles (Figma 1734:383): dark, 820px tall; the text column and the
@@ -159,11 +183,13 @@
   line-height: calc(22 / 14);
 }
 
+// Clips the illustration that settles from a little larger as it is revealed.
 .principles__figures {
   position: relative;
   flex-shrink: 0;
   width: fluid(670);
   height: fluid(420);
+  overflow: hidden;
 }
 
 .principles__figure {
@@ -520,7 +546,13 @@
   }
 }
 
-// "Play Video", centred on the first photo (Figma 1734:401).
+// "Play Video", centred on the first photo (Figma 1734:401); it follows the
+// cursor over the photo, which hides the system cursor (src/js/about-gallery.js,
+// as the hero showreel).
+.about-gallery__photo.is-following {
+  cursor: none;
+}
+
 .about-gallery__play {
   position: absolute;
   top: 50%;
@@ -550,16 +582,67 @@
 }
 
 // Name, then the role at 462px; rows 54px apart with a line 16px below each.
+// The line is drawn from the left as the row comes in (--line,
+// src/js/about-team.js), as Milestone's rows.
 .about-team__member {
+  position: relative;
   display: grid;
   grid-template-columns: fs(462) 1fr;
   padding-bottom: fs(16);
   font-size: fs(14);
   line-height: calc(22 / 14);
   color: var(--color-ink);
-  border-bottom: 1px solid #e5e5e5;
 
   & + & {
     padding-top: fs(15);
   }
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    background: #e5e5e5;
+    transform: scaleX(var(--line, 1));
+    transform-origin: 0 50%;
+  }
+
+  span {
+    transition: opacity 0.3s ease-out;
+  }
+}
+
+// The photo beside the cursor over a row (src/js/about-team.js).
+.about-team__preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  width: fs(220);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: fluid(4);
+  pointer-events: none;
+
+  img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    visibility: hidden;
+
+    &.is-shown {
+      visibility: visible;
+    }
+  }
+}
+
+// While the pointer is over the list (its gaps included, so moving down it
+// does not flash them back), every other row dims, as the navbar and footer
+// links (user).
+.about-team__list:hover .about-team__member:not(:hover) span {
+  opacity: 0.3;
 }

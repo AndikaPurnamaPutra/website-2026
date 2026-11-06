@@ -70,4 +70,50 @@
   // Effects
   --blur-glass: #{fluid(100)};
   --shadow-coin: 0 #{fluid(4)} #{fluid(4)} rgba(0, 0, 0, 0.25);
+
+  // Page theme (docs/implementation/21-page-theme.md): light here, dark below
+  // on body.is-dark (src/js/page-theme.js). Sections follow the theme (as
+  // revelatio.studio: the coming section is light too until the switch).
+  --theme-bg: var(--color-white);
+  --theme-fg: var(--color-ink);
+  --theme-divider: var(--color-divider);
+  --theme-border: var(--color-border-strong);
+  --theme-switch-time: 0.35s; // as revelatio.studio (checked on the site)
+  --theme-switch: var(--theme-switch-time) ease;
+}
+
+// Dark theme: the page while the Services section is in view; Services
+// alone without JS, as in Figma.
+body.is-dark,
+html:not(.js) .services {
+  --theme-bg: var(--color-ink);
+  --theme-fg: var(--color-white);
+  --theme-divider: var(--color-divider-dark);
+  --theme-border: var(--color-border-dark);
+}
+
+// Registered as colours, so the switch can ease on body and everything that
+// uses them eases with it (gradient text included).
+@property --theme-bg {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #ffffff;
+}
+
+@property --theme-fg {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #111111;
+}
+
+@property --theme-divider {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #e7e7e7;
+}
+
+@property --theme-border {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #d9d9d9;
 }

@@ -28,8 +28,15 @@ html.lenis body {
 body {
   margin: 0;
   font-family: var(--font-body);
-  color: var(--color-ink);
-  background: var(--color-white);
+  // The page theme (src/js/page-theme.js) switches as on revelatio.studio:
+  // 0.35s, ease (quick at first), not at once (user: too harsh).
+  color: var(--theme-fg);
+  background: var(--theme-bg);
+  transition:
+    --theme-bg var(--theme-switch),
+    --theme-fg var(--theme-switch),
+    --theme-divider var(--theme-switch),
+    --theme-border var(--theme-switch);
   letter-spacing: -0.02em;
   -webkit-font-smoothing: antialiased;
 }
@@ -73,4 +80,22 @@ button {
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
+}
+
+// Read by screen readers, not shown (e.g. a sentence split into letters for
+// an effect, src/js/statement-ink.js).
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
 }

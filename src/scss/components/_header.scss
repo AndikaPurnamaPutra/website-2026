@@ -1,9 +1,10 @@
 // Figma: Menu Bar 1611:6986. Fixed bar, same height at the top and while
-// scrolling (24px padding → 72px). Transparent, without Figma's white
+// scrolling (20px padding → 64px; Figma 24px → 72px). Transparent, without Figma's white
 // background and shadow, as on leoparpeix.com and jasminegunarto.com (user
 // decision): only the logo and links float over the page. Logo, text and
-// paddings keep Figma's pixel size at every viewport width (not fluid); only
-// the side edges follow the page content (.container).
+// paddings keep Figma's size at every viewport width (not fluid), in rem so
+// they grow with the visitor's browser font size, as the text does (16px =
+// 1rem; user); only the side edges follow the page content (.container).
 @use "../abstracts/functions" as *;
 
 .site-header {
@@ -12,22 +13,30 @@
   right: 0;
   left: 0;
   z-index: 100;
-  padding-block: 24px;
+  padding-block: 1.25rem; // 20px (Figma 24px; user)
   // Inverts whatever lies behind it, as on leoparpeix.com (user decision):
   // white logo and links, blended by difference, read dark on white, light
   // on dark and in opposite colours over pictures.
   color: var(--color-white);
   mix-blend-mode: difference;
+  // Slides away over Services and Motto (src/js/header.js), as it used to.
+  transition: transform 0.8s cubic-bezier(0.33, 1, 0.68, 1);
+
+  // 1px extra so no hairline stays at a fractional height (browser zoom).
+  &.is-hidden:not(:has(:focus-visible, .site-nav__item--work.is-shown)) {
+    transform: translateY(calc(-100% - 1px));
+  }
 
   // The Work panel is inside the bar and would be inverted too, so while it
-  // is open the bar is drawn normally: dark, and white over the dark sections
-  // (src/js/header.js).
-  &:has(.site-nav__item--work.is-open) {
+  // shows (open, and until it has faded out: inverted as it faded, the white
+  // panel turned black; user) the bar is drawn normally: dark, and white over
+  // the dark sections (src/js/header.js, src/js/work-menu.js).
+  &:has(.site-nav__item--work.is-shown) {
     color: var(--color-ink);
     mix-blend-mode: normal;
   }
 
-  &.is-dark:has(.site-nav__item--work.is-open) {
+  &.is-dark:has(.site-nav__item--work.is-shown) {
     color: var(--color-white);
   }
 }
@@ -39,7 +48,7 @@
   filter: brightness(0) invert(1);
 }
 
-.site-header:has(.site-nav__item--work.is-open):not(.is-dark) {
+.site-header:has(.site-nav__item--work.is-shown):not(.is-dark) {
   .site-header__logo img,
   .site-nav__link img {
     filter: none;
@@ -47,6 +56,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .site-header,
   .site-nav__item--work .site-nav__link img {
     transition: none;
   }
@@ -74,7 +84,7 @@ main {
 .site-header__back {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   justify-self: start;
   font-family: var(--font-body);
   font-weight: 500;
@@ -83,8 +93,8 @@ main {
   letter-spacing: -0.02em;
 
   img {
-    width: 20px;
-    height: 20px;
+    width: 1.25rem;
+    height: 1.25rem;
   }
 }
 
@@ -92,19 +102,33 @@ main {
   display: block;
 
   img {
-    width: 50.25px;
-    height: 24px;
+    width: 3.140625rem; // 50.25 × 24px
+    height: 1.5rem;
   }
 }
 
 .site-nav {
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 2.5rem;
 }
 
 .site-nav__item {
   position: relative;
+}
+
+// Focus on the hovered link (user): the others dim while the pointer is over
+// the menu, its gaps and the open Work panel included, so moving from one
+// link to the next does not flash them back (it did when only the links
+// counted). Keyboard focus too.
+.site-nav__item > .site-nav__link {
+  transition: opacity 0.3s ease;
+}
+
+.site-nav:is(:hover, :has(.site-nav__link:focus-visible))
+  > .site-nav__item:not(:hover, :has(> .site-nav__link:focus-visible))
+  > .site-nav__link {
+  opacity: 0.3;
 }
 
 .site-nav__link {
@@ -117,8 +141,8 @@ main {
   letter-spacing: -0.02em;
 
   img {
-    width: 16px;
-    height: 16px;
+    width: 1rem;
+    height: 1rem;
   }
 }
 
@@ -135,9 +159,11 @@ main {
 .site-nav__item--work {
   position: static;
 
-  // The chevron turns up while the menu is open (user decision).
+  // The chevron turns up while the menu is open (user decision), in time
+  // with the panel (0.5s, src/js/work-menu.js) and turning a little past its
+  // place before it settles (user: at 0.3s it was plain).
   .site-nav__link img {
-    transition: transform 0.3s cubic-bezier(0.33, 1, 0.68, 1);
+    transition: transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1);
   }
 
   &.is-open .site-nav__link img {
@@ -147,29 +173,43 @@ main {
 
 .work-menu {
   position: absolute;
-  top: calc(100% + 42px);
+  top: calc(100% + 2.375rem); // 38px: 18px below the bar
   right: var(--page-gutter);
   left: var(--page-gutter);
+  padding: 16px;
+  color: var(--color-ink);
+  // Its background is the layer below, so it can grow from a small box with
+  // its shadow (src/js/work-menu.js); the content is drawn above it.
+  isolation: isolate;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.work-menu__content {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
-  color: var(--color-ink);
+}
+
+.work-menu__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background: var(--color-white);
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  visibility: hidden;
-  opacity: 0;
+}
 
-  // Keeps the hover while the pointer crosses the gap above the panel.
-  &::before {
-    content: "";
-    position: absolute;
-    right: 0;
-    bottom: 100%;
-    left: 0;
-    height: 42px;
-  }
+// Keeps the hover while the pointer crosses the gap above the panel; on the
+// Work item rather than the panel, whose content is clipped while it grows
+// (src/js/work-menu.js). Only while the panel shows.
+.site-nav__item--work.is-shown::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: var(--page-gutter);
+  left: var(--page-gutter);
+  height: 2.625rem;
 }
 
 .work-menu__brand {
@@ -202,6 +242,16 @@ main {
   margin-right: auto;
 }
 
+// Focus on the hovered category, as in the menu bar: the others dim while
+// the pointer is over the list (its gaps included).
+.work-menu__link {
+  transition: opacity 0.3s ease;
+}
+
+.work-menu__links:is(:hover, :has(:focus-visible)) > li:not(:hover, :has(:focus-visible)) > .work-menu__link {
+  opacity: 0.3;
+}
+
 .work-menu__link {
   display: flex;
   align-items: center;
@@ -209,12 +259,6 @@ main {
   font-weight: 500;
   font-size: fs(14);
   line-height: normal;
-  transition: opacity 0.3s ease-out;
-
-  &:hover,
-  &:focus-visible {
-    opacity: 0.5;
-  }
 }
 
 .work-menu__count {
@@ -264,7 +308,8 @@ main {
     height: 100%;
     max-width: none;
     object-fit: cover;
-    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    // Hover: as the Our Work cards (_work-carousel.scss).
+    transition: transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
   }
 
   // Dark fade at the top (Figma "Card Header", 43px).
@@ -281,7 +326,7 @@ main {
 
   &:hover img,
   &:focus-visible img {
-    transform: scale(1.04);
+    transform: scale(1.06);
   }
 }
 

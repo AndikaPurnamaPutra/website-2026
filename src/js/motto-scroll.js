@@ -1,6 +1,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { designPx } from "./design-px.js";
+import { getSmoothScroll } from "./smooth-scroll.js";
 
 // Pinned Motto + CTA section (Figma storyboard 1527:4259, flow from the user):
 // entry: the Milestone + Motto wrapper turns from light to dark across the whole
@@ -9,14 +10,31 @@ import { designPx } from "./design-px.js";
 //         clock once the step is reached), the ellipse rises;
 // step 2: the line flips to motto 2;   step 3: "believers." turns gradient;
 // step 4: flip to motto 3 and to the CTA label, the glow fades out, Get a
-//         Quote appears;
-// step 5: the whole motto turns gradient; in the short rest after it the
-//         content starts to rise, faster and faster, so it is already moving
-//         with the page when the section releases (user: the long hold before
-//         the footer felt stuck, then let go all at once).
+//         Quote appears; motto 3 stays white (user: no highlight there, so
+//         no step for one); from there the content rises, faster and faster,
+//         so it is already moving with the page when the section releases
+//         (user: the long hold before the footer felt stuck, then let go all
+//         at once).
 // The glow from below follows one smoothed journey (see lightPath).
 // Timing and easing are not in Figma (approved proposal).
 
+// The exit: over the last 0.4 of a screen the content rises faster and
+// faster until it moves with the page as the section releases. The page
+// turns light as it starts (src/js/page-theme.js).
+export const EXIT = 0.4; // of the screen height
+
+// One gesture, one step (see the wheel steps below).
+const QUIET = 180; // ms without wheel events that ends a gesture
+const FLIP_GLIDE = 0.65; // s for a flip (1.1 as sstr.tech, then 0.8, felt slow; user)
+const HIGHLIGHT_GLIDE = 0.4; // s for a step to a highlight
+// The next gesture counts once a step is this far through (at its end, then
+// at 80%, many gestures were lost: at an ordinary pace 11 for 5 steps, and
+// Motto felt long; user).
+const READY = 0.6;
+// Within this share of the screen of a stop counts as on it (the swipe into
+// the section came to rest 39px short of the first stop, and the next gesture
+// was spent getting there, with nothing happening).
+const NEAR = 0.05;
 
 export function initMottoScroll() {
   const section = document.querySelector("[data-motto]");
@@ -27,7 +45,6 @@ export function initMottoScroll() {
   const milestone = wrapper?.querySelector(".milestone__inner");
   const backdrop = section.querySelector(".motto__backdrop");
   const label = section.querySelector(".motto__label");
-  const wrapperTexture = wrapper?.querySelector(".tone-shift__texture");
   const lines = [...section.querySelectorAll(".motto__line")];
   const ellipse = section.querySelector(".motto__ellipse");
   const labelTexts = [...section.querySelectorAll(".motto__label-text")];
@@ -42,31 +59,24 @@ export function initMottoScroll() {
   //   motto 1 → highlight → flip → highlight → flip + CTA → highlight → hold.
   // At 900px high: DWELL ≈200px of stillness before and after each change,
   // a flip over FLIP ≈340px, a highlight fired at a point (it plays on its
-  // own clock, ≈0.8s).
+  // own clock, ≈0.6s).
   const DWELL = 0.22;
   const FLIP = 0.38;
-  // Motto 3 comes with the new label, the diagonal background and the CTA,
-  // so its highlight waits a little longer (user: it came at once).
-  const DWELL_MOTTO3 = 0.35;
   // A highlight played on the way down only reverses once the scroll is back
   // this far above its point, so a small scroll up does not undo it at once.
   const HYSTERESIS = 0.1;
-  // The exit: over the last 0.4 of a screen the content rises faster and
-  // faster until it moves with the page as the section releases.
-  const EXIT = 0.4; // of the screen height
-  // After the last highlight ("One Week Wonders Studio™") the frame holds for
-  // about one scroll (0.3 of a screen) before the exit (user decision).
-  const HOLD = 0.3; // of the screen height
   const highlight1 = DWELL;
   const flip1 = highlight1 + DWELL;
   const highlight2 = flip1 + FLIP + DWELL;
   const flip2 = highlight2 + DWELL;
-  const highlight3 = flip2 + FLIP + DWELL_MOTTO3;
-  // Timeline length: the steps, the hold and the exit.
-  const length = highlight3 + DWELL + HOLD + EXIT;
+  // Motto 3 in place; the exit starts there (its highlight and the hold
+  // after it were dropped, user).
+  const motto3 = flip2 + FLIP;
+  // Timeline length: the steps and the exit.
+  const length = motto3 + EXIT;
   // Calm points (resize keeps the reader on the nearest one): before and
   // after each change.
-  const calm = [highlight1 / 2, highlight1 + DWELL / 2, flip1 + FLIP + DWELL / 2, highlight2 + DWELL / 2, flip2 + FLIP + DWELL_MOTTO3 / 2, highlight3 + DWELL / 2];
+  const calm = [highlight1 / 2, highlight1 + DWELL / 2, flip1 + FLIP + DWELL / 2, highlight2 + DWELL / 2, motto3];
   const smooth = reduceMotion ? "steps(1)" : "power2.inOut";
   const linesBox = section.querySelector(".motto__lines");
   const content = section.querySelector(".motto__inner");
@@ -149,6 +159,7 @@ export function initMottoScroll() {
     // reload further down) it is placed there at once.
     let target = 0;
     const pin = ScrollTrigger.create({
+      id: "motto", // the page turns light again at its end (src/js/page-theme.js)
       trigger: section,
       start: "top top",
       end: () => `+=${window.innerHeight * length}`,
@@ -208,14 +219,15 @@ export function initMottoScroll() {
     };
 
     // Letters change from white to the gradient one after another, left to
-    // right. Unlike the flips, this plays on its own clock (≈0.8s) once the
+    // right. Unlike the flips, this plays on its own clock (≈0.6s) once the
     // scroll passes its point, and plays back when scrolling up past it (less
     // HYSTERESIS), so the wave has the same tempo however one scrolls.
     const gradients = [];
     // before/after: where the flips next to it end and start (the timeline
     // waits there while the wave runs, see follow below).
     const toGradient = (i, at, before, after) => {
-      const each = { duration: 0.35, ease: "power1.out", stagger: { amount: 0.45 } };
+      // ≈0.6s in all (0.8 felt long; user).
+      const each = { duration: 0.3, ease: "power1.out", stagger: { amount: 0.3 } };
       const wave = gsap
         .timeline({ paused: true })
         .to(charGradient[i], { opacity: 1, ...each }, 0)
@@ -308,11 +320,8 @@ export function initMottoScroll() {
     timeline.to(diagonal, { autoAlpha: 1, duration: FLIP }, flip2);
     timeline.to(cta, { autoAlpha: 1, y: 0, duration: 0.6 * FLIP }, flip2 + 0.4 * FLIP);
 
-    toGradient(2, highlight3, flip2 + FLIP, length - EXIT);
-
-    // The calm after the last highlight, the hold and the exit run to the end
-    // of the pin (the exit is below).
-    timeline.to({}, { duration: length - highlight3 }, highlight3);
+    // The exit runs to the end of the pin (below).
+    timeline.to({}, { duration: length - motto3 }, motto3);
 
     // Moves the timeline towards the scroll, softly (like a 0.7s scrub; 1.2s
     // felt heavy, user), but
@@ -358,14 +367,143 @@ export function initMottoScroll() {
       });
     }
 
-    // Entry (before the pin): full-screen light → dark on the wrapper.
+    // One gesture, one step (user; as sstr.tech's section_webgl and About
+    // Principles, src/js/principles-scroll.js): on the wheel, inside the pin,
+    // each new gesture glides the page to the next stop, so a highlight or a
+    // flip always plays in full on its own clock, however small or strong the
+    // scroll (following the scroll, a small one left a flip half done, a
+    // quick one ran past the next step). The stops lie just before and after
+    // each change; the last one, motto 3 in place, at the start of the exit.
+    // Touch screens and the keyboard scroll freely.
+    // A gesture during a glide or a highlight is swallowed, as on sstr.tech,
+    // so each step needs a gesture of its own (user: kept and played after,
+    // a flip sometimes followed a highlight on its own, inconsistent); the
+    // steps ease in and out (sine, as sstr.tech's).
+    // In and out is the reader's own scroll, as everywhere else (user: a
+    // glide of its own there, into the first stop and on to the footer, felt
+    // odd): a swipe into the section is carried on by the smooth scroll and
+    // held softly at the first stop (from above) or the last (from below), as
+    // in About Principles; after the last stop the page scrolls on freely, the
+    // content rising with it.
+    if (!reduceMotion) {
+      const stops = [calm[0], flip1, flip1 + FLIP, flip2, motto3];
+      const placeOf = (time) => pin.start + (time / length) * (pin.end - pin.start);
+      const sineInOut = (t) => -(Math.cos(Math.PI * t) - 1) / 2;
+      let glideEnd = 0;
+      let stepped = false;
+      let lastWheel = 0;
+      let lastStrength = 0;
+      let entry = null; // { target, limit, direction } while scrolling into the section
+      const glide = (top, duration, easing) => {
+        const lenis = getSmoothScroll();
+        entry = null;
+        // Timed here rather than by Lenis' onComplete, which an interrupted
+        // glide may never call.
+        glideEnd = performance.now() + duration * 1000 * READY;
+        if (lenis) lenis.scrollTo(top, { duration, easing, force: true });
+        else window.scrollTo({ top, behavior: "smooth" });
+      };
+      const busy = () =>
+        performance.now() < glideEnd || gradients.some((g) => g.wave.isActive() && (g.wave.reversed() ? 1 - g.wave.progress() : g.wave.progress()) < READY);
+      const scrollNow = () => getSmoothScroll()?.targetScroll ?? window.scrollY;
+
+      // The step from the current place in that direction; false above the
+      // first stop going up and past the last going down (the page scrolls on
+      // freely).
+      const step = (direction) => {
+        const from = scrollNow();
+        const places = stops.map(placeOf);
+        // The next stop that way (the current one if between two).
+        const near = places.findIndex((place) => Math.abs(place - from) < NEAR * window.innerHeight);
+        const next =
+          near >= 0
+            ? near + direction
+            : direction > 0
+              ? places.findIndex((place) => place > from)
+              : places.findLastIndex((place) => place < from);
+        if (next < 0 || next >= stops.length) return false;
+        // Between stops 1 and 2, and 3 and 4, lies a flip; the other steps are
+        // a short move past a highlight's point (the wave plays on its own
+        // clock).
+        const before = near >= 0 ? near : next - direction;
+        glide(places[next], Math.min(before, next) % 2 === 1 ? FLIP_GLIDE : HIGHLIGHT_GLIDE, sineInOut);
+        return true;
+      };
+      // The wheel's own scroll, held back at the entry's limit.
+      const carry = (delta) => {
+        const lenis = getSmoothScroll();
+        const distance = delta * (lenis?.options.wheelMultiplier ?? 1);
+        entry.target = entry.direction > 0 ? Math.min(entry.target + distance, entry.limit) : Math.max(entry.target + distance, entry.limit);
+        if (lenis) lenis.scrollTo(entry.target, { force: true });
+        else window.scrollTo(0, entry.target);
+      };
+
+      const onWheel = (event) => {
+        if (event.ctrlKey || !event.deltaY) return; // pinch zoom
+        const now = performance.now();
+        const strength = Math.abs(event.deltaY);
+        const quiet = now - lastWheel >= QUIET;
+        const stronger = strength > 8 && strength > lastStrength * 1.5;
+        lastWheel = now;
+        lastStrength = strength;
+        const swallow = () => {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        };
+        const sameGesture = !quiet && !stronger;
+        const direction = Math.sign(event.deltaY);
+        if (busy()) {
+          stepped = true;
+          return swallow();
+        }
+        // The rest of the swipe that came into the section.
+        if (entry && sameGesture && direction === entry.direction) {
+          swallow();
+          return carry(event.deltaY);
+        }
+        if (stepped && sameGesture) return swallow();
+        stepped = false;
+        entry = null;
+
+        const from = scrollNow();
+        const to = from + event.deltaY * (getSmoothScroll()?.options.wheelMultiplier ?? 1);
+        if (from >= pin.start && from <= pin.end) {
+          if (!step(direction)) return;
+          swallow();
+          stepped = true;
+        } else if ((from < pin.start && to >= pin.start) || (from > pin.end && to <= pin.end)) {
+          // Into the section: held at the first stop (from above) or the last
+          // (from below).
+          swallow();
+          stepped = true;
+          const places = stops.map(placeOf);
+          entry = { target: from, limit: direction > 0 ? places[0] : places.at(-1), direction };
+          carry(event.deltaY);
+        }
+      };
+      window.addEventListener("wheel", onWheel, { passive: false, capture: true });
+      const cleanupResize = cleanupListeners;
+      cleanupListeners = () => {
+        cleanupResize();
+        window.removeEventListener("wheel", onWheel, { capture: true });
+      };
+    }
+
+    // Entry (before the pin). The wrapper turns dark with the page theme, at
+    // once as Motto comes in (src/js/page-theme.js), its texture with it
+    // (_motto.scss); here, with the scroll, Milestone leaves, the section's
+    // backdrop comes in and motto 1 blurs in.
     // Start values are set here, not with fromTo: ScrollTrigger's refresh
     // reverts fromTo starts that lie ahead of the playhead. Motto 1 blurs in on
     // the lines box, so no line is driven by two timelines (the flips own them).
     if (!reduceMotion && wrapper) {
       wrapper.classList.add("is-toned");
-      gsap.set(wrapper, { backgroundColor: "#ffffff" });
-      gsap.set(wrapperTexture, { opacity: 0 });
+      // The wrapper darkens with the scroll here, over the screen left empty
+      // by Milestone (user: the page theme's switch, 0.35s on its own clock,
+      // turned the whole empty screen from white to black at once, a
+      // flicker); the page theme switches behind it meanwhile, unseen.
+      const tokens = getComputedStyle(document.documentElement);
+      gsap.set(wrapper, { backgroundColor: tokens.getPropertyValue("--color-white").trim() });
       gsap.set(backdrop, { autoAlpha: 0 });
       gsap.set(linesBox, { autoAlpha: 0, y: () => 12 * designPx(), filter: "blur(6px)" });
       gsap.set(label, { autoAlpha: 0, y: () => 8 * designPx() });
@@ -383,12 +521,14 @@ export function initMottoScroll() {
         // light (no dark text over grey), the background darkens slowly, and
         // motto 1 comes in while it does, so the space never reads as empty.
         .to(milestone, { autoAlpha: 0, y: () => -40 * designPx(), duration: 0.45, ease: "sine.inOut" }, 0.05)
-        .to(wrapper, { backgroundColor: "#111111", duration: 0.7 }, 0.25)
-        .to(wrapperTexture, { opacity: 0.1, duration: 0.7 }, 0.25)
+        .to(wrapper, { backgroundColor: tokens.getPropertyValue("--color-ink").trim(), duration: 0.35 }, 0.4)
         .to(backdrop, { autoAlpha: 1, duration: 0.15 }, 0.85)
         // Motto 1 blurs in while the section scrolls in (it is complete before
-        // the pin), as the background turns dark.
-        .to(linesBox, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.5, ease: "power2.out" }, 0.38);
+        // the pin), once the page has turned dark (Motto's top at 37%,
+        // src/js/page-theme.js; timeline time t is Motto's top at 75% − t ×
+        // 75%): white on the light page, it was unseen, then popped into view
+        // at the switch (user: a flicker).
+        .to(linesBox, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.45, ease: "power2.out" }, 0.52);
 
       // The label follows once motto 1 has settled in the center, i.e. when the
       // section pins. It plays on its own clock (the reader rests on step 0

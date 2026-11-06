@@ -14,7 +14,12 @@ const FADE = 1.2; // back to the text colour
 // `element` holds one text node; `gradient` is a CSS gradient for the text.
 export function createGradientWave(element, gradient) {
   const node = element.firstChild;
-  element.style.setProperty("--wave-color", getComputedStyle(element).color);
+  // The text colour at rest: taken from the element, unless its CSS sets
+  // --wave-color (it then follows that, e.g. the page theme on Milestone; a
+  // colour read once stayed white after the page turned light again).
+  if (!getComputedStyle(element).getPropertyValue("--wave-color").trim()) {
+    element.style.setProperty("--wave-color", getComputedStyle(element).color);
+  }
   element.style.setProperty("--wave-gradient", gradient);
 
   const glyphs = [...node.textContent]

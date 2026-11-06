@@ -2,6 +2,8 @@
 // 1516:2442 / 1516:2468. Transition timing is not in Figma (0.3s proposed).
 @use "../abstracts/functions" as *;
 
+$button-sweep: 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+
 .cta {
   display: flex;
   flex-direction: column;
@@ -28,8 +30,69 @@
   border-radius: var(--radius-sm);
 }
 
+// On its own ("More Work", "Send email"): on hover it turns into an outline
+// with dark text, its dark fill swept off to the right and the text changing
+// colour just where the sweep passes (user's pick of the hover trials). The
+// fill (a layer of its own) and the light and dark copies of the text
+// (src/pug/mixins/cta-button.pug) are all cut by one moving edge, a clip
+// with the same timing, so the colour changes exactly at the fill's edge, and
+// the fill stays within the button's round corners (scaled, they were
+// squeezed and its edge fell out of step with the text; user). The outline
+// is an inset line, so nothing moves.
 .button {
+  position: relative;
+  isolation: isolate;
   display: inline-block;
+  color: transparent;
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--color-ink);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--color-ink);
+    // The button's own round corners; the sweep's edge is straight (rounded
+    // too, it left notches against the outline; user).
+    border-radius: inherit;
+    clip-path: inset(0 0 0 0);
+    transition: clip-path $button-sweep;
+  }
+}
+
+.button__light,
+.button__ink {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transition: clip-path $button-sweep;
+}
+
+.button__light {
+  color: var(--color-white);
+  clip-path: inset(0 0 0 0);
+}
+
+.button__ink {
+  color: var(--color-ink);
+  clip-path: inset(0 100% 0 0);
+}
+
+.button:hover,
+.button:focus-visible {
+  &::before {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  .button__light {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  .button__ink {
+    clip-path: inset(0 0 0 0);
+  }
 }
 
 // Small variant: "Send email" in the footer (Figma 1574:1234, Inter Medium
@@ -57,6 +120,9 @@
   img {
     flex-shrink: 0;
     width: fs(32);
+    // Its full size while the box opens and closes: limited to the box (the
+    // reset's max-width: 100%), it was squeezed flat (user).
+    max-width: none;
     height: fs(32);
     margin-left: fs(8);
     // Figma flips the "down-right" arrow vertically, so it points up-right.
@@ -64,11 +130,12 @@
   }
 }
 
-// Space is always reserved so the layout does not shift on hover.
+// Always shown, faint (user; Figma's interaction frames show it on hover
+// only, its Motto frame shows it): it tells why to click, and touch screens
+// have no hover to show it.
 .cta__caption {
   line-height: 1.7;
-  opacity: 0;
-  transition: opacity 0.3s ease-out;
+  opacity: 0.6; // as .text-muted (contrast)
 }
 
 .cta__button:hover,
@@ -81,14 +148,12 @@
   }
 }
 
-.cta__button:hover + .cta__caption,
-.cta__button:focus-visible + .cta__caption {
-  opacity: 0.5;
-}
-
-// Light variant on dark sections (Figma 1527:4247): shown open, as in Figma.
+// Light variant on dark sections (Figma 1527:4247): white on dark. It opens
+// on hover only, as the others do (user; Figma shows it open; opened by the
+// scroll as its step came in, it was dropped).
 .cta--light {
-  .cta__button {
+  .cta__button:hover,
+  .cta__button:focus-visible {
     border-color: var(--color-white);
   }
 
@@ -97,21 +162,17 @@
     background: var(--color-white);
   }
 
-  .cta__icon {
-    width: fs(48);
-    opacity: 1;
-  }
-
   .cta__caption {
     color: var(--color-white);
-    opacity: 0.5;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .cta__button,
   .cta__icon,
-  .cta__caption {
+  .button::before,
+  .button__light,
+  .button__ink {
     transition: none;
   }
 }

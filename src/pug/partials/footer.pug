@@ -16,12 +16,16 @@ footer.site-footer
     a.site-footer__logo(href="index.html" aria-label="One Week Wonders — Home")
       img(src="assets/images/logo.svg" width="50.25" height="24" alt="")
 
-    img.site-footer__coin(src="assets/images/hero/coin.png" width="366" height="344" alt="")
+    img.site-footer__coin(src="assets/images/hero/coin.webp" width="366" height="344" alt="")
 
     form.site-footer__form(action="mailto:owwstudio@gmail.com" method="get" data-footer-form)
-      label.site-footer__label(for="footer-company") Get in Touch
-      input#footer-company.site-footer__input(type="text" name="subject" placeholder="Your company name" autocomplete="organization" required)
-      button.button.button--small(type="submit") Send email
+      label.site-footer__label(for="footer-email") Get in Touch
+      //- The visitor's email (user; it was the company name), shown as an
+      //- example address (user's pick). Named "subject"
+      //- so the form's own mailto: (without JS) puts it in the subject.
+      input#footer-email.site-footer__input(type="email" name="subject" placeholder="you@company.com" autocomplete="email" required)
+      button.button.button--small(type="submit")
+        +buttonText("Send email")
 
     nav.site-footer__columns(aria-label="Footer")
       each column in columns

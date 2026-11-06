@@ -5,8 +5,8 @@ extends ../layouts/default
 //- (user decision): src/js/contact-form.js only plays its states.
 //- Figma typos fixed (user decision): "Partnership", Email placeholder,
 //- "$10K - $20K USD".
-block title
-  | Contact — OWW
+block meta
+  +pageMeta("Contact — OWW", "Tell us about your project: your goals, timeline and budget. Or schedule a free 15-minute call with One Week Wonders Studio™ in Yogyakarta, Indonesia.", "contact.html")
 
 block content
   -
@@ -44,7 +44,7 @@ block content
         each option in options
           label.contact-form__chip
             input(type=type name=name value=option)
-            span= option
+            span(data-text=option)= option
 
   section.contact
     .container.contact__inner
@@ -54,14 +54,16 @@ block content
             h1.text-heading-42 We’d love to hear from you. Tell us all the things.
             p.contact__lead Have an ambitious idea or a product ready to scale? Tell us about your goals, timeline, and vision—we’ll help you bring it to life.
           .contact__cta
-            a.button.text-18(href="#") Schedule a call
+            a.button.text-18(href="#")
+              +buttonText("Schedule a call")
             p.contact__cta-caption Free 15min call
 
         .contact__office
-          img.contact__office-image(src="assets/images/contact/office.jpg" width="210" height="122" alt="")
+          img.contact__office-image(src="assets/images/contact/office.webp" width="210" height="122" alt="")
           .contact__office-info
-            a.contact__office-link(href=mapsUrl target="_blank" rel="noopener")
-              | Office HQ
+            //- Its hover: src/js/contact-office.js and _contact.scss.
+            a.contact__office-link(href=mapsUrl target="_blank" rel="noopener" data-office-link)
+              span.contact__office-text Office HQ
               span.contact__office-arrow
                 img(src="assets/icons/arrow-down-right.svg" width="9.5" height="9.5" alt="")
             p.contact__address
@@ -135,10 +137,11 @@ block content
 
         .contact-form__divider
         //- Placeholder until Cloudflare Turnstile is set up (user decision).
-        img.contact-form__turnstile(src="assets/images/contact/turnstile-placeholder.png" width="297" height="63" alt="")
+        img.contact-form__turnstile(src="assets/images/contact/turnstile-placeholder.webp" width="297" height="63" alt="")
 
         .contact-form__submit-row
-          button.contact-form__submit(type="submit")
+          //- data-label: the light copy its hover sweeps in (_contact.scss).
+          button.contact-form__submit(type="submit" data-label="Submit")
             span(data-submit-label) Submit
             img.contact-form__submit-check(src="assets/icons/check.svg" width="20" height="20" alt="" hidden)
           p.contact-form__privacy Your details are safe with us. By sending this, you agree to our #[a(href="privacy-policy.html") Privacy Policy].
@@ -148,11 +151,11 @@ block content
 
     //- Endless marquee pushed by the scroll, stops on hover (src/js/marquee.js,
     //- user decisions).
-    .contact-gallery(data-marquee="pause scroll" data-marquee-speed="60")
+    .contact-gallery(data-marquee="pause scroll" data-marquee-speed="75" data-marquee-push="1.5" data-marquee-max="1500")
       .contact-gallery__track(data-marquee-track)
         each item, i in gallery
           a.contact-gallery__item(href="#" style=`--w: ${item.size[0]}; --h: ${item.size[1]}`)
             span.contact-gallery__media
-              img(src=`assets/images/contact/gallery-${i + 1}.jpg` width=item.size[0] height=item.size[1] alt="")
+              img(src=`assets/images/contact/gallery-${i + 1}.webp` width=item.size[0] height=item.size[1] alt="" loading="lazy")
             span.contact-gallery__title.text-13
               span= item.title

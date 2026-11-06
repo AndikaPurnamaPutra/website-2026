@@ -1,8 +1,8 @@
 //- Temporary page for checking design tokens in the browser. Not linked from other pages.
 extends ../layouts/default
 
-block title
-  | Styleguide — OWW
+block meta
+  +pageMeta("Styleguide — OWW", "The design system of the One Week Wonders Studio™ website: type, colours, spacing and components.", "styleguide.html", { noindex: true })
 
 block content
   div(style="padding: var(--page-gutter); display: grid; gap: var(--space-60);")
