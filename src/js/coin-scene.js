@@ -212,12 +212,17 @@ export function mountCoin(anchors, fallback) {
       // video fills the screen (showreel centred, src/js/hero-showreel.js),
       // where that cannot be seen, and comes back there on the way up.
       // On touch screens and below the laptop width the showreel does not
-      // grow (src/js/hero-showreel.js), so the coin only fades with the scroll.
-      const box = touch || window.innerWidth < 1024 ? null : showreel?.getBoundingClientRect();
-      const covered = box ? box.top + box.height / 2 - screen / 2 + window.scrollY : Infinity;
+      // grow (src/js/hero-showreel.js): there it goes as it sinks behind the
+      // showreel's top edge, fading over the last stretch (it moves down
+      // 1 + HERO_DOWN px per px of scroll relative to the page), else it came
+      // out again below the showreel, over the next section (user report).
+      // Its Figma place with the page at the top (document place - scroll 0).
+      const at = rest(anchors.hero);
+      const reel = showreel?.getBoundingClientRect();
+      const grows = !touch && window.innerWidth >= 1024;
+      const covered = !reel ? Infinity : grows ? reel.top + reel.height / 2 - screen / 2 + window.scrollY : (reel.top - at.box.top) / (1 + HERO_DOWN);
+      const sinking = grows ? 0 : span(scroll / covered, 0.6, 1);
       if (s < 1.2 && scroll < covered) {
-        // Its Figma place with the page at the top (document place - scroll 0).
-        const at = rest(anchors.hero);
         const top = at.y + window.scrollY;
         // On load: comes down from above, growing from small to its size
         // while half a flip slows to a stop (user decision), then rests in
@@ -233,7 +238,7 @@ export function mountCoin(anchors, fallback) {
           zoom: at.zoom * (INTRO_SCALE + (1 - INTRO_SCALE) * enter),
           tilt: FLIP * turn + FLIP * (1 - enter),
           // With the preloader it fades in (src/js/coin-motion.js).
-          opacity: span(intro, 0, 0.25) * (1 - span(s, 0.95, 1.2)) * coinMotion.fade,
+          opacity: span(intro, 0, 0.25) * (1 - span(s, 0.95, 1.2)) * (1 - sinking) * coinMotion.fade,
         };
       }
     }
