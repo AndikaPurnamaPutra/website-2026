@@ -66,13 +66,14 @@ export function mountCoin(anchors, fallback) {
   stage.setAttribute("aria-hidden", "true");
   document.body.prepend(stage);
 
-  // Touch screens (phones, tablets): no antialiasing and a 1× canvas, so the
-  // full-screen drawing stays light beside the showreel video (user report:
-  // the showreel stuttered while scrolling on a phone).
+  // Touch screens (phones, tablets): a 2× canvas with antialiasing (user
+  // report: at 1× without it the coin looked pixelated on an iPhone 13, a 3×
+  // screen). It had been lowered while the showreel grew with the scroll on
+  // phones and stuttered; it no longer grows there.
   const touch = window.matchMedia("(hover: none)").matches;
   let renderer;
   try {
-    renderer = new THREE.WebGLRenderer({ antialias: !touch, alpha: true, powerPreference: "high-performance" });
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
   } catch {
     stage.remove();
     fallback();
@@ -81,7 +82,7 @@ export function mountCoin(anchors, fallback) {
   // The canvas covers the whole screen and is drawn every frame while the
   // coin shows: 1.5× (not 2×) keeps Retina screens at a steady frame rate,
   // with no visible loss on the soft metal.
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, touch ? 1 : 1.5));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, touch ? 2 : 1.5));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 0.35;

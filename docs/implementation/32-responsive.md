@@ -639,6 +639,16 @@ sama (selisih 8 piksel di titik dua jam yang berkedip).
 - [x] Disetujui ("ya", 9 Nov 2026).
 - [x] Dikerjakan dan dicek.
 
+## Koin 3D tajam di layar sentuh (laporan pengguna 9 Nov 2026)
+
+iPhone 13: koin 3D "pecah / pixelated". Sebab: langkah 7b menggambarnya 1×
+tanpa antialiasing di layar sentuh (untuk meringankan showreel yang saat itu
+membesar dan patah-patah); iPhone 13 berlayar 3×. Showreel tidak lagi
+membesar di layar sentuh, jadi kanvas dikembalikan ke 2× dengan antialiasing
+(`coin-scene.js`; desktop tetap 1,5×). Diuji di iPhone pengguna: tepi dan
+logo halus (screenshot sebelum/sesudah), 60 fps diam dan saat digulir (frame
+terlama 19–20 ms), kanvas 780px.
+
 ## Langkah 4 — About (usulan 9 Nov 2026, menunggu persetujuan)
 
 Kondisi (screenshot 390 dan 834): halaman bisa digeser ke samping di HP dan
