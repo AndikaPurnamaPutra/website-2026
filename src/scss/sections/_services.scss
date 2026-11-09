@@ -168,12 +168,11 @@
   width: fs(305);
 }
 
-// Tablet and phones (plan 32, step 3c; no Figma): the section flows, with no
-// pin and no steps (src/js/services-scroll.js runs from 1024 up only). The
+// Phones (plan 32, step 3c; no Figma): the section flows, with no pin and
+// no steps (src/js/services-scroll.js runs from the tablet width up). The
 // cards and the pictures become cells of one grid, in turn: each card, then
-// its picture (the markup keeps them in two groups for the desktop). Phones
-// in one column; tablets with the card beside its picture.
-@include below-laptop {
+// its picture, 4:3 (the markup keeps them in two groups for the desktop).
+@include mobile {
   .services__inner {
     display: grid;
     grid-template-columns: 1fr;
@@ -204,9 +203,11 @@
     }
   }
 
+  // The card's parts closer together than the desktop's 32 (user).
   .services__card:nth-child(n) {
     position: static;
     z-index: auto;
+    gap: fs(24);
     width: auto;
     opacity: 1;
     visibility: visible;
@@ -243,28 +244,28 @@
   }
 }
 
+// Tablet (plan 32, step 3f; user decision: as the desktop, sized for the
+// tablet): the pinned section with its steps, the cards across the content
+// width at the top (the deck behind them as on the desktop), the picture
+// filling the screen below them, the note under the picture.
 @include tablet {
-  .services__inner {
-    grid-template-columns: fluid(320) 1fr;
-    column-gap: fluid(24);
-    row-gap: fluid(32);
-    align-items: start;
+  .services__card {
+    left: var(--page-gutter);
+    width: calc(100% - 2 * var(--page-gutter));
   }
 
-  .services__label,
+  // Below the cards (top 98 + card ≤ 300 + the deck's 32 + 10) and above the
+  // note (40 + three lines + 24).
+  .services__media {
+    inset: fluid(440) var(--page-gutter) fluid(130) var(--page-gutter);
+  }
+
+  .services__fade {
+    width: 100%;
+  }
+
   .services__note {
-    grid-column: 1 / -1;
-  }
-
-  .services__media .services__image {
-    margin-bottom: 0;
-  }
-}
-
-// Phones: the card's parts closer together (32 read loose on a small screen;
-// user, 9 Nov 2026).
-@include mobile {
-  .services__card:nth-child(n) {
-    gap: fs(24);
+    width: auto;
+    max-width: fs(420);
   }
 }

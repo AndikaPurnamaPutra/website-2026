@@ -48,15 +48,17 @@ const DECK = [
 ];
 
 
-// Only from the laptop width up (plan 32, step 3c): below it the section
-// flows, cards and pictures one after another (_services.scss), with no pin
-// and no steps. gsap.matchMedia sets the pin up and takes it down as the
-// width crosses 1024 (an iPad turned round).
+// From the tablet width up (plan 32, steps 3c and 3f; user decision: on
+// tablets as the desktop, sized for them): on phones the section flows, cards
+// and pictures one after another (_services.scss), with no pin and no steps.
+// gsap.matchMedia sets the pin up and takes it down as the width crosses
+// 744 (a phone turned sideways). The sticky-stack alternative for tablets
+// is kept on the branch services-tablet/stack.
 export function initServicesScroll() {
   const section = document.querySelector("[data-services]");
   if (!section) return () => {};
   const media = gsap.matchMedia();
-  media.add("(min-width: 1024px)", () => setup(section));
+  media.add("(min-width: 744px)", () => setup(section));
   return () => media.revert();
 }
 

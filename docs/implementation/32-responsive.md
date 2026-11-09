@@ -383,6 +383,35 @@ Home — ini penyebab terakhir), logo terbaca, kartu utuh dan marquee jalan;
       kolom (68×20 BenQ di 390), kartu 300×260; 744 dan 834 logo 3 kolom,
       kartu 400; 1440 identik piksel.
 
+## Langkah 3f — Services di tablet (pengguna, 9 Nov 2026)
+
+Pengguna: Services dua kolom di tablet tidak disukai; satu kolom (kartu lalu
+gambar 16:9) "terlalu monoton"; di iPad Pro "sangat rusak" (bagian mana belum
+dijawab). Dua versi dibuat untuk dibandingkan di iPad:
+
+1. **Tumpukan sticky** (pilihan A), di branch `services-tablet/stack`
+   (commit "Services on tablets and touch screens, variant: a sticky stack"):
+   tiap layanan satu ubin (kartu di atas gambar 16:9) yang menempel dekat
+   atas layar, ubin berikutnya naik menutupinya; murni CSS; di layar sentuh
+   lebar kartu di samping gambar; pin hanya di layar hover ≥ 1024;
+   `overflow-anchor: none` di section (Chrome melompat saat kartu menempel).
+2. **Seperti desktop, ukuran tablet** (permintaan pengguna berikutnya), di
+   `responsive/plan`: pin dan langkah aktif dari **744 ke atas**
+   (`gsap.matchMedia("(min-width: 744px)")`), termasuk layar sentuh; di
+   tablet kartu selebar konten di atas (tumpukan kartu di belakangnya seperti
+   desktop), gambar mengisi dari 440 sampai 130 dari bawah, catatan di bawah
+   gambar, fade selebar konten. HP (< 744) tetap mengalir (kartu lalu gambar
+   4:3, jarak dalam kartu 24).
+   Dicek (Chrome headless, sentuh, animasi): 834×1194 dan 744×1000 ter-pin,
+   kartu berganti, tirai gambar, langkah terakhir memenuhi section; 390
+   mengalir; 1440 identik piksel.
+   Risiko: efek yang diikat ke scroll di Safari iPad (lihat showreel di
+   iPhone); kartu punya pengejaran halus sendiri sehingga lebih tersamar.
+   Dipastikan oleh pengguna di iPad.
+
+- [x] Kedua versi dibuat dan di-push.
+- [ ] Pengguna memilih di iPad; yang tidak dipilih dihapus atau diarsipkan.
+
 ## Langkah 7a — Preloader di HP (disetujui dan dikerjakan 9 Nov 2026)
 
 Keluhan pengguna: preloader terasa lama sekali di HP. Sebab: preloader
