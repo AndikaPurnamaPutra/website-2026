@@ -1,5 +1,6 @@
 // Figma: Section-03 1523:3292 (static) and storyboard 1516:2229 (scroll steps).
 @use "../abstracts/functions" as *;
+@use "../abstracts/breakpoints" as *;
 
 // Follows the page theme (docs/implementation/21-page-theme.md): light as it
 // comes up, dark from the switch on (src/js/page-theme.js), as the coming
@@ -165,4 +166,97 @@
   left: var(--page-gutter);
   z-index: 1;
   width: fs(305);
+}
+
+// Tablet and phones (plan 32, step 3c; no Figma): the section flows, with no
+// pin and no steps (src/js/services-scroll.js runs from 1024 up only). The
+// cards and the pictures become cells of one grid, in turn: each card, then
+// its picture (the markup keeps them in two groups for the desktop). Phones
+// in one column; tablets with the card beside its picture.
+@include below-laptop {
+  .services__inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: fluid(16);
+    height: auto;
+    padding: fluid(40) var(--page-gutter) fluid(60);
+    overflow: visible;
+  }
+
+  .services__label {
+    position: static;
+    margin-bottom: fluid(24);
+  }
+
+  .services__cards,
+  .services__media {
+    display: contents;
+  }
+
+  // Card n before picture n.
+  @for $i from 1 through 5 {
+    .services__card:nth-child(#{$i}) {
+      order: $i * 2 - 1;
+    }
+
+    .services__image:nth-child(#{$i}) {
+      order: $i * 2;
+    }
+  }
+
+  .services__card:nth-child(n) {
+    position: static;
+    z-index: auto;
+    width: auto;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    clip-path: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .services__media .services__image {
+    position: static;
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    margin-bottom: fluid(32);
+    border-radius: var(--radius-sm);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  // No steps, so nothing to fade; the link over the pictures (its targets
+  // still placeholders) waits for the service pages.
+  .services__fade,
+  .services__link {
+    display: none;
+  }
+
+  .services__note {
+    position: static;
+    order: 99;
+    width: auto;
+    max-width: fs(305);
+  }
+}
+
+@include tablet {
+  .services__inner {
+    grid-template-columns: fluid(320) 1fr;
+    column-gap: fluid(24);
+    row-gap: fluid(32);
+    align-items: start;
+  }
+
+  .services__label,
+  .services__note {
+    grid-column: 1 / -1;
+  }
+
+  .services__media .services__image {
+    margin-bottom: 0;
+  }
 }

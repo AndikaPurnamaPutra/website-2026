@@ -228,6 +228,68 @@ dengan ")" di baris sendiri (dibiarkan; teks Figma).
       (sentuh, dengan animasi) section ter-pin (top tetap 146 dari scroll
       1350) dan tinta mengalir sampai penuh.
 
+## Langkah 3c — Services (disetujui dan dikerjakan 9 Nov 2026)
+
+Kondisi: section setinggi layar yang di-pin; kartu-kartu bertumpuk di kiri
+(absolut, 345px), gambar/video di kanan (absolut, dari x = 385), tiap langkah
+scroll mengganti kartu dan gambar, langkah terakhir memperbesar gambar. Di
+834 gambar terdesak ke kolom sempit; di 390 gambar keluar layar (hanya kartu
+pertama dan catatan yang terlihat). Keputusan 3: di HP Services mengalir
+(kartu + gambar), tidak di-pin.
+
+**Tablet dan HP (< 1024): mengalir, tanpa pin dan tanpa langkah.**
+```
+(What we do)
+[Kartu Branding: judul, garis, tag, teks]
+[gambar/video Branding 4:3]
+[Kartu Brand Strategy]            ← HP: satu kolom, kartu lalu gambarnya,
+[video Brand Strategy]               16 di antaranya, 48 antar layanan
+… (5 layanan)
+Catatan "Visual trends evolve…"
+
+Tablet: dua kolom per layanan, kartu kiri (320) | gambar kanan (sisa, 4:3),
+        baris-baris berjarak 32; label dan catatan selebar dua kolom.
+```
+- Kartu: statis, lebar kolom, isi dan ukuran teks tetap (judul 28, tag 14,
+  teks 14); tanpa backdrop blur (latar sudah polos; hemat di HP). Tanpa
+  tumpukan kartu di belakang (deck) karena tidak ada langkah.
+- Gambar dan video: statis, lebar kolom, rasio 4:3, sudut 4px; video tetap
+  diputar hanya saat terlihat (`inview-videos.js`).
+- Tema halaman tetap berganti gelap saat Services datang dan terang menjelang
+  Our Work (`page-theme.js` sudah punya jalur tanpa pin).
+- Header: atribut `data-header-hide` menyembunyikan header selama section di
+  layar; dibiarkan (header memang sembunyi saat scroll turun).
+- Link di atas gambar (`.services__link`, tujuan masih `#`) disembunyikan di
+  tata letak mengalir; saat halaman layanan ada, tiap gambar bisa dibungkus
+  link sendiri.
+- Tidak ada animasi masuk di tata letak mengalir (tidak menambah animasi).
+
+**Desktop dan laptop (≥ 1024):** tidak berubah.
+
+**Cara:**
+- `_services.scss`, `@include below-laptop`: `.services__inner` jadi grid
+  (tinggi auto, padding 40 / gutter / 60), `.services__cards` dan
+  `.services__media` `display: contents`, urutan kartu–gambar berselang
+  dengan `order` (kartu ke-n: 2n−1, gambar ke-n: 2n), kartu dan gambar statis
+  (transform, clip-path, opacity, visibility direset), fade dan link
+  disembunyikan, label dan catatan statis. `@include tablet`: dua kolom.
+- `services-scroll.js`: seluruh pin/langkah dibungkus
+  `gsap.matchMedia().add("(min-width: 1024px)", …)`, jadi di bawah 1024 tidak
+  jalan dan kelas `is-enhanced` tidak dipasang; saat iPad diputar (834 ↔
+  1194) ia dipasang/dilepas sendiri. Tanpa perubahan Pug/konten.
+
+**Cek:** 320, 390, 744, 834 (urutan kartu–gambar, rasio, tidak ada scroll
+samping, video jalan saat terlihat), tema gelap→terang di 390, 1024 dan 1440
+tidak berubah (pin dan langkah tetap), putar dari 834 ke 1194 (pin terpasang).
+
+- [x] Disetujui ("ya", 9 Nov 2026).
+- [x] Dikerjakan dan dicek (Chrome headless): 390, 744, 834 urutan
+      kartu–gambar berselang (CICICICICI), gambar 4:3, tidak melebihi layar,
+      `is-enhanced` tidak terpasang; 1440 identik piksel; 1024 dan 1440 dengan
+      animasi tetap ter-pin dan melangkah; di 390 tema gelap saat Services
+      datang dan terang di Our Work; 834 → 1194 → 834 pin terpasang dan
+      dilepas sendiri (tinggi inner 2025 → 834 → 2025).
+
 ## Langkah 7a — Preloader di HP (disetujui dan dikerjakan 9 Nov 2026)
 
 Keluhan pengguna: preloader terasa lama sekali di HP. Sebab: preloader
