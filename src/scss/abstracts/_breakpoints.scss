@@ -46,3 +46,12 @@ $desktop: 1280px;
     @content;
   }
 }
+
+// Mobile and tablet layouts, or a touch screen of any width (an iPad Pro
+// turned sideways is 1194 or 1366 wide): where scroll-driven sections flow
+// instead.
+@mixin below-laptop-or-touch {
+  @media (max-width: #{$laptop - 0.02px}), (hover: none) {
+    @content;
+  }
+}

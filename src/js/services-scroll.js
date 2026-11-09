@@ -48,17 +48,21 @@ const DECK = [
 ];
 
 
-// From the tablet width up (plan 32, steps 3c and 3f; user decision: on
-// tablets as the desktop, sized for them): on phones the section flows, cards
-// and pictures one after another (_services.scss), with no pin and no steps.
-// gsap.matchMedia sets the pin up and takes it down as the width crosses
-// 744 (a phone turned sideways). The sticky-stack alternative for tablets
-// is kept on the branch services-tablet/stack.
+// The pin and its steps on hover-capable screens from the laptop width up
+// (plan 32, steps 3c and 3f). Below that width, and on every touch screen
+// (an iPad Pro sideways is 1194 or 1366 wide, and its browser reports the
+// scroll to scripts only now and then, so steps tied to it lagged; user),
+// the section flows, cards and pictures one after another (_services.scss),
+// with no pin and no steps. gsap.matchMedia switches as the width crosses
+// 1024. Tried for tablets and turned down by the user, 9 Nov 2026: the
+// desktop pin sized for the tablet, a sticky stack (branch
+// services-tablet/stack), and the flow with the desktop's deck and arrival
+// motion; tablets follow the phone.
 export function initServicesScroll() {
   const section = document.querySelector("[data-services]");
   if (!section) return () => {};
   const media = gsap.matchMedia();
-  media.add("(min-width: 744px)", () => setup(section));
+  media.add("(min-width: 1024px) and (hover: hover)", () => setup(section));
   return () => media.revert();
 }
 
