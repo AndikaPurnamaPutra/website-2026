@@ -670,6 +670,15 @@ terlama 19–20 ms), kanvas 780px.
    untuk dorongan showreel. Desktop tetap kanvas layar penuh. Diuji di
    iPhone: koin di tempatnya saat diam, setelah 250px, dan di footer; 60 fps
    (frame terlama 35 ms saat digulir).
+   Pengguna: "hanya berputar-putar", ingin gerak seperti desktop. Gerak
+   desktop dikembalikan di atas kanvas di halaman: posisi = tempatnya di
+   halaman (bergulir sendiri) + selisih gerak desktop dari tempat itu
+   (turun lebih lambat dan tenggelam ke showreel di hero; jatuh dari balik
+   Motto di footer), selisih itu dihaluskan ±80 ms (`drift`) karena
+   laporan scroll iOS terlambat dan tak rata; ruang kanvas diperluas untuk
+   gerak itu (hero 0,6 layar ke bawah, footer `DROP` ke atas). Dicek di
+   Chrome (sentuh, 390×699): tenggelam di hero setelah 100px, jatuh dari
+   balik Motto di footer.
 
 ## Langkah 4 — About (usulan 9 Nov 2026, menunggu persetujuan)
 

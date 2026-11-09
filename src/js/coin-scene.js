@@ -227,10 +227,8 @@ export function mountCoin(anchors, fallback) {
       const at = rest(anchors.hero);
       const reel = showreel?.getBoundingClientRect();
       const grows = !touch && window.innerWidth >= 1024;
-      // On touch screens the coin stays on its place on the page (see
-      // placeOnPage), so it never sinks behind the showreel there.
-      const covered = !reel || touch ? Infinity : grows ? reel.top + reel.height / 2 - screen / 2 + window.scrollY : (reel.top - at.box.top) / (1 + HERO_DOWN);
-      const sinking = grows || touch ? 0 : span(scroll / covered, 0.6, 1);
+      const covered = !reel ? Infinity : grows ? reel.top + reel.height / 2 - screen / 2 + window.scrollY : (reel.top - at.box.top) / (1 + HERO_DOWN);
+      const sinking = grows ? 0 : span(scroll / covered, 0.6, 1);
       if (s < 1.2 && scroll < covered) {
         const top = at.y + window.scrollY;
         // On load: comes down from above, growing from small to its size
@@ -243,7 +241,8 @@ export function mountCoin(anchors, fallback) {
         const turn = sine(span(s, 0, 1.1));
         return {
           x: at.x,
-          y: touch ? at.y - screen * INTRO_DROP * (1 - enter) : top - screen * INTRO_DROP * (1 - enter) + scroll * HERO_DOWN,
+          y: top - screen * INTRO_DROP * (1 - enter) + scroll * HERO_DOWN,
+          place: at.y,
           where: "hero",
           zoom: at.zoom * (INTRO_SCALE + (1 - INTRO_SCALE) * enter),
           tilt: FLIP * turn + FLIP * (1 - enter),
@@ -269,7 +268,7 @@ export function mountCoin(anchors, fallback) {
       const max = tall && atEnd < LAND * screen ? Math.max(pageEnd - (LAND * screen - atEnd), 0) : pageEnd;
       if (scroll > max) {
         faceUs(true);
-        return { x: at.x, y: at.y, zoom: at.zoom, tilt: FLIP * (1.5 + 0.5 * facing.value), opacity: 1, where: "footer" };
+        return { x: at.x, y: at.y, place: at.y, zoom: at.zoom, tilt: FLIP * (1.5 + 0.5 * facing.value), opacity: 1, where: "footer" };
       }
       const left = (max - scroll) / screen;
       const arrive = 1 - clamp(left);
@@ -298,9 +297,8 @@ export function mountCoin(anchors, fallback) {
         const turn = 0.5 * sine(descent) + 0.5 * facing.value;
         return {
           x: at.x,
-          // On touch screens on its place on the page (no drop: a position
-          // tied to the scroll lags behind the page there).
-          y: touch ? at.y : end - screen * DROP * (1 - settle),
+          y: end - screen * DROP * (1 - settle),
+          place: at.y,
           where: "footer",
           zoom: at.zoom,
           tilt: FLIP * (1 + turn),
@@ -382,8 +380,16 @@ export function mountCoin(anchors, fallback) {
 
     let px = p.x;
     let py = p.y;
-    // From the screen to the canvas on the page.
-    if (touch) py = p.y + window.scrollY - placedTop;
+    // From the screen to the canvas on the page: its place on the page (which
+    // scrolls with it), plus how far the motion takes it from there, eased
+    // a little (about 80 ms): that part follows the scroll, which the
+    // phone's browser reports to scripts late and unevenly.
+    if (touch) {
+      const offset = p.y - p.place;
+      drift += (offset - drift) * (justPlaced ? 1 : 1 - Math.exp(-dt * 12));
+      justPlaced = false;
+      py = p.place + window.scrollY - placedTop + drift;
+    }
     const width = view.w;
     const height = view.h;
     camera.setViewOffset(width, height, width / 2 - px, height / 2 - py, width, height);
@@ -403,6 +409,8 @@ export function mountCoin(anchors, fallback) {
   // where the coin hangs before it is pushed up (src/js/preloader.js).
   let placed = null;
   let placedTop = 0;
+  let drift = 0;
+  let justPlaced = false;
   let placedPreloading = false;
   const preloading = () => document.documentElement.classList.contains("is-preloading");
   const placeOnPage = (where) => {
@@ -412,8 +420,11 @@ export function mountCoin(anchors, fallback) {
     const pushed = gsap.getProperty(picture, "y") || 0;
     const top = rect.top - pushed + window.scrollY;
     placedPreloading = preloading();
-    const above = (where === "hero" ? INTRO_DROP * window.innerHeight : 0) + rect.height;
-    const below = rect.height + (placedPreloading ? window.innerHeight : 0);
+    // Room for the motion: in the hero the drop on load above and the sink
+    // as the page scrolls below; in the footer the drop from above.
+    const screen = window.innerHeight;
+    const above = (where === "hero" ? INTRO_DROP : DROP) * screen + rect.height;
+    const below = rect.height + (where === "hero" ? 0.6 * screen : 0) + (placedPreloading ? screen : 0);
     placedTop = Math.max(0, top - above);
     const bottom = top + rect.height + below;
     view.w = document.documentElement.clientWidth;
@@ -422,6 +433,7 @@ export function mountCoin(anchors, fallback) {
     renderer.setSize(view.w, view.h);
     camera.aspect = view.w / view.h;
     placed = where;
+    justPlaced = true;
   };
 
   const onResize = () => {
