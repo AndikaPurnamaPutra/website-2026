@@ -261,6 +261,14 @@ yang paling mungkin, khusus layar sentuh (`hover: none`), desktop tak berubah:
   desktop 1440 identik piksel dengan acuan. Yang menentukan: cek di HP
   pengguna.
 
+- Masih patah di HP pengguna (iPhone 13, Safari). Keputusan pengguna
+  (pilihan 1): **di layar sentuh showreel tidak membesar saat scroll**; tetap
+  di kotaknya, ketuk membuka pop-up. Safari menggulir sendiri dan melaporkan
+  posisi ke skrip hanya sesekali, jadi pembesaran yang diikat ke scroll
+  selalu tertinggal. Koin lalu memudar mengikuti scroll saja (tidak lagi
+  sembunyi saat video memenuhi layar). Sudut clip dan tinggi `100lvh` untuk
+  sentuh dicabut lagi (tidak terpakai). Dicek: sentuh 390 tanpa transform
+  dan clip, koin sembunyi di scroll ±1000; desktop 1440 masih membesar.
 - [ ] Dicek di HP pengguna (showreel halus, koin tampil atau gambar
       penggantinya).
 
