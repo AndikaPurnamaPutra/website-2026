@@ -493,6 +493,52 @@ melebihi layar), 1440 identik; odometer di 390 dengan animasi.
       470 lebar, tidak melebihi layar; 1440 identik piksel; odometer di 390
       mendarat di $139M+, 120+, 8.
 
+## Langkah 3h — Motto (disetujui dan dikerjakan 9 Nov 2026)
+
+Kondisi: section setinggi layar yang di-pin dengan 5 langkah (motto 1 →
+sorot → balik → sorot → balik + CTA); teks aksen digambar per huruf lewat
+salinan absolut yang hanya diberi posisi horizontal (`--x`), sehingga baris
+motto dipaksa satu baris (`nowrap`, 42px). Blok isi 1050 × 664 dengan jarak
+254. Di 390 baris motto 900px lebar → terpotong kiri-kanan (hanya "…tting
+Design, Grounded…" yang terlihat); di 834 juga terpotong (1122). Keputusan 3:
+Motto tetap di-pin di HP (teks). Langkah per gestur roda hanya mouse; di
+layar sentuh langkahnya mengikuti scroll seperti Statement.
+
+**Tablet dan HP (< 1024):** tetap di-pin dengan langkah yang sama.
+- Baris motto **membungkus**, rata tengah: tablet 36px, HP 28px (motto
+  terpanjang "Design to advocates and investors into believers." jadi 2
+  baris di 770 dan 2–3 baris di 350). Ketiga motto berbagi satu sel grid dan
+  masing-masing dipusatkan vertikal (tinggi beda saat membungkus).
+- Blok isi selebar konten (bukan 1050), tinggi mengikuti isi, jarak label →
+  motto → tombol 96 (tablet) / 64 (HP); isi tetap di tengah layar.
+- Glow (elips 1440 lebar) dibiarkan, terpotong oleh `overflow: hidden`.
+
+**JS (`motto-scroll.js`):** `measure()` juga menyimpan posisi vertikal tiap
+huruf (`--y`, em) dan dipanggil lagi pada `refreshInit`/`restoreStep`
+(perubahan lebar, rotasi iPad), supaya salinan per huruf mengikuti baris
+yang membungkus; CSS `.motto__glyph { top: var(--y, 0) }`. Desktop tidak
+berubah (`--y` = 0 di satu baris).
+
+**Desktop dan laptop (≥ 1024):** tidak berubah.
+
+**Cek:** 320, 390, 744, 834 teks di dalam layar; di 390 dengan animasi:
+pin, sorot gradien per huruf di baris yang membungkus (screenshot di
+tengah langkah 1 dan 3), balik ke motto 2 dan 3, tombol muncul; rotasi 834 ↔
+1194 posisi huruf diukur ulang; 1440 identik piksel.
+
+Catatan pengerjaan: `--y` diukur relatif terhadap huruf pertama baris
+(bukan tepi atas blok; kotak huruf menggantung setengah leading di bawahnya,
+dan diukur dari blok salinan turun beberapa piksel di desktop).
+
+- [x] Disetujui ("ya", 9 Nov 2026).
+- [x] Dikerjakan dan dicek (Chrome headless): 320 / 390 / 744 / 834 baris
+      membungkus (2–3 / 2–2–1 / 1–2–1 / 1 baris), teks di dalam layar, 28 /
+      36px; kotak teks salinan per huruf tepat di atas hurufnya (selisih 0)
+      di 390, 834, 1440; 1440 identik piksel; di 390 dengan animasi: pin,
+      sorot 18/18 huruf motto 1 di baris yang membungkus, balik ke motto 2
+      (10/10 huruf "believers.") dan motto 3, label berganti, tombol muncul;
+      rotasi 834 → 1194 → 390 pengukuran ulang tepat.
+
 ## Langkah 7a — Preloader di HP (disetujui dan dikerjakan 9 Nov 2026)
 
 Keluhan pengguna: preloader terasa lama sekali di HP. Sebab: preloader

@@ -2,6 +2,7 @@
 // 1440 × 1024 frame. Default styles show the last frame (1527:4241); JS sets the
 // earlier states and plays the steps.
 @use "../abstracts/functions" as *;
+@use "../abstracts/breakpoints" as *;
 
 .motto {
   position: relative;
@@ -211,7 +212,7 @@
 
 .motto__glyph {
   position: absolute;
-  top: 0;
+  top: var(--y, 0); // its letter's row, where the line wraps (tablets, phones)
   left: var(--x);
 }
 
@@ -252,4 +253,42 @@
   opacity: 0;
   pointer-events: none;
   will-change: transform, opacity;
+}
+
+// Tablet and phones (plan 32, step 3h; no Figma): still pinned with the same
+// steps; the motto lines wrap, centred (36px / 28px), the content block as
+// wide as the content with closer gaps. Each line is centred in the shared
+// cell, as their heights differ once wrapped. The letter copies follow the
+// rows (--y, src/js/motto-scroll.js).
+@include below-laptop {
+  .motto__inner {
+    gap: fluid(96);
+    width: calc(100% - 2 * var(--page-gutter));
+    height: auto;
+  }
+
+  .motto__label {
+    flex: none;
+  }
+
+  .motto__lines {
+    align-items: center;
+  }
+
+  .motto__line {
+    max-width: 100%;
+    font-size: fs(36);
+    text-align: center;
+    white-space: normal;
+  }
+}
+
+@include mobile {
+  .motto__inner {
+    gap: fluid(64);
+  }
+
+  .motto__line {
+    font-size: fs(28);
+  }
 }

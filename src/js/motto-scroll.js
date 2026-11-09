@@ -102,7 +102,9 @@ export function initMottoScroll() {
   });
 
   // Measured without the line's current transform; repeated once the web font
-  // has loaded (a fallback font would give other letter positions).
+  // has loaded (a fallback font would give other letter positions), and after
+  // a resize (below the laptop width the lines wrap, plan 32: each copy also
+  // takes its letter's row, --y).
   const measure = () => {
     const range = document.createRange();
     lines.forEach((line) => {
@@ -111,12 +113,21 @@ export function initMottoScroll() {
       const lineBox = line.getBoundingClientRect();
       const em = parseFloat(getComputedStyle(line).fontSize);
       line.style.setProperty("--pw", `${lineBox.width / em}em`);
+      // The rows are measured against the line's first letter, so a copy on
+      // the first row sits at 0 (the letter boxes hang below the block's
+      // top by the half-leading, the same in the copy).
+      const first = document.createTreeWalker(line, NodeFilter.SHOW_TEXT).nextNode();
+      range.setStart(first, 0);
+      range.setEnd(first, 1);
+      const rowTop = range.getBoundingClientRect().top;
       line.querySelectorAll(".motto__glyph").forEach((glyph) => {
         const node = glyph.accent.firstChild;
         const i = Number(glyph.dataset.index);
         range.setStart(node, i);
         range.setEnd(node, i + 1);
-        glyph.style.setProperty("--x", `${(range.getBoundingClientRect().left - lineBox.left) / em}em`);
+        const box = range.getBoundingClientRect();
+        glyph.style.setProperty("--x", `${(box.left - lineBox.left) / em}em`);
+        glyph.style.setProperty("--y", `${(box.top - rowTop) / em}em`);
       });
       line.style.transform = transform;
     });
@@ -203,6 +214,7 @@ export function initMottoScroll() {
     };
     const restoreStep = () => {
       resizing = false;
+      measure();
       if (keepStep !== null) window.scrollTo(0, pin.start + (timeline.labels[`step${keepStep}`] / length) * (pin.end - pin.start));
       keepStep = null;
       // Re-sync the gradient waves once the timeline shows the right step again.
