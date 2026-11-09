@@ -59,25 +59,32 @@ export function initHeroShowreel() {
     // and looked jerky on large screens (user report). The video scales
     // evenly until it covers the screen, and the clip trims the sides that
     // reach past it; the clip's corners go from 4px to square.
-    // Not on touch screens (user decision, 9 Nov 2026: it stuttered on an
-    // iPhone 13 in Safari, where the browser scrolls on its own and reports
-    // the position to scripts only now and then, so a growth tied to the
-    // scroll lags behind): there the showreel stays in its box, and a tap
-    // opens the pop-up as before. The coin then fades with the scroll alone
-    // (src/js/coin-scene.js).
-    if (window.matchMedia("(hover: none)").matches) return;
+    // On touch screens the clip has no rounded corners (a rounded clip over
+    // a scaling video is costly there; the video keeps its CSS corners, cut
+    // away by the clip as it grows), and the screen height is the largest
+    // one (100lvh): the browser's bars come and go while scrolling, and the
+    // video measured with the bars would leave a gap below once they go.
+    const touch = window.matchMedia("(hover: none)").matches;
+    const largeHeight = () => {
+      const probe = document.createElement("div");
+      probe.style.cssText = "position:fixed;top:0;left:0;width:0;height:100lvh;visibility:hidden;pointer-events:none";
+      document.body.append(probe);
+      const height = probe.offsetHeight;
+      probe.remove();
+      return Math.max(window.innerHeight, height);
+    };
     let fit;
     const measure = () => {
       const box = showreel.getBoundingClientRect();
       const width = window.innerWidth + 2;
-      const height = window.innerHeight + 2;
+      const height = (touch ? largeHeight() : window.innerHeight) + 2;
       const scale = Math.max(width / box.width, height / box.height);
       fit = {
         scale,
         shiftX: window.innerWidth / 2 - (box.left + box.width / 2),
         clipX: (box.width - width / scale) / 2,
         clipY: (box.height - height / scale) / 2,
-        radius: 4 * designPx(), // --radius-sm
+        radius: touch ? 0 : 4 * designPx(), // --radius-sm
       };
     };
     let grown = 0;
@@ -103,7 +110,7 @@ export function initHeroShowreel() {
       },
       onUpdate: (self) => grow(self.progress),
     });
-    preview.style.borderRadius = "0";
+    if (!touch) preview.style.borderRadius = "0";
     listeners.push(() => {
       preview.style.transform = "";
       preview.style.clipPath = "";
