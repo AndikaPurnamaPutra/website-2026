@@ -1,5 +1,6 @@
 // Figma: Testimonials 1574:973
 @use "../abstracts/functions" as *;
+@use "../abstracts/breakpoints" as *;
 
 .trusted {
   padding-block: fluid(180);
@@ -71,10 +72,12 @@
       transform 0.5s var(--ease);
   }
 
+  // Figma size, scaled down where the columns are narrower (--logo-scale,
+  // tablets and phones).
   img {
     position: relative;
-    width: calc(var(--w) * var(--px));
-    height: calc(var(--h) * var(--px));
+    width: calc(var(--w) * var(--px) * var(--logo-scale, 1));
+    height: calc(var(--h) * var(--px) * var(--logo-scale, 1));
     max-width: none;
     transition: transform 0.5s var(--ease);
   }
@@ -84,7 +87,7 @@
 // 13px text stay centered as a group for every logo height.
 .trusted__logo-more {
   position: absolute;
-  top: calc(50% + (var(--h) * var(--scale) / 2 + 3.5) * var(--px));
+  top: calc(50% + (var(--h) * var(--logo-scale, 1) * var(--scale) / 2 + 3.5) * var(--px));
   right: 0;
   left: 0;
   font-family: var(--font-display);
@@ -280,4 +283,77 @@
 
 .testimonial-card__role {
   opacity: 0.5;
+}
+
+// Tablet and phones (plan 32, step 3e; no Figma): the headline across the
+// width, the logos in fewer columns and smaller (in four Figma-sized columns
+// they ran off the phone screen), the testimonial cards narrower on phones.
+@include below-laptop {
+  .trusted {
+    padding-block: fluid(120);
+  }
+
+  .trusted__inner {
+    gap: fluid(60);
+    padding-inline: var(--page-gutter);
+  }
+
+  .trusted__header {
+    width: 100%;
+    max-width: fs(699);
+  }
+
+  .trusted__logos {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .trusted__logo {
+    --logo-scale: 0.85;
+
+    height: fluid(100);
+  }
+
+  .trusted__marquee {
+    margin-top: fluid(60);
+  }
+}
+
+@include mobile {
+  .trusted {
+    padding-block: fluid(100);
+  }
+
+  .trusted__inner {
+    gap: fluid(48);
+  }
+
+  .trusted__header .text-heading-42 {
+    font-size: fs(32);
+  }
+
+  .trusted__logos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .trusted__logo {
+    --logo-scale: 0.6;
+
+    height: fluid(72);
+  }
+
+  .trusted__marquee {
+    margin-top: fluid(48);
+  }
+
+  // Five cards of 300 (1628 with the gaps) centred, as the desktop's five.
+  .trusted__track {
+    margin-left: calc(50% - #{fluid(814)});
+  }
+
+  .testimonial-card {
+    flex-basis: fluid(300);
+    height: auto;
+    min-height: fluid(260);
+    padding: fluid(24);
+  }
 }

@@ -341,6 +341,48 @@ identik.
       tablet), kartu 280×210 di 390 (239 di 320), 325 di 834; 1440 identik
       piksel. Bersamaan: jarak dalam kartu Services di HP 32 → 24 (pengguna).
 
+## Langkah 3e — Trusted (disetujui dan dikerjakan 9 Nov 2026)
+
+Kondisi: judul berlebar tetap 699px (keluar layar di 390); logo dalam grid 4
+kolom dengan ukuran Figma × `--px` (`max-width: none`) → di 390 grid melebar
+sampai 766px (penyebab terakhir halaman bisa digeser ke samping di HP); kartu
+testimoni 400×260 lebih lebar dari layar HP (350). Marquee testimoni sudah
+berjalan sendiri dan didorong scroll; hover logo hanya di perangkat hover.
+
+**Tablet (744–1023):**
+- Judul lebar penuh (maks 699), tetap 42px rata tengah.
+- Logo 3 kolom (4 baris), tinggi sel 100, logo diskalakan 0,85 (`--logo-scale`,
+  dikalikan ke lebar/tinggi logo dan posisi "See More").
+- Kartu testimoni tetap 400 (frame px) — dua kartu terlihat.
+- Jarak section 120 atas/bawah, antar bagian 60.
+
+**HP (< 744):**
+- Judul 32px, lebar penuh, rata tengah.
+- Logo 2 kolom (6 baris), tinggi sel 72, logo diskalakan 0,6 (PayMongo 196 →
+  118 di kolom 165).
+- "and hundred more..." tetap di tengah.
+- Kartu testimoni lebar 300, tinggi minimal 260 (membesar bila kutipannya
+  panjang), padding 24; posisi awal baris tetap di tengah (5 kartu = 1628).
+  Fade tepi tetap.
+- Jarak section 100 atas/bawah, antar bagian 48, marquee 48 dari garis.
+
+**Desktop dan laptop (≥ 1024):** tidak berubah. Animasi masuk (teks naik,
+logo memudar masuk satu per satu, garis, testimoni) tidak berubah.
+
+**Cara:** `_trusted-clients.scss`: aturan dasar logo dan "See More" dikali
+`var(--logo-scale, 1)`; `below-laptop` / `tablet` / `mobile` untuk header,
+grid, kartu, jarak. Tanpa Pug/JS/konten.
+
+**Cek:** 320, 390, 744, 834 (tidak ada scroll samping di seluruh halaman
+Home — ini penyebab terakhir), logo terbaca, kartu utuh dan marquee jalan;
+1440 identik.
+
+- [x] Disetujui ("ya", 9 Nov 2026).
+- [x] Dikerjakan dan dicek (Chrome headless): 320 dan 390 lebar dokumen =
+      lebar layar (**Home tidak lagi bisa digeser ke samping di HP**), logo 2
+      kolom (68×20 BenQ di 390), kartu 300×260; 744 dan 834 logo 3 kolom,
+      kartu 400; 1440 identik piksel.
+
 ## Langkah 7a — Preloader di HP (disetujui dan dikerjakan 9 Nov 2026)
 
 Keluhan pengguna: preloader terasa lama sekali di HP. Sebab: preloader
