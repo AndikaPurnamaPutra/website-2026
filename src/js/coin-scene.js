@@ -117,8 +117,11 @@ export function mountCoin(anchors, fallback) {
     // The preloader waits for it (src/js/preloader.js).
     document.dispatchEvent(new CustomEvent("coin:ready"));
   };
+  // On phones a half-size studio light (351 KB instead of 1.36 MB; the coin
+  // is small there): docs/implementation/32-responsive.md, step 7.
+  const phone = window.matchMedia("(max-width: 743.98px)").matches;
   new RGBELoader().load(
-    "assets/models/white-studio-1k.hdr",
+    phone ? "assets/models/white-studio-512.hdr" : "assets/models/white-studio-1k.hdr",
     (texture) => {
       texture.mapping = THREE.EquirectangularReflectionMapping;
       scene.environment = texture;

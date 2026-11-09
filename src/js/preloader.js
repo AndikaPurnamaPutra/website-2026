@@ -63,8 +63,10 @@ const BLUR_SHIFT = 12; // Figma px, up with the curtain
 const COIN_EDGE = (208 + 0.47 * 420) / 420;
 const HANG_GAP = 40; // Figma px from the coin to the bottom of the screen
 // The page opens MAX_WAIT seconds after it was opened even if an asset is
-// still loading (user decision).
+// still loading (user decision); sooner on touch screens (phones on mobile
+// data), now that only the first screen is waited for.
 const MAX_WAIT = 20; // s
+const MAX_WAIT_TOUCH = 8; // s
 // The coin fades in after the showreel has shown (user), as it settles, so
 // it is not a step of its own; slowly and evenly, never at once (user: a
 // quick ease-out looked harsh).
@@ -107,14 +109,17 @@ export function initPreloader() {
     startSmoothScroll();
   };
 
-  // Loading progress: everything the page shows (user: really wait until all
-  // of it is in): every image, the lazy ones loaded now too; the videos until
-  // they can play through (not fully downloaded; user decision), on touch
-  // screens until their first frame (iOS may load no more before playing);
-  // the web fonts; the window load; and the 3D coin (it loads after the
-  // window load and must be in before it is pushed up: "coin:ready",
-  // src/js/coin-scene.js and src/js/coin-3d.js). An asset that fails counts
-  // as in, and after MAX_WAIT seconds the page opens anyway.
+  // Loading progress: what the first screen shows (user decision, 9 Nov
+  // 2026; before, every image and video of the page, ≈16 MB on the homepage,
+  // which took 13 s and more on mobile data): the images of the header and
+  // the hero; the hero's showreel preview until it can play through (not
+  // fully downloaded; user decision), on touch screens until its first frame
+  // (iOS may load no more before playing); the web fonts; the window load;
+  // and the 3D coin (it loads after the window load and must be in before it
+  // is pushed up: "coin:ready", src/js/coin-scene.js and src/js/coin-3d.js).
+  // The rest of the page loads as usual, the lazy images when they come
+  // near. An asset that fails counts as in, and after MAX_WAIT seconds the
+  // page opens anyway.
   let loaded = 0;
   const once = (target, events) => {
     let counted = false;
@@ -126,14 +131,14 @@ export function initPreloader() {
     events.forEach((type) => target.addEventListener(type, count, { once: true }));
     return count;
   };
-  const images = [...document.images];
-  images.forEach((img) => {
-    if (img.loading === "lazy") img.loading = "eager";
-  });
+  // Not the lazy ones among them (the Work menu's cards, ≈1 MB, hidden until
+  // it opens): they load when the menu shows, and would otherwise never be
+  // counted.
+  const images = [...document.querySelectorAll(".site-header img, .hero img")].filter((img) => img.loading !== "lazy");
   const pending = images.filter((img) => !img.complete);
   const touch = window.matchMedia("(pointer: coarse)").matches;
   const videoReady = touch ? 2 : 4; // HAVE_CURRENT_DATA / HAVE_ENOUGH_DATA
-  const videos = [...document.querySelectorAll("video[data-inview-video]")].filter((video) => video.readyState < videoReady);
+  const videos = [...document.querySelectorAll(".hero video[data-inview-video]")].filter((video) => video.readyState < videoReady);
   const total = pending.length + videos.length + 2 + (coin ? 1 : 0);
   pending.forEach((img) => once(img, ["load", "error"]));
   videos.forEach((video) => {
@@ -148,7 +153,7 @@ export function initPreloader() {
   const coinDone = coin ? once(document, ["coin:ready"]) : null;
   // Counted from the opening of the page (performance.now), not from this
   // script, which may itself come in late on a slow connection.
-  const maxWait = gsap.delayedCall(Math.max(0, MAX_WAIT - performance.now() / 1000), () => (loaded = total));
+  const maxWait = gsap.delayedCall(Math.max(0, (touch ? MAX_WAIT_TOUCH : MAX_WAIT) - performance.now() / 1000), () => (loaded = total));
 
   // The outline heads for the progress at a smoothly changing pace (see
   // DRAW_HOLD above).

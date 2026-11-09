@@ -184,6 +184,61 @@ sebagai satu bagian bila barisnya inline.
       WebGL, gambar pengganti yang tampil) dan Safari iOS, dicek di perangkat
       pengguna.
 
+## Langkah 7a — Preloader di HP (disetujui dan dikerjakan 9 Nov 2026)
+
+Keluhan pengguna: preloader terasa lama sekali di HP. Sebab: preloader
+menunggu semua aset halaman (keputusan lama "tunggu sampai semuanya masuk"):
+di beranda ±16 MB (4 video 10,2 MB termasuk video Services 5 MB dan video
+pop-up; 26 gambar 2,1 MB, yang lazy dipaksa eager; koin 3D 3,5 MB), 13 detik
+atau lebih di 4G, sampai batas 20 detik.
+
+Keputusan (pengguna, "oke sekarang"):
+- Preloader hanya menunggu layar pertama: gambar header dan hero, frame
+  pertama video showreel kecil (di layar sentuh) atau sampai bisa diputar
+  (desktop), font, `load`, koin 3D. Sisanya memuat seperti biasa setelah
+  halaman terbuka. Berlaku di semua perangkat (`src/js/preloader.js`).
+- Batas tunggu di layar sentuh 8 detik (desktop tetap 20).
+- Koin 3D di HP memakai cahaya studio setengah ukuran
+  (`white-studio-512.hdr`, 351 KB; dibuat dari yang 1k dengan rata-rata 2×2
+  piksel) — desktop tetap 1k. Model GLB versi HP (tekstur 512) belum: perintah
+  `gltf-transform` lewat `npx` diblokir di sesi ini; bisa dijalankan pengguna
+  (lihat docs/implementation/15-hero-coin-3d.md) kalau masih perlu.
+- Gambar Services dan tekstur Motto jadi `loading="lazy"` (AGENTS.md §15);
+  gambar Our Work tetap eager (karusel mendatar).
+
+- Tekstur Motto kedua (`.tone-shift__texture`, 557 KB) juga lazy.
+
+Diukur (Chrome headless, HP 390, 4G tiruan 10 Mbps / 40 ms, CPU 4× lebih
+lambat, server lokal yang sama):
+| | Sebelum | Sesudah |
+|---|---|---|
+| Semua yang ditunggu masuk (`coin:ready`) | 9,7 s | 5,5 s |
+| Tirai mulai naik (`preloader:reveal`) | 12,2 s | 8,0 s |
+| Halaman bisa di-scroll | ±14,1 s | 10,0 s |
+| Diunduh sampai terbuka | ±7–8 MB | 6,45 MB |
+
+Catatan: gambar lazy di header (kartu menu Work, ±1 MB, tersembunyi sampai
+menu dibuka) dulu dipaksa eager dan ikut ditunggu; sekarang dikecualikan
+(dibiarkan lazy; kalau ikut dihitung tanpa dipaksa, preloader menunggunya
+sampai batas waktu).
+
+Temuan: setelah aset masuk, koreografi preloader sendiri (garis logo
+diselesaikan, isi, tahun naik, napas, tirai 1,5 s, showreel didorong 1,6 s)
+memakan ±4,5 s lagi (aset masuk 5,5 s → scroll 10,0 s), dan itu yang kini
+mendominasi di HP. Yang masih
+diunduh sebelum terbuka: model koin 1,3 MB + kode three.js 0,8 MB, video
+showreel kecil 1,7 MB (potret 1280×1920 diunduh utuh), gambar Our Work ±1 MB.
+Langkah lanjutan yang mungkin (perlu keputusan / alat):
+- Koreografi lebih singkat di HP (keputusan desain pengguna).
+- Video showreel kecil versi HP (±480 px lebar, ±400 KB; perlu ffmpeg, tidak
+  ada di mesin ini) lewat `<source media>`.
+- Model GLB tekstur 512 untuk HP (gltf-transform; diblokir di sesi ini).
+- Gambar Our Work lazy (dicek bersama langkah responsive Our Work).
+- Kode koin dimulai bersamaan dengan aset lain, bukan setelah `load`.
+
+- [x] Dikerjakan dan diukur; koin 3D di HP memuat HDR 512 tanpa fallback
+      (WebGL headless).
+
 ## Kriteria selesai
 - Tidak ada scroll ke samping di lebar mana pun dari 320px.
 - Teks terbaca tanpa zoom (≥ 12px), area sentuh ≥ 44px.
