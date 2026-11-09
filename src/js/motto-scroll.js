@@ -205,11 +205,25 @@ export function initMottoScroll() {
     // of leaving the timeline between two steps. The step is recorded while
     // scrolling and frozen during a resize (reading the scroll then is
     // unreliable: the browser may already have clamped it).
+    // On phones the browser's bars resize the window as the page scrolls,
+    // and ScrollTrigger does not refresh for that (ignoreMobileResize,
+    // src/js/main.js): the flag was then never cleared and the highlights
+    // and the glow stopped (user report, iPhone 13). It clears itself when
+    // no refresh has started shortly after the resize.
     let keepStep = null;
+    let settle = null;
     const onResize = () => {
       resizing = true;
+      clearTimeout(settle);
+      settle = setTimeout(() => {
+        if (!ScrollTrigger.isRefreshing && keepStep === null) {
+          resizing = false;
+          syncGradients();
+        }
+      }, 500);
     };
     const rememberStep = () => {
+      resizing = true;
       keepStep = inside ? settledStep : null;
     };
     const restoreStep = () => {
@@ -228,6 +242,7 @@ export function initMottoScroll() {
       window.removeEventListener("resize", onResize);
       ScrollTrigger.removeEventListener("refreshInit", rememberStep);
       ScrollTrigger.removeEventListener("refresh", restoreStep);
+      clearTimeout(settle);
     };
 
     // Letters change from white to the gradient one after another, left to
