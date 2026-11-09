@@ -649,6 +649,28 @@ membesar di layar sentuh, jadi kanvas dikembalikan ke 2× dengan antialiasing
 logo halus (screenshot sebelum/sesudah), 60 fps diam dan saat digulir (frame
 terlama 19–20 ms), kanvas 780px.
 
+## Sorotan Motto dan gerak koin di iPhone (laporan pengguna 9 Nov 2026)
+
+1. **Sorotan Motto tidak bekerja di iPhone** (kambuh): bilah alamat Safari
+   memicu `resize` saat digulir; Motto menandai "resizing" dan menunggu
+   refresh ScrollTrigger untuk melepasnya, sedangkan `ignoreMobileResize`
+   (langkah 7b) membuat refresh itu tak pernah datang → sorotan dan cahaya
+   berhenti. Dibuktikan di iPhone dengan satu `resize` tiruan (0/18 huruf).
+   Perbaikan (`motto-scroll.js`): tanda dilepas sendiri 500 ms setelah
+   resize bila tak ada refresh. Diuji di iPhone dengan resize berulang saat
+   menggulir: 18/18 dan 10/10 huruf menyala, motto 1→2→3.
+2. **Koin patah-patah saat bergerak di iPhone**: kanvas tetap di layar,
+   posisi dihitung dari scroll; Safari iOS melaporkan scroll ke skrip
+   sedikit terlambat → koin tertinggal lalu menyusul. Pilihan A (pengguna):
+   di layar sentuh kanvas diletakkan **di halaman** di sekitar tempat koin
+   (hero, lalu footer; `placeOnPage` di `coin-scene.js`), sehingga bergulir
+   bersama halaman; koin menempel pada tempatnya (tanpa parallax turun dan
+   tanpa jatuh di footer), putaran, efek masuk, dan balik karena scroll
+   tetap; selama preloader kanvas hero menjangkau satu layar lebih ke bawah
+   untuk dorongan showreel. Desktop tetap kanvas layar penuh. Diuji di
+   iPhone: koin di tempatnya saat diam, setelah 250px, dan di footer; 60 fps
+   (frame terlama 35 ms saat digulir).
+
 ## Langkah 4 — About (usulan 9 Nov 2026, menunggu persetujuan)
 
 Kondisi (screenshot 390 dan 834): halaman bisa digeser ke samping di HP dan
