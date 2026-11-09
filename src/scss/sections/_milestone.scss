@@ -1,5 +1,6 @@
 // Figma: Milestones 1574:1160
 @use "../abstracts/functions" as *;
+@use "../abstracts/breakpoints" as *;
 
 .milestone__inner {
   display: flex;
@@ -93,4 +94,51 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+// Tablet (plan 32, step 3g; no Figma): the two columns kept, the stats
+// narrower so the headline keeps its two lines.
+@include tablet {
+  .milestone__inner {
+    padding-block: fluid(120);
+  }
+
+  .milestone__stats {
+    width: fluid(470);
+  }
+}
+
+// Phones: stacked, the intro over the stats across the width, the rows as
+// on the desktop (value left, label right, a line under each).
+@include mobile {
+  .milestone__inner {
+    flex-direction: column;
+    gap: fluid(40);
+    padding-block: fluid(100);
+  }
+
+  .milestone__intro .text-heading-42 {
+    font-size: fs(32);
+  }
+
+  .milestone__stats {
+    gap: fluid(32);
+    width: 100%;
+  }
+
+  .milestone__list {
+    gap: fluid(12);
+  }
+
+  .milestone__row {
+    padding-block: fluid(20);
+  }
+
+  .milestone__value {
+    font-size: fs(40);
+  }
+
+  .milestone__text {
+    font-size: fs(18);
+  }
 }

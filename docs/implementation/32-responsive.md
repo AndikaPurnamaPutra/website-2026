@@ -460,6 +460,39 @@ Laptop 1024 (mouse): versi desktop dirapatkan (kartu 245, gambar 722, teks
 - [x] Dikerjakan dan dicek.
 - [ ] Dicek pengguna di iPad.
 
+## Langkah 3g — Milestone (disetujui dan dikerjakan 9 Nov 2026)
+
+Kondisi: dua kolom (intro kiri; statistik kanan selebar 670) dengan
+`space-between`. Di 390 keduanya berdesakan: eyebrow membungkus, judul 42px
+jadi 4 baris, kolom statistik ±210px sehingga label membungkus ("Capital /
+raised"). Di 834 muat, tapi kolom judul sempit (3 baris). Tidak ada scroll
+samping. Animasi: odometer per digit, gelombang gradien di "$139M+", tinta
+di kalimat utama; skrip mengukur lebar karakter saat init (tidak bergantung
+breakpoint).
+
+**Tablet (744–1023):** tetap dua kolom, kolom statistik 470 (bukan 670)
+sehingga judul 42px muat dalam 2 baris ("From Concept / To Impact"); jarak
+atas/bawah 120.
+
+**HP (< 744):** ditumpuk: eyebrow, judul 32px (2 baris), lalu statistik
+selebar konten (nilai kiri 40px, label kanan 16px, garis per baris seperti
+desktop), lalu kalimat 18px. Jarak atas/bawah 100; antara intro dan
+statistik 40; padding baris 20; antar baris 12; statistik → kalimat 32.
+
+**Laptop dan desktop (≥ 1024):** tidak berubah. Animasi tidak berubah.
+
+**Cara:** `_milestone.scss` dalam `@include tablet` / `mobile`. Tanpa
+Pug/JS/konten.
+
+**Cek:** 320, 390, 744, 834 (judul 2 baris, label tidak membungkus, tidak
+melebihi layar), 1440 identik; odometer di 390 dengan animasi.
+
+- [x] Disetujui ("ya", 9 Nov 2026).
+- [x] Dikerjakan dan dicek (Chrome headless): 320, 390, 744, 834 judul 2
+      baris, label satu baris (16px tinggi), statistik 287 / 350 / 419 /
+      470 lebar, tidak melebihi layar; 1440 identik piksel; odometer di 390
+      mendarat di $139M+, 120+, 8.
+
 ## Langkah 7a — Preloader di HP (disetujui dan dikerjakan 9 Nov 2026)
 
 Keluhan pengguna: preloader terasa lama sekali di HP. Sebab: preloader
