@@ -409,8 +409,56 @@ dijawab). Dua versi dibuat untuk dibandingkan di iPad:
    iPhone); kartu punya pengejaran halus sendiri sehingga lebih tersamar.
    Dipastikan oleh pengguna di iPad.
 
-- [x] Kedua versi dibuat dan di-push.
-- [ ] Pengguna memilih di iPad; yang tidak dipilih dihapus atau diarsipkan.
+- Pengguna tidak menyukai keduanya (9 Nov 2026), dan tiga arah lain (geser
+  ke samping, ubin bergambar, akordeon) ditolak karena tidak berkaitan dengan
+  section-nya dan terlalu berbeda dari desktop dan HP.
+
+Versi berikutnya, alur dengan rupa dan gerak desktop (kartu bayangan deck
+di bawah tiap kartu, kartu naik dan gambar membuka seperti tirai saat masuk
+layar), dibuat dan terukur berjalan, tapi pengguna melihatnya statis di
+localhost dan meminta kembali ke versi sebelumnya.
+
+**Keputusan akhir (pengguna, 9 Nov 2026): tablet mengikuti HP.** HP, tablet,
+dan semua layar sentuh (mixin `below-laptop-or-touch`): satu kolom, kartu
+lalu gambarnya, gambar 4:3 di HP dan 16:9 dari 744 ke atas, jarak
+kartu→gambar 16, antar layanan 48 (HP) / 64 (tablet ke atas), jarak dalam
+kartu 24, tanpa kartu bayangan dan tanpa animasi masuk. Pin dan langkah
+hanya di layar hover ≥ 1024 (`gsap.matchMedia`). Dicek: 390 (350×263) dan
+834 (770×433) mengalir, 1440 identik piksel dan tetap di-pin. Branch
+`services-tablet/stack` dibiarkan sebagai arsip (bisa dihapus).
+
+Laptop 1024 (mouse): versi desktop dirapatkan (kartu 245, gambar 722, teks
+12,4px). Cacat ditemukan dan diperbaiki: catatan "Visual trends…" (fs 305 =
+271px) melewati kolom kiri (245px) dan tertutup gambar → lebarnya
+`min(fs(305), fluid(325))` (231px di 1024; 1440 tetap 305, identik piksel).
+
+- Laporan pengguna (9 Nov 2026): saat inspeksi di browser, tata letak yang
+  dipakai "berubah-ubah", terutama di 1024 di Services. Sebab: CSS dan pin
+  Services (`gsap.matchMedia`) berpindah langsung saat lebar melewati 1024
+  atau emulasi sentuh dinyalakan, sedangkan pembesaran showreel dan tanda
+  tema halaman diputuskan sekali saat halaman dimuat → campur aduk tanpa
+  reload. Perbaikan: pembesaran showreel (dan tombol yang mengikuti kursor)
+  dalam `gsap.matchMedia("(min-width: 1024px) and (hover: hover)")`
+  (`hero-showreel.js`); tanda "terang" tema halaman mencari pin Services
+  pada tiap refresh (`page-theme.js`). Diukur (mouse): 1200 → showreel
+  membesar 1,39× dan Services di-pin; diubah ke 900 → showreel diam, tanpa
+  pin; kembali 1200 → seperti semula; tema terang di Our Work di ketiganya;
+  hero 1440 identik piksel. Perpindahan di 1024 sendiri memang disengaja
+  (mouse = laptop/pin, sentuh = alur).
+
+- Laporan pengguna (9 Nov 2026, 1024): pembesaran showreel menutupi konten
+  hero dan memotong Statement. Sebab: di layar yang lebih "kotak"
+  (1024×768) kotak showreel 542 dari 768 tinggi, jadi saat memenuhi layar
+  video melebar 114px ke atas (menutupi tanggal/sosial hero yang masih di
+  layar) dan ke bawah (melewati jarak 113px ke eyebrow Statement); di
+  1440×900 hanya 60px. Perbaikan (`hero-showreel.js`): tinggi pembesaran
+  dibatasi `min(tinggi layar, tinggi kotak + 2 × 80 frame-px)` (ROOM =
+  jarak showreel ke teks hero). Diukur: 1024×768 skala 1,21 (band 37–708,
+  tidak menutupi tanggal maupun eyebrow); 1440×900 skala 1,155 tak berubah;
+  1280×720 skala 1,06.
+
+- [x] Dikerjakan dan dicek.
+- [ ] Dicek pengguna di iPad.
 
 ## Langkah 7a — Preloader di HP (disetujui dan dikerjakan 9 Nov 2026)
 
@@ -505,6 +553,14 @@ yang paling mungkin, khusus layar sentuh (`hover: none`), desktop tak berubah:
   dengan jendela disempitkan): tidak membesar bila layar sentuh **atau** lebar
   di bawah 1024 (tata letak tablet/HP), supaya jendela desktop yang
   disempitkan menunjukkan apa yang HP tunjukkan. Desktop ≥ 1024 membesar.
+- Laporan pengguna (9 Nov 2026, tablet): koin hero turun sampai ke section
+  di bawahnya. Sebab: tanpa pembesaran showreel, koin (turun 0,4 px per px
+  scroll) hanya memudar di 0,95–1,2 layar, dan sebelum itu muncul lagi di
+  bawah tepi bawah showreel. Perbaikan (`coin-scene.js`): di tata letak tanpa
+  pembesaran koin hilang saat tenggelam di balik tepi atas showreel
+  (titik = jarak tepi showreel ke tepi atas koin ÷ 1,4), memudar di 60–100%
+  jalan ke sana, dan tidak kembali. Diukur: 834 → 1 / 0,76 (80 px) / 0 (120
+  px); 390 → 1 / 0,25 (60 px) / 0 (90 px); desktop 1440 tetap 1 (jalur lama).
 - [ ] Dicek di HP pengguna (showreel halus, koin tampil atau gambar
       penggantinya).
 

@@ -43,6 +43,17 @@ export function initHeroShowreel() {
   document.body.append(lightbox);
   showreel.classList.add("is-interactive");
 
+  // The growth and the following button only from the laptop width up and
+  // on screens that can hover; gsap.matchMedia sets them up and takes them
+  // down live as the window is resized across 1024 (or touch is emulated),
+  // as the Services pin does, so the page never mixes the two.
+  const media = gsap.matchMedia();
+  media.add("(min-width: 1024px) and (hover: hover)", () => {
+  const local = [];
+  const onLocal = (target, type, handler, options) => {
+    target.addEventListener(type, handler, options);
+    local.push(() => target.removeEventListener(type, handler, options));
+  };
   // Button follows the cursor (offset from its centred Figma position).
   const ctx = gsap.context(() => {
     if (reduceMotion) return;
@@ -64,14 +75,21 @@ export function initHeroShowreel() {
     // the browser scrolls on its own and reports the position to scripts
     // only now and then, so a growth tied to the scroll lags behind; and a
     // narrowed desktop window should show what phones show): there the
-    // showreel stays in its box, and a tap opens the pop-up as before. The
-    // coin then fades with the scroll alone (src/js/coin-scene.js).
-    if (window.matchMedia("(hover: none), (max-width: 1023.98px)").matches) return;
+    // showreel stays in its box (this branch is not set up), and a tap opens
+    // the pop-up as before. The coin then fades with the scroll alone
+    // (src/js/coin-scene.js).
+    // Upwards and downwards it grows no further than the room around the
+    // showreel (ROOM, its distance to the hero text above it): on a squarer
+    // screen (1024 x 768: the box is 542 of 768 tall) the full screen height
+    // reached 114px past the box, over the hero's date and social links
+    // above and the Statement's eyebrow below (user report). On 1440 x 900
+    // (60px past the box) nothing changes.
+    const ROOM = 80; // Figma px, --space-80
     let fit;
     const measure = () => {
       const box = showreel.getBoundingClientRect();
       const width = window.innerWidth + 2;
-      const height = window.innerHeight + 2;
+      const height = Math.min(window.innerHeight, box.height + 2 * ROOM * designPx()) + 2;
       const scale = Math.max(width / box.width, height / box.height);
       fit = {
         scale,
@@ -105,7 +123,7 @@ export function initHeroShowreel() {
       onUpdate: (self) => grow(self.progress),
     });
     preview.style.borderRadius = "0";
-    listeners.push(() => {
+    local.push(() => {
       preview.style.transform = "";
       preview.style.clipPath = "";
       preview.style.borderRadius = "";
@@ -153,19 +171,25 @@ export function initHeroShowreel() {
       toX(gsap.utils.clamp(area.left + halfW, area.right - halfW, cursor.x) - centreX);
       toY(gsap.utils.clamp(area.top + halfH, area.bottom - halfH, cursor.y) - centreY);
     };
-    on(window, "pointermove", (event) => {
+    onLocal(window, "pointermove", (event) => {
       if (event.pointerType !== "mouse") return;
       cursor.x = event.clientX;
       cursor.y = event.clientY;
       place();
     }, { passive: true });
-    on(window, "scroll", place, { passive: true });
-    on(document, "pointerout", (event) => {
+    onLocal(window, "scroll", place, { passive: true });
+    onLocal(document, "pointerout", (event) => {
       if (event.relatedTarget) return;
       cursor.x = -1;
       cursor.y = -1;
       place();
     });
+  });
+  return () => {
+    ctx.revert();
+    local.forEach((remove) => remove());
+    showreel.classList.remove("is-following");
+  };
   });
 
   // Centred box at the video's aspect ratio (3:2 for now).
@@ -264,7 +288,7 @@ export function initHeroShowreel() {
   return () => {
     hide();
     animation?.kill();
-    ctx.revert();
+    media.revert();
     listeners.forEach((remove) => remove());
     showreel.classList.remove("is-interactive", "is-following");
     gsap.set([stage, backdrop, close], { clearProps: "all" });

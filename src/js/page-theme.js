@@ -40,10 +40,15 @@ export function initPageTheme() {
   const mark = (vars) => ScrollTrigger.create({ end: "max", onToggle: update, onRefresh: update, ...vars });
 
   if (services && ourWork) {
-    const pin = ScrollTrigger.getById("services");
+    // Looked up on every refresh: the pin comes and goes with the layout
+    // (src/js/services-scroll.js, gsap.matchMedia), and the mark follows.
+    const lightAt = () => {
+      const pin = ScrollTrigger.getById("services");
+      return pin ? pin.end - EXIT * window.innerHeight : LIGHT_AT;
+    };
     ranges.push({
       from: mark({ trigger: services, start: DARK_AT }),
-      to: pin ? mark({ start: () => pin.end - EXIT * window.innerHeight }) : mark({ trigger: ourWork, start: LIGHT_AT }),
+      to: mark({ trigger: ourWork, start: lightAt }),
     });
   }
   // Milestone → Motto (user): Milestone stays on light and fades out, then
