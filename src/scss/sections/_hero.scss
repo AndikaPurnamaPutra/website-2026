@@ -364,3 +364,88 @@
     aspect-ratio: 4 / 5;
   }
 }
+
+// Short screens (phones turned sideways, height < 500; plan 32, step 7):
+// the headline, the info, the social links and the coin share the first
+// screen. The headline smaller and higher, the info tighter; small phones
+// sideways take the tablet's row (social links left, info right, the coin
+// between) and its wide showreel instead of the phone's column and 4:5
+// showreel. The coin, smaller, sits on the social links' line (the
+// showreel, 1360:781 across the content, and its 80 above, with the gutter
+// below it).
+@include short {
+  // Right below the 64px bar (main reserves 104 frame px for it, 128px on a
+  // small phone sideways).
+  .hero {
+    margin-top: calc(4.5rem - #{fluid(104)});
+  }
+
+  .hero__inner {
+    padding-top: 0;
+  }
+
+  .hero__title {
+    font-size: fs(32);
+  }
+
+  .hero__content {
+    row-gap: fs(12);
+  }
+
+  // Wider, so the description flows in two lines instead of Figma's three
+  // (an iPhone 13 sideways leaves 326px of screen).
+  .hero__info {
+    gap: fs(12);
+    width: fs(420);
+    justify-self: end;
+  }
+
+  .hero__description .hero__line,
+  .hero__description .hero__line-text {
+    display: inline;
+  }
+
+  .hero__description .hero__line::after {
+    content: " ";
+  }
+
+  .hero__showreel {
+    margin-top: var(--space-80);
+    aspect-ratio: 1360 / 781;
+  }
+
+  .hero__coin {
+    bottom: calc((100vw - 2 * var(--page-gutter)) * 781 / 1360 + var(--space-80) + var(--page-gutter));
+  }
+}
+
+@include tablet {
+  @include short {
+    .hero__coin {
+      width: fluid(160);
+      height: fluid(150);
+    }
+  }
+}
+
+@include mobile {
+  @include short {
+    .hero__content {
+      grid-template-columns: auto 1fr;
+      align-items: end;
+    }
+
+    .hero__title,
+    .hero__info {
+      order: 0;
+    }
+
+    // Right of the two social tiles (2 × 50 + 11).
+    .hero__coin {
+      right: auto;
+      left: calc(var(--page-gutter) + #{fs(111 + 24)});
+      width: fluid(120);
+      height: fluid(113);
+    }
+  }
+}

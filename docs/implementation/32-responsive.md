@@ -584,6 +584,61 @@ Temuan di iPhone (layar terpakai 699px, bukan 844):
 
 - [x] Diperbaiki dan dicek ulang (7 ukuran Chrome + iPhone).
 
+## Langkah 7b-2 — Layar pendek / HP lanskap (disetujui dan dikerjakan 9 Nov 2026)
+
+Berlaku untuk tinggi layar < 500 (mixin `short`), yaitu HP lanskap
+(667×375 iPhone SE, 844×390 iPhone 13, 932×430 Pro Max). Diperiksa di
+Chrome dengan animasi, Home layar demi layar:
+- **Hero** (tata letak tablet di 844): judul 64px memenuhi layar pertama;
+  koin dan showreel di bawah lipatan, koin tidak pernah terlihat.
+- **Statement** (di-pin di tengah layar): isi 675px tinggi di layar 390;
+  eyebrow tertutup header, tombol "Schedule a call" terpotong di bawah
+  (349–433).
+- **Menu HP** (667×375): isi panel 562px, "Contact" dan sosial di bawah
+  lipatan (panel bisa digulir, tapi tidak terlihat ada isinya).
+- Motto muat (22–368), Services/Our Work/Trusted/Milestone/footer mengalir,
+  preloader muat (logo 145–185, tahun 307–328). Branch arsip
+  `services-tablet/stack` dihapus (f6a2972).
+
+Usulan (hanya `short`; layar lain tidak berubah):
+1. **Hero**: judul 40px; koin 160×150 di kanan sejajar baris sosial (seperti
+   HP); jarak atas lebih rapat. Target: judul, info, sosial, dan koin di
+   layar pertama.
+2. **Statement**: teks 24px (line-height 1.5), jarak eyebrow→teks 16,
+   teks→tombol 24, sehingga eyebrow + teks + tombol (±320px) muat di bawah
+   header saat ditahan.
+3. **Menu HP**: tautan 32px dalam satu kolom kiri, kontak dan sosial di
+   kolom kanan (dua kolom), jarak atas lebih rapat; semua terlihat tanpa
+   menggulir panel.
+4. Motto, section lain, preloader: tidak diubah.
+
+**File:** `_hero.scss`, `_statement.scss`, `_header.scss` (menu HP), mixin
+`short` yang sudah ada. **Cek:** 667×375, 844×390, 932×430 (screenshot
+hero, Statement saat ditahan, menu terbuka), 390×844 dan 1440 tidak berubah,
+dan iPhone pengguna diputar lanskap.
+
+Pengerjaan (`short`):
+- Hero: judul 32px, tepat di bawah bar 64px (`margin-top: 4.5rem −
+  fluid(104)`), info 420 lebar dengan deskripsi mengalir 2 baris, jarak 12;
+  HP lanskap kecil (< 744) memakai baris tablet (sosial kiri, koin tengah,
+  info kanan) dan showreel 1360:781; koin di baris sosial (160×150 tablet,
+  120×113 HP).
+- Statement: teks 24px / 1.4, jarak 16 dan 12, ikon dan folder ukuran HP.
+- Menu HP: dua kolom (tautan 32px kiri, kontak dan sosial kanan).
+- **iPhone Safari memperbesar teks sendiri saat lanskap**
+  (`text-size-adjust: auto`): blok info 204px alih-alih 139. Ditambahkan
+  `text-size-adjust: 100%` di `_reset.scss` (seluruh situs; zoom manual
+  tetap).
+
+Dicek: iPhone 13 pengguna lanskap (750×326): hero 72–325 (muat),
+Statement saat ditahan 92–318; Chrome 667×375, 844×390, 932×430: hero
+72–325, Statement 69–370 / 93–358 / 113–379, menu 667×375 tanpa gulir
+(terakhir 351); 390×844 dan 834×1194 identik piksel dengan sebelum, 1440
+sama (selisih 8 piksel di titik dua jam yang berkedip).
+
+- [x] Disetujui ("ya", 9 Nov 2026).
+- [x] Dikerjakan dan dicek.
+
 ## Langkah 4 — About (usulan 9 Nov 2026, menunggu persetujuan)
 
 Kondisi (screenshot 390 dan 834): halaman bisa digeser ke samping di HP dan

@@ -99,3 +99,11 @@ button {
   white-space: nowrap;
   clip-path: inset(50%);
 }
+
+// iPhone Safari enlarges text on its own when the phone is turned sideways
+// (text-size-adjust: auto), past the sizes set here (found on an iPhone 13:
+// the hero ran off a 326px screen). Pinch zoom still works.
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}

@@ -511,3 +511,25 @@ main {
     transition: none;
   }
 }
+
+// Phone menu on short screens (phones turned sideways; plan 32, step 7): the
+// links smaller on the left, the contact and social links on the right, all
+// on the screen without scrolling the panel.
+@include mobile {
+  @include short {
+    .mobile-menu__inner {
+      flex-direction: row;
+      align-items: flex-end;
+      padding-top: 4.5rem;
+      padding-bottom: 1.5rem;
+    }
+
+    .mobile-menu__link {
+      font-size: fs(32);
+    }
+
+    .mobile-menu__info {
+      max-width: 50%;
+    }
+  }
+}

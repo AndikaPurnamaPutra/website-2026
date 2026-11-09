@@ -274,3 +274,34 @@ body.is-dark .statement {
     transform-origin: left center;
   }
 }
+
+// Short screens (height < 500; plan 32, step 7): held in the middle of the
+// screen, the eyebrow, the sentence and the button fit below the header.
+@include short {
+  .statement__inner {
+    gap: fs(16);
+  }
+
+  .statement__content {
+    gap: fs(12);
+  }
+
+  .statement__text {
+    font-size: fs(24);
+    line-height: 1.4;
+  }
+
+  .statement__icon {
+    width: fs(46);
+    height: fs(36);
+    margin-top: 0;
+  }
+
+  .statement__folder {
+    width: fs(84);
+    height: fs(55);
+    margin-top: 0;
+    transform: scale(0.7);
+    transform-origin: left center;
+  }
+}
