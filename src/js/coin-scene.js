@@ -63,9 +63,13 @@ export function mountCoin(anchors, fallback) {
   stage.setAttribute("aria-hidden", "true");
   document.body.prepend(stage);
 
+  // Touch screens (phones, tablets): no antialiasing and a 1× canvas, so the
+  // full-screen drawing stays light beside the showreel video (user report:
+  // the showreel stuttered while scrolling on a phone).
+  const touch = window.matchMedia("(hover: none)").matches;
   let renderer;
   try {
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+    renderer = new THREE.WebGLRenderer({ antialias: !touch, alpha: true, powerPreference: "high-performance" });
   } catch {
     stage.remove();
     fallback();
@@ -74,7 +78,7 @@ export function mountCoin(anchors, fallback) {
   // The canvas covers the whole screen and is drawn every frame while the
   // coin shows: 1.5× (not 2×) keeps Retina screens at a steady frame rate,
   // with no visible loss on the soft metal.
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, touch ? 1 : 1.5));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 0.35;
@@ -352,8 +356,20 @@ export function mountCoin(anchors, fallback) {
   };
   window.addEventListener("resize", onResize);
 
+  // The graphics context can be taken away (phones short of graphics memory:
+  // the canvas goes blank with no error; user report: no coin on a phone).
+  // Then the coin pictures come back in its place.
+  const onContextLost = (event) => {
+    event.preventDefault();
+    gsap.ticker.remove(tick);
+    stage.remove();
+    fallback();
+  };
+  renderer.domElement.addEventListener("webglcontextlost", onContextLost);
+
   return () => {
     gsap.ticker.remove(tick);
+    renderer.domElement.removeEventListener("webglcontextlost", onContextLost);
     window.removeEventListener("resize", onResize);
     window.removeEventListener("pointermove", onPointerMove);
     document.removeEventListener("pointerout", onPointerOut);

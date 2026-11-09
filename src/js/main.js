@@ -35,6 +35,10 @@ import { initScrollMemory } from "./scroll-memory.js";
 import { initPageTransitions } from "./page-transition.js";
 
 gsap.registerPlugin(ScrollTrigger);
+// Phones: the browser's bars coming and going while scrolling resize the
+// window; those resizes do not refresh the scroll animations (they made the
+// showreel's growth jump; user report).
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 let cleanups = [];
 

@@ -1,4 +1,5 @@
 @use "../abstracts/functions" as *;
+@use "../abstracts/breakpoints" as *;
 
 // Glass pill with a label and an icon: "Play Showreel" in the hero and
 // "Play Video" in the About gallery (Figma "Showreel Button", 1734:401).
@@ -23,5 +24,14 @@
   img {
     width: fs(16);
     height: fs(16);
+  }
+}
+
+// Touch screens: no blur behind it (a backdrop blur over a scaling video
+// made the showreel stutter while scrolling on a phone; user report).
+@include touch {
+  .glass-button {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }

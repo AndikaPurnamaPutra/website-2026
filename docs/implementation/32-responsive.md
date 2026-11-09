@@ -239,6 +239,31 @@ Langkah lanjutan yang mungkin (perlu keputusan / alat):
 - [x] Dikerjakan dan diukur; koin 3D di HP memuat HDR 512 tanpa fallback
       (WebGL headless).
 
+## Langkah 7b — Showreel dan koin di HP (laporan pengguna 9 Nov 2026, disetujui, dikerjakan)
+
+Laporan: di HP showreel patah-patah saat scroll, dan koin tidak terlihat.
+Tidak bisa direproduksi di sini (butuh perangkat); perbaikan dari penyebab
+yang paling mungkin, khusus layar sentuh (`hover: none`), desktop tak berubah:
+- Koin: bila konteks WebGL hilang (HP kehabisan memori grafis: kanvas kosong
+  tanpa error) gambar koin pengganti kembali (`webglcontextlost`, semua
+  perangkat). Di layar sentuh tanpa antialias dan kanvas 1× (`coin-scene.js`).
+- Showreel: clip tanpa sudut bulat saat membesar (sudut CSS video tetap),
+  tinggi layar dari `100lvh` agar tidak menyisakan celah saat bar browser
+  pergi (`hero-showreel.js`); blur tombol kaca mati (`_glass-button.scss`);
+  `ScrollTrigger.config({ ignoreMobileResize: true })` agar bar Safari yang
+  naik-turun tidak membuat pembesaran meloncat (`main.js`).
+- Belum: model GLB tekstur 512 untuk HP (memori GPU ±4× lebih kecil). Perintah
+  untuk pengguna (dari folder proyek; keluaran ke `src/assets/models/`):
+  `npx -y @gltf-transform/cli@4 optimize src/assets/models/oww-pin.glb src/assets/models/oww-pin-512.glb --compress meshopt --texture-compress webp --texture-size 512 --flatten false --join false --simplify false --instance false --palette false`
+  lalu `coin-scene.js` memilihnya di layar sentuh.
+- Dicek (Chrome headless, sentuh ditiru, 390): blur mati, kanvas 390 px lebar,
+  koin tampil, showreel membesar 1,93× dan koin sembunyi saat tertutup;
+  desktop 1440 identik piksel dengan acuan. Yang menentukan: cek di HP
+  pengguna.
+
+- [ ] Dicek di HP pengguna (showreel halus, koin tampil atau gambar
+      penggantinya).
+
 ## Kriteria selesai
 - Tidak ada scroll ke samping di lebar mana pun dari 320px.
 - Teks terbaca tanpa zoom (≥ 12px), area sentuh ≥ 44px.
