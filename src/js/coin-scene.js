@@ -211,9 +211,9 @@ export function mountCoin(anchors, fallback) {
       // through the sections below (user report). It goes once the showreel's
       // video fills the screen (showreel centred, src/js/hero-showreel.js),
       // where that cannot be seen, and comes back there on the way up.
-      // On touch screens the showreel does not grow (src/js/hero-showreel.js),
-      // so the coin only fades with the scroll.
-      const box = touch ? null : showreel?.getBoundingClientRect();
+      // On touch screens and below the laptop width the showreel does not
+      // grow (src/js/hero-showreel.js), so the coin only fades with the scroll.
+      const box = touch || window.innerWidth < 1024 ? null : showreel?.getBoundingClientRect();
       const covered = box ? box.top + box.height / 2 - screen / 2 + window.scrollY : Infinity;
       if (s < 1.2 && scroll < covered) {
         // Its Figma place with the page at the top (document place - scroll 0).

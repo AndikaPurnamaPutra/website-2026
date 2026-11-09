@@ -59,13 +59,14 @@ export function initHeroShowreel() {
     // and looked jerky on large screens (user report). The video scales
     // evenly until it covers the screen, and the clip trims the sides that
     // reach past it; the clip's corners go from 4px to square.
-    // Not on touch screens (user decision, 9 Nov 2026: it stuttered on an
-    // iPhone 13 in Safari, where the browser scrolls on its own and reports
-    // the position to scripts only now and then, so a growth tied to the
-    // scroll lags behind): there the showreel stays in its box, and a tap
-    // opens the pop-up as before. The coin then fades with the scroll alone
-    // (src/js/coin-scene.js).
-    if (window.matchMedia("(hover: none)").matches) return;
+    // Not on touch screens, nor in the tablet and phone layouts (user
+    // decisions, 9 Nov 2026: it stuttered on an iPhone 13 in Safari, where
+    // the browser scrolls on its own and reports the position to scripts
+    // only now and then, so a growth tied to the scroll lags behind; and a
+    // narrowed desktop window should show what phones show): there the
+    // showreel stays in its box, and a tap opens the pop-up as before. The
+    // coin then fades with the scroll alone (src/js/coin-scene.js).
+    if (window.matchMedia("(hover: none), (max-width: 1023.98px)").matches) return;
     let fit;
     const measure = () => {
       const box = showreel.getBoundingClientRect();
