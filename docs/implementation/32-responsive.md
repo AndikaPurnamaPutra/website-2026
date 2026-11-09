@@ -184,6 +184,50 @@ sebagai satu bagian bila barisnya inline.
       WebGL, gambar pengganti yang tampil) dan Safari iOS, dicek di perangkat
       pengguna.
 
+## Langkah 3b — Statement (disetujui dan dikerjakan 9 Nov 2026)
+
+Kondisi: kalimatnya 4 baris tetap (Figma) dengan `white-space: nowrap`,
+42px, ikon biru dan folder di dalam baris. Di 834 lebar teks 1208px dan di
+390 keluar layar kiri-kanan (terpotong "e specialize … cutting-edg"). Di
+1024 masih muat (skala tipe 0,889). Section di-pin 1,8 layar saat tinta
+mengalir (keputusan 3: tetap di-pin di HP).
+
+**Tablet (744–1023):** kalimat mengalir biasa (tanpa baris tetap dan offset
+per baris), 32px, line-height 1.5, rata tengah, lebar penuh dikurangi gutter
+32. Ikon dan folder tetap ukuran desktop (66×52, 120×78) di dalam alur teks
+dengan jarak 12px kiri-kanan, sejajar tengah baris. Eyebrow dan tombol tetap.
+Jarak atas/bawah 100 / 160.
+
+**HP (< 744):** sama, 24px, line-height 1.5 (±8 baris di 390); ikon dan
+folder 0,7× (46×36, 84×55). Jarak atas/bawah 80 / 120. Hold tetap 1,8 layar;
+isi (eyebrow + ±8 baris + tombol ≈ 520px) muat di layar 390×664 ke atas; HP
+lanskap (844 lebar) memakai aturan tablet dan muat dalam 2–3 baris.
+
+**Animasi:** tinta per huruf, ikon, folder dan tombol tetap bekerja:
+`statement-ink.js` memecah teks per `.statement__line` dan tidak mengukur
+tata letak baris, jadi baris yang membungkus tidak mengubahnya. Ikon dan
+folder dipanggil oleh huruf sebelumnya seperti sekarang.
+
+**Cara:** `_statement.scss` dalam `@include below-laptop` / `mobile`:
+`.statement__line` jadi inline (height auto, white-space normal, transform
+none, margin baris 3 dihapus), ikon `vertical-align: middle`, folder
+`display: inline-block; vertical-align: middle`; `.statement__inner`
+padding-inline gutter. Tanpa perubahan Pug/JS/konten.
+
+**Cek:** 320, 390, 744, 834 (teks tidak keluar layar, ikon dan folder di
+alur), pin dan tinta di 390 (scroll), 1024 dan 1440 tidak berubah.
+
+Catatan pengerjaan: reset CSS membuat `svg` block, jadi ikon diberi
+`display: inline-block`. Folder dikecilkan dengan `transform: scale(0.7)` di
+kotak 84×55 (bagian-bagiannya absolut dalam fs()). Di 320 eyebrow membungkus
+dengan ")" di baris sendiri (dibiarkan; teks Figma).
+
+- [x] Disetujui ("ya", 9 Nov 2026).
+- [x] Dikerjakan dan dicek (Chrome headless): 320, 390, 744, 834 teks di
+      dalam layar, ikon dan folder di alur; 1440 identik piksel; di 390
+      (sentuh, dengan animasi) section ter-pin (top tetap 146 dari scroll
+      1350) dan tinta mengalir sampai penuh.
+
 ## Langkah 7a — Preloader di HP (disetujui dan dikerjakan 9 Nov 2026)
 
 Keluhan pengguna: preloader terasa lama sekali di HP. Sebab: preloader
@@ -269,6 +313,14 @@ yang paling mungkin, khusus layar sentuh (`hover: none`), desktop tak berubah:
   sembunyi saat video memenuhi layar). Sudut clip dan tinggi `100lvh` untuk
   sentuh dicabut lagi (tidak terpakai). Dicek: sentuh 390 tanpa transform
   dan clip, koin sembunyi di scroll ±1000; desktop 1440 masih membesar.
+- Riwayat: perubahan "showreel tidak membesar" sempat dibatalkan
+  (`effce46`) lalu dipasang lagi (cherry-pick) atas permintaan pengguna, 9 Nov
+  2026: di HP showreel diam dan tetap potret 4:5 (pembesaran terasa aneh).
+  Tablet (744–1023) tetap 16:9 dan juga diam (layar sentuh).
+- Aturannya lalu diperluas (pengguna, 9 Nov 2026, saat mengecek di localhost
+  dengan jendela disempitkan): tidak membesar bila layar sentuh **atau** lebar
+  di bawah 1024 (tata letak tablet/HP), supaya jendela desktop yang
+  disempitkan menunjukkan apa yang HP tunjukkan. Desktop ≥ 1024 membesar.
 - [ ] Dicek di HP pengguna (showreel halus, koin tampil atau gambar
       penggantinya).
 

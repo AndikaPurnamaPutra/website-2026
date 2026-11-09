@@ -1,5 +1,6 @@
 // Figma: Section-2 1523:3259
 @use "../abstracts/functions" as *;
+@use "../abstracts/breakpoints" as *;
 
 .statement__inner {
   display: flex;
@@ -197,5 +198,79 @@ body.is-dark .statement {
 
   .statement .cta__label {
     transition: none;
+  }
+}
+
+// Tablet and phones (plan 32, step 3b; no Figma): the sentence flows as a
+// paragraph, centred, instead of Figma's four fixed lines (1208px wide), the
+// icon and the folder in the flow of the text. The ink, the icon, the folder
+// and the button work as before (src/js/statement-ink.js splits the text per
+// line and measures no line layout).
+@include below-laptop {
+  .statement__inner {
+    max-width: none;
+    padding: fluid(100) var(--page-gutter) fluid(160);
+  }
+
+  .statement__text {
+    font-size: fs(32);
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  .statement__line {
+    display: inline;
+    height: auto;
+    white-space: normal;
+    transform: none;
+  }
+
+  .statement__line--3 {
+    > :first-child {
+      margin-right: 0;
+    }
+
+    > :last-child {
+      margin-left: 0;
+    }
+  }
+
+  // Inline again (the reset makes svg a block).
+  .statement__icon {
+    display: inline-block;
+    margin: 0 fs(12);
+    vertical-align: middle;
+  }
+
+  .statement__folder {
+    display: inline-block;
+    margin: 0 fs(12);
+    vertical-align: middle;
+  }
+}
+
+@include mobile {
+  .statement__inner {
+    padding-block: fluid(80) fluid(120);
+  }
+
+  .statement__text {
+    font-size: fs(24);
+  }
+
+  // The icon and the folder at 0.7×; the folder's parts are in fs(), so it
+  // is scaled whole.
+  .statement__icon {
+    width: fs(46);
+    height: fs(36);
+    margin-top: 0;
+  }
+
+  .statement__folder {
+    width: fs(84);
+    height: fs(55);
+    margin-top: 0;
+    transform: scale(0.7);
+    transform-origin: left center;
   }
 }
