@@ -539,6 +539,123 @@ dan diukur dari blok salinan turun beberapa piksel di desktop).
       (10/10 huruf "believers.") dan motto 3, label berganti, tombol muncul;
       rotasi 834 → 1194 → 390 pengukuran ulang tepat.
 
+## Langkah 3h-2 — Sorotan Motto di iPhone (laporan pengguna 9 Nov 2026)
+
+iPhone 13 Safari: sorotan motto "tidak muncul". Diuji langsung di iPhone
+pengguna (iOS 27.0.1, tersambung kabel, dikendalikan lewat `safaridriver`
+dengan `platformName: iOS`): di preview Vercel (commit Motto `1cb698c`,
+gradien asli `background-clip: text`) **kedua sorotan tergambar dengan
+benar** ("Trendsetting Design" dan "believers." di baris kedua). Juga benar
+di Safari Mac. Perbaikan warna solid per huruf yang sempat dibuat tidak
+diperlukan dan dibatalkan sebelum di-commit. Kemungkinan yang dilihat
+pengguna sebelumnya: versi sebelum `1cb698c`, di mana baris motto 900px
+terpotong di layar HP sehingga kata yang disorot berada di luar layar.
+
+## Pemeriksaan seluruh Home di semua perangkat (9 Nov 2026)
+
+Alat: Chrome headless dengan animasi (15 ukuran: 320×640, 360×780, 390×844,
+430×932, 844×390, 744×1133, 834×1194, 1024×1366, 1194×834, 1366×1024 —
+sentuh; 1024×768, 1280×720, 1366×768, 1440×900, 1920×1080 — mouse), lewat
+server statis (`python3 -m http.server` di `dist/`; browser-sync menyamakan
+scroll antar browser dan mengacaukan hasil), dan **iPhone 13 pengguna**
+lewat kabel (`safaridriver`, iOS 27.0.1).
+
+Hasil Chrome: tidak ada error JS, tidak ada scroll samping atau elemen keluar
+layar (elips Motto dan gambar Services yang membesar terpotong bingkainya),
+preloader ±5,3 s, koin 3D termuat di semua ukuran.
+
+Temuan di iPhone (layar terpakai 699px, bukan 844):
+1. **Koin hero** mulai di 695 (di bawah lipatan) dan tenggelam di balik
+   showreel begitu digeser → tidak pernah terlihat. Perbaikan
+   (`_hero.scss`, HP): koin 150×141, dasar sejajar dasar tombol sosial
+   (`bottom: 437.5 + 20 + 64`), showreel 64 di bawah sosial. Diuji di
+   iPhone: koin utuh di layar pertama, tenggelam ke showreel saat digeser.
+2. **Footer lebih tinggi dari layar** (816 > 699): dengan efek tirai,
+   bagian atasnya (logo, "Get in Touch", koin) masih tertutup Motto saat di
+   layar dan sudah lewat saat terbuka → tidak pernah terlihat. Perbaikan:
+   efek tirai mati bila footer lebih tinggi dari layar (`footer-reveal.js`,
+   diperiksa tiap refresh); koin footer di HP di dalam footer, kanan atas
+   sejajar logo, 100×94, `top: 32` (pilihan B pengguna; `_footer.scss`); di
+   footer setinggi itu koin 3D mendarat saat tempatnya 40% dari atas layar
+   lalu ikut bergulir (`coin-scene.js`, `LAND`). Diuji di iPhone: logo,
+   form, dan koin terlihat. Desktop: tirai tetap (−281 → 0 di 1440×900).
+3. HP lanskap (844×390): koin hero di bawah lipatan — masuk langkah 7
+   (layar pendek), belum dikerjakan.
+
+- [x] Diperbaiki dan dicek ulang (7 ukuran Chrome + iPhone).
+
+## Langkah 4 — About (usulan 9 Nov 2026, menunggu persetujuan)
+
+Kondisi (screenshot 390 dan 834): halaman bisa digeser ke samping di HP dan
+tablet (lebar dokumen 1380 / 1392) karena galeri memakai posisi Figma
+mutlak dalam kanvas 1360 × 2128 (di HP `--px` = 1, jadi foto 1130px). Intro
+sudah muat (judul 3 baris; foto 1360:560 jadi pita 350 × 144 di HP).
+Principles di-pin: di 390 ilustrasi terdorong keluar layar kanan, di 834
+kolom teks 210px dan ilustrasi 590 berdesakan. Tim: kolom peran di 462 →
+keluar layar di HP (547); tablet muat.
+
+### 4a Intro
+- HP: judul 32px; foto 4:3 (gambar `height: 130%; object-fit: cover` agar
+  tetap lebih tinggi dari bingkainya untuk paralaks `about-intro.js`); teks
+  dan tombol seperti sekarang; jarak bawah 120.
+- Tablet: foto 16:9, jarak bawah 160. Selebihnya tetap.
+
+### 4b Principles — mengalir (keputusan 3), seperti Services
+Berlaku di HP, tablet, dan semua layar sentuh (`below-laptop-or-touch`); pin
+dan langkah hanya di layar hover ≥ 1024 (`gsap.matchMedia`, seperti
+`services-scroll.js`).
+```
+Hundreds of products later, …        (24px HP / 28px tablet)
+01 (Execution Over Overhead)
+   We replace long discovery…
+[ ilustrasi 01 — papan, 670:420, selebar konten ]
+02 (Frictionless Infrastructure)
+   …
+[ ilustrasi 02 ]
+… sampai 06
+```
+- `.principles__inner` jadi grid satu kolom; `__text`, `__detail`,
+  `__items`, `__figures` `display: contents`; urutan intro → item n →
+  ilustrasi n lewat `order`; daftar nomor (tombol) disembunyikan, nomor tiap
+  prinsip ditulis lewat `counter` di depan judul.
+- Tiap ilustrasi: `position: static`, lebar penuh, `aspect-ratio: 670/420`,
+  sudut 4px. Papan (ilustrasi 01, HTML dalam em): `font-size: calc(100cqw /
+  670)` dengan `container-type: inline-size` pada inner, jadi skalanya
+  mengikuti lebar; `position: relative` untuk anak-anaknya.
+- Animasi: cerita papan (Motion-01, ±4,5 s) diputar sekali saat papan masuk
+  layar; tidak ada animasi lain (tidak menambah).
+- Jarak: intro → prinsip 1: 48; teks → ilustrasi 20; antar prinsip 48 (HP) /
+  64 (tablet); section padding 80 / 100.
+
+### 4c Galeri
+- Tablet (744–1023): komposisi Figma dipertahankan tapi diskalakan ke lebar
+  konten: `--gpx: calc(100cqw / 1360)` (container pada `.container`),
+  dipakai untuk x/y/w/h dan tinggi kanvas; di 770 lebar foto besar 640, foto
+  kecil 195. Naik-turun saat scroll (`about-gallery.js`, dalam frame px)
+  tetap.
+- HP (< 744): satu kolom, urutan Figma, tiap foto selebar konten dengan
+  rasio Figma-nya (1130:636, 460:589, 805:411, 345:325, 920:478), jarak 16.
+  Tirai dan naik-turun tetap (ukuran naik 96/150 frame-px masih wajar di
+  kolom; dicek). "Play Video" tetap di tengah foto pertama.
+- Jarak atas 120 (HP) / 160 (tablet).
+
+### 4d Tim
+- HP: nama dan peran ditumpuk dalam satu baris (peran 12px, abu, di bawah
+  nama), garis per baris tetap; lead 16px.
+- Tablet: seperti desktop (sudah muat).
+- Pratinjau foto mengikuti kursor hanya mouse (sudah).
+
+**Desktop dan laptop (≥ 1024):** tidak berubah. **File:** `_about.scss`,
+`principles-scroll.js` (pembungkus matchMedia + cabang alur untuk cerita
+papan). Tanpa Pug/konten.
+
+**Cek:** 320, 390, 744, 834 tiap section (tidak ada scroll samping di seluruh
+About), papan proporsional, cerita papan jalan di HP, galeri bergerak, tim
+terbaca; 1440 identik piksel; rotasi 834 ↔ 1194 (pin/alur berganti).
+
+- [ ] Disetujui.
+- [ ] Dikerjakan dan dicek.
+
 ## Langkah 7a — Preloader di HP (disetujui dan dikerjakan 9 Nov 2026)
 
 Keluhan pengguna: preloader terasa lama sekali di HP. Sebab: preloader

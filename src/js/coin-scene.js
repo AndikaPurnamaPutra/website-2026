@@ -46,6 +46,9 @@ const FLIP = -Math.PI; // half a flip as it leaves the hero, over its horizontal
 // same rate (another half, FLIP → 2 × FLIP) to face us again: one flip that
 // starts in the hero and ends in the footer (user decision).
 const HERO_DOWN = 0.4; // px the coin moves down per px of scroll, leaving the hero
+// Footer taller than the screen (phones): the share of the screen down at
+// which the coin lands (see pose).
+const LAND = 0.4;
 const DROP = 0.6; // screens the coin travels down while it arrives in the footer
 const INTRO = 2.4; // s: the entrance on load
 const INTRO_DROP = 0.35; // screens it comes down from, above its place
@@ -243,15 +246,28 @@ export function mountCoin(anchors, fallback) {
       }
     }
     if (anchors.footer) {
-      const max = document.documentElement.scrollHeight - screen;
+      const pageEnd = document.documentElement.scrollHeight - screen;
+      const at = rest(anchors.footer);
+      const shift = footer ? gsap.getProperty(footer, "y") : 0;
+      // Its place on the screen at the end of the page (document place - the
+      // footer's current reveal shift - the last scroll position).
+      const atEnd = at.y + window.scrollY - shift - pageEnd;
+      // Where it lands: at the end of the page, as designed, with the footer
+      // within the screen. A footer taller than the screen (phones) scrolls
+      // with the page (src/js/footer-reveal.js) and its coin's place has
+      // left the top by the end (user report: never seen): there it lands
+      // once its place is LAND of the way down the screen, then stays on its
+      // place as the page scrolls on.
+      const tall = !!footer && footer.offsetHeight > screen;
+      const max = tall && atEnd < LAND * screen ? Math.max(pageEnd - (LAND * screen - atEnd), 0) : pageEnd;
+      if (scroll > max) {
+        faceUs(true);
+        return { x: at.x, y: at.y, zoom: at.zoom, tilt: FLIP * (1.5 + 0.5 * facing.value), opacity: 1 };
+      }
       const left = (max - scroll) / screen;
       const arrive = 1 - clamp(left);
       if (arrive > 0) {
-        // Its design place at the end of the page (document place - the
-        // footer's current reveal shift - the last scroll position).
-        const at = rest(anchors.footer);
-        const shift = footer ? gsap.getProperty(footer, "y") : 0;
-        const end = at.y + window.scrollY - shift - max;
+        const end = max === pageEnd ? atEnd : LAND * screen;
         // Comes down from above (from behind Motto) and rests there. The
         // flip carries on the hero's turn, but only once the coin shows
         // below the edge of the section above (user decision, option A):

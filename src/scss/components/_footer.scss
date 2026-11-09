@@ -324,10 +324,15 @@
     display: none;
   }
 
+  // Inside the footer, top right beside the logo (user decision, option B):
+  // the footer is taller than a phone's screen, so the coin coming out from
+  // under the section above at its top edge was never seen (it was still
+  // covered while that edge was on screen).
   .site-footer__coin {
-    top: fluid(-64);
-    width: fluid(150);
-    height: fluid(141);
+    top: fluid(32); // the 3D coin reaches a little past its box
+    right: var(--page-gutter);
+    width: fluid(100);
+    height: fluid(94);
   }
 }
 

@@ -344,16 +344,23 @@
     content: " ";
   }
 
+  // Smaller and higher (user decision, 9 Nov 2026): on an iPhone 13 Safari
+  // leaves 699px of screen, the first screen ends just below the social
+  // links, and the coin sat below that, then sank behind the showreel as
+  // soon as the page moved, so it was never seen. Now it sits on the right,
+  // its lower edge level with the social links' (the showreel, 437.5 tall
+  // with the 20 gutter below it, is 64 below them), whole on the first
+  // screen; the showreel comes closer (64).
   .hero__coin {
     right: var(--page-gutter);
-    bottom: fluid(363);
+    bottom: fluid(437.5 + 20 + 64);
     left: auto;
-    width: fluid(200);
-    height: fluid(188);
+    width: fluid(150);
+    height: fluid(141);
   }
 
   .hero__showreel {
-    margin-top: fluid(120);
+    margin-top: fluid(64);
     aspect-ratio: 4 / 5;
   }
 }

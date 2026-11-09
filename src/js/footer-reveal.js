@@ -20,9 +20,15 @@ export function initFooterReveal() {
   // includes the shift, which made the range start too early and the footer
   // move with the page for most of it.
   const above = footer.previousElementSibling;
+  // Not for a footer taller than the screen (phones: 816 of 699 on an
+  // iPhone 13): its top was still behind the section above while it rose,
+  // and had left the screen by the time it was uncovered, so its logo, the
+  // form's label and the coin were never seen (user report). It scrolls
+  // with the page there. Checked on every refresh.
+  const tall = () => footer.offsetHeight > window.innerHeight;
   const tween = gsap.fromTo(
     footer,
-    { y: () => -LAG * footer.offsetHeight, "--footer-shade": SHADE },
+    { y: () => (tall() ? 0 : -LAG * footer.offsetHeight), "--footer-shade": () => (tall() ? 0 : SHADE) },
     {
       y: 0,
       "--footer-shade": 0,
