@@ -1,5 +1,6 @@
 // Figma: Hero 1523:3215
 @use "../abstracts/functions" as *;
+@use "../abstracts/breakpoints" as *;
 
 // The full-screen showreel reaches 1px past the screen edges (no seam); after
 // its pin it stays that size in the flow, so the sides are clipped here to keep
@@ -242,4 +243,117 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+// Laptop (1024–1279): the coin a little further left, off the date.
+@include laptop {
+  .hero__coin {
+    left: calc(50% + #{fluid(182 - 224 - 40)});
+  }
+}
+
+// Tablet and phones (plan 32, step 3a; no Figma). The intro column is
+// dissolved (display: contents) so the headline, the social links and the
+// info become cells of one grid: the headline across the top, the rest
+// placed below it. By source order, so it holds while the intro animation
+// wraps the social links in a mask (src/js/hero-intro.js).
+@include below-laptop {
+  .hero__inner {
+    padding-top: fluid(40);
+  }
+
+  .hero__intro {
+    display: contents;
+  }
+
+  .hero__content {
+    display: grid;
+    row-gap: fluid(48);
+  }
+
+  .hero__title {
+    grid-column: 1 / -1;
+  }
+
+  .hero__info {
+    flex: none;
+  }
+
+  .hero__coin {
+    top: auto;
+  }
+}
+
+// Tablet: the headline in Figma's 3 lines at 64px; below it the social
+// links on the left, the info on the right (its desktop width) and the coin
+// between them, its lower part behind the showreel as on the desktop.
+@include tablet {
+  .hero__content {
+    grid-template-columns: auto 1fr;
+    align-items: end;
+  }
+
+  .hero__title {
+    font-size: fs(64);
+  }
+
+  .hero__info {
+    width: fs(321);
+    justify-self: end;
+  }
+
+  .hero__coin {
+    left: fluid(162);
+    // Its lower 120 behind the showreel (442 tall at this width).
+    bottom: fluid(354);
+    width: fluid(300);
+    height: fluid(281);
+  }
+}
+
+// Phones: one column in the order the parts rise in (headline, description,
+// date and time, social links); the headline at 48px wraps Figma's line
+// blocks to 5 lines. The coin, smaller, on the right in the gap before the
+// showreel, half of it behind it. The showreel is 4:5: the video is portrait
+// (1280 × 1920), so it shows more of it and grows less to fill the screen.
+@include mobile {
+  .hero__content {
+    grid-template-columns: 1fr;
+    row-gap: fluid(32);
+  }
+
+  .hero__title {
+    order: -2;
+    font-size: fs(48);
+  }
+
+  .hero__info {
+    order: -1;
+    gap: fs(24);
+  }
+
+  // The description flows as one paragraph: its Figma lines, kept as blocks,
+  // wrapped raggedly on narrow phones (320–360). A space between them, as
+  // the lines have none; the intro raises it whole (src/js/hero-intro.js).
+  .hero__description .hero__line,
+  .hero__description .hero__line-text {
+    display: inline;
+  }
+
+  .hero__description .hero__line::after {
+    content: " ";
+  }
+
+  .hero__coin {
+    right: var(--page-gutter);
+    bottom: fluid(363);
+    left: auto;
+    width: fluid(200);
+    height: fluid(188);
+  }
+
+  .hero__showreel {
+    margin-top: fluid(120);
+    aspect-ratio: 4 / 5;
+  }
 }

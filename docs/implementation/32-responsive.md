@@ -1,6 +1,7 @@
 # 32 — Responsive (semua perangkat)
 
-Branch: `responsive/plan` (dari `dev`). Status: rancangan, belum ada kode. Figma hanya punya desain desktop 1440;
+Branch: `responsive/plan` (dari `dev`). Status: langkah 1–2 selesai (dasar,
+navbar + menu HP, footer; 6 Nov 2026), langkah 3 berjalan. Figma hanya punya desain desktop 1440;
 tidak ada frame tablet atau mobile. Rencana ini menetapkan cara kerja dan
 urutan; tiap tampilan baru tetap diusulkan dan disetujui dulu (AGENTS.md
 §7, §13).
@@ -93,6 +94,96 @@ urutan; tiap tampilan baru tetap diusulkan dan disetujui dulu (AGENTS.md
    1366×768, 1440, 1512, 1920, 2560; HP lanskap (844×390); Safari iOS;
    Lighthouse mobile.
 
+## Langkah 3a — Hero (disetujui dan dikerjakan 9 Nov 2026)
+
+Kondisi (screenshot Chrome, reduced motion agar preloader lewat): di 390
+judul 80px jadi 7 baris dan menimpa deskripsi dan koin; di 834 judul 5 baris
+dan koin menutup tanggal; di 1024 pas, koin menyentuh teks tanggal.
+
+Susunan desktop: kiri judul + tombol sosial, kanan deskripsi + tanggal/jam,
+koin di antaranya (bagian bawahnya di belakang showreel), showreel 1360:781
+di bawah. Catatan: video showreel aslinya potret 1280×1920; di desktop hanya
+bagian tengahnya yang tampak (object-fit: cover).
+
+**Tablet (744–1023, frame 834):**
+```
+Elite digital products          (64px, 3 baris seperti Figma)
+designed at venture
+speed
+
+[Be][Dr]        (koin)        Strategy, visual systems, ...
+                               Monday, November 9
+                               IDN / GMT +7 [09:04AM]
+[============ showreel 1360:781 ============]
+```
+- Judul selebar konten di atas; baris kedua: sosial kiri bawah, deskripsi +
+  tanggal/jam kanan (lebar 321 seperti desktop), koin di tengah di antara
+  keduanya (≈300×281 px frame), bagian bawahnya di belakang showreel seperti
+  desktop. Jarak judul → baris kedua 48.
+- Showreel tetap 1360:781, lebar penuh.
+
+**HP (< 744, frame 390, gutter 20):**
+```
+Elite digital          (48px; 5 baris: Elite digital / products /
+products                designed at / venture / speed, karena
+designed at             blok baris Figma dipertahankan untuk
+venture                 animasi naiknya)
+speed
+
+Strategy, visual systems, branding, and high-end
+web design. ... (14px, mengalir)
+
+Monday, November 9
+IDN / GMT +7 [09:04AM]
+
+[Be][Dr]                              (koin
+                                       ≈200×188, kanan)
+[==== showreel 4:5 (350×437) ====]
+```
+- Satu kolom, urutan: judul, deskripsi, tanggal/jam, sosial (sama dengan
+  urutan animasi naiknya, jadi tidak ada bagian yang muncul "di tengah").
+- Koin lebih kecil di kanan, di celah antara sosial dan showreel, separuh
+  bawahnya di belakang showreel (seperti footer HP). Koin 3D mengikuti kotak
+  gambar ini (sudah begitu di `coin-scene.js`), jadi ikut mengecil; piksel
+  rasio sudah dibatasi 1.5 (keputusan 4 dipakai: tetap 3D).
+- **Showreel 4:5** (bukan 16:9): video aslinya potret, jadi di HP justru lebih
+  utuh; dan saat scroll ia hanya perlu membesar ±1.9× untuk memenuhi layar
+  (16:9 di HP perlu 4.2× dan jadi pecah). Tombol "Play Showreel" tetap di
+  tengah (di layar sentuh tidak mengikuti jari; sudah begitu). Ketuk di mana
+  saja membuka pop-up (sudah bekerja lewat click).
+- Judul 48px: di 320px masih 5 baris ("designed at" muat sampai ±57px).
+
+**Laptop (1024–1279):** koin digeser sedikit ke kiri (±40 px frame) agar tidak
+menyentuh teks tanggal. Desktop ≥ 1280 tidak berubah.
+
+**Cara:** aturan di `src/scss/sections/_hero.scss` dalam `@include tablet` /
+`mobile` / `laptop`. Di bawah laptop `.hero__intro` jadi `display: contents`
+dan `.hero__content` jadi grid, supaya judul bisa selebar konten dan sosial
+pindah tempat tanpa mengubah Pug (urutan DOM dan animasi tetap). Rasio
+showreel 4:5 lewat CSS saja; `hero-showreel.js` mengukur kotak, tidak perlu
+diubah. Tidak ada konten atau elemen baru.
+
+**Cek:** 320, 360, 390, 430, 744, 834, 1024, 1180; HP lanskap 844×390; tidak
+ada scroll samping; animasi masuk setelah preloader dan setelah transisi
+halaman; showreel membesar sampai penuh saat scroll dan pop-up terbuka dengan
+ketuk; koin 3D di tempat dan ukurannya; desktop 1440 dibandingkan screenshot
+sebelum.
+
+Penyimpangan kecil dari usulan: di HP deskripsi mengalir sebagai satu
+paragraf (baris-baris Figma-nya inline, dengan spasi), karena sebagai blok
+terpisah ia membungkus tidak rapi di 320–360; `hero-intro.js` menaikkannya
+sebagai satu bagian bila barisnya inline.
+
+- [x] Disetujui ("ya", 9 Nov 2026).
+- [x] Dikerjakan dan dicek (Chrome headless, viewport dipaksa; catatan:
+      Chrome headless punya lebar jendela minimal 500, jadi HP harus lewat
+      emulasi perangkat): 320, 360, 390, 744, 834, 1024, 844×390; 1440
+      identik piksel dengan sebelum; hero tidak melebihi layar; animasi
+      masuk selesai dengan urutan baru; showreel 4:5 membesar 1.93× sampai
+      memenuhi layar di tengah scroll. Belum dicek: koin 3D (headless tanpa
+      WebGL, gambar pengganti yang tampil) dan Safari iOS, dicek di perangkat
+      pengguna.
+
 ## Kriteria selesai
 - Tidak ada scroll ke samping di lebar mana pun dari 320px.
 - Teks terbaca tanpa zoom (≥ 12px), area sentuh ≥ 44px.
@@ -105,4 +196,5 @@ urutan; tiap tampilan baru tetap diusulkan dan disetujui dulu (AGENTS.md
 - [x] Keputusan 2–6 (usulan disetujui; 4 dan 5 dikonfirmasi lagi di
       langkahnya).
 - [x] Referensi navbar dari pengguna; usulan navbar disetujui.
-- [ ] Langkah 1–8.
+- [x] Langkah 1–2 (dasar; navbar + menu HP; footer).
+- [ ] Langkah 3–8.

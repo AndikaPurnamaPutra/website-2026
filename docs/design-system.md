@@ -93,7 +93,16 @@ Variants handled at section level (same size, different line-height or tracking 
 - CTA texture: `mix-blend-mode: screen`, opacity .1 [T]
 
 ## Breakpoints
-Not defined yet. The designer will deliver mobile designs, and breakpoints will be added (`src/scss/abstracts/_breakpoints.scss`) when they arrive.
+Figma has only the 1440 desktop; the tablet and phone layouts are proposed per section and approved by the user (`docs/implementation/32-responsive.md`). Desktop first: the styles as written are the desktop, `src/scss/abstracts/_breakpoints.scss` adds the rest. [U, user decision 6 Nov 2026]
+| Name | Width | Design pixel (`--px`) | Type (`--type-px`) | Gutter |
+|---|---|---|---|---|
+| Desktop | ≥ 1280 | `100vw / 1440`, capped at 2560 | rem-based, 1× → 1.2× at 2560 | 40 |
+| Laptop | 1024–1279 | `100vw / 1440` (0.711–0.889×) | floor 1280/1440 | 40 |
+| Tablet | 744–1023 | `100vw / 834` (frame 834) | 1rem, not scaled | 32 |
+| Mobile | < 744 | `100vw / 390` (frame 390), clamped to 320–480 | 1rem, not scaled | 20 |
+- Mixins: `mobile`, `tablet`, `below-laptop` (both), `laptop`, `short` (height < 500: phones sideways), `touch` (`hover: none`: hover interactions replaced).
+- Values in tablet and mobile rules are written in their frame's px with `fluid()` / `fs()`; JS follows in `src/js/design-px.js`.
+- Text never below 12px; touch targets at least 44px; no sideways scroll from 320px up.
 
 ## Header
 - Figma `1611:6986`: fixed, solid white, padding 24px 40px (72px tall), shadow `0 4px 10px rgba(0,0,0,.04)`. Same height at the top and while scrolling. [T]

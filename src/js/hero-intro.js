@@ -29,8 +29,12 @@ export function initHeroIntro() {
   const [titleTexts, descriptionTexts] = [".hero__title", ".hero__description"].map((selector) => [
     ...hero.querySelectorAll(`${selector} .hero__line-text`),
   ]);
-  // One-line parts rise whole, each in a mask of its own.
-  const wrapped = [".hero__date", ".hero__timezone", ".hero__social"].map((selector) => {
+  // On phones the description flows as one paragraph (its lines inline,
+  // src/scss/sections/_hero.scss), so it rises whole, with the one-line
+  // parts: each in a mask of its own.
+  const flowing = getComputedStyle(descriptionTexts[0]).display === "inline";
+  const whole = [flowing ? ".hero__description" : null, ".hero__date", ".hero__timezone", ".hero__social"].filter(Boolean);
+  const wrapped = whole.map((selector) => {
     const part = hero.querySelector(selector);
     const mask = document.createElement("div");
     mask.className = "hero-intro-mask";
@@ -38,13 +42,15 @@ export function initHeroIntro() {
     mask.append(part);
     return part;
   });
-  lines.forEach((line) => line.classList.add("hero-intro-mask"));
+  const lineTexts = flowing ? titleTexts : [...titleTexts, ...descriptionTexts];
+  const maskedLines = flowing ? lines.filter((line) => !line.closest(".hero__description")) : lines;
+  maskedLines.forEach((line) => line.classList.add("hero-intro-mask"));
 
-  const parts = [...titleTexts, ...descriptionTexts, ...wrapped];
+  const parts = [...lineTexts, ...wrapped];
   gsap.set(parts, { yPercent: RISE.yPercent });
 
   const finish = () => {
-    lines.forEach((line) => line.classList.remove("hero-intro-mask"));
+    maskedLines.forEach((line) => line.classList.remove("hero-intro-mask"));
     wrapped.forEach((part) => part.parentElement.replaceWith(part));
     gsap.set(parts, { clearProps: "transform" });
   };
@@ -56,7 +62,7 @@ export function initHeroIntro() {
     .timeline({ paused: true, onComplete: finish })
     .to(titleTexts, { yPercent: 0, ...rise, stagger: LINE_GAP }, start)
     .add(() => document.dispatchEvent(new CustomEvent("hero:introduced")), start + titleEnd + RISE.duration * 0.8)
-    .to([...descriptionTexts, ...wrapped], { yPercent: 0, ...rise, stagger: PART_GAP }, start + titleEnd + LINE_GAP);
+    .to([...(flowing ? [] : descriptionTexts), ...wrapped], { yPercent: 0, ...rise, stagger: PART_GAP }, start + titleEnd + LINE_GAP);
   const play = () => timeline.play();
   const reveal = transition ? "page:reveal" : "preloader:reveal";
   document.addEventListener(reveal, play, { once: true });
