@@ -290,6 +290,57 @@ tidak berubah (pin dan langkah tetap), putar dari 834 ke 1194 (pin terpasang).
       datang dan terang di Our Work; 834 → 1194 → 834 pin terpasang dan
       dilepas sendiri (tinggi inner 2025 → 834 → 2025).
 
+## Langkah 3d — Our Work (disetujui dan dikerjakan 9 Nov 2026)
+
+Kondisi: header satu baris (eyebrow + judul 42px kiri, 5 kategori kanan,
+nowrap) → di 390 kategori keluar layar (lebar 594; ini salah satu penyebab
+halaman bisa digeser ke samping di HP), judul jadi 4 baris; di 834 kategori
+membungkus "Graphic / Design". Dua karusel: kartu `fluid(325)` → di 390 kartu
+325px nyaris selebar konten (350), kartu berikutnya hanya mengintip 5px;
+scroll karusel sudah native (snap, geser jari), panah tetap bekerja; label
+"View Project" hanya mouse. Tombol "More Work" dan garis di bawahnya.
+
+**Tablet dan HP (< 1024):**
+```
+( Our Work )
+Thoughtful Design,            (HP 32px, 2 baris; tablet 42px)
+Real Impact
+Branding  UI/UX  Illustration  2D/3D  Graphic Design   (membungkus, gap 12×20)
+────────────────────────────────
+Recently Added            ‹ ›
+[kartu][kartu][ka…  → geser; HP kartu 280 (gambar 280×210), yang berikutnya
+                       mengintip ±50px; tablet kartu tetap 325
+Selected Work             ‹ ›
+[kartu][kartu][ka…
+────────────────────────────────
+[More Work]
+```
+- Header ditumpuk: eyebrow, judul, lalu baris kategori yang membungkus
+  (rata kiri). Judul HP 32px, tablet tetap 42px.
+- Kartu HP 280 (frame px): kotak crop gambar per kartu (nilai Figma × `--px`)
+  ikut diskalakan 280/325 lewat variabel `--card-scale`, supaya potongan
+  gambarnya sama seperti desktop. Judul kartu 13px dan nowrap tetap (judul
+  panjang tertutup kartu berikutnya, seperti desktop).
+- Jarak section: HP 100 atas/bawah, tablet 120 (desktop 180).
+- Animasi masuk (teks naik, kartu membuka) tidak berubah.
+
+**Laptop dan desktop (≥ 1024):** tidak berubah.
+
+**Cara:** `_our-work.scss` (`below-laptop`: header kolom, kategori
+`flex-wrap`, judul 32px di `mobile`, padding) dan `_work-carousel.scss`
+(`mobile`: `.work-card` 280, media 210, `--card-scale: 280/325`; aturan dasar
+crop dikali `var(--card-scale, 1)`). Tanpa perubahan Pug/JS/konten.
+
+**Cek:** 320, 390, 744, 834 (tidak ada scroll samping dari section ini,
+kategori membungkus, kartu mengintip, geser dan panah jalan, judul kartu), 1440
+identik.
+
+- [x] Disetujui ("okey", 9 Nov 2026).
+- [x] Dikerjakan dan dicek (Chrome headless): 320, 390, 744, 834 tidak ada
+      yang melebihi layar (kategori membungkus 2 baris di HP, 1 baris di
+      tablet), kartu 280×210 di 390 (239 di 320), 325 di 834; 1440 identik
+      piksel. Bersamaan: jarak dalam kartu Services di HP 32 → 24 (pengguna).
+
 ## Langkah 7a — Preloader di HP (disetujui dan dikerjakan 9 Nov 2026)
 
 Keluhan pengguna: preloader terasa lama sekali di HP. Sebab: preloader

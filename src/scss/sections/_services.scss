@@ -260,3 +260,11 @@
     margin-bottom: 0;
   }
 }
+
+// Phones: the card's parts closer together (32 read loose on a small screen;
+// user, 9 Nov 2026).
+@include mobile {
+  .services__card:nth-child(n) {
+    gap: fs(24);
+  }
+}

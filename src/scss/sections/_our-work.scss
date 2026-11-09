@@ -1,5 +1,6 @@
 // Figma: Our Work 1523:3316
 @use "../abstracts/functions" as *;
+@use "../abstracts/breakpoints" as *;
 
 .our-work {
   display: flex;
@@ -49,5 +50,34 @@
 @media (prefers-reduced-motion: reduce) {
   .our-work__category {
     transition: none;
+  }
+}
+
+// Tablet and phones (plan 32, step 3d; no Figma): the header stacked, the
+// categories wrapping (in one line they ran off the phone screen).
+@include below-laptop {
+  .our-work {
+    padding-block: fluid(120);
+  }
+
+  .our-work__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: fluid(32);
+  }
+
+  .our-work__categories {
+    flex-wrap: wrap;
+    gap: fs(12) fs(20);
+  }
+}
+
+@include mobile {
+  .our-work {
+    padding-block: fluid(100);
+  }
+
+  .our-work__heading .text-heading-42 {
+    font-size: fs(32);
   }
 }

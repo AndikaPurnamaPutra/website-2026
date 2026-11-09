@@ -1,5 +1,6 @@
 // Figma: carousel rows in Our Work (1523:3330 / 1523:3359).
 @use "../abstracts/functions" as *;
+@use "../abstracts/breakpoints" as *;
 
 // container-type lets the track compute the page edge with cqw.
 .work-carousel {
@@ -84,13 +85,15 @@
   background: var(--color-white);
 }
 
-// Image box size and offset come from Figma per card (inline --w/--h/--x/--y).
+// Image box size and offset come from Figma per card (inline --w/--h/--x/--y),
+// scaled with the card where it is narrower than Figma's (--card-scale,
+// phones).
 .work-card__crop {
   position: absolute;
-  top: calc(50% + var(--y) * var(--px));
-  left: calc(50% + var(--x) * var(--px));
-  width: calc(var(--w) * var(--px));
-  height: calc(var(--h) * var(--px));
+  top: calc(50% + var(--y) * var(--px) * var(--card-scale, 1));
+  left: calc(50% + var(--x) * var(--px) * var(--card-scale, 1));
+  width: calc(var(--w) * var(--px) * var(--card-scale, 1));
+  height: calc(var(--h) * var(--px) * var(--card-scale, 1));
   overflow: hidden;
   transform: translate(-50%, -50%);
 }
@@ -149,5 +152,19 @@
 
   span {
     line-height: 1.2;
+  }
+}
+
+// Phones (plan 32, step 3d): narrower cards, so the next one peeks in (325
+// was nearly the whole screen); the pictures cropped as on the desktop.
+@include mobile {
+  .work-card {
+    --card-scale: calc(280 / 325);
+
+    flex-basis: fluid(280);
+  }
+
+  .work-card__media {
+    height: fluid(210);
   }
 }
