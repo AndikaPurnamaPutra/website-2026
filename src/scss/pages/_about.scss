@@ -1532,6 +1532,7 @@
 // with their name.
 .ds-pointer {
   position: absolute;
+  z-index: 3; // over everything else in the illustration
   top: calc(var(--y, 0) * 1em);
   left: calc(var(--x, 0) * 1em);
   width: 16em;
@@ -1562,6 +1563,633 @@
     background: rgba(0, 0, 0, 0.25);
     border: 0.1em solid rgba(255, 255, 255, 0.24);
     border-radius: 1.6em;
+  }
+}
+
+// Illustration 04, a client's comment answered and done (Figma P-1
+// 2095:5591 … P-4 2129:6457; docs/implementation/36-principles-04-feedback.md).
+// On the same scale as 01 (one em per Figma pixel); places that move are
+// custom properties for src/js/principles-scroll.js. The defaults are P-1.
+
+// The window's and the card's lavender edge (1.321, brightest at --ra
+// degrees; the Figma code gives a plain colour, the renders a gradient).
+@mixin cm-edge {
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -1.321em;
+    padding: 1.321em;
+    pointer-events: none;
+    background: conic-gradient(
+      from calc(var(--ra, 0) * 1deg - 180deg),
+      rgb(26 26 27) 0deg,
+      rgb(26 26 27) 50deg,
+      rgb(70 70 92) 120deg,
+      rgb(112 112 150) 180deg,
+      rgb(70 70 92) 240deg,
+      rgb(26 26 27) 310deg,
+      rgb(26 26 27) 360deg
+    );
+    border-radius: inherit;
+    opacity: var(--ring, 1);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
+}
+
+.cm-glow {
+  opacity: 1;
+}
+
+// Every text in Inter, trimmed to its capitals and baseline, as in Figma.
+.cm-tag,
+.cm-box,
+.cm-card {
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  line-height: normal;
+
+  span {
+    text-box: trim-both cap alphabetic;
+    white-space: nowrap;
+  }
+}
+
+// P-1: dashed arcs from the client (#4F4F4F fading to the background).
+.cm-arcs {
+  position: absolute;
+  inset: 0;
+  width: 670em;
+  height: 420em;
+}
+
+.cm-arc {
+  stroke-width: 1;
+  stroke-dasharray: 3 2.9;
+}
+
+// The team: glass discs (--dx, --dy, --k to move and shrink them), over the
+// window (the client flies into it).
+.cm-member {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 64em;
+  height: 64em;
+  background: rgba(0, 0, 0, 0.25);
+  border: 0.828em solid rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+  box-shadow: 0 6.4em 32em rgba(0, 0, 0, 0.25);
+  translate: calc(var(--dx, 0) * 1em) calc(var(--dy, 0) * 1em);
+  scale: var(--k, 1);
+  backdrop-filter: blur(13.252em);
+
+  img {
+    display: block;
+    width: 50em;
+    height: 50em;
+  }
+
+  &[data-member="client"] {
+    top: 68em;
+    left: 285em;
+    width: 100em;
+    height: 100em;
+    background: #1f1f29;
+    border-width: 1.293em;
+    box-shadow: 0 10em 50em rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(20.707em);
+
+    img {
+      width: 80em;
+      height: 80em;
+    }
+  }
+
+  &[data-member="lead"] {
+    top: 222em;
+    left: 119em;
+    background: #271f29;
+  }
+
+  &[data-member="pmo"] {
+    top: 210em;
+    left: 482em;
+    background: #291f1f;
+  }
+
+  &[data-member="designer-a"] {
+    top: 290em;
+    left: 220em;
+  }
+
+  &[data-member="designer-b"] {
+    top: 290em;
+    left: 395em;
+  }
+}
+
+.cm-member__user {
+  width: 32em !important;
+  height: 32em !important;
+}
+
+// Their names, centred under or beside them, over the discs (as in Figma).
+.cm-tag {
+  position: absolute;
+  z-index: 2;
+  padding: 8em;
+  background: rgba(0, 0, 0, 0.25);
+  border: 0.696em solid #202020;
+  border-radius: 16em;
+  translate: -50% 0;
+  backdrop-filter: blur(13.252em);
+
+  span {
+    display: block;
+    font-size: 10em;
+    color: #cacaca;
+  }
+
+  &[data-tag="lead"] {
+    top: 217em;
+    left: 103.2em;
+  }
+
+  &[data-tag="pmo"] {
+    top: 210em;
+    left: 560.2em;
+  }
+
+  &[data-tag="designer-a"] {
+    top: 345em;
+    left: 249.2em;
+  }
+
+  &[data-tag="designer-b"] {
+    top: 345em;
+    left: 427.2em;
+  }
+}
+
+.cm-tag--client {
+  top: 50em;
+  left: 334.7em;
+  padding: 12em;
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 6.4em 32em rgba(207, 207, 207, 0.25);
+
+  span {
+    font-size: 14em;
+    color: #fff;
+  }
+}
+
+// P-2 and P-3: the window (--x, --y, --w, --h): the thread (234 × 267),
+// then Figma (542 × 446, past the frame's foot); hidden in P-1.
+.cm-box {
+  --x: 218;
+  --y: 76;
+  --w: 234;
+  --h: 267;
+
+  position: absolute;
+  top: calc(var(--y) * 1em);
+  left: calc(var(--x) * 1em);
+  width: calc(var(--w) * 1em);
+  height: calc(var(--h) * 1em);
+  background: #000;
+  border: 1.321em solid transparent;
+  border-radius: 20em;
+  opacity: 0;
+  @include cm-edge;
+
+  img {
+    display: block;
+  }
+}
+
+.cm-screen {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  border-radius: 18.679em;
+  isolation: isolate;
+}
+
+.cm-thread,
+.cm-figma {
+  position: absolute;
+  inset: 0;
+}
+
+.cm-title {
+  position: absolute;
+  top: calc(18.68em / 14);
+  left: calc(18.68em / 14);
+  font-size: 14em;
+  color: #fff;
+}
+
+.cm-search {
+  position: absolute;
+  top: 40.68em;
+  left: 18.68em;
+  display: flex;
+  align-items: center;
+  gap: 4em;
+  box-sizing: border-box;
+  width: 194em;
+  height: 28em;
+  padding: 4em 6em;
+  border: 1em solid #202020;
+  border-radius: 10em;
+
+  > img {
+    width: 12em;
+    height: 12em;
+  }
+}
+
+.cm-search__hint {
+  font-size: 8em;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.cm-kbd {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  padding: 2em 4em;
+  background: #171717;
+  border-radius: 4em;
+
+  img {
+    width: 10em;
+    height: 10em;
+  }
+
+  span {
+    font-size: 8em;
+    font-weight: 400;
+    color: #fff;
+  }
+}
+
+// A comment: the face, then the name, a dot, the time and the words.
+.cm-comment {
+  position: absolute;
+  left: 18.68em;
+  display: flex;
+  align-items: flex-start;
+  gap: 8em;
+
+  &[data-comment="client"] {
+    top: 80.68em;
+  }
+
+  &[data-comment="pmo"] {
+    top: 141.68em;
+  }
+
+  &[data-comment="typing"] {
+    top: 202.68em;
+  }
+}
+
+.cm-face {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  box-sizing: border-box;
+  width: 32em;
+  height: 32em;
+  background: #1f1f29;
+  border: 0.414em solid #202020;
+  border-radius: 50%;
+  box-shadow: 0 3.2em 16em rgba(0, 0, 0, 0.25);
+
+  img {
+    width: 25.6em;
+    height: 25.6em;
+  }
+
+  [data-comment="pmo"] & {
+    background: #291f1f;
+  }
+}
+
+.cm-face--empty {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.cm-comment__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8em;
+  width: 154em;
+  padding-top: 8em;
+}
+
+.cm-comment__head {
+  display: flex;
+  align-items: center;
+  gap: 4em;
+  height: 7em;
+}
+
+.cm-comment__name {
+  font-size: 10em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.cm-comment__dot {
+  width: 2em;
+  height: 2em;
+  background: #6a6a6a;
+  border-radius: 50%;
+}
+
+.cm-comment__time {
+  font-size: 8em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.cm-box .cm-comment__text,
+.cm-card .cm-comment__text {
+  display: block;
+  font-size: 8em;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: normal;
+}
+
+.cm-skeleton {
+  width: 73em;
+  height: 8em;
+}
+
+.cm-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 4em;
+
+  span {
+    height: 8em;
+    background: rgba(217, 217, 217, 0.1);
+    border-radius: 88.534em;
+
+    + span {
+      width: 106em;
+    }
+  }
+}
+
+// P-3: Figma.
+.cm-figma {
+  opacity: 0;
+}
+
+.cm-light {
+  position: absolute;
+  top: -201.3em;
+  left: -330.7em;
+  width: 1208.53em;
+  height: 891em;
+  max-width: none;
+}
+
+.cm-bar {
+  position: absolute;
+  top: 18.68em;
+  left: 22.68em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 494em;
+}
+
+.cm-bar__app {
+  display: flex;
+  align-items: center;
+  gap: 8em;
+  width: 241.355em;
+}
+
+.cm-bar__name {
+  font-size: 16em;
+  color: #fff;
+}
+
+.cm-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: 5.286em;
+}
+
+.cm-key,
+.cm-share {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1.17em solid #212123;
+  border-radius: 9.273em;
+  box-shadow: 0 6.182em 6.182em rgba(0, 0, 0, 0.25);
+}
+
+.cm-key {
+  width: 32em;
+  height: 32em;
+
+  img {
+    width: 14em;
+    height: 14em;
+  }
+}
+
+.cm-key img.cm-key__figma {
+  width: 17.145em;
+  height: 23.56em;
+  translate: 0 1.44em;
+}
+
+.cm-share {
+  padding: 10em;
+  border-width: 1em;
+  border-radius: 8em;
+  box-shadow: 0 5.286em 5.286em rgba(0, 0, 0, 0.25);
+
+  span {
+    font-size: 12em;
+    color: #fff;
+  }
+}
+
+.cm-pane {
+  position: absolute;
+  top: 74.68em;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  box-sizing: border-box;
+  height: 339em;
+  padding: 8em;
+  background: rgba(26, 26, 26, 0.2);
+  border: 1em solid #202020;
+  border-radius: 7.928em;
+}
+
+.cm-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4em;
+  width: 100%;
+
+  span {
+    width: 100%;
+    height: 5em;
+    background: rgba(217, 217, 217, 0.1);
+    border-radius: 88.534em;
+
+    &:nth-child(2) {
+      width: 79.284em;
+    }
+  }
+}
+
+.cm-pane--layers {
+  left: 22.68em;
+  gap: 24em;
+  width: 117em;
+}
+
+.cm-lines--short {
+  width: 71em;
+
+  span:nth-child(2) {
+    width: 39em;
+  }
+}
+
+.cm-pane--props {
+  left: 399.68em;
+  gap: 8em;
+  width: 117em;
+
+  > span {
+    width: 100%;
+    height: 18em;
+    background: #111;
+    border-radius: 8em;
+  }
+}
+
+// The canvas: three cards, then the copy --gap below them (32 → 64 as the
+// designer drags it; Figma's 64), measured by the red line.
+.cm-pane--canvas {
+  --gap: 64;
+
+  left: 147.68em;
+  gap: calc(var(--gap) * 1em);
+  width: 244em;
+}
+
+.cm-cards {
+  display: flex;
+  gap: 8em;
+  width: 227em;
+
+  span {
+    flex: 1 0 0;
+    height: 80em;
+    background: rgba(217, 217, 217, 0.04);
+    border-radius: 8em;
+  }
+}
+
+.cm-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 24em;
+  width: 100%;
+}
+
+.cm-lines--long {
+  span:nth-child(2) {
+    width: 190em;
+  }
+
+  span:nth-child(3) {
+    width: 85em;
+  }
+
+  + .cm-lines--long {
+    width: 157em;
+
+    span:nth-child(2) {
+      width: 204em;
+    }
+  }
+}
+
+.cm-gap {
+  position: absolute;
+  top: 88em;
+  left: 117em;
+  height: calc(var(--gap) * 1em);
+
+  img {
+    position: absolute;
+    top: 1em;
+    width: 1em;
+    height: calc((var(--gap) - 2) * 1em);
+  }
+}
+
+// (in its own size, 8: 4 across, half the gap down less half its height)
+.cm-gap__value {
+  position: absolute;
+  top: calc((var(--gap) / 2 - 3.9) * 1em / 8);
+  left: 0.5em;
+  padding: calc(3em / 8);
+  font-size: 8em;
+  color: #fff;
+  background: #8f4b29;
+  border-radius: calc(2em / 8);
+}
+
+// P-4: the comment, resolved, over the dimmed window.
+.cm-card {
+  position: absolute;
+  top: 166em;
+  left: 201em;
+  display: flex;
+  align-items: center;
+  gap: 14em;
+  box-sizing: border-box;
+  width: 268em;
+  height: 89em;
+  padding: 0 0 0 17.36em;
+  background: #000;
+  border: 1.321em solid transparent;
+  border-radius: 20em;
+  box-shadow: 0 6.4em 32em rgba(207, 207, 207, 0.25);
+  opacity: 0;
+  @include cm-edge;
+
+  .cm-comment {
+    position: static;
+  }
+
+  .cm-check {
+    display: block;
+    width: 20em;
+    height: 20em;
   }
 }
 

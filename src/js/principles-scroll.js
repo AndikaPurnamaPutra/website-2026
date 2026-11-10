@@ -17,8 +17,8 @@ gsap.registerPlugin(SplitText);
 // (as Services' entrance). Over the last EXIT of a screen the section rises, faster and
 // faster, so it already moves with the page when it is released (as
 // Services). A number click glides to its principle.
-// Illustrations 01 ("Task Manager"), 02 (the tools joining OWW) and 03
-// (wireframe to approved design) play their storyboards on a seamless loop
+// Illustrations 01 ("Task Manager"), 02 (the tools joining OWW), 03
+// (wireframe to approved design) and 04 (a client's comment done) play their storyboards on a seamless loop
 // while their principle is shown (user decisions), resting while it is not. With reduced motion the changes are
 // instant and they show one step, still.
 const STEP = 0.8; // screen heights of scrolling per principle (0.7, held, felt long; free: 0.5 and 0.75 a little too fast, 0.85 a little heavy; user)
@@ -44,7 +44,12 @@ export function initPrinciplesScroll() {
 }
 
 // The illustrations that play a storyboard (data-story in about.pug).
-const STORIES = { tasks: createBoardStory, integrations: createIntegrationsStory, design: createDesignStory };
+const STORIES = {
+  tasks: createBoardStory,
+  integrations: createIntegrationsStory,
+  design: createDesignStory,
+  feedback: createFeedbackStory,
+};
 const createStory = (figure) => STORIES[figure.dataset.story]?.(figure) ?? null;
 
 // Each storyboard plays once as its illustration comes into view.
@@ -736,8 +741,11 @@ function createIntegrationsStory(figure) {
       // The dark the next round lifts from.
       .set(cover, { opacity: 1 }, 12.7)
       .set({}, {}, 12.8);
+  
+    // Shown at its first step at once (the stylesheet shows P-1 as it
+    // stands; without this, that showed for a frame before the story began).
+    timeline.time(0.02).pause(0);
   });
-
   return {
     loop: true,
     play: () => timeline.restart(),
@@ -957,8 +965,11 @@ function createDesignStory(figure) {
       .set(bars, { "--x": 30.68, "--w": (i) => BAR_W[i] }, 18.9)
       .to(bars, { opacity: 1, duration: 0.6, ease: "sine.inOut" }, 19.4)
       .set({}, {}, 20.4);
+  
+    // Shown at its first step at once (the stylesheet shows P-1 as it
+    // stands; without this, that showed for a frame before the story began).
+    timeline.time(0.02).pause(0);
   });
-
   return {
     loop: true,
     play: () => timeline.restart(),
@@ -969,6 +980,219 @@ function createDesignStory(figure) {
     revert: () => {
       timeline.kill();
       ctx.revert();
+    },
+  };
+}
+
+// The "feedback" storyboard of illustration 04 (Figma P-1 … P-4, 2095:5591 →
+// 2117:5738 → 2129:5935 → 2129:6457;
+// docs/implementation/36-principles-04-feedback.md), in Figma pixels (the
+// custom properties in _about.scss). It loops, about 15s a round; each step
+// grows out of the last, set off by a person (user decisions):
+// 1. the team forms round the client, the arcs drawing out to each (P-1);
+// 2. the arcs draw back to the client, the people become their pointers,
+//    the thread opens and the client's face flies into the first comment,
+//    which comes in; the PMO's face flies into the answer; someone is
+//    typing the third (P-2);
+// 3. the thread grows into Figma, where the designer drags the copy down
+//    until the gap is 64 (P-3);
+// 4. it dims, the comment comes up as a card and the designer clicks it
+//    resolved (P-4);
+// 5. the card goes back into the client, alone again: the next round
+//    begins from there.
+// With reduced motion it shows P-4, still.
+function createFeedbackStory(figure) {
+  const q = (selector) => figure.querySelector(selector);
+  const qa = (selector) => [...figure.querySelectorAll(selector)];
+  const ctx = gsap.context(() => {}, figure);
+  const STILL = 12.6; // s: P-4, shown with reduced motion
+  // The window as the thread (P-2) and as Figma (P-3).
+  const THREAD = { "--x": 218, "--y": 76, "--w": 234, "--h": 267 };
+  const FIGMA = { "--x": 64, "--y": 50, "--w": 542, "--h": 446 };
+  // Where the client's and the PMO's faces fly to (the comments' faces:
+  // centres 254, 174 and 254, 235; 32 across).
+  const TO_COMMENT = {
+    client: { "--dx": -81, "--dy": 56, "--k": 0.32 },
+  };
+  const gap = { value: 32 };
+
+  let timeline;
+  ctx.add(() => {
+    const member = (name) => q(`[data-member="${name}"]`);
+    const members = qa(".cm-member");
+    const tags = qa(".cm-tag");
+    const arcs = qa("[data-arc-mask]");
+    const box = q(".cm-box");
+    const thread = q(".cm-thread");
+    // The thread's title and search come in once it is open (they would be
+    // cut while it opens round the client).
+    const chrome = [q(".cm-title"), q(".cm-search")];
+    const figma = q(".cm-figma");
+    const comment = (name) => q(`[data-comment="${name}"]`);
+    const faces = qa(".cm-thread .cm-face");
+    const heads = qa(".cm-thread .cm-comment__head, .cm-thread .cm-skeleton");
+    const texts = qa(".cm-thread .cm-comment__text, .cm-thread .cm-bars");
+    const canvas = q(".cm-pane--canvas");
+    const value = q(".cm-gap__value");
+    const card = q(".cm-card");
+    const check = q(".cm-check");
+    const pointer = (name) => q(`[data-pointer="${name}"]`);
+    const glow = q(".cm-glow");
+    const light = q(".cm-light");
+    const writeGap = () => (value.textContent = String(Math.round(gap.value)));
+    gsap.set(qa(".ds-pointer", figure), { transformOrigin: "11% 11%" });
+    gsap.set(card, { transformOrigin: "50% 50%" });
+    gsap.set(check, { transformOrigin: "50% 50%" });
+    // Each arc is drawn from the client by its mask (one dash along it).
+    arcs.forEach((path) => {
+      const length = path.getTotalLength();
+      path.dataset.length = length;
+      path.setAttribute("stroke-dasharray", `${length} ${length}`);
+    });
+    const arcLength = (_, path) => +path.dataset.length;
+
+    timeline = gsap.timeline({
+      paused: true,
+      repeat: -1,
+      defaults: { ease: "power2.inOut", lazy: false, immediateRender: false },
+      onUpdate: writeGap,
+    });
+    const glide = (el, at, x, y, duration = 0.9) =>
+      timeline
+        .to(el, { "--x": x, duration, ease: "power2.inOut" }, at)
+        .to(el, { "--y": y, duration, ease: "sine.inOut" }, at);
+    const click = (el, at) =>
+      timeline
+        .to(el, { scale: 0.82, duration: 0.12, ease: "sine.out" }, at)
+        .to(el, { scale: 1, duration: 0.3, ease: "power2.out" }, at + 0.12);
+    // Every round starts from P-1 (a tween of its own each).
+    const start = (targets, vars) => timeline.fromTo(targets, vars, { ...vars, duration: 0.01 }, 0);
+    start(members, { opacity: (i, el) => (el === member("client") ? 1 : 0), "--dx": 0, "--dy": 0, "--k": (i, el) => (el === member("client") ? 1 : 0.6) });
+    start(tags, { opacity: (i, el) => (el.dataset.tag === "client" ? 1 : 0), y: 0 });
+    start(arcs, { attr: { "stroke-dashoffset": arcLength } });
+    start(box, { ...THREAD, opacity: 0, backgroundColor: "#000000", "--ring": 1 });
+    start(thread, { opacity: 1 });
+    start(chrome, { opacity: 0, y: 0 });
+    start(figma, { opacity: 0 });
+    start(light, { opacity: 1 });
+    start([...faces, comment("typing")], { opacity: 0, scale: 1 });
+    start(heads, { opacity: 0, y: 0 });
+    start(texts, { opacity: 0, y: 0 });
+    start(canvas, { "--gap": 32 });
+    start(gap, { value: 32 });
+    start(card, { opacity: 0, y: 0, scale: 1 });
+    start(check, { opacity: 0.35, scale: 1 });
+    start(pointer("client"), { opacity: 0, scale: 1, "--x": 335, "--y": 118 });
+    start(pointer("pmo"), { opacity: 0, scale: 1, "--x": 514, "--y": 242 });
+    start(pointer("designer"), { opacity: 0, scale: 1, "--x": 427, "--y": 322 });
+    start(glow, { opacity: 1 });
+
+    // 1. The team forms round the client: each arc draws out from it and
+    // its person comes up where it ends, then the names (P-1; user: P-1
+    // builds up rather than starting formed).
+    const others = ["lead", "designer-a", "designer-b", "pmo"];
+    timeline
+      .to(arcs, { attr: { "stroke-dashoffset": 0 }, duration: 0.8, ease: "power2.out", stagger: 0.1 }, 0.3)
+      .to(others.map(member), { opacity: 1, "--k": 1, duration: 0.55, ease: "back.out(1.5)", stagger: 0.1 }, 0.75)
+      .fromTo(tags.filter((tag) => tag.dataset.tag !== "client"), { y: 4 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out", stagger: 0.08 }, 1.2);
+
+    // 2. The team becomes the people at work: the arcs draw back into the
+    // client, the PMO and a designer shrink into their pointers, the others
+    // go; the client flies into the thread, which opens round it from where
+    // it lands, and its pointer comes out after it (P-2).
+    timeline
+      .to(arcs, { attr: { "stroke-dashoffset": arcLength }, duration: 0.7, ease: "power2.in" }, 2.6)
+      .to(tags, { opacity: 0, duration: 0.4, ease: "sine.in" }, 2.6)
+      .to([member("lead"), member("designer-a")], { opacity: 0, "--k": 0.6, duration: 0.5, ease: "sine.in" }, 2.75)
+      .to([member("pmo"), member("designer-b")], { opacity: 0, "--k": 0.3, duration: 0.45, ease: "sine.in" }, 2.85)
+      .to([pointer("pmo"), pointer("designer")], { opacity: 1, duration: 0.35, ease: "sine.out" }, 2.95)
+      .to(member("client"), { ...TO_COMMENT.client, duration: 0.85, ease: "power3.inOut" }, 2.95)
+      // (its size and its fading in one tween: apart, it showed full size
+      // for a moment before it opened)
+      .fromTo(box, { "--x": 238, "--y": 158, "--w": 32, "--h": 32, opacity: 0 }, { ...THREAD, opacity: 1, duration: 0.85, ease: "power3.out" }, 3.68)
+      // The landed face stays until the thread is open (the comment's own
+      // face sits by the thread's corner, which moves while it opens).
+      .set(faces[0], { opacity: 1 }, 4.55)
+      .fromTo(chrome, { y: 4 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out", stagger: 0.08 }, 4.25)
+      .set(member("client"), { opacity: 0 }, 4.55)
+      .to(pointer("client"), { opacity: 1, duration: 0.35, ease: "sine.out" }, 3.2);
+    glide(pointer("pmo"), 2.95, 180, 248, 1.1);
+    glide(pointer("designer"), 2.95, 473, 238, 1.1);
+    glide(pointer("client"), 3.2, 129, 121, 1.0);
+    timeline
+      // The client's comment comes in, as if typed.
+      .fromTo(heads[0], { y: 4 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 4.35)
+      .fromTo(texts[0], { y: 4 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 4.5)
+      // The PMO answers.
+      .fromTo(faces[1], { scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.6)" }, 5.2)
+      .fromTo(heads[1], { y: 4 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 5.35)
+      .fromTo(texts[1], { y: 4 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 5.5)
+      // Someone is typing.
+      .to([comment("typing"), faces[2], heads[2]], { opacity: 1, duration: 0.4, ease: "sine.out" }, 6.4)
+      .to(texts[2], { opacity: 1, duration: 0.5, ease: "sine.out" }, 6.5)
+      .fromTo(comment("typing"), { opacity: 1 }, { opacity: 0.45, duration: 0.45, ease: "sine.inOut", yoyo: true, repeat: 1 }, 6.95);
+    // (beside the thread, not over the PMO's face in it)
+    glide(pointer("pmo"), 4.6, 172, 238, 1);
+    glide(pointer("client"), 5.6, 150, 160, 1);
+    // 3. The thread grows into Figma; the designer drags the copy down to a
+    // 64 gap (P-3).
+    timeline
+      .to([pointer("client"), pointer("pmo")], { opacity: 0, duration: 0.45, ease: "sine.in" }, 7.9)
+      .to(box, { ...FIGMA, duration: 1.1, ease: "power3.inOut" }, 8)
+      .to(thread, { opacity: 0, duration: 0.4, ease: "sine.in" }, 8)
+      .to(figma, { opacity: 1, duration: 0.6, ease: "sine.out" }, 8.35)
+      .to(glow, { opacity: 0, duration: 1, ease: "sine.inOut" }, 8);
+    glide(pointer("designer"), 8.4, 300, 245.3, 0.9);
+    timeline
+      .to(pointer("designer"), { scale: 0.82, duration: 0.12, ease: "sine.out" }, 9.35)
+      .to(pointer("designer"), { "--y": 277.3, duration: 1, ease: "power2.inOut" }, 9.5)
+      .to(canvas, { "--gap": 64, duration: 1, ease: "power2.inOut" }, 9.5)
+      .to(gap, { value: 64, duration: 1, ease: "power2.inOut" }, 9.5)
+      .to(pointer("designer"), { scale: 1, duration: 0.3, ease: "power2.out" }, 10.5);
+    glide(pointer("designer"), 10.7, 489, 303, 0.8);
+    // 4. It dims; the comment comes up and is resolved (P-4).
+    timeline
+      .to(box, { backgroundColor: "#0f0f0f", "--ring": 0, duration: 0.8, ease: "sine.inOut" }, 11)
+      .to(figma, { opacity: 0.2, duration: 0.8, ease: "sine.inOut" }, 11)
+      .to(light, { opacity: 0, duration: 0.8, ease: "sine.inOut" }, 11)
+      .fromTo(card, { y: 10, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power2.out" }, 11.2);
+    glide(pointer("designer"), 11.4, 436, 208.5, 0.8);
+    click(pointer("designer"), 12.25);
+    timeline
+      .to(check, { opacity: 1, duration: 0.2, ease: "sine.out" }, 12.3)
+      .fromTo(check, { scale: 1.25 }, { scale: 1, duration: 0.45, ease: "back.out(2)" }, 12.3)
+      // 5. The card goes back into the client, alone again (the next round
+      // forms the team).
+      .to(pointer("designer"), { opacity: 0, duration: 0.4, ease: "sine.in" }, 13.4)
+      .to(card, { y: -92, scale: 0.37, duration: 0.8, ease: "power2.inOut" }, 13.4)
+      .to(card, { opacity: 0, duration: 0.3, ease: "sine.in" }, 13.75)
+      .to(box, { opacity: 0, duration: 0.6, ease: "sine.inOut" }, 13.45)
+      .set(member("client"), { "--dx": 0, "--dy": 0, "--k": 0.5 }, 13.5)
+      .to(member("client"), { opacity: 1, "--k": 1, duration: 0.6, ease: "power2.out" }, 14.05)
+      .to(glow, { opacity: 1, duration: 0.8, ease: "sine.inOut" }, 13.6)
+      .set(member("pmo"), { "--k": 0.6 }, 13.5)
+      .to(tags.filter((tag) => tag.dataset.tag === "client"), { opacity: 1, duration: 0.4, ease: "sine.out" }, 14.3)
+      .set({}, {}, 15.0);
+  
+    // Shown at its first step at once (the stylesheet shows P-1 as it
+    // stands; without this, that showed for a frame before the story began).
+    timeline.time(0.02).pause(0);
+  });
+  return {
+    loop: true,
+    play: () => timeline.restart(),
+    resume: () => timeline.play(),
+    pause: () => timeline.pause(),
+    reset: () => timeline.pause(0),
+    finish: () => {
+      timeline.pause(STILL);
+      q(".cm-gap__value").textContent = "64";
+    },
+    revert: () => {
+      timeline.kill();
+      ctx.revert();
+      q(".cm-gap__value").textContent = "64";
+      qa("[data-arc-mask]").forEach((path) => ["stroke-dasharray", "stroke-dashoffset"].forEach((name) => path.removeAttribute(name)));
     },
   };
 }
