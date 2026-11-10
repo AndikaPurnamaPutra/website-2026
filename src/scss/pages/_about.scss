@@ -989,6 +989,582 @@
   opacity: 0;
 }
 
+// Illustration 03, from wireframe to approved design (Figma P-1 2161:80 …
+// P-6 2167:519; docs/implementation/35-principles-03-design.md). On the same
+// scale as 01 (one em per Figma pixel). Positions inside the window are
+// Figma's, from the inside of its 1.321 border; places that move are custom
+// properties for src/js/principles-scroll.js. The defaults are P-1.
+
+// A browser window --wh tall, centred in the frame (284 in P-1 and P-2, 336
+// with a design, 314 in P-6). Its edge (1.321) is lavender fading to dark
+// round the window, brightest at --ra degrees (sampled from the Figma
+// renders: top right round the wireframe, bottom left round a design; the
+// code export gives a plain colour); none in P-6 (--ring).
+.ds-window {
+  --wh: 284;
+  --ra: 60;
+  --ring: 0.75;
+
+  position: absolute;
+  top: calc((210 - var(--wh) / 2) * 1em);
+  left: 64em;
+  width: 542em;
+  height: calc(var(--wh) * 1em);
+  font-family: "Inter", sans-serif;
+  background: #000;
+  border: 1.321em solid transparent;
+  border-radius: 20em;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -1.321em;
+    padding: 1.321em;
+    pointer-events: none;
+    background: conic-gradient(
+      from calc(var(--ra) * 1deg - 180deg),
+      rgb(26 26 27) 0deg,
+      rgb(26 26 27) 50deg,
+      rgb(70 70 92) 120deg,
+      rgb(112 112 150) 180deg,
+      rgb(70 70 92) 240deg,
+      rgb(26 26 27) 310deg,
+      rgb(26 26 27) 360deg
+    );
+    border-radius: inherit;
+    opacity: var(--ring);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
+
+  img {
+    display: block;
+  }
+}
+
+// Everything on the screen, clipped to the window: dimmed together in P-6.
+.ds-screen {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  border-radius: 18.679em;
+  // The designs stack over each other in here only, under the pointers.
+  isolation: isolate;
+}
+
+// The light over the wireframe ("Polygon 1"), --lx to the side.
+.ds-light {
+  position: absolute;
+  top: -201.3em;
+  left: -339.7em;
+  width: 1208.53em;
+  height: 891em;
+  translate: calc(var(--lx, 0) * 1em) 0;
+}
+
+.ds-dots {
+  position: absolute;
+  top: 18.68em;
+  left: 18.68em;
+  display: flex;
+  gap: 4em;
+
+  span {
+    width: 10em;
+    height: 10em;
+    border-radius: 50%;
+    background: rgba(255, 75, 69, 0.75);
+
+    &:nth-child(2) {
+      background: rgba(255, 175, 0, 0.75);
+    }
+
+    &:nth-child(3) {
+      background: rgba(0, 194, 0, 0.75);
+    }
+  }
+}
+
+.ds-rule {
+  position: absolute;
+  top: 44.68em;
+  left: -1.32em;
+  width: 542em;
+  height: 1em;
+  background: #202020;
+}
+
+// The wireframe's blocks (10% grey; --bo as they snap to the grid).
+.ds-bar {
+  position: absolute;
+  top: calc(var(--y) * 1em);
+  left: calc(var(--x) * 1em);
+  width: calc(var(--w) * 1em);
+  height: calc(var(--h) * 1em);
+  background: rgba(217, 217, 217, var(--bo, 0.1));
+}
+
+// Every text trimmed to its capitals and baseline, as in Figma.
+.ds-window :is(span, p),
+.ds-badge span,
+.ds-pointer span {
+  line-height: normal;
+  text-box: trim-both cap alphabetic;
+}
+
+// P-2: twelve columns 10 apart (#FF8A8A 12%) and the grid's note.
+.ds-grid {
+  position: absolute;
+  top: 64.68em;
+  left: 18.68em;
+  display: flex;
+  gap: 10em;
+  width: 502em;
+  height: 198em;
+  opacity: 0;
+}
+
+.ds-col {
+  flex: 1 0 0;
+  background: rgba(255, 138, 138, 0.12);
+}
+
+.ds-note {
+  position: absolute;
+  top: 73em;
+  left: 90em;
+  display: flex;
+  flex-direction: column;
+  gap: 6em;
+  box-sizing: border-box;
+  width: 97em;
+  height: 52em;
+  padding: 6em;
+  background: #141414;
+  border: 1em solid #191919;
+  border-radius: 8em;
+
+}
+
+.ds-note__title {
+  font-size: 8em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.ds-note__rule {
+  height: 0.5em;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+}
+
+.ds-note__row {
+  display: flex;
+  justify-content: space-between;
+
+  span {
+    white-space: nowrap;
+    font-size: 8em;
+    color: rgba(255, 255, 255, 0.6);
+
+    + span {
+      color: rgba(255, 255, 255, 0.4);
+    }
+  }
+}
+
+// The designs' words and buttons (their photos are the frames below);
+// hidden in P-1, JS brings them in.
+.ds-page {
+  position: absolute;
+  inset: 0;
+
+  &:not([data-page="spaces"]) {
+    opacity: 0;
+  }
+
+  &[data-page="spaces"] > * {
+    opacity: 0;
+  }
+}
+
+.ds-nav {
+  position: absolute;
+  top: 54.68em;
+  left: 18.68em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 502em;
+
+  > img {
+    width: 16em;
+    height: 16em;
+  }
+}
+
+.ds-nav__links {
+  display: flex;
+  gap: 12em;
+
+  span {
+    font-size: 6em;
+    font-weight: 500;
+    color: #cacaca;
+    white-space: nowrap;
+  }
+}
+
+.ds-nav__cta,
+.ds-link {
+  display: flex;
+  align-items: center;
+  gap: 2em;
+
+  span {
+    font-size: 6em;
+    font-weight: 500;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  img {
+    width: 10em;
+    height: 10em;
+  }
+}
+
+.ds-link span {
+  text-decoration: underline;
+  text-underline-position: from-font;
+}
+
+.ds-pill {
+  display: flex;
+  align-items: center;
+  gap: 2em;
+  padding: 6em;
+  border: 1em solid #2c2c2c;
+  border-radius: 100em;
+
+  span {
+    font-size: 6em;
+    font-weight: 500;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  img {
+    width: 8em;
+    height: 8em;
+  }
+}
+
+.ds-pill--prev {
+  opacity: 0.5;
+
+  img {
+    scale: -1 1;
+  }
+}
+
+.ds-button {
+  display: flex;
+  align-items: center;
+  background: #585858;
+  border-radius: 100em;
+
+  span {
+    font-size: 6em;
+    font-weight: 500;
+    color: #fff;
+    white-space: nowrap;
+  }
+}
+
+.ds-button--small {
+  padding: 7em 6em;
+}
+
+.ds-button--victory {
+  position: absolute;
+  top: 189.68em;
+  left: 18.68em;
+  padding: 8em;
+}
+
+.ds-copy {
+  display: block;
+  font-size: 6em;
+  font-weight: 500;
+  color: #858585;
+}
+
+// Headlines: Inter 24, -0.72 apart.
+.ds-title {
+  position: absolute;
+  margin: 0;
+  font-size: 24em;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+}
+
+.ds-title--spaces {
+  top: calc(104.68em / 24);
+  left: calc(18.68em / 24);
+  width: calc(246em / 24);
+  color: #818181;
+}
+
+// "Shaping Experiences.": Instrument Serif Italic 28, +0.56 apart.
+.ds-title__serif {
+  font-family: "Instrument Serif", serif;
+  font-size: calc(28em / 24);
+  font-style: italic;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+
+.ds-title--ideas {
+  position: static;
+  width: calc(264em / 24);
+  color: #acabab;
+}
+
+.ds-title--victory {
+  top: calc(104.68em / 24);
+  left: calc(18.68em / 24);
+  width: calc(136em / 24);
+  line-height: 1.1;
+  color: #acabab;
+}
+
+// The designs' photos, at 40%: two frames that move and change shape from
+// one design to the next. The first ("Designing Spaces"' photo, then the
+// wide desk, then the barbell) is the wireframe's picture first (grey 10%
+// with its icon): its box (--sx, --sy, --sw, --sh), grey (--sf), photos
+// (--sp) and icon (--si); one photo shows at a time. The second (the
+// stairs, then the runner) is hidden until the first design.
+.ds-shot,
+.ds-shot2 {
+  position: absolute;
+  overflow: hidden;
+}
+
+.ds-shot__pics,
+.ds-shot2 {
+  img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.ds-shot {
+  --sx: 308.68;
+  --sy: 68.68;
+  --sw: 200;
+  --sh: 190;
+  --sf: 0.1;
+  --sp: 0;
+  --si: 1;
+
+  top: calc(var(--sy) * 1em);
+  left: calc(var(--sx) * 1em);
+  width: calc(var(--sw) * 1em);
+  height: calc(var(--sh) * 1em);
+  background: rgba(217, 217, 217, var(--sf));
+}
+
+.ds-shot__pics {
+  position: absolute;
+  inset: 0;
+  opacity: var(--sp);
+
+  img:not([data-pic="spaces"]) {
+    opacity: 0;
+  }
+}
+
+.ds-shot2 {
+  --bx: 146.68;
+  --by: 196.68;
+  --bw: 96;
+  --bh: 118;
+
+  top: calc(var(--by) * 1em);
+  left: calc(var(--bx) * 1em);
+  width: calc(var(--bw) * 1em);
+  height: calc(var(--bh) * 1em);
+  opacity: 0;
+
+  img[data-pic="run"] {
+    opacity: 0;
+  }
+}
+
+.ds-shot__icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24em;
+  height: 24em;
+  opacity: var(--si);
+  translate: -50% -50%;
+}
+
+.ds-intro {
+  position: absolute;
+  top: 196.68em;
+  left: 18.68em;
+  display: flex;
+  gap: 32em;
+  height: 118em;
+}
+
+.ds-intro__text {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 96em;
+}
+
+// (its 16 from the index, in the copy's own size)
+.ds-window .ds-intro__text .ds-copy {
+  margin-top: calc(16em / 6);
+  margin-bottom: auto;
+}
+
+.ds-intro__index {
+  display: flex;
+  align-items: center;
+  gap: 4em;
+
+  span:last-child {
+    font-size: 6em;
+    font-weight: 500;
+    color: #cacaca;
+  }
+}
+
+.ds-intro__line {
+  width: 33em;
+  height: 1em;
+  background: #373737;
+}
+
+.ds-hero {
+  position: absolute;
+  top: 96.68em;
+  left: 18.68em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 502em;
+}
+
+.ds-hero__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8em;
+  width: 143em;
+}
+
+.ds-window .ds-copy--victory {
+  position: absolute;
+  top: calc(151.68em / 6);
+  left: calc(445.66em / 6);
+  width: calc(75em / 6);
+}
+
+.ds-pager {
+  position: absolute;
+  top: 296.68em;
+  left: 431.68em;
+  display: flex;
+  gap: 2em;
+
+  .ds-pill {
+    box-sizing: border-box;
+    height: 18em;
+  }
+}
+
+// P-6: "Approved by Lead", glass, centred over the window.
+.ds-badge {
+  position: absolute;
+  top: 188em;
+  left: 246em;
+  display: flex;
+  align-items: center;
+  gap: 12em;
+  box-sizing: border-box;
+  width: 178em;
+  height: 44em;
+  padding: 0 10.6em;
+  font-family: "Inter", sans-serif;
+  background: rgba(0, 0, 0, 0.25);
+  border: 0.696em solid rgba(255, 255, 255, 0.3);
+  border-radius: 16em;
+  box-shadow: 0 6.4em 32em rgba(207, 207, 207, 0.25);
+  backdrop-filter: blur(13.252em);
+  opacity: 0;
+
+  img {
+    display: block;
+    width: 20em;
+    height: 20em;
+  }
+
+  span {
+    font-size: 14em;
+    font-weight: 500;
+    color: #fff;
+    white-space: nowrap;
+  }
+}
+
+// The designers' pointers (Figma's multiplayer cursor, 16 × 16) at --x, --y,
+// with their name.
+.ds-pointer {
+  position: absolute;
+  top: calc(var(--y, 0) * 1em);
+  left: calc(var(--x, 0) * 1em);
+  width: 16em;
+  height: 16em;
+  font-family: "Inter", sans-serif;
+  opacity: 0;
+
+  img {
+    position: absolute;
+    top: 1.728em;
+    left: 1.734em;
+    display: block;
+    width: 12.96em;
+    height: 13.07em;
+    max-width: none;
+  }
+
+  // (in the name's own size, 10: 9 down, 10 across, 8 round it)
+  span {
+    position: absolute;
+    top: 0.9em;
+    left: 1em;
+    padding: 0.8em;
+    font-size: 10em;
+    font-weight: 500;
+    color: #cacaca;
+    white-space: nowrap;
+    background: rgba(0, 0, 0, 0.25);
+    border: 0.1em solid rgba(255, 255, 255, 0.24);
+    border-radius: 1.6em;
+  }
+}
+
 // Gallery (Figma 1734:399): 1360 × 2128, 200px below Principles. The photos
 // sit where Figma places them (--x, --y, --w, --h in Figma pixels).
 .about-gallery {

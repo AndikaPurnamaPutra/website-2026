@@ -17,9 +17,9 @@ gsap.registerPlugin(SplitText);
 // (as Services' entrance). Over the last EXIT of a screen the section rises, faster and
 // faster, so it already moves with the page when it is released (as
 // Services). A number click glides to its principle.
-// Illustrations 01 ("Task Manager") and 02 (the tools joining OWW) play
-// their storyboards on a seamless loop while their principle is shown (user
-// decisions), resting while it is not. With reduced motion the changes are
+// Illustrations 01 ("Task Manager"), 02 (the tools joining OWW) and 03
+// (wireframe to approved design) play their storyboards on a seamless loop
+// while their principle is shown (user decisions), resting while it is not. With reduced motion the changes are
 // instant and they show one step, still.
 const STEP = 0.8; // screen heights of scrolling per principle (0.7, held, felt long; free: 0.5 and 0.75 a little too fast, 0.85 a little heavy; user)
 const EXIT = 0.4; // of the screen height, as Services
@@ -44,7 +44,7 @@ export function initPrinciplesScroll() {
 }
 
 // The illustrations that play a storyboard (data-story in about.pug).
-const STORIES = { tasks: createBoardStory, integrations: createIntegrationsStory };
+const STORIES = { tasks: createBoardStory, integrations: createIntegrationsStory, design: createDesignStory };
 const createStory = (figure) => STORIES[figure.dataset.story]?.(figure) ?? null;
 
 // Each storyboard plays once as its illustration comes into view.
@@ -759,6 +759,216 @@ function createIntegrationsStory(figure) {
         ["--tx", "--ty"].forEach((name) => tool.style.removeProperty(name));
         gsap.set(tool, { clearProps: "transform" });
       });
+    },
+  };
+}
+
+// The "design" storyboard of illustration 03 (Figma P-1 … P-6, 2161:80 →
+// 2161:254 → 2161:337 → 2194:2389 → 2202:2465 → 2167:519;
+// docs/implementation/35-principles-03-design.md), in Figma pixels (the
+// custom properties in _about.scss). It loops, about 20s a round, each step
+// set off by a pointer so the story reads (user decisions):
+// 1. the UI designer comes in and clicks the layout grid on; the
+//    wireframe's blocks light up a little, snap to its columns and fade,
+//    leaving the grid and its note (P-2);
+// 2. the brand designer comes in and clicks: the window opens up to a
+//    design, the snapped picture growing into its photo (P-3);
+// 3. the designers rework the layout twice and back: one takes the photo
+//    by its corner and drags it into its new shape, the other photo and
+//    the words moving to theirs (P-4, P-5, P-3);
+// 4. it dims, the lead's pointer comes and "Approved by Lead" appears as it
+//    clicks (P-6);
+// 5. the design folds back into the wireframe, and it begins again.
+// With reduced motion it shows P-6, still.
+function createDesignStory(figure) {
+  const q = (selector) => figure.querySelector(selector);
+  const qa = (selector) => [...figure.querySelectorAll(selector)];
+  const ctx = gsap.context(() => {}, figure);
+  const STILL = 17; // s: P-6, shown with reduced motion
+  // The wireframe's blocks and picture snap to the grid's columns (32.667
+  // wide, 10 apart, from 18.68): the blocks to 6, 4, 6, 5 and 3 columns from
+  // the first, the picture to the last 6 (where the design's photo will be).
+  const BAR_W = [226, 140, 226, 199, 103];
+  const BAR_SNAP = [246, 160.67, 246, 203.33, 118];
+  // The first photo frame: the wireframe's picture, snapped, then in each
+  // design (P-3, P-4, P-5); the second frame in P-3, P-4 (folded into the
+  // wide photo's left half, hidden) and P-5.
+  const WIRE = { "--sx": 308.68, "--sy": 68.68, "--sw": 200, "--sh": 190, "--sf": 0.1, "--sp": 0, "--si": 1 };
+  const SNAP = { "--sx": 274.68, "--sw": 246 };
+  const ONE = {
+    spaces: { "--sx": 274.68, "--sy": 92.68, "--sw": 246, "--sh": 222 },
+    ideas: { "--sx": 18.68, "--sy": 166.68, "--sw": 502, "--sh": 148 },
+    victory: { "--sx": 315.67, "--sy": 104.68, "--sw": 108, "--sh": 155 },
+  };
+  const TWO = {
+    spaces: { "--bx": 146.68, "--by": 196.68, "--bw": 96, "--bh": 118 },
+    ideas: { "--bx": 18.68, "--by": 166.68, "--bw": 251, "--bh": 148 },
+    victory: { "--bx": 174.68, "--by": 104.68, "--bw": 133, "--bh": 210 },
+  };
+  // Where a pointer's tip takes the first frame (its top left corner), in
+  // the frame: the window's inside starts at 65.321, 43.321 in the designs.
+  const corner = (name) => ({ x: 65.321 + ONE[name]["--sx"] - 1.73, y: 43.321 + ONE[name]["--sy"] - 1.73 });
+
+  let timeline;
+  ctx.add(() => {
+    const win = q(".ds-window");
+    const screen = q(".ds-screen");
+    const light = q(".ds-light");
+    const bars = qa(".ds-bar");
+    const grid = q(".ds-grid");
+    const cols = qa(".ds-col");
+    const note = q(".ds-note");
+    const page = (name) => q(`[data-page="${name}"]`);
+    const spaces = page("spaces");
+    const others = [page("ideas"), page("victory")];
+    const parts = [...spaces.children];
+    const shot = q(".ds-shot");
+    const shot2 = q(".ds-shot2");
+    const pic = (name) => q(`[data-pic="${name}"]`);
+    const brand = q('[data-pointer="brand"]');
+    const ui = q('[data-pointer="ui"]');
+    const cursor = q(".tm-cursor");
+    const badge = q(".ds-badge");
+    const glow = q(".ds-glow");
+    gsap.set(cursor, { transformOrigin: "36.6% 27.2%" });
+    gsap.set(badge, { transformOrigin: "50% 50%" });
+    gsap.set([brand, ui], { transformOrigin: "11% 11%" });
+
+    timeline = gsap.timeline({ paused: true, repeat: -1, defaults: { ease: "power2.inOut", lazy: false, immediateRender: false } });
+    // A pointer glides to x, y, its two axes eased apart (a slight curve).
+    const glide = (pointer, at, x, y, duration = 0.9) =>
+      timeline
+        .to(pointer, { "--x": x, duration, ease: "power2.inOut" }, at)
+        .to(pointer, { "--y": y, duration, ease: "sine.inOut" }, at);
+    // A pointer clicks: it presses in and lets go.
+    const click = (pointer, at) =>
+      timeline
+        .to(pointer, { scale: 0.82, duration: 0.12, ease: "sine.out" }, at)
+        .to(pointer, { scale: 1, duration: 0.3, ease: "power2.out" }, at + 0.12);
+    // The layout changes from one design to the next: a designer drags the
+    // first photo by its corner into its new shape, the second photo moves
+    // with it, the photos change inside them, and the words of the old
+    // design move up and out as the new one's come up in.
+    const MORPH = 1.2;
+    const rework = (from, to, pointer, at, two) => {
+      const a = corner(from);
+      const b = corner(to);
+      glide(pointer, at - 1.05, a.x, a.y, 0.85);
+      timeline
+        .to(pointer, { scale: 0.82, duration: 0.12, ease: "sine.out" }, at - 0.15)
+        .to(pointer, { "--x": b.x, "--y": b.y, duration: MORPH, ease: "power3.inOut" }, at)
+        .to(pointer, { scale: 1, duration: 0.3, ease: "power2.out" }, at + MORPH)
+        .to(shot, { ...ONE[to], duration: MORPH, ease: "power3.inOut" }, at)
+        .to(pic(two.out1), { opacity: 0, duration: 0.6, ease: "sine.inOut" }, at + 0.35)
+        .to(pic(two.in1), { opacity: 1, duration: 0.6, ease: "sine.inOut" }, at + 0.2)
+        .to(shot2, { ...TWO[to], duration: MORPH, ease: "power3.inOut" }, at)
+        .to(page(from), { opacity: 0, y: -5, duration: 0.45, ease: "sine.in" }, at)
+        .fromTo(page(to), { y: 6 }, { opacity: 1, y: 0, duration: 0.65, ease: "power2.out" }, at + 0.45);
+      if (two.hide) timeline.to(shot2, { opacity: 0, duration: 0.5, ease: "sine.inOut" }, at + 0.2);
+      if (two.show) timeline.to(shot2, { opacity: 0.4, duration: 0.6, ease: "sine.inOut" }, at + 0.4);
+      if (two.swap) timeline.to(pic(two.swap[0]), { opacity: 0, duration: 0.6, ease: "sine.inOut" }, at + 0.35).to(pic(two.swap[1]), { opacity: 1, duration: 0.6, ease: "sine.inOut" }, at + 0.2);
+    };
+
+    // Every round starts from P-1 (a tween of its own each: a set at 0 is not
+    // redrawn as it loops).
+    const start = (targets, vars) => timeline.fromTo(targets, vars, { ...vars, duration: 0.01 }, 0);
+    start(win, { "--wh": 284, "--ra": 60, "--ring": 0.75, backgroundColor: "#000000" });
+    start(screen, { opacity: 1 });
+    start(light, { opacity: 1, "--lx": 0 });
+    start(bars, { opacity: 1, "--x": 30.68, "--w": (i) => BAR_W[i], "--bo": 0.1 });
+    start(grid, { opacity: 0 });
+    start(cols, { opacity: 0, scaleX: 0.4 });
+    start(note, { opacity: 0, x: 0, y: 0, scale: 1 });
+    start(shot, WIRE);
+    start(shot2, { ...TWO.spaces, opacity: 0 });
+    start([pic("spaces"), pic("stairs")], { opacity: 1 });
+    start([pic("desk"), pic("lift"), pic("run")], { opacity: 0 });
+    start(parts, { opacity: 0, y: 0 });
+    start(spaces, { opacity: 1, y: 0 });
+    start(others, { opacity: 0, y: 0 });
+    start(brand, { opacity: 0, scale: 1, "--x": 243, "--y": -14 });
+    start(ui, { opacity: 0, scale: 1, "--x": 545, "--y": 440 });
+    start(cursor, { autoAlpha: 0, scale: 1, "--cx": 470, "--cy": 440 });
+    start(badge, { opacity: 0, scale: 0.92 });
+    start(glow, { opacity: 0 });
+
+    // 1. The UI designer comes in and clicks the layout grid on; the
+    // wireframe lights up a little, snaps to the columns and fades, leaving
+    // the grid and its note (P-2; user: slower and clearer).
+    const fromMiddle = (_, col) => Math.abs(cols.indexOf(col) - 5.5) * 0.03;
+    timeline.to(ui, { opacity: 1, duration: 0.4, ease: "sine.out" }, 0.4);
+    glide(ui, 0.4, 423, 335, 1);
+    click(ui, 1.4);
+    timeline
+      .to(light, { "--lx": -8, duration: 3.4, ease: "sine.inOut" }, 0.4)
+      .to(grid, { opacity: 1, duration: 0.01 }, 1.55)
+      .to(cols, { opacity: 1, scaleX: 1, duration: 0.6, ease: "power2.out", stagger: fromMiddle }, 1.55)
+      .to(bars, { "--bo": 0.24, duration: 0.4, ease: "sine.out" }, 2.1)
+      .to(shot, { "--sf": 0.2, duration: 0.4, ease: "sine.out" }, 2.1)
+      .to(bars, { "--x": 18.68, "--w": (i) => BAR_SNAP[i], duration: 1.1, ease: "power2.inOut", stagger: 0.08 }, 2.3)
+      .to(shot, { ...SNAP, duration: 1.1, ease: "power2.inOut" }, 2.4)
+      .fromTo(note, { x: 8, y: 6, scale: 0.94 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.5, ease: "power2.out" }, 3.4)
+      .to(bars, { "--bo": 0.1, duration: 0.4, ease: "sine.inOut" }, 3.6)
+      .to(bars, { opacity: 0, duration: 0.7, ease: "sine.inOut" }, 3.95)
+      .to(shot, { "--sf": 0, "--si": 0, duration: 0.7, ease: "sine.inOut" }, 3.95)
+      // 2. The brand designer comes and clicks: the window opens up to the
+      // design, its photo growing out of the snapped picture (P-3).
+      .to(brand, { opacity: 1, duration: 0.4, ease: "sine.out" }, 4.7);
+    glide(brand, 4.7, 243, 37, 0.8);
+    click(brand, 5.5);
+    timeline
+      .to(grid, { opacity: 0, duration: 0.5, ease: "sine.inOut" }, 5.6)
+      .to(win, { "--wh": 336, "--ra": 200, "--ring": 1, duration: 1, ease: "power2.inOut" }, 5.65)
+      .to(light, { opacity: 0, duration: 0.8, ease: "sine.inOut" }, 5.65)
+      .fromTo(shot, { ...WIRE, ...SNAP, "--sf": 0, "--si": 0 }, { ...ONE.spaces, "--sp": 0.4, duration: 1.1, ease: "power2.inOut" }, 5.7)
+      .fromTo(parts, { y: 6 }, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out", stagger: 0.14 }, 5.95)
+      .to(shot2, { opacity: 0.4, duration: 0.7, ease: "sine.inOut" }, 6.3);
+    glide(ui, 5.7, 480, 347, 1);
+    glide(brand, 6.9, 300, 118, 1.1);
+    // 3. Reworked twice, then back (P-4, P-5, P-3).
+    rework("spaces", "ideas", ui, 8.4, { out1: "spaces", in1: "desk", hide: true });
+    glide(ui, 9.9, 470, 330, 1);
+    rework("ideas", "victory", brand, 11.1, { out1: "desk", in1: "lift", show: true, swap: ["stairs", "run"] });
+    glide(brand, 12.6, 232, 214, 1);
+    rework("victory", "spaces", ui, 13.8, { out1: "lift", in1: "spaces", swap: ["run", "stairs"] });
+    timeline.to([brand, ui], { opacity: 0, duration: 0.45, ease: "sine.in" }, 15.2);
+    // 4. It dims; the lead's pointer comes and clicks: approved (P-6).
+    timeline
+      .to(win, { "--wh": 314, "--ring": 0, backgroundColor: "#0f0f0f", duration: 0.9, ease: "power2.inOut" }, 15.4)
+      .to(screen, { opacity: 0.1, duration: 0.9, ease: "sine.inOut" }, 15.4)
+      // (the photo at 40% of the screen's 10% would be 4%; Figma has 10%)
+      .to(shot, { "--sp": 1, duration: 0.9, ease: "sine.inOut" }, 15.4)
+      .to(glow, { opacity: 1, duration: 1, ease: "sine.inOut" }, 15.5)
+      .to(cursor, { autoAlpha: 1, duration: 0.4, ease: "sine.out" }, 15.7)
+      .to(cursor, { "--cx": 377, duration: 1, ease: "power2.inOut" }, 15.7)
+      .to(cursor, { "--cy": 226, duration: 1, ease: "power2.out" }, 15.7)
+      .to(cursor, { scale: 0.88, duration: 0.12, ease: "sine.out" }, 16.65)
+      .to(cursor, { scale: 1, duration: 0.35, ease: "power2.out" }, 16.77)
+      .to(badge, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.4)" }, 16.7)
+      // 5. Back to the wireframe, and again.
+      .to(badge, { opacity: 0, scale: 0.96, duration: 0.5, ease: "sine.inOut" }, 18.5)
+      .to(cursor, { autoAlpha: 0, "--cx": 400, "--cy": 260, duration: 0.5, ease: "sine.in" }, 18.5)
+      .to(glow, { opacity: 0, duration: 1, ease: "sine.inOut" }, 18.6)
+      .to([parts, shot2], { opacity: 0, duration: 0.4, ease: "sine.inOut" }, 18.7)
+      .to(win, { "--wh": 284, "--ra": 60, "--ring": 0.75, backgroundColor: "#000000", duration: 1.1, ease: "power2.inOut" }, 18.9)
+      .to(screen, { opacity: 1, duration: 1.1, ease: "sine.inOut" }, 18.9)
+      .to(shot, { ...WIRE, duration: 1.1, ease: "power2.inOut" }, 18.9)
+      .to(light, { opacity: 1, "--lx": 0, duration: 1.1, ease: "sine.inOut" }, 18.9)
+      .set(bars, { "--x": 30.68, "--w": (i) => BAR_W[i] }, 18.9)
+      .to(bars, { opacity: 1, duration: 0.6, ease: "sine.inOut" }, 19.4)
+      .set({}, {}, 20.4);
+  });
+
+  return {
+    loop: true,
+    play: () => timeline.restart(),
+    resume: () => timeline.play(),
+    pause: () => timeline.pause(),
+    reset: () => timeline.pause(0),
+    finish: () => timeline.pause(STILL),
+    revert: () => {
+      timeline.kill();
+      ctx.revert();
     },
   };
 }
