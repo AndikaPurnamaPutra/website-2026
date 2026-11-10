@@ -114,7 +114,7 @@ block content
                       = line
         .principles__figures
           //- 01: the "Task Manager" board (mixins above).
-          .principles__figure.p-board.is-active(aria-hidden="true" data-board)
+          .principles__figure.p-board.is-active(aria-hidden="true" data-story="tasks")
             span.tm-dots
             span.tm-glow
               img(src="assets/images/about/principles/tm/glow-phone.svg" width="992" height="665" alt="")
@@ -153,7 +153,65 @@ block content
               +tmCard(Object.assign({}, finalize, { key: "finalize-float", circle: "circle-lifted" }))
             img.tm-cursor(src="assets/images/about/principles/tm/cursor.svg" width="46" height="46" alt="")
             img.tm-grab(src="assets/images/about/principles/tm/grab.svg" width="13" height="13" alt="")
-          each n in [2, 3, 4, 5, 6]
+          //- 02: Figma, Webflow and ClickUp join OWW (Figma P-1 1950:6117 …
+          //- P-7 1957:7774; docs/implementation/34-principles-02-integrations.md).
+          //- The cells: a 7 × 5 grid around OWW (--i, --j from its centre); the
+          //- outer ones only show once it shrinks (P-5).
+          .principles__figure.p-board(aria-hidden="true" data-story="integrations")
+            span.tm-dots
+            span.tm-glow.int-glow
+              img(src="assets/images/about/principles/tm/glow-phone.svg" width="992" height="665" alt="")
+            //- Dots ([x, y, radius, alpha]) and streaks ([x, y, length]) of
+            //- "Group 1000005339" at their P-1 places; each glides up on its
+            //- own as the tools rise.
+            span.int-particles
+              each dot in [[215.505, 172.936, 2.66, 0.5], [147.661, 34.587, 2.66, 0.5], [2.66, 91.789, 2.66, 0.5], [114.404, 187.569, 1.33, 0.5], [275.367, 211.514, 1.33, 0.5], [288.67, 81.147, 1.33, 1], [50.55, 2.66, 1.33, 0.5], [248.761, 1.33, 1.33, 0.5]]
+                span.int-spark.int-dot(style=`--x: ${dot[0]}; --y: ${dot[1]}; --r: ${dot[2]}; --o: ${dot[3]}`)
+              each streak in [[87.8, 247.43, 29.27], [202.2, 203.53, 58.53], [46.56, 86.47, 58.53]]
+                span.int-spark.int-streak(style=`--x: ${streak[0]}; --y: ${streak[1]}; --h: ${streak[2]}`)
+            .int-grid
+              each j in [-2, -1, 0, 1, 2]
+                each i in [-3, -2, -1, 0, 1, 2, 3]
+                  if i || j
+                    span.int-cell(class=Math.abs(i) > 2 || Math.abs(j) > 1 ? "int-cell--outer" : null style=`--i: ${i}; --j: ${j}`)
+                      img(src="assets/images/about/principles/int/check.svg" width="20" height="20" alt="")
+            span.int-fade
+            .int-links
+              //- The lines (Figma "Vector 3267", #5D5D5D, and Webflow's line
+              //- behind OWW, #575757), one per tool, and the light flowing
+              //- down each into OWW (P-3): a few dashes ending at one head
+              //- (src/js/principles-scroll.js).
+              -
+                var lines = [
+                  ["figma", "M150.55 154.38V289.19C150.55 302.45 161.3 313.19 174.55 313.19H277", "#617dd3"],
+                  ["webflow", "M335 154.38V313.64", "#146ef5"],
+                  ["clickup", "M519.45 154.38V289.19C519.45 302.45 508.7 313.19 495.45 313.19H393", "#fe22c9"]
+                ]
+              //- Each light shows only on the part of its line that is drawn
+              //- (its mask follows the line).
+              svg.int-streams(viewBox="0 0 670 420" fill="none")
+                defs
+                  each line in lines
+                    mask(id=`int-mask-${line[0]}` maskUnits="userSpaceOnUse" x="0" y="0" width="670" height="420")
+                      path(d=line[1] data-wire=line[0] stroke="#fff" stroke-width="4")
+                each line in lines
+                  path.int-wire(d=line[1] data-wire=line[0])
+                each line in lines
+                  g.int-stream(stroke=line[2] mask=`url(#int-mask-${line[0]})`)
+                    each k in [1, 2, 3, 4, 5, 6]
+                      path(d=line[0] === "webflow" ? "M335 154.38V247" : line[1])
+            span.int-tool(data-tool="figma")
+              img(src="assets/images/about/principles/int/figma.svg" width="48" height="65" alt="")
+            span.int-tool(data-tool="webflow")
+              img(src="assets/images/about/principles/int/webflow.svg" width="52" height="33" alt="")
+            span.int-tool(data-tool="clickup")
+              img(src="assets/images/about/principles/int/clickup.svg" width="40" height="48" alt="")
+            span.int-oww
+              img(src="assets/images/about/principles/int/oww.svg" width="63" height="30" alt="")
+            //- P-7's dark, which the next round of the loop lifts from.
+            span.int-cover
+            img.tm-cursor(src="assets/images/about/principles/tm/cursor.svg" width="46" height="46" alt="")
+          each n in [3, 4, 5, 6]
             img.principles__figure(src=`assets/images/about/principle-${n}.webp` width="670" height="420" alt="" loading="lazy")
 
     //- Gallery (Figma 1734:399): five photos placed freely, [x, y, width,

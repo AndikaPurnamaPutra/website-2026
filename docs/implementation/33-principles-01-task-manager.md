@@ -103,3 +103,34 @@ Dibandingkan piksel demi piksel dengan render Figma (1×, 670 × 420):
 
 Selisih rata-rata per kanal terhadap Figma: P-2 3,1, P-3 1,4, P-5 1,7
 (sebelumnya P-1 5,4 dan P-5 2,6; sisanya penghalusan huruf dan pola titik).
+
+## Revisi: mulus dan berulang (pengguna, 10 Nov 2026)
+"Untuk no 1 juga dibuat seamless, dan juga berulang"; lalu "dari cursor ke
+drag berpindah card terlalu patah"; "masih kaku, patah-patah; dari cursor
+ke grab terlihat kasar".
+- **Berulang**: cerita maju sampai P-5, ditahan 1,2 s, lalu kembali dengan
+  tenang: centang memudar (0,7 s), layar HP melebar ke papan penuh (1,8 s,
+  sedikit lebih pelan dari menyempitnya; pengguna: "dari kecil ke lebar
+  terasa aneh, sangat cepat"), kartu-kartu memudar dan muncul kembali
+  seperti P-1, lalu mulai lagi (±9,5 s per putaran; sambungan tak
+  terlihat). Bagian maju diputar 1,25× lebih cepat (pengguna: "terlalu
+  lambat"). Cerita dimainkan lewat waktunya, jadi mundurnya
+  persis kebalikan majunya. Desktop: berhenti saat prinsip lain tampil; HP:
+  berputar selama terlihat; reduced motion: P-5 diam.
+- **Satu gerakan tanpa jeda**: cursor datang melengkung, kartu menyala saat
+  didekati, ditekan saat cursor berhenti; kartu terangkat, miring −13° (P-3)
+  dan terbawa ke Completed dalam satu jalur halus (melewati titik P-3), sedikit
+  membesar di tengah jalan dan turun saat mendarat; tempatnya menutup dan
+  Completed memberi ruang selama kartu terbang; papan meredup dan terang lagi
+  bersamaan.
+- **Cursor ke tangan**: tangan muncul tepat di ujung cursor (sebelumnya ±45 px
+  di sebelahnya lalu bergeser), cursor mengecil dan memudar sementara tangan
+  membesar masuk; tangan menempel di titik tekan pada kartu dan ikut berputar.
+- Semua ease lembut (sine / power2 in-out); centang tumbuh pelan
+  (`back.out(1.3)`, sebelumnya memantul).
+- Perbaikan: garis tepi jendela hilang setelah putaran pertama (`--ring`
+  jendela hanya nilai cadangan, terbaca 0) → `--ring: 1` di `.tm-frame`.
+- Dicek: P-5 2,09 terhadap Figma (seperti sebelumnya); perubahan kecepatan
+  antar frame kecil (cursor ≤29, kartu dan tangan ≤13 px/s per frame); frame
+  rate 60 fps juga dengan CPU 4× lebih lambat; About 320–1920 tanpa error
+  dan scroll samping.

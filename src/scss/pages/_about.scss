@@ -249,6 +249,7 @@
   background-position: -4.361em -3.271em;
   background-size: 16.7158em 16.7158em;
   transform: translateX(-50%);
+  scale: var(--z, 1); // 02 lets them settle as each round begins
   mask-image: radial-gradient(546.235em 1046.555em at 697.7em 0, #000, transparent 95.3125%);
 }
 
@@ -293,6 +294,7 @@
 }
 
 .tm-frame {
+  --ring: 1; // stated, so the story reads it back as 1 when it loops
   --wl: 64; // left
   --ww: 542; // width
 
@@ -740,6 +742,252 @@
   height: 12.6em;
 }
 
+// Illustration 02, the tools joining OWW (Figma P-1 1950:6117 … P-7
+// 1957:7774; docs/implementation/34-principles-02-integrations.md). On the
+// same scale as 01 (one em per Figma pixel); places and sizes that move are
+// custom properties in Figma pixels for src/js/principles-scroll.js. The
+// defaults are P-1.
+
+// The tiles' stroke (inside, --b wide): Figma's linear gradient (white,
+// 10% at 54%, 30%; top left to bottom right) at $alpha, as the code export
+// leaves it out. 0.7 for the glass tiles and OWW, 0.2 for the grid (sampled
+// from the renders).
+@mixin int-ring($alpha) {
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: calc(var(--b, 1.5) * 1em);
+    pointer-events: none;
+    background: linear-gradient(
+      126deg,
+      rgba(255, 255, 255, 0.808 * $alpha),
+      rgba(255, 255, 255, 0.1 * $alpha) 53.9%,
+      rgba(255, 255, 255, 0.258 * $alpha)
+    );
+    border-radius: inherit;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
+}
+
+// The light from below shows from the start (01 fades it in at its end).
+.int-glow {
+  opacity: 1;
+}
+
+// Dots and streaks rising with the tools ("Group 1000005339").
+.int-particles {
+  position: absolute;
+  top: calc(var(--py, 220.37) * 1em);
+  left: 190.17em;
+  width: 290em;
+  height: 276.697em;
+}
+
+// Each one --sy above its place while it glides up.
+.int-dot {
+  position: absolute;
+  top: calc((var(--y) - var(--r) + var(--sy, 0)) * 1em);
+  left: calc((var(--x) - var(--r)) * 1em);
+  width: calc(var(--r) * 2em);
+  height: calc(var(--r) * 2em);
+  background: rgba(217, 217, 217, var(--o));
+  border-radius: 50%;
+}
+
+// A streak: white 50% at its head fading to nothing below.
+.int-streak {
+  position: absolute;
+  top: calc((var(--y) + var(--sy, 0)) * 1em);
+  left: calc((var(--x) - 0.665) * 1em);
+  width: 1.33em;
+  height: calc(var(--h) * 1em);
+  background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
+}
+
+// The tools: 80 × 80 glass tiles, centred on --tx, --ty, turned --tr degrees.
+.int-tool {
+  position: absolute;
+  top: calc(var(--ty) * 1em - 40em);
+  left: calc(var(--tx) * 1em - 40em);
+  display: grid;
+  place-items: center;
+  width: 80em;
+  height: 80em;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 20em;
+  box-shadow: 0 8em 40em rgba(0, 0, 0, 0.25);
+  transform: rotate(calc(var(--tr) * 1deg));
+  backdrop-filter: blur(25em);
+  @include int-ring(0.7);
+
+  img {
+    grid-area: 1 / 1;
+  }
+
+  &[data-tool="figma"] {
+    --tx: 173;
+    --ty: 398.68;
+    --tr: -29.42;
+
+    img {
+      width: 47.63em;
+      height: 65.44em;
+      translate: 0 4.99em;
+    }
+  }
+
+  &[data-tool="webflow"] {
+    --tx: 335;
+    --ty: 275.58;
+    --tr: 0;
+
+    img {
+      width: 52.424em;
+      height: 32.629em;
+      filter: drop-shadow(0 4em 3em rgba(0, 0, 0, 0.15));
+    }
+  }
+
+  &[data-tool="clickup"] {
+    --tx: 518.84;
+    --ty: 398.68;
+    --tr: 18.72;
+
+    img {
+      width: 40em;
+      height: 48em;
+      filter: drop-shadow(0 4em 3em rgba(0, 0, 0, 0.15));
+    }
+  }
+}
+
+// The lines from the tools to OWW (P-3), drawn downwards, and the light in
+// each tool's colour flowing down each line.
+// Hidden in P-1 (without JS); JS draws each line along its path instead.
+.int-links {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 0 100% 0);
+}
+
+// The lines, then the light: six dashes over each other at 1/4 each,
+// brightest at the head.
+.int-streams {
+  position: absolute;
+  inset: 0;
+  width: 670em;
+  height: 420em;
+
+  path {
+    stroke-width: 1.5;
+  }
+}
+
+.int-wire {
+  stroke: #5d5d5d;
+}
+
+.int-wire[data-wire="webflow"] {
+  stroke: #575757;
+  stroke-width: 1;
+}
+
+.int-stream path {
+  opacity: 0.25;
+}
+
+// OWW: --s square centred on --ox, --oy, corners --r, stroke --b, logo --l
+// wide, shadow scaled with it (0 11.6 58 at 116) at --sa. Glass in P-3,
+// #0F0F0F from P-4; it fills the frame in P-7.
+.int-oww {
+  --ox: 335;
+  --oy: 305;
+  --s: 116;
+  --r: 32;
+  --b: 1.5;
+  --l: 63.359;
+  --sa: 0.25;
+
+  position: absolute;
+  top: calc((var(--oy) - var(--s) / 2) * 1em);
+  left: calc((var(--ox) - var(--s) / 2) * 1em);
+  display: grid;
+  place-items: center;
+  width: calc(var(--s) * 1em);
+  height: calc(var(--s) * 1em);
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: calc(var(--r) * 1em);
+  box-shadow: 0 calc(var(--s) * 0.098em) calc(var(--s) * 0.49em) rgba(0, 0, 0, var(--sa));
+  opacity: 0;
+  visibility: hidden;
+  backdrop-filter: blur(12em);
+  @include int-ring(0.7);
+
+  img {
+    width: calc(var(--l) * 1em);
+    height: calc(var(--l) * 0.4776em);
+  }
+}
+
+// P-7's dark (OWW filling the frame), over everything but the pointer: the
+// loop ends on it and the next round lifts it.
+.int-cover {
+  position: absolute;
+  inset: 0;
+  background: #0f0f0f;
+  opacity: 0;
+  pointer-events: none;
+}
+
+// The grid around OWW: --s tiles --p apart (116 / 132 in P-4, 90 / 106 in
+// P-5), spread out from OWW by --k, each with a grey tick (10%) from P-5.
+.int-grid {
+  --s: 116;
+  --p: 132;
+  --k: 1; // how far spread from OWW (0: all behind it)
+
+  position: absolute;
+  inset: 0;
+}
+
+.int-cell {
+  --b: calc(1.14 + (var(--s) - 90) * 0.01385);
+
+  position: absolute;
+  top: calc((210 + var(--j) * var(--p) * var(--k) - var(--s) / 2) * 1em);
+  left: calc((335 + var(--i) * var(--p) * var(--k) - var(--s) / 2) * 1em);
+  display: grid;
+  place-items: center;
+  width: calc(var(--s) * 1em);
+  height: calc(var(--s) * 1em);
+  background: #141414;
+  border-radius: calc((24 + (var(--s) - 90) * 0.3077) * 1em);
+  opacity: 0;
+  @include int-ring(0.2);
+
+  img {
+    width: 20em;
+    height: 20em;
+    opacity: 0;
+  }
+}
+
+// The frame's edges fade into the background in P-5 (103.729 on each side).
+.int-fade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(#141414, rgba(20, 20, 20, 0)) top / 100% 103.729em no-repeat,
+    linear-gradient(to top, #141414, rgba(20, 20, 20, 0)) bottom / 100% 103.729em no-repeat,
+    linear-gradient(to right, #141414, rgba(20, 20, 20, 0)) left / 103.729em 100% no-repeat,
+    linear-gradient(to left, #141414, rgba(20, 20, 20, 0)) right / 103.729em 100% no-repeat;
+  opacity: 0;
+}
 
 // Gallery (Figma 1734:399): 1360 × 2128, 200px below Principles. The photos
 // sit where Figma places them (--x, --y, --w, --h in Figma pixels).
