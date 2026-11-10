@@ -201,6 +201,7 @@ function setup(section) {
   // Centred on screen (the section is at least a screen tall), then held for
   // one STEP of scrolling per principle and the exit.
   const pin = ScrollTrigger.create({
+    id: "principles", // for the page theme (src/js/page-theme.js)
     trigger: section,
     pin: true,
     start: "center center",

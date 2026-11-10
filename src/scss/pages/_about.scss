@@ -4,18 +4,24 @@
 @use "../abstracts/functions" as *;
 @use "../abstracts/breakpoints" as *;
 
-// Above the footer, so the footer coin passes behind it (as on Contact).
+// Above the footer, so the footer coin passes behind it (as on Contact). It
+// takes the page theme's background: the page turns dark for Principles, as
+// the homepage does for Services (src/js/page-theme.js; plan 39).
 .about {
   position: relative;
   z-index: 1;
-  background: var(--color-white);
+  background: var(--theme-bg);
 }
 
 // Intro: title at y 144 (main reserves 104), photo at 313, text at 928;
 // Principles 200px below the button.
+// Half Figma's space at its foot: Principles' own (it is a screen tall, its
+// content centred) adds to it now that the page turns dark with it (plan
+// 39; user: with Figma's 200 the sections were too far apart, 478px; with
+// none, too close, 278px).
 .about-intro {
   padding-top: fluid(40);
-  padding-bottom: fluid(200);
+  padding-bottom: fluid(100);
 }
 
 // Entrance (src/js/about-intro.js): hidden from the first paint until the
@@ -65,7 +71,8 @@
   max-width: fs(1015);
   font-weight: 500;
   letter-spacing: -0.02em;
-  color: var(--color-text-secondary);
+  // #555 on light (ink at 72%), a light grey once the page turns dark.
+  color: color-mix(in srgb, var(--theme-fg) 72%, var(--theme-bg));
 }
 
 .about-intro__lead {
@@ -85,8 +92,46 @@
   gap: fs(16);
 }
 
+// Dark on light, light once the page turns dark (plan 39). Its colours swap
+// at once, 40% into the page's switch, as the Statement's button on the
+// homepage: eased with the page, fill, text and page all passed through the
+// same grey together and the button vanished for a moment (user: it looked
+// delayed). (The sweep's own timing is _cta-button.scss's.)
 .about-intro__cta .button {
+  $swap: 0s calc(var(--theme-switch-time) * 0.4);
+  $sweep: 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+
   border-radius: fluid(4);
+  transition: box-shadow $swap;
+
+  &::before {
+    transition:
+      clip-path $sweep,
+      background-color $swap;
+  }
+
+  .button__light,
+  .button__ink {
+    transition:
+      clip-path $sweep,
+      color $swap;
+  }
+}
+
+body.is-dark .about-intro__cta .button {
+  box-shadow: inset 0 0 0 1px var(--color-white);
+
+  &::before {
+    background: var(--color-white);
+  }
+
+  .button__light {
+    color: var(--color-ink);
+  }
+
+  .button__ink {
+    color: var(--color-white);
+  }
 }
 
 .about-intro__cta-caption {
@@ -98,12 +143,13 @@
 
 // Principles (Figma 1734:383): dark, 820px tall; the text column and the
 // 670 × 420 illustration sit 200px from the top.
+// Dark with the page (the page theme turns dark as it comes up; plan 39).
 .principles {
   display: flex;
   align-items: center;
   height: fluid(820);
-  color: var(--color-white);
-  background: var(--color-ink);
+  color: var(--theme-fg);
+  background: var(--theme-bg);
 }
 
 // Pinned while the principles change (src/js/principles-scroll.js): at
@@ -3769,8 +3815,22 @@
 
 // Gallery (Figma 1734:399): 1360 × 2128, 200px below Principles. The photos
 // sit where Figma places them (--x, --y, --w, --h in Figma pixels).
+// Likewise half at its top on the laptop and up; tablets and phones keep
+// theirs (below).
 .about-gallery {
-  padding-top: fluid(201);
+  padding-top: fluid(100);
+}
+
+// Wide touch screens: Principles flows there (not a screen tall), so the
+// intro and the gallery keep Figma's spaces round it.
+@media (min-width: 1024px) and (hover: none) {
+  .about-intro {
+    padding-bottom: fluid(200);
+  }
+
+  .about-gallery {
+    padding-top: fluid(201);
+  }
 }
 
 .about-gallery__photos {

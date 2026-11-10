@@ -26,6 +26,8 @@ export function initPageTheme() {
   const services = document.querySelector("[data-services]");
   const ourWork = document.querySelector(".our-work");
   const motto = document.querySelector("[data-motto]");
+  const principles = document.querySelector("[data-principles]");
+  const gallery = document.querySelector(".about-gallery");
   const toned = motto?.closest(".tone-shift");
 
   // Dark stretches: each from one mark to another.
@@ -49,6 +51,18 @@ export function initPageTheme() {
     ranges.push({
       from: mark({ trigger: services, start: DARK_AT }),
       to: mark({ trigger: ourWork, start: lightAt }),
+    });
+  }
+  // About: dark for Principles, as Services on the homepage (plan 39; user:
+  // "kita coba"). Later than Services (user: it changed too soon, both
+  // ways): dark once its top is half way up the screen; light again once
+  // the gallery is well in, its top at 40% of the screen (25% where
+  // Principles flows: tablets, phones, touch; user: still too soon at the
+  // pin's end).
+  if (principles && gallery) {
+    ranges.push({
+      from: mark({ trigger: principles, start: "top 50%" }),
+      to: mark({ trigger: gallery, start: () => (ScrollTrigger.getById("principles") ? "top 40%" : "top 25%") }),
     });
   }
   // Milestone → Motto (user): Milestone stays on light and fades out, then

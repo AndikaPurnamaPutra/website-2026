@@ -109,10 +109,11 @@
   }
 }
 
-// Dark theme: the page while the Services section is in view; Services
-// alone without JS, as in Figma.
+// Dark theme: the page while the Services section (homepage) or Principles
+// (About) is in view; those sections alone without JS, as in Figma.
 body.is-dark,
-html:not(.js) .services {
+html:not(.js) .services,
+html:not(.js) .principles {
   --theme-bg: var(--color-ink);
   --theme-fg: var(--color-white);
   --theme-divider: var(--color-divider-dark);
