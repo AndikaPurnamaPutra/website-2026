@@ -18,8 +18,8 @@ gsap.registerPlugin(SplitText);
 // faster, so it already moves with the page when it is released (as
 // Services). A number click glides to its principle.
 // Illustrations 01 ("Task Manager"), 02 (the tools joining OWW), 03
-// (wireframe to approved design), 04 (a client's comment done) and 05 (a
-// project's task done) play their storyboards on a seamless loop
+// (wireframe to approved design), 04 (a client's comment done), 05 (a
+// project's task done) and 06 (a design system handed over) play their storyboards on a seamless loop
 // while their principle is shown (user decisions), resting while it is not. With reduced motion the changes are
 // instant and they show one step, still.
 const STEP = 0.8; // screen heights of scrolling per principle (0.7, held, felt long; free: 0.5 and 0.75 a little too fast, 0.85 a little heavy; user)
@@ -51,6 +51,7 @@ const STORIES = {
   design: createDesignStory,
   feedback: createFeedbackStory,
   progress: createProgressStory,
+  handoff: createHandoffStory,
 };
 const createStory = (figure) => STORIES[figure.dataset.story]?.(figure) ?? null;
 
@@ -1384,6 +1385,169 @@ function createProgressStory(figure) {
       timeline.kill();
       ctx.revert();
       q(".tl-progress__value").textContent = "0%";
+    },
+  };
+}
+
+// The "handoff" storyboard of illustration 06 (Figma P-1 … P-4, 1942:119 →
+// 1948:857 → 1988:1267 → 1988:1621;
+// docs/implementation/38-principles-06-handoff.md), in Figma pixels (the
+// custom properties in _about.scss). It loops, about 13s a round; each step
+// grows out of the last, set off by the pointer (user decisions):
+// 1. the pointer picks the phone in the design system's devices, then
+//    clicks Apply (P-1);
+// 2. the panel turns into the app it is applied to, built top to bottom;
+//    its parts are tied to their tokens by dashed lines (P-2);
+// 3. the app moves aside and dims, the developer's view comes up and its
+//    code is typed in, line by line (P-3);
+// 4. it all comes down to "Ready to develop", which the pointer clicks
+//    (P-4);
+// 5. the badge opens back into the design system, and again.
+// With reduced motion it shows P-4, still.
+function createHandoffStory(figure) {
+  const q = (selector) => figure.querySelector(selector);
+  const qa = (selector) => [...figure.querySelectorAll(selector)];
+  const ctx = gsap.context(() => {}, figure);
+  const STILL = 10.9; // s: P-4, shown with reduced motion
+  // The window as the design system (P-1), the app (P-2), the app aside
+  // (P-3), and the badge's place (where it opens back from).
+  const PANEL = { "--x": 143, "--y": 56, "--w": 383, "--h": 309, "--r": 20 };
+  const APP = { "--x": 267, "--y": 46, "--w": 160, "--h": 327, "--r": 12 };
+  const BADGE = { "--x": 249, "--y": 188, "--w": 172, "--h": 44, "--r": 16 };
+
+  let timeline;
+  ctx.add(() => {
+    const em = () => figure.getBoundingClientRect().width / 670;
+    const F = figure.getBoundingClientRect();
+    const centre = (el) => {
+      const r = el.getBoundingClientRect();
+      return { x: (r.left + r.width / 2 - F.left) / em(), y: (r.top + r.height / 2 - F.top) / em() };
+    };
+    const box = q(".sy-box");
+    const panel = q(".sy-panel");
+    const app = q(".sy-app");
+    const parts = qa(".sy-brand, .sy-app-rule, .sy-search, .sy-nav > *, .sy-foot");
+    const mark = q(".sy-pill--device");
+    const phone = centre(q('[data-device="mobile"]'));
+    const apply = centre(q(".sy-apply"));
+    const masks = qa("[data-link-mask]");
+    const dots = qa(".sy-dot");
+    const tokens = qa(".sy-token");
+    const dev = q(".sy-dev");
+    const lines = qa(".sy-line");
+    const codeFoot = q(".sy-code__foot");
+    const badge = q(".sy-badge");
+    const check = badge.querySelector("img");
+    const cursor = q(".tm-cursor");
+    const glow = q(".sy-glow");
+    gsap.set(cursor, { transformOrigin: "36.6% 27.2%" });
+    gsap.set([badge, check, dev, ...tokens, ...dots], { transformOrigin: "50% 50%" });
+    // Each line is drawn along by its mask (one dash along it).
+    masks.forEach((path) => {
+      const length = path.getTotalLength();
+      path.dataset.length = length;
+      path.setAttribute("stroke-dasharray", `${length} ${length}`);
+    });
+    const lengthOf = (_, path) => +path.dataset.length;
+
+    timeline = gsap.timeline({ paused: true, repeat: -1, defaults: { ease: "power2.inOut", lazy: false, immediateRender: false } });
+    const glide = (at, x, y, duration = 0.8) =>
+      timeline
+        .to(cursor, { "--cx": x, duration, ease: "power2.inOut" }, at)
+        .to(cursor, { "--cy": y, duration, ease: "sine.inOut" }, at);
+    const click = (el, at) =>
+      timeline
+        .to(el, { scale: 0.85, duration: 0.12, ease: "sine.out" }, at)
+        .to(el, { scale: 1, duration: 0.3, ease: "power2.out" }, at + 0.12);
+    // Every round starts from P-1 (a tween of its own each).
+    const start = (targets, vars) => timeline.fromTo(targets, vars, { ...vars, duration: 0.01 }, 0);
+    start(box, { ...PANEL, opacity: 1, backgroundColor: "#000000", "--ring": 1 });
+    start(panel, { opacity: 1 });
+    start(app, { opacity: 0 });
+    start(parts, { opacity: 0, y: 0 });
+    start(mark, { "--dm": 0 });
+    start(masks, { attr: { "stroke-dashoffset": lengthOf } });
+    start(dots, { opacity: 0, scale: 1 });
+    start(tokens, { opacity: 0, scale: 1 });
+    start(dev, { opacity: 0, y: 0, scale: 1 });
+    start(lines, { "--t": 0 });
+    start(codeFoot, { opacity: 0 });
+    start(badge, { opacity: 0, scale: 1 });
+    start(check, { opacity: 0.35, scale: 1 });
+    start(cursor, { autoAlpha: 0, scale: 1, "--cx": 540, "--cy": 400 });
+    start(glow, { opacity: 1 });
+
+    // 1. The phone, then Apply (P-1).
+    timeline.to(cursor, { autoAlpha: 1, duration: 0.3, ease: "sine.out" }, 0.3);
+    glide(0.3, phone.x, phone.y, 0.85);
+    click(cursor, 1.15);
+    timeline.to(mark, { "--dm": 44, duration: 0.4, ease: "power2.inOut" }, 1.2);
+    glide(1.55, apply.x, apply.y, 0.7);
+    click(cursor, 2.3);
+    // 2. The panel turns into the app, built top to bottom; its parts tied to
+    // their tokens (P-2).
+    timeline
+      .to(cursor, { autoAlpha: 0, duration: 0.3, ease: "sine.in" }, 2.5)
+      .to(box, { ...APP, duration: 0.95, ease: "power3.inOut" }, 2.45)
+      .to(panel, { opacity: 0, duration: 0.25, ease: "sine.in" }, 2.45)
+      .to(app, { opacity: 1, duration: 0.01 }, 2.55)
+      // (each to its own strength: Daily tasks and its three at 40%; they
+      // come in while the window still changes, so it is never empty)
+      .fromTo(parts, { y: 5 }, { opacity: (_, el) => (el.matches(".sy-item--dim") ? 0.4 : 1), y: 0, duration: 0.4, ease: "power2.out", stagger: 0.05 }, 2.6)
+      .to(masks, { attr: { "stroke-dashoffset": 0 }, duration: 0.7, ease: "power2.inOut", stagger: 0.15 }, 3.95)
+      .fromTo(dots, { scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)", stagger: 0.1 }, 3.95)
+      .fromTo(tokens, { scale: 0.92 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.6)", stagger: 0.25 }, 4.35)
+      // 3. Aside and dim; the developer's view, its code typed in (P-3).
+      .to([...tokens, ...dots], { opacity: 0, duration: 0.4, ease: "sine.in" }, 5.6)
+      .to(masks, { attr: { "stroke-dashoffset": lengthOf }, duration: 0.4, ease: "sine.in" }, 5.6)
+      .to(box, { "--x": 169, backgroundColor: "#0f0f0f", "--ring": 0, duration: 0.8, ease: "power2.inOut" }, 5.7)
+      .to(app, { opacity: 0.2, duration: 0.8, ease: "sine.inOut" }, 5.7)
+      .fromTo(dev, { y: 14, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power2.out" }, 5.95)
+      .to(lines, { "--t": 1, duration: 0.22, ease: "power1.out", stagger: 0.16 }, 6.5)
+      .to(codeFoot, { opacity: 1, duration: 0.3, ease: "sine.out" }, 8.15)
+      // 4. Ready to develop, clicked (P-4).
+      .to(dev, { opacity: 0, scale: 0.7, duration: 0.5, ease: "power2.in" }, 9.0)
+      .to(box, { opacity: 0, duration: 0.45, ease: "sine.in" }, 9.0)
+      .to(glow, { opacity: 0, duration: 1, ease: "sine.inOut" }, 9.0)
+      .fromTo(badge, { scale: 0.92 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.4)" }, 9.35)
+      .set(cursor, { "--cx": 520, "--cy": 330 }, 9.35)
+      .to(cursor, { autoAlpha: 1, duration: 0.3, ease: "sine.out" }, 9.4);
+    glide(9.4, 377, 226, 0.9);
+    click(cursor, 10.4);
+    timeline
+      .to(check, { opacity: 1, duration: 0.2, ease: "sine.out" }, 10.45)
+      .fromTo(check, { scale: 1.3 }, { scale: 1, duration: 0.45, ease: "back.out(2)" }, 10.45)
+      // 5. Back into the design system, and again.
+      .to(cursor, { autoAlpha: 0, duration: 0.3, ease: "sine.in" }, 11.5)
+      .to(badge, { opacity: 0, scale: 0.96, duration: 0.3, ease: "sine.in" }, 11.5)
+      .set(panel, { opacity: 0 }, 11.5)
+      .set(app, { opacity: 0 }, 11.5)
+      .set(parts, { opacity: 0 }, 11.5)
+      .set(mark, { "--dm": 0 }, 11.5)
+      .set([dev, codeFoot], { opacity: 0 }, 11.5)
+      .set(lines, { "--t": 0 }, 11.5)
+      .set(box, { ...BADGE, backgroundColor: "#000000", "--ring": 1 }, 11.5)
+      .to(box, { opacity: 1, duration: 0.2, ease: "sine.out" }, 11.55)
+      .to(box, { ...PANEL, duration: 0.9, ease: "power3.inOut" }, 11.55)
+      .to(panel, { opacity: 1, duration: 0.4, ease: "sine.out" }, 11.8)
+      .to(glow, { opacity: 1, duration: 1, ease: "sine.inOut" }, 11.6)
+      .set({}, {}, 13.2);
+
+    // Shown at its first step at once (as the other stories).
+    timeline.time(0.02).pause(0);
+  });
+
+  return {
+    loop: true,
+    play: () => timeline.restart(),
+    resume: () => timeline.play(),
+    pause: () => timeline.pause(),
+    reset: () => timeline.pause(0),
+    finish: () => timeline.pause(STILL),
+    revert: () => {
+      timeline.kill();
+      ctx.revert();
+      qa("[data-link-mask]").forEach((path) => ["stroke-dasharray", "stroke-dashoffset"].forEach((name) => path.removeAttribute(name)));
     },
   };
 }

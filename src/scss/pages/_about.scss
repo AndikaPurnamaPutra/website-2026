@@ -2866,6 +2866,907 @@
   text-align: right;
 }
 
+// Illustration 06, a design system applied and handed over (Figma P-1
+// 1942:119 … P-4 1988:1621; docs/implementation/38-principles-06-handoff.md).
+// On the same scale as 01 (one em per Figma pixel); sizes include borders,
+// as in Figma; places that move are custom properties for
+// src/js/principles-scroll.js. The defaults are P-1.
+
+.sy-glow {
+  opacity: 1;
+}
+
+.sy-box,
+.sy-dev,
+.sy-token {
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  line-height: normal;
+
+  span {
+    text-box: trim-both cap alphabetic;
+    white-space: nowrap;
+  }
+
+  img {
+    display: block;
+  }
+}
+
+// P-2: the dashed lines from the app's parts to their tokens (#4F4F4F),
+// drawn by their masks.
+.sy-links {
+  position: absolute;
+  inset: 0;
+  width: 670em;
+  height: 420em;
+}
+
+.sy-link {
+  stroke: #4f4f4f;
+  stroke-width: 1;
+  stroke-dasharray: 3.083 3.083;
+}
+
+.sy-dot {
+  fill: #4f4f4f;
+}
+
+// The tokens' notes (85 wide).
+.sy-token {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 8em;
+  box-sizing: border-box;
+  width: 85em;
+  padding: 7em;
+  background: #141414;
+  border: 1em solid #191919;
+  border-radius: 8em;
+  opacity: 0;
+
+  &[data-token="component"] {
+    top: 183em;
+    left: 126em;
+  }
+
+  &[data-token="bg"] {
+    top: 220em;
+    left: 459em;
+    height: 40em;
+  }
+}
+
+.sy-token__name {
+  font-size: 8em;
+  font-weight: 400;
+  color: #fff;
+}
+
+.sy-token__bars {
+  display: flex;
+  flex-direction: column;
+  gap: 4em;
+
+  span {
+    width: 100%;
+    height: 4em;
+    background: rgba(217, 217, 217, 0.1);
+    border-radius: 88.534em;
+
+    + span {
+      width: 42em;
+    }
+  }
+
+  + .sy-token__bars span {
+    width: 54em;
+
+    + span {
+      width: 32em;
+    }
+  }
+}
+
+.sy-token__value {
+  display: flex;
+  align-items: center;
+  gap: 4em;
+}
+
+.sy-swatch {
+  box-sizing: border-box;
+  width: 10em;
+  height: 10em;
+  background: #050505;
+  border: 0.625em solid #202020;
+}
+
+.sy-token__hex {
+  font-size: 8em;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.sy-token__alpha {
+  font-size: 6em;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+// The window (--x, --y, --w, --h, corners --r): the design system (383 ×
+// 309), then the app (160 × 327).
+.sy-box {
+  --x: 143;
+  --y: 56;
+  --w: 383;
+  --h: 309;
+  --r: 20;
+  --ra: 200;
+
+  position: absolute;
+  top: calc(var(--y) * 1em);
+  left: calc(var(--x) * 1em);
+  box-sizing: border-box;
+  width: calc(var(--w) * 1em);
+  height: calc(var(--h) * 1em);
+  background: #000;
+  border: 1.321em solid transparent;
+  border-radius: calc(var(--r) * 1em);
+  @include cm-edge;
+}
+
+.sy-screen {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  border-radius: calc((var(--r) - 1.321) * 1em);
+  isolation: isolate;
+}
+
+.sy-panel,
+.sy-app {
+  position: absolute;
+  inset: 0;
+}
+
+.sy-app {
+  opacity: 0;
+}
+
+.sy-head {
+  position: absolute;
+  top: 18.68em;
+  left: 22.68em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 335em;
+}
+
+.sy-head__title {
+  display: flex;
+  align-items: center;
+  gap: 8em;
+}
+
+.sy-key {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 32em;
+  height: 32em;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1.2em solid #212123;
+  border-radius: 9.273em;
+  box-shadow: 0 6.182em 6.182em rgba(0, 0, 0, 0.25);
+
+  img {
+    width: 14.23em;
+    height: 14.23em;
+  }
+}
+
+.sy-key--small {
+  width: 28em;
+  height: 28em;
+  border-width: 1em;
+  border-radius: 8.114em;
+  box-shadow: 0 5.409em 5.409em rgba(0, 0, 0, 0.25);
+
+  img {
+    width: 14em;
+    height: 14em;
+  }
+}
+
+.sy-head__name {
+  font-size: 16em;
+  color: #fff;
+}
+
+.sy-apply {
+  display: flex;
+  align-items: center;
+  gap: 2em;
+  box-sizing: border-box;
+  height: 32em;
+  padding: 10em;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1em solid #212123;
+  border-radius: 8em;
+  box-shadow: 0 5.286em 5.286em rgba(0, 0, 0, 0.25);
+
+  span {
+    font-size: 12em;
+    color: #fff;
+  }
+
+  img {
+    width: 12em;
+    height: 12em;
+  }
+}
+
+.sy-rule {
+  position: absolute;
+  top: 70.68em;
+  left: 22.68em;
+  width: 328em;
+  height: 1em;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) -13.57%, rgba(255, 255, 255, 0.2) 52%, rgba(255, 255, 255, 0) 116.3%);
+}
+
+.sy-controls {
+  position: absolute;
+  top: 90.68em;
+  left: 22.68em;
+  display: flex;
+  align-items: center;
+  gap: 8em;
+}
+
+.sy-control {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6em;
+}
+
+.sy-control--font {
+  width: 92em;
+}
+
+.sy-label {
+  font-size: 10em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.sy-colors {
+  width: 74em;
+  height: 26em;
+}
+
+.sy-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4em;
+  box-sizing: border-box;
+  height: 26em;
+  padding-left: 4em;
+  background: #000;
+  border: 1em solid #202020;
+  border-radius: 100em;
+
+  > img {
+    position: relative;
+    width: 16em;
+    height: 16em;
+  }
+}
+
+.sy-pill__on {
+  display: flex;
+  align-items: center;
+  gap: 2em;
+  height: 24em;
+  padding: 2em 4em;
+  box-sizing: border-box;
+  background: #171717;
+  border-radius: 100em;
+
+  img {
+    width: 16em;
+    height: 16em;
+  }
+
+  span {
+    font-size: 10em;
+    color: #fff;
+  }
+}
+
+.sy-pill--font {
+  width: 100%;
+  padding: 8em 6em 8em 8em;
+  gap: 2em;
+
+  span {
+    font-size: 10em;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  img {
+    width: 8em;
+    height: 8em;
+  }
+}
+
+// The device the system is set for: its mark slides under the one picked
+// (--dm: 0 the desktop … 44 the phone, Figma's).
+.sy-pill--device {
+  --dm: 44;
+
+  padding-right: 4em;
+}
+
+.sy-pill__mark {
+  position: absolute;
+  top: 0;
+  left: calc(var(--dm) * 1em);
+  width: 24em;
+  height: 24em;
+  background: #171717;
+  border-radius: 100em;
+}
+
+.sy-pill__phone {
+  margin-left: 4em;
+}
+
+.sy-lines {
+  position: absolute;
+  top: 149.68em;
+  left: 22.68em;
+  display: flex;
+  flex-direction: column;
+  gap: 4em;
+  width: 335em;
+
+  span {
+    width: 100%;
+    height: 8em;
+    background: rgba(217, 217, 217, 0.1);
+    border-radius: 88.534em;
+
+    + span {
+      width: 216em;
+    }
+  }
+}
+
+.sy-type {
+  position: absolute;
+  top: 189.68em;
+  left: 22.68em;
+  display: flex;
+  flex-direction: column;
+  gap: 14em;
+  box-sizing: border-box;
+  width: 165em;
+  padding: 12em;
+  overflow: hidden;
+  background: rgba(26, 26, 26, 0.2);
+  border: 1em solid #151515;
+  border-radius: 12em;
+}
+
+.sy-type__light {
+  position: absolute;
+  top: -55em;
+  left: -57em;
+  width: 277em;
+  height: 204em;
+  max-width: none;
+  scale: 1 -1;
+}
+
+.sy-type__top {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.sy-type__aa {
+  font-size: 48em;
+  font-weight: 400;
+  color: #fff;
+}
+
+.sy-type__weights {
+  display: flex;
+  flex-direction: column;
+  gap: 4em;
+  opacity: 0.8;
+
+  span {
+    font-size: 6em;
+    color: #fff;
+  }
+}
+
+.sy-w300 {
+  font-weight: 300;
+}
+
+.sy-w400 {
+  font-weight: 400;
+}
+
+.sy-w700 {
+  font-weight: 700;
+}
+
+.sy-type__foot {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 17em;
+}
+
+// Two lines, trimmed to the first's capitals and the last's baseline, as
+// in Figma (so "Inter Display" sits level with them).
+.sy-box .sy-type__sample {
+  display: block;
+  width: 60em;
+  font-size: 10em;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.4);
+  text-box: trim-both cap alphabetic;
+
+  span {
+    display: block;
+    text-box: none;
+  }
+}
+
+// Trimmed as Figma's, its box let down below the baseline (and taken back),
+// so the gradient, painted only inside it, reaches the "y"'s tail.
+.sy-type__name {
+  padding-bottom: 0.3em;
+  margin-bottom: -0.3em;
+  font-size: 10em;
+  font-weight: 400;
+  color: transparent;
+  background: linear-gradient(90deg, #6d6d6d, #fff 49.2%, #6d6d6d);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.sy-space {
+  position: absolute;
+  top: 189.68em;
+  left: 192.68em;
+  box-sizing: border-box;
+  width: 165em;
+  height: 94em;
+  background: rgba(26, 26, 26, 0.2);
+  border: 1em solid #202020;
+  border-radius: 12em;
+}
+
+.sy-space__title {
+  position: absolute;
+  top: calc(11em / 10);
+  left: calc(11em / 10);
+  font-size: 10em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.sy-space__steps {
+  position: absolute;
+  top: 30em;
+  left: 11em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 141em;
+}
+
+.sy-step {
+  display: flex;
+  flex-direction: column;
+  gap: 4em;
+  min-width: 11em;
+}
+
+.sy-step__bar {
+  height: 43em;
+  background: #291818;
+}
+
+.sy-step__label {
+  font-size: 6em;
+  font-weight: 400;
+  color: #fff;
+}
+
+// The app (OWW Studio's side bar; P-2).
+.sy-brand {
+  position: absolute;
+  top: 6.68em;
+  left: 6.68em;
+  display: flex;
+  align-items: center;
+  gap: 4em;
+  box-sizing: border-box;
+  width: 144em;
+  height: 32em;
+  padding: 0 8em;
+
+  img {
+    width: 33.5em;
+    height: 16em;
+  }
+
+  span {
+    font-size: 12em;
+    color: #fff;
+  }
+}
+
+.sy-app-rule {
+  position: absolute;
+  top: 46.68em;
+  left: 6.68em;
+  width: 144em;
+  height: 1em;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) -13.57%, rgba(255, 255, 255, 0.2) 52%, rgba(255, 255, 255, 0) 116.3%);
+}
+
+.sy-app-rule--foot {
+  top: 279.68em;
+}
+
+.sy-search {
+  position: absolute;
+  top: 54.68em;
+  left: 10.68em;
+  display: flex;
+  align-items: center;
+  gap: 4em;
+  box-sizing: border-box;
+  width: 136em;
+  height: 22em;
+  padding: 4em 3em 4em 6em;
+  border: 1em solid #202020;
+  border-radius: 6em;
+
+  > img {
+    width: 12em;
+    height: 12em;
+  }
+}
+
+.sy-search__hint {
+  font-size: 8em;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.sy-kbd {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  padding: 2em 4em;
+  background: #171717;
+  border-radius: 4em;
+
+  img {
+    width: 10em;
+    height: 10em;
+  }
+
+  span {
+    font-size: 8em;
+    font-weight: 400;
+    color: #fff;
+  }
+}
+
+.sy-nav {
+  position: absolute;
+  top: 88.68em;
+  left: 10.68em;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 136em;
+}
+
+.sy-nav__group {
+  align-self: flex-start;
+  margin-bottom: calc(8em / 8);
+  font-size: 8em;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.sy-item {
+  display: flex;
+  align-items: center;
+  gap: 4em;
+  box-sizing: border-box;
+  width: 100%;
+  height: 22em;
+  padding: 4em 6em;
+  border-radius: 6em;
+
+  img {
+    width: 12em;
+    height: 12em;
+  }
+
+  > span:not([class]) {
+    font-size: 8em;
+    font-weight: 400;
+    color: #fff;
+  }
+}
+
+.sy-item--on {
+  background: rgba(255, 255, 255, 0.08);
+  border: 0.5em solid #202020;
+}
+
+.sy-item--dim {
+  opacity: 0.4;
+}
+
+.sy-item--sub {
+  width: 124em;
+  border-left: 0.5em solid #5a5a5a;
+  border-radius: 0;
+}
+
+.sy-item__dot {
+  width: 12em;
+  height: 12em;
+  background: rgba(217, 217, 217, 0.1);
+  border-radius: 50%;
+}
+
+.sy-item__bar {
+  height: 6em;
+  background: rgba(217, 217, 217, 0.1);
+  border-radius: 88.534em;
+}
+
+.sy-foot {
+  position: absolute;
+  top: 291.68em;
+  left: 10.68em;
+  display: flex;
+  align-items: center;
+  gap: 6em;
+}
+
+.sy-foot__bars {
+  display: flex;
+  flex-direction: column;
+  gap: 4em;
+  width: 79em;
+
+  span {
+    width: 100%;
+    height: 6em;
+    background: rgba(217, 217, 217, 0.1);
+    border-radius: 88.534em;
+
+    + span {
+      width: 64em;
+    }
+  }
+}
+
+.sy-upgrade {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 22em;
+  padding: 8em;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1em solid #212123;
+  border-radius: 8em;
+  box-shadow: 0 5.286em 5.286em rgba(0, 0, 0, 0.25);
+
+  span {
+    font-size: 8em;
+    font-weight: 400;
+    color: #fff;
+  }
+}
+
+// P-3: the developer's view (226 × 253) and its code (typed in: each line
+// cut from the right, --t).
+.sy-dev {
+  --ra: 200;
+
+  position: absolute;
+  top: 83em;
+  left: 275em;
+  box-sizing: border-box;
+  width: 226em;
+  height: 253em;
+  background: #000;
+  border: 1.321em solid transparent;
+  border-radius: 18em;
+  opacity: 0;
+  @include cm-edge;
+}
+
+.sy-dev__head {
+  position: absolute;
+  top: 14.68em;
+  left: 18.68em;
+  display: flex;
+  align-items: center;
+  gap: 8em;
+}
+
+.sy-dev__name {
+  font-size: 14em;
+  color: #fff;
+}
+
+.sy-rule--dev {
+  top: 58.68em;
+  left: 18.68em;
+  width: 186em;
+}
+
+.sy-dev__body {
+  position: absolute;
+  top: 74.68em;
+  left: 18.68em;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2em;
+  width: 185.661em;
+}
+
+.sy-tab {
+  display: flex;
+  align-items: center;
+  gap: 2em;
+  box-sizing: border-box;
+  height: 24em;
+  padding: 8em 6em 8em 8em;
+  background: #000;
+  border: 0.7em solid #202020;
+  border-radius: 8em;
+
+  img {
+    width: 10em;
+    height: 10em;
+
+    + span + img {
+      width: 8em;
+      height: 8em;
+    }
+  }
+
+  span {
+    font-size: 8em;
+    color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+.sy-code {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  background: rgba(26, 26, 26, 0.2);
+  border: 1em solid #202020;
+  border-radius: 10em;
+}
+
+// The code, as Figma's picture of it: monospace, 6.3 with 9.76 between the
+// lines, in its colours.
+.sy-code__screen {
+  position: relative;
+  display: block;
+  width: 183.661em;
+  height: 129em;
+  overflow: hidden;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-weight: 400;
+  background: #040711;
+  border-radius: 11.064em;
+}
+
+.sy-line {
+  --t: 1;
+
+  position: absolute;
+  left: calc(7.6em / 6.3); // (in its own size)
+  display: block;
+  font-size: 6.3em;
+  line-height: 1;
+  clip-path: inset(-20% calc((1 - var(--t)) * 100%) -20% 0);
+
+  @for $i from 1 through 10 {
+    &:nth-child(#{$i}) {
+      top: calc((7.9 + (#{$i} - 1) * 9.76) * 1em / 6.3);
+    }
+  }
+
+  span {
+    white-space: pre;
+    text-box: none;
+  }
+}
+
+.sy-t {
+  color: #d2d5da;
+}
+
+.sy-k {
+  color: #b787f5;
+}
+
+.sy-f {
+  color: #70a3f3;
+}
+
+.sy-n {
+  color: #f5d565;
+}
+
+.sy-s {
+  color: #a0ecb1;
+}
+
+.sy-p {
+  color: #9da3ae;
+}
+
+.sy-g {
+  color: #e479b3;
+}
+
+.sy-a {
+  color: #8ae5f6;
+}
+
+.sy-code__foot {
+  position: absolute;
+  top: 106em;
+  right: 7.6em;
+  left: 7.6em;
+  display: flex;
+  justify-content: space-between;
+  padding-top: 9em;
+  border-top: 0.3em solid #11131d;
+
+  span {
+    font-size: 5.6em;
+    color: #6c727f;
+  }
+}
+
+// P-4: ready (the badge of 03, narrower).
+.sy-badge {
+  left: 249em;
+  width: 172em;
+}
+
 // Gallery (Figma 1734:399): 1360 × 2128, 200px below Principles. The photos
 // sit where Figma places them (--x, --y, --w, --h in Figma pixels).
 .about-gallery {

@@ -1,0 +1,13 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="SunDim">
+<path id="Vector" d="M8 2.5V2" stroke-linecap="round" stroke-linejoin="round" stroke="#999999"/>
+<path id="Vector_2" d="M11.5 8C11.5 9.933 9.933 11.5 8 11.5C6.067 11.5 4.5 9.933 4.5 8C4.5 6.067 6.067 4.5 8 4.5C9.933 4.5 11.5 6.067 11.5 8Z" stroke-linecap="round" stroke-linejoin="round" stroke="#999999"/>
+<path id="Vector_3" d="M4 4L3.5 3.5" stroke-linecap="round" stroke-linejoin="round" stroke="#999999"/>
+<path id="Vector_4" d="M4 12L3.5 12.5" stroke-linecap="round" stroke-linejoin="round" stroke="#999999"/>
+<path id="Vector_5" d="M12 4L12.5 3.5" stroke-linecap="round" stroke-linejoin="round" stroke="#999999"/>
+<path id="Vector_6" d="M12 12L12.5 12.5" stroke-linecap="round" stroke-linejoin="round" stroke="#999999"/>
+<path id="Vector_7" d="M2.5 8H2" stroke-linecap="round" stroke-linejoin="round" stroke="#999999"/>
+<path id="Vector_8" d="M8 13.5V14" stroke-linecap="round" stroke-linejoin="round" stroke="#999999"/>
+<path id="Vector_9" d="M13.5 8H14" stroke-linecap="round" stroke-linejoin="round" stroke="#999999"/>
+</g>
+</svg>
