@@ -5,10 +5,8 @@ import { designPx } from "./design-px.js";
 // data-marquee-speed sets another speed:
 // - Trusted Clients testimonials (approved proposal, not in Figma): to the
 //   left at 55 px/s (40 felt almost still; user), keep moving on hover (user
-//   decision); data-marquee="scroll": pushed
-//   by the page scroll as the Contact gallery, 1.5× as much
-//   (data-marquee-push; user: a little faster), easing towards 1500 px/s
-//   (data-marquee-max, so a hard swipe does not fling it).
+//   decision); not pushed by the page scroll (it sped up as one scrolled;
+//   user, 10 Nov 2026: removed).
 // - Contact gallery, data-marquee="pause scroll", 75 px/s (60 felt slow for
 //   large pictures; user), pushed by the scroll as the testimonials (1.5×,
 //   easing towards 1500 px/s):

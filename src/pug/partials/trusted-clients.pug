@@ -44,9 +44,8 @@ section.trusted
     hr.divider
 
   //- Without JS the row sits centered like Figma; JS duplicates it into a marquee.
-  //- "scroll": the page scroll pushes it faster, as the Contact gallery, and
-  //- 1.5× as much, easing towards 1500 Figma px/s on a hard swipe (user).
-  .trusted__marquee(data-marquee="scroll" data-marquee-speed="55" data-marquee-push="1.5" data-marquee-max="1500")
+  //- Always at its own pace: the page scroll no longer pushes it (user).
+  .trusted__marquee(data-marquee="" data-marquee-speed="55")
     ul.trusted__track(data-marquee-track)
       each item, i in testimonials
         li.testimonial-card(class=item.noise ? "testimonial-card--noise" : null)
