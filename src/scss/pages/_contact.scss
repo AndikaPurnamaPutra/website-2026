@@ -3,6 +3,7 @@
 // Figma's percentage line-heights render as whole pixels (14px at 170% =
 // 24px lines), so they are written as px ratios.
 @use "../abstracts/functions" as *;
+@use "../abstracts/breakpoints" as *;
 
 // A dark line drawn from the left over the light one on hover and focus
 // (user: more feel; it turned dark at once). 0.5px, as the line (Figma).
@@ -991,5 +992,101 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
 @keyframes contact-fallback {
   to {
     visibility: visible;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Tablet and phones (plan 32, step 5; no Figma). The page takes the site's
+// tablet and phone scale (it keeps its own above), and one column: the
+// heading, the text and the button, then the form (what this page is for),
+// then the office, the address and the email note. Nothing sticks. The
+// gallery's pictures follow that scale too.
+@include below-laptop {
+  .contact {
+    --px: var(--site-px-small);
+    --type-px: 0.0625rem;
+
+    margin-top: 0;
+    padding-bottom: fluid(80);
+  }
+
+  .contact__inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: fluid(64);
+    padding-inline: var(--page-gutter);
+  }
+
+  .contact__aside {
+    display: contents;
+  }
+
+  .contact__intro {
+    order: 1;
+  }
+
+  .contact-form {
+    order: 2;
+    width: auto;
+  }
+
+  .contact__office {
+    order: 3;
+    width: auto;
+  }
+
+  .contact-gallery {
+    width: auto;
+    margin-top: fluid(80);
+  }
+
+  .contact-gallery__item {
+    padding-right: fluid(20);
+  }
+
+  .contact-gallery__media img,
+  .contact-gallery__title {
+    width: calc(var(--w) * var(--px));
+  }
+
+  .contact-gallery__media img {
+    height: calc(var(--h) * var(--px));
+  }
+
+  // Centred on the info button, kept within the screen (the button sits at
+  // about a third of the form; 260 wide, as on the desktop, ran past the
+  // edge of a phone).
+  .contact-form__tip {
+    left: 50%;
+    max-width: min(#{fs(260)}, calc(100vw - 2 * var(--page-gutter)));
+    transform: translateX(-35%);
+  }
+}
+
+@include mobile {
+  .contact__inner {
+    gap: fluid(48);
+  }
+
+  .contact__heading .text-heading-42 {
+    font-size: fs(32);
+  }
+
+  .contact-form {
+    gap: fs(32);
+    padding: fs(20);
+  }
+
+  .contact-form__fields {
+    gap: fs(32);
+  }
+
+  .contact-form__dropzone,
+  .contact-form__upload {
+    width: 100%;
+  }
+
+  .contact-form__submit-row {
+    flex-wrap: wrap;
   }
 }

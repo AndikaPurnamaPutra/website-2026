@@ -91,6 +91,7 @@
 // (1rem = 16px), not scaled with the screen.
 @include tablet {
   :root {
+    --site-px-small: calc(100vw / 834);
     --px: calc(100vw / 834);
     --type-px: 0.0625rem;
     --page-gutter: #{fluid(32)};
@@ -101,6 +102,7 @@
   :root {
     // 320–480px wide as 320–480 frame pixels; wider phones (sideways,
     // folding) keep the 480 size.
+    --site-px-small: clamp(calc(320px / 390), calc(100vw / 390), calc(480px / 390));
     --px: clamp(calc(320px / 390), calc(100vw / 390), calc(480px / 390));
     --type-px: 0.0625rem;
     --page-gutter: #{fluid(20)};

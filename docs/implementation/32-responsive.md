@@ -785,6 +785,53 @@ anggota — sekarang placeholder).
       HP; 1440: keempat bagian identik piksel dengan commit sebelumnya,
       Principles tetap di-pin dan melangkah.
 
+## Langkah 5 — Contact (disetujui dan dikerjakan 10 Nov 2026)
+
+Kondisi: halaman ini punya skala sendiri (`--px`/`--type-px` tetap
+berhenti di 1280/1440 dan tidak mengikuti token tablet/HP), dua kolom:
+kolom kiri lengket (judul, tombol, foto kantor, alamat) 478 dan form 786
+dengan `space-between`. Di 390 **form berada di luar layar kanan** (hanya
+tepinya terlihat; elemen form sampai 678px), halaman tidak bisa digeser ke
+samping karena `overflow-x: clip`, jadi form tidak bisa dicapai sama sekali;
+kolom kiri menyisakan ruang kosong 309 di tengah. Di 834 dua kolom
+berdesakan (kiri 350, form 425). Galeri marquee di bawah tetap berjalan.
+
+**Tablet dan HP (< 1024):**
+- Skala halaman ikut token tablet/HP (`--px`, `--type-px` tidak lagi
+  ditimpa di bawah 1024), sisi mengikuti `--page-gutter`.
+- Satu kolom, tidak lengket: judul, paragraf, tombol "Schedule a call",
+  lalu **form** (kartu selebar konten), lalu foto kantor + alamat + catatan
+  email (urutan: hal yang paling dicari dulu). Jarak antar blok 48 (HP) /
+  64 (tablet); jarak 309 di kolom kiri dihapus.
+- Form: chip membungkus seperti sekarang, dropzone selebar form, Turnstile
+  dan tombol Submit tetap; di HP padding kartu 20, judul 28px.
+- Judul halaman 32px di HP (tablet 42 tetap).
+- Galeri: tetap marquee; ukuran gambar mengikuti skala HP/tablet (bukan
+  0,889× desktop), jarak atas 80.
+
+**Laptop dan desktop (≥ 1024):** tidak berubah.
+
+**Cara:** `_contact.scss` dalam `@include below-laptop` / `mobile`
+(urutan lewat `order` pada `.contact__aside` yang dibuat `display:
+contents`); tanpa Pug/JS/konten.
+
+**Cek:** 320, 390, 744, 834 (form terlihat dan bisa diisi, tidak ada scroll
+samping, dropdown Turnaround dan tooltip Project Type di dalam layar), 1440
+identik; iPhone pengguna bila tersambung.
+
+Pengerjaan: skala tablet/HP situs disediakan sebagai `--site-px-small` di
+`_tokens.scss` dan diambil kembali oleh `.contact` di bawah 1024 (halaman
+ini menimpa `--px` dengan skalanya sendiri). Tooltip "Project Type" di
+tengah tombol info dengan geser −35% dan lebar maksimal selebar layar.
+
+- [x] Disetujui ("ya", 10 Nov 2026).
+- [x] Dikerjakan dan dicek (Chrome): 320, 390, 744, 834 satu kolom (intro →
+      form → kantor), tidak ada elemen keluar layar, tooltip di dalam layar
+      (49–309 di 320); di 390 (sentuh) memilih Project Scope dan Project
+      Type memunculkan Turnaround, dropdown terbuka di dalam layar (40–350);
+      Contact, Home, About 1440 dan Home 390/834 identik piksel dengan commit
+      sebelumnya. iPhone pengguna tidak terjangkau saat itu.
+
 ## Langkah 7a — Preloader di HP (disetujui dan dikerjakan 9 Nov 2026)
 
 Keluhan pengguna: preloader terasa lama sekali di HP. Sebab: preloader
