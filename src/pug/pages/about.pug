@@ -482,7 +482,124 @@ block content
               span.ds-pointer(data-pointer=pointer[0])
                 img(src="assets/images/about/principles/des/pointer.svg" width="13" height="13" alt="")
                 span= pointer[1]
-          each n in [5, 6]
+          //- 05: from the quarter's projects to a task done (Figma P-1 2034:2093
+          //- … P-6 2095:4031; docs/implementation/37-principles-05-progress.md):
+          //- a project opens into its timeline, a task into its checklist,
+          //- ticked to 100%.
+          .principles__figure.p-board(aria-hidden="true" data-story="progress")
+            span.tm-dots
+            span.tm-glow.tl-glow
+              img(src="assets/images/about/principles/tm/glow-phone.svg" width="992" height="665" alt="")
+            //- P-1 and P-2: the quarter's projects.
+            .tl-list
+              span.tl-list__head
+                span.tl-list__title Quarter 4
+                span.tl-list__dates October – December 2026
+              span.tl-project(data-project="finova")
+                span.tl-icon
+                  img(src="assets/images/about/principles/tl/finova.svg" width="14" height="14" alt="")
+                span.tl-project__text
+                  span.tl-project__name Finova Banking App
+                  span.tl-project__kind Mobile App
+                img.tl-project__open(src="assets/images/about/principles/tl/arrow.svg" width="16" height="16" alt="")
+              span.tl-project(data-project="lumio")
+                span.tl-icon
+                  img(src="assets/images/about/principles/tl/lumio.svg" width="14" height="14" alt="")
+                span.tl-project__text
+                  span.tl-project__name Lumio Brand Identity
+                  span.tl-project__kind Branding
+              each k in [0, 1]
+                span.tl-project.tl-project--empty
+                  span.tl-icon
+                  span.tl-project__bars
+                    span
+                    span
+            //- P-3 and P-4: the project's timeline, which grows out of its
+            //- card (--x, --y, --w, --h) and is looked at closely (--zx, --zy,
+            //- --zs) through a soft round window (--mr).
+            .tl-view
+              .tl-box
+                .tl-screen
+                  //- The card it grows out of.
+                  span.tl-chip
+                    span.tl-icon
+                      img(src="assets/images/about/principles/tl/finova.svg" width="14" height="14" alt="")
+                    span.tl-project__text
+                      span.tl-project__name Finova Banking App
+                      span.tl-project__kind Mobile App
+                  //- The timeline.
+                  .tl-timeline
+                    img.tl-light(src="assets/images/about/principles/des/light.svg" width="1209" height="891" alt="")
+                    span.tl-hatch
+                    span.tl-head
+                      span.tl-head__title
+                        span.tl-key
+                          img(src="assets/images/about/principles/tm/calendar.svg" width="16" height="16" alt="")
+                        span.tl-head__text
+                          span.tl-head__name Finova Banking App
+                          span.tl-head__view Timeline
+                      span.tl-head__actions
+                        span.tl-team
+                          each a in [1, 2, 3]
+                            img(src=`assets/images/about/principles/tl/avatar-${a}.webp` width="22" height="22" alt="")
+                        span.tl-key
+                          img(src="assets/images/about/principles/tm/dots-vertical.svg" width="14" height="14" alt="")
+                    span.tl-rule
+                    span.tl-dates
+                      img.tl-caret.tl-caret--back(src="assets/images/about/principles/tl/caret.svg" width="12" height="12" alt="")
+                      span.tl-dates__days
+                        each d in ["Nov 1", "Nov 8", "Nov 15", "Nov 22", "Nov 29", "Dec 6", "Dec 13"]
+                          span= d
+                      img.tl-caret(src="assets/images/about/principles/tl/caret.svg" width="12" height="12" alt="")
+                    span.tl-today
+                      span.tl-today__tab
+                      img(src="assets/images/about/principles/tl/today.svg" width="5" height="294" alt="")
+                    each bar in [["discovery", 38.68, 123.68, 158, "Discovery & Research", "5 days", "Completed"], ["b", 62.68, 178.68, 213], ["frontend", 212.68, 233.68, 213, "Frontend Development", "12 days", "In Progress"], ["d", 392.68, 142.68, 213], ["e", 286.68, 288.68, 213], ["f", 115.68, 343.68, 257]]
+                      span.tl-bar(data-bar=bar[0] style=`--bx: ${bar[1]}; --by: ${bar[2]}; --bw: ${bar[3]}`)
+                        if bar[4]
+                          span.tl-bar__text
+                            span.tl-bar__name= bar[4]
+                            span.tl-meta
+                              span= bar[5]
+                              span.tl-meta__dot
+                              span= bar[6]
+                          if bar[0] === "frontend"
+                            img.tl-bar__more(src="assets/images/about/principles/tm/dots-vertical.svg" width="14" height="14" alt="")
+                        else
+                          span.tl-bar__lines
+                            span
+                            span
+                              span
+                              span
+            //- P-5 and P-6: the task, which grows out of its bar; its steps
+            //- are ticked off to 100%.
+            .tl-task
+              span.tl-task__head
+                span.tl-task__title
+                  span.tl-task__name Frontend Development
+                  span.tl-meta
+                    span 12 days
+                    span.tl-meta__dot
+                    span In Progress
+                img(src="assets/images/about/principles/tl/dots.svg" width="16" height="16" alt="")
+              span.tl-task__rule
+              span.tl-steps
+                each step in ["Set up project structure", "Configure routing & navigation", 85, 155]
+                  span.tl-step
+                    span.tl-check
+                      img(src="assets/images/about/principles/tl/check-empty.svg" width="18" height="18" alt="")
+                      img.tl-check__done(src="assets/images/about/principles/tl/check-done.svg" width="18" height="18" alt="")
+                    if typeof step === "string"
+                      span.tl-step__text= step
+                    else
+                      span.tl-step__bar(style=`width: ${step}em`)
+              span.tl-progress
+                span.tl-progress__track
+                  span.tl-progress__fill
+                span.tl-progress__value 0%
+            //- The pointer (it clicks, so the arrow; user).
+            img.tm-cursor(src="assets/images/about/principles/tm/cursor.svg" width="46" height="46" alt="")
+          each n in [6]
             img.principles__figure(src=`assets/images/about/principle-${n}.webp` width="670" height="420" alt="" loading="lazy")
 
     //- Gallery (Figma 1734:399): five photos placed freely, [x, y, width,

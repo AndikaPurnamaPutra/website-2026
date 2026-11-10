@@ -18,7 +18,8 @@ gsap.registerPlugin(SplitText);
 // faster, so it already moves with the page when it is released (as
 // Services). A number click glides to its principle.
 // Illustrations 01 ("Task Manager"), 02 (the tools joining OWW), 03
-// (wireframe to approved design) and 04 (a client's comment done) play their storyboards on a seamless loop
+// (wireframe to approved design), 04 (a client's comment done) and 05 (a
+// project's task done) play their storyboards on a seamless loop
 // while their principle is shown (user decisions), resting while it is not. With reduced motion the changes are
 // instant and they show one step, still.
 const STEP = 0.8; // screen heights of scrolling per principle (0.7, held, felt long; free: 0.5 and 0.75 a little too fast, 0.85 a little heavy; user)
@@ -49,6 +50,7 @@ const STORIES = {
   integrations: createIntegrationsStory,
   design: createDesignStory,
   feedback: createFeedbackStory,
+  progress: createProgressStory,
 };
 const createStory = (figure) => STORIES[figure.dataset.story]?.(figure) ?? null;
 
@@ -1193,6 +1195,195 @@ function createFeedbackStory(figure) {
       ctx.revert();
       q(".cm-gap__value").textContent = "64";
       qa("[data-arc-mask]").forEach((path) => ["stroke-dasharray", "stroke-dashoffset"].forEach((name) => path.removeAttribute(name)));
+    },
+  };
+}
+
+// The "progress" storyboard of illustration 05 (Figma P-1 … P-6, 2034:2093 →
+// 2034:2338 → 2044:2407 → 2095:3658 → 2095:2965 → 2095:4031;
+// docs/implementation/37-principles-05-progress.md), in Figma pixels (the
+// custom properties in _about.scss). It loops, about 14s a round; each step
+// grows out of the last, set off by the pointer (user decisions):
+// 1. the pointer comes to Finova in the quarter's projects, which lifts
+//    (P-2), and clicks it;
+// 2. the card opens into the project's timeline: today's line drops, the
+//    tasks' bars grow in (P-3);
+// 3. the view closes in on Frontend Development, the rest fading round it,
+//    and the pointer clicks it (P-4);
+// 4. its bar opens downwards into the task, its title staying put (P-5);
+// 5. its steps are ticked one by one, to 100% (P-6);
+// 6. back the same way to the quarter's projects, and again.
+// With reduced motion it shows P-6, still.
+function createProgressStory(figure) {
+  const q = (selector) => figure.querySelector(selector);
+  const qa = (selector) => [...figure.querySelectorAll(selector)];
+  const ctx = gsap.context(() => {}, figure);
+  const STILL = 10.3; // s: P-6, shown with reduced motion
+  // The window: the lifted card (P-2), then the timeline (P-3).
+  const CARD = { "--x": 212, "--y": 136.21, "--w": 246, "--h": 53.58, "--r": 14.614, backgroundColor: "#1a1a1a" };
+  const WIN = { "--x": 60, "--y": 60, "--w": 550, "--h": 370, "--r": 20, backgroundColor: "#000000" };
+  // P-4: closer (×1.1737, Figma's) on Frontend Development.
+  const CLOSE = { "--zx": -47.77, "--zy": -147, "--zs": 1.1737 };
+  const FAR = { "--zx": 0, "--zy": 0, "--zs": 1 };
+  const PRESS = { x: 404, y: 172 }; // where the pointer takes the card
+  const ON_CARD = 1.15; // s: the pointer gets onto the card (its foot, 189)
+  const BAR = { top: 188.82, height: 45.78 }; // Frontend's bar in P-4
+  const done = { p: 0 };
+
+  let timeline;
+  ctx.add(() => {
+    const em = () => figure.getBoundingClientRect().width / 670;
+    const list = q(".tl-list");
+    const finova = q('[data-project="finova"]');
+    const open = q(".tl-project__open");
+    const view = q(".tl-view");
+    const box = q(".tl-box");
+    const chip = q(".tl-chip");
+    const timelineLayer = q(".tl-timeline");
+    const bars = qa(".tl-bar");
+    const frontend = q('[data-bar="frontend"]');
+    const today = q(".tl-today");
+    const task = q(".tl-task");
+    const checks = qa(".tl-check__done");
+    const texts = qa(".tl-step__text");
+    const progress = q(".tl-progress");
+    const value = q(".tl-progress__value");
+    const cursor = q(".tm-cursor");
+    const writeValue = () => (value.textContent = `${Math.round(done.p)}%`);
+    gsap.set(cursor, { transformOrigin: "36.6% 27.2%" });
+    // The task's height and its ticks' centres, in Figma pixels (laid out
+    // where it ends, in P-5).
+    const F = figure.getBoundingClientRect();
+    const taskHeight = task.getBoundingClientRect().height / em();
+    const ticks = qa(".tl-check").map((check) => {
+      const r = check.getBoundingClientRect();
+      return { x: (r.left + r.width / 2 - F.left) / em(), y: (r.top + r.height / 2 - F.top) / em() + BAR.top - 137 };
+    });
+    // It opens downwards from the bar's place (its title stays put).
+    const DROP = BAR.top - 137;
+    const IN_BAR = { "--ty": DROP, "--cut": taskHeight - BAR.height };
+    const OPEN = { "--ty": DROP, "--cut": 0 };
+
+    timeline = gsap.timeline({
+      paused: true,
+      repeat: -1,
+      defaults: { ease: "power2.inOut", lazy: false, immediateRender: false },
+      onUpdate: writeValue,
+    });
+    const glide = (at, x, y, duration = 0.8) =>
+      timeline
+        .to(cursor, { "--cx": x, duration, ease: "power2.inOut" }, at)
+        .to(cursor, { "--cy": y, duration, ease: "sine.inOut" }, at);
+    const click = (el, at) =>
+      timeline
+        .to(el, { scale: 0.85, duration: 0.12, ease: "sine.out" }, at)
+        .to(el, { scale: 1, duration: 0.3, ease: "power2.out" }, at + 0.12);
+    // Every round starts from P-1 (a tween of its own each).
+    const start = (targets, vars) => timeline.fromTo(targets, vars, { ...vars, duration: 0.01 }, 0);
+    start(list, { opacity: 1 });
+    start(q(".tl-glow"), { opacity: 1 });
+    start(finova, { opacity: 1, "--hk": 1, "--hs": 0, backgroundColor: "rgba(26, 26, 26, 0.2)" });
+    start(open, { opacity: 0 });
+    start(view, { "--mr": 1 });
+    start(box, { ...CARD, ...FAR, opacity: 0 });
+    start(chip, { opacity: 1 });
+    start(timelineLayer, { opacity: 0 });
+    start(bars, { opacity: 1, clipPath: "inset(0% 100% 0% 0%)" });
+    start(today, { clipPath: "inset(0% 0% 100% 0%)" });
+    start(task, { opacity: 0, ...IN_BAR });
+    start(checks, { opacity: 0, scale: 1 });
+    start(texts, { "--s": 0 });
+    start(progress, { "--p": 0 });
+    start(done, { p: 0 });
+    start(cursor, { autoAlpha: 0, scale: 1, "--cx": 520, "--cy": 430 });
+
+    // 1. The pointer comes to Finova, which lifts as it gets onto it (P-2),
+    // and clicks it (the arrow: it clicks, it does not grab; user).
+    timeline.to(cursor, { autoAlpha: 1, duration: 0.3, ease: "sine.out" }, 0.3);
+    glide(0.3, PRESS.x, PRESS.y, 1.0);
+    timeline
+      .to(finova, { "--hk": 1.2178, "--hs": 1, backgroundColor: "#1a1a1a", duration: 0.45, ease: "power2.out" }, ON_CARD)
+      .to(open, { opacity: 1, duration: 0.3, ease: "sine.out" }, ON_CARD + 0.1);
+    click(cursor, 1.75);
+    // 2. The card opens into the timeline (P-3).
+    timeline
+      .set(box, { opacity: 1 }, 2.1)
+      .set(finova, { opacity: 0 }, 2.1)
+      .to(list, { opacity: 0, duration: 0.4, ease: "sine.inOut" }, 2.1)
+      // (the light from below is only round the projects, P-1 and P-2)
+      .to(q(".tl-glow"), { opacity: 0, duration: 1, ease: "sine.inOut" }, 2.1)
+      .to(cursor, { autoAlpha: 0, duration: 0.3, ease: "sine.in" }, 2.15)
+      .to(box, { ...WIN, duration: 1.05, ease: "power3.inOut" }, 2.1)
+      .to(chip, { opacity: 0, duration: 0.3, ease: "sine.in" }, 2.1)
+      .to(timelineLayer, { opacity: 1, duration: 0.5, ease: "sine.out" }, 2.32)
+      .to(today, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.7, ease: "power2.out" }, 2.95)
+      .to(bars, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.6, ease: "power2.out", stagger: 0.08 }, 3.0)
+      // 3. Closer on Frontend Development; the pointer clicks it (P-4).
+      .to(box, { ...CLOSE, duration: 1.1, ease: "power2.inOut" }, 4.4)
+      .to(view, { "--mr": 0, duration: 1.1, ease: "power2.inOut" }, 4.4)
+      .set(cursor, { "--cx": 520, "--cy": 400 }, 4.75)
+      .to(cursor, { autoAlpha: 1, duration: 0.3, ease: "sine.out" }, 4.8);
+    glide(4.8, 418, 229, 0.9);
+    click(cursor, 5.8);
+    // 4. Its bar opens into the task (P-5).
+    timeline
+      .set(task, { opacity: 1 }, 5.95)
+      .set(frontend, { opacity: 0 }, 5.95)
+      .to(task, { ...OPEN, duration: 0.8, ease: "power3.inOut" }, 5.95);
+    // 5. Its steps ticked one by one, to 100% (P-6).
+    ticks.forEach((tick, k) => {
+      const at = 7.0 + k * 0.65;
+      glide(at - 0.5, tick.x, tick.y, 0.42);
+      click(cursor, at);
+      timeline
+        .to(checks[k], { opacity: 1, duration: 0.2, ease: "sine.out" }, at + 0.05)
+        .fromTo(checks[k], { scale: 1.3 }, { scale: 1, duration: 0.4, ease: "back.out(2)" }, at + 0.05)
+        .to(progress, { "--p": (k + 1) * 25, duration: 0.4, ease: "power2.out" }, at + 0.05)
+        .to(done, { p: (k + 1) * 25, duration: 0.4, ease: "power2.out" }, at + 0.05);
+      if (texts[k]) timeline.to(texts[k], { "--s": 1, duration: 0.3, ease: "power2.out" }, at + 0.1);
+    });
+    // (Figma's P-6 has no pointer: it goes once the last step is ticked)
+    timeline.to(cursor, { autoAlpha: 0, duration: 0.4, ease: "sine.in" }, 9.55);
+    // 6. Back to the quarter's projects, and again.
+    timeline
+      .to(task, { ...IN_BAR, duration: 0.6, ease: "power2.inOut" }, 10.6)
+      .set(frontend, { opacity: 1 }, 11.2)
+      .set(task, { opacity: 0 }, 11.2)
+      .set(checks, { opacity: 0 }, 11.3)
+      .set(texts, { "--s": 0 }, 11.3)
+      .set(progress, { "--p": 0 }, 11.3)
+      .set(done, { p: 0 }, 11.3)
+      .to(box, { ...FAR, duration: 0.9, ease: "power2.inOut" }, 11.2)
+      .to(view, { "--mr": 1, duration: 0.9, ease: "power2.inOut" }, 11.2)
+      .to(timelineLayer, { opacity: 0, duration: 0.3, ease: "sine.in" }, 12.1)
+      .to(chip, { opacity: 1, duration: 0.3, ease: "sine.out" }, 12.4)
+      .to(box, { ...CARD, duration: 0.9, ease: "power3.inOut" }, 12.1)
+      .to(list, { opacity: 1, duration: 0.5, ease: "sine.inOut" }, 12.4)
+      .to(q(".tl-glow"), { opacity: 1, duration: 1, ease: "sine.inOut" }, 12.2)
+      .set(finova, { opacity: 1 }, 13.0)
+      .set(box, { opacity: 0 }, 13.0)
+      .to(finova, { "--hk": 1, "--hs": 0, backgroundColor: "rgba(26, 26, 26, 0.2)", duration: 0.5, ease: "power2.inOut" }, 13.05)
+      .to(open, { opacity: 0, duration: 0.3, ease: "sine.in" }, 13.05)
+      .set({}, {}, 13.8);
+
+    // Shown at its first step at once (as the other stories).
+    timeline.time(0.02).pause(0);
+  });
+
+  return {
+    loop: true,
+    play: () => timeline.restart(),
+    resume: () => timeline.play(),
+    pause: () => timeline.pause(),
+    reset: () => timeline.pause(0),
+    finish: () => {
+      timeline.pause(STILL);
+      q(".tl-progress__value").textContent = "100%";
+    },
+    revert: () => {
+      timeline.kill();
+      ctx.revert();
+      q(".tl-progress__value").textContent = "0%";
     },
   };
 }

@@ -2193,6 +2193,679 @@
   }
 }
 
+// Illustration 05, from the quarter's projects to a task done (Figma P-1
+// 2034:2093 … P-6 2095:4031; docs/implementation/37-principles-05-progress.md).
+// On the same scale as 01 (one em per Figma pixel); sizes include the
+// borders, as in Figma; places that move are custom properties for
+// src/js/principles-scroll.js. The defaults are P-1.
+
+.tl-glow {
+  opacity: 1;
+}
+
+.tl-list,
+.tl-box,
+.tl-task {
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  line-height: normal;
+
+  span {
+    text-box: trim-both cap alphabetic;
+    white-space: nowrap;
+  }
+
+  img {
+    display: block;
+  }
+}
+
+// The pointer over everything (the lifted card stacks itself).
+.tl-list ~ .tm-cursor {
+  z-index: 3;
+}
+
+// P-1: the quarter's projects (234 × 278).
+.tl-list {
+  --ra: 200;
+
+  position: absolute;
+  top: 71em;
+  left: 218em;
+  box-sizing: border-box;
+  width: 234em;
+  height: 278em;
+  background: #000;
+  border: 1.321em solid transparent;
+  border-radius: 20em;
+  @include cm-edge;
+}
+
+.tl-list__head {
+  position: absolute;
+  top: 18.68em;
+  left: 15.68em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8em;
+  width: 201em;
+}
+
+.tl-list__title {
+  font-size: 16em;
+  color: #fff;
+}
+
+.tl-list__dates {
+  font-size: 10em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+// A project card: 202 × 44, 48 apart; the first one lifts as the pointer
+// comes over it (--hk, --hs: its scale and shadow; P-2).
+.tl-project {
+  --hk: 1;
+  --hs: 0;
+
+  position: absolute;
+  left: 14.68em;
+  box-sizing: border-box;
+  width: 202em;
+  height: 44em;
+  background: rgba(26, 26, 26, 0.2);
+  border: 1em solid #202020;
+  border-radius: 12em;
+  box-shadow: 0 16em 16em rgba(0, 0, 0, var(--hs));
+  scale: var(--hk);
+
+  &:nth-of-type(2) {
+    top: 68.68em;
+    z-index: 1;
+  }
+
+  &:nth-of-type(3) {
+    top: 116.68em;
+  }
+
+  &:nth-of-type(4) {
+    top: 164.68em;
+  }
+
+  &:nth-of-type(5) {
+    top: 212.68em;
+  }
+}
+
+.tl-icon {
+  position: absolute;
+  top: 7em;
+  left: 7em;
+  display: grid;
+  place-items: center;
+  width: 28em;
+  height: 28em;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8.114em;
+  box-shadow: 0 5.409em 5.409em rgba(0, 0, 0, 0.25);
+
+  img {
+    width: 14em;
+    height: 14em;
+  }
+}
+
+.tl-project__text {
+  position: absolute;
+  top: 12em;
+  left: 43em;
+  display: flex;
+  flex-direction: column;
+  gap: 6em;
+}
+
+.tl-project__name {
+  font-size: 10em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.tl-project__kind {
+  font-size: 8em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.tl-project__open {
+  position: absolute;
+  top: 14.43em;
+  left: 174.72em;
+  width: 13.14em;
+  height: 13.14em;
+  opacity: 0;
+}
+
+.tl-project__bars {
+  position: absolute;
+  top: 11em;
+  left: 43em;
+  display: flex;
+  flex-direction: column;
+  gap: 4em;
+
+  span {
+    width: 118em;
+    height: 8em;
+    background: rgba(217, 217, 217, 0.1);
+    border-radius: 88.534em;
+
+    + span {
+      width: 56em;
+    }
+  }
+}
+
+// P-3 and P-4: the timeline seen through a soft round window (--mr: 1 open,
+// 0 Figma's ellipse round 338, 226; P-4), so what is round the task fades.
+.tl-view {
+  --mr: 1;
+
+  position: absolute;
+  inset: 0;
+  mask-image: radial-gradient(
+    calc((250.957 + var(--mr) * 2000) * 1em) calc((156 + var(--mr) * 2000) * 1em) at 338em 226em,
+    #000,
+    transparent
+  );
+}
+
+// The window (--x, --y, --w, --h, corners --r): the project's card first,
+// then the timeline (550 × 370); looked at closely by --zx, --zy, --zs.
+.tl-box {
+  --x: 60;
+  --y: 60;
+  --w: 550;
+  --h: 370;
+  --r: 20;
+  --ra: 315;
+
+  position: absolute;
+  top: calc(var(--y) * 1em);
+  left: calc(var(--x) * 1em);
+  box-sizing: border-box;
+  width: calc(var(--w) * 1em);
+  height: calc(var(--h) * 1em);
+  background: #000;
+  border: 1.321em solid transparent;
+  border-radius: calc(var(--r) * 1em);
+  translate: calc(var(--zx, 0) * 1em) calc(var(--zy, 0) * 1em);
+  scale: var(--zs, 1);
+  transform-origin: 0 0;
+  opacity: 0;
+  @include cm-edge;
+}
+
+.tl-screen {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  border-radius: calc((var(--r) - 1.321) * 1em);
+  isolation: isolate;
+}
+
+// The card's face, as large as the lifted card (1.2178).
+.tl-chip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 202em;
+  height: 44em;
+  scale: 1.2178;
+  transform-origin: 0 0;
+}
+
+.tl-timeline {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.tl-light {
+  position: absolute;
+  top: -201.3em;
+  left: -271em;
+  width: 1208.53em;
+  height: 891em;
+  max-width: none;
+}
+
+// The days ahead, hatched (white 3% every 9.5, turned 20°).
+.tl-hatch {
+  position: absolute;
+  top: 103.68em;
+  left: 196.68em;
+  width: 229em;
+  height: 328em;
+  background: repeating-linear-gradient(110deg, rgba(255, 255, 255, 0.03) 0 1.5em, transparent 1.5em 9.5em);
+}
+
+.tl-head {
+  position: absolute;
+  top: 18.68em;
+  left: 18.68em;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 510em;
+}
+
+.tl-head__title,
+.tl-head__actions {
+  display: flex;
+  align-items: center;
+  gap: 8em;
+}
+
+.tl-head__title {
+  align-items: flex-start;
+}
+
+.tl-head__actions {
+  gap: 4em;
+}
+
+.tl-key {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 32em;
+  height: 32em;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1.2em solid #212123;
+  border-radius: 9.273em;
+  box-shadow: 0 6.182em 6.182em rgba(0, 0, 0, 0.25);
+
+  img {
+    width: 14em;
+    height: 14em;
+  }
+}
+
+.tl-head__title .tl-key img {
+  width: 16em;
+  height: 16em;
+}
+
+.tl-head__text {
+  display: flex;
+  flex-direction: column;
+  gap: 8em;
+  width: 152em;
+  padding: 4em 0;
+}
+
+.tl-head__name {
+  font-size: 16em;
+  color: #fff;
+}
+
+.tl-head__view {
+  font-size: 12em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.tl-team {
+  display: flex;
+  padding: 4em;
+  background: #000;
+  border: 1em solid #202020;
+  border-radius: 100em;
+
+  img {
+    width: 22em;
+    height: 22em;
+    border-radius: 50%;
+
+    + img {
+      margin-left: -4em;
+    }
+  }
+}
+
+.tl-rule {
+  position: absolute;
+  top: 71.68em;
+  left: 22.68em;
+  width: 506em;
+  height: 1em;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) -13.57%,
+    rgba(255, 255, 255, 0.2) 52%,
+    rgba(255, 255, 255, 0) 116.3%
+  );
+}
+
+.tl-dates {
+  position: absolute;
+  top: 87.68em;
+  left: 18.68em;
+  display: flex;
+  align-items: center;
+  gap: 8em;
+  width: 510em;
+}
+
+.tl-caret {
+  width: 12em;
+  height: 12em;
+}
+
+.tl-caret--back {
+  scale: -1 1;
+}
+
+.tl-dates__days {
+  display: flex;
+  flex: 1 0 0;
+  justify-content: space-between;
+
+  span {
+    font-size: 10em;
+    color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+// Today (Nov 15): its tab and line (drawn down by JS: the box it is cut
+// to must have a size).
+.tl-today {
+  position: absolute;
+  inset: 0;
+}
+
+.tl-today__tab {
+  position: absolute;
+  top: 99.68em;
+  left: 170.68em;
+  box-sizing: border-box;
+  width: 48em;
+  height: 8em;
+  background: linear-gradient(to top, #00183b 18.75%, #000 137.5%);
+  border: 1em solid #000b1c;
+  border-top: 0;
+  border-radius: 0 0 8em 8em;
+}
+
+.tl-today img {
+  position: absolute;
+  top: 105.01em;
+  left: 194.01em;
+  width: 5.333em;
+  height: 293.667em;
+}
+
+// A task's bar (--bx, --by, --bw).
+.tl-bar {
+  position: absolute;
+  top: calc(var(--by) * 1em);
+  left: calc(var(--bx) * 1em);
+  box-sizing: border-box;
+  width: calc(var(--bw) * 1em);
+  height: 39em;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1em solid #202020;
+  border-radius: 10em;
+}
+
+// The task in progress: black, its done part edged lighter.
+.tl-bar[data-bar="frontend"] {
+  background: #000;
+  border-color: #191919;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -1em;
+    left: -1em;
+    box-sizing: border-box;
+    width: 52em;
+    height: 39em;
+    border: 1em solid #2e2e37;
+    border-right: 0;
+    border-radius: 10em 0 0 10em;
+  }
+}
+
+.tl-bar__text {
+  position: absolute;
+  top: 9em;
+  left: 11em;
+  display: flex;
+  flex-direction: column;
+  gap: 6em;
+}
+
+.tl-bar__name {
+  font-size: 10em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.tl-meta {
+  display: flex;
+  align-items: center;
+  gap: 4em;
+
+  span {
+    font-size: 8em;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .tl-meta__dot {
+    width: 2em;
+    height: 2em;
+    font-size: 1em;
+    background: #6a6a6a;
+    border-radius: 50%;
+  }
+}
+
+.tl-bar__more {
+  position: absolute;
+  top: 11.5em;
+  left: 188em;
+  width: 14em;
+  height: 14em;
+}
+
+.tl-bar__lines {
+  position: absolute;
+  top: 9em;
+  left: 11em;
+  display: flex;
+  flex-direction: column;
+  gap: 4em;
+  width: 118em;
+
+  span {
+    height: 8em;
+    background: rgba(217, 217, 217, 0.1);
+    border-radius: 88.534em;
+  }
+
+  > span:last-child {
+    display: flex;
+    gap: 4em;
+    background: none;
+
+    span {
+      width: 28em;
+
+      + span {
+        width: 42em;
+      }
+    }
+  }
+}
+
+// P-5 and P-6: the task (250 wide), grown out of its bar: it opens
+// downwards from the bar's place (51.82 below Figma's, so its title stays
+// where the bar's was; user: it jumped up), cut to --cut of its foot at the
+// start.
+.tl-task {
+  --ra: 200;
+  --ty: 0;
+  --cut: 0;
+
+  position: absolute;
+  top: 137em;
+  left: 263em;
+  display: flex;
+  flex-direction: column;
+  gap: 14em;
+  box-sizing: border-box;
+  width: 250em;
+  padding: 14em;
+  background: #000;
+  border: 1em solid transparent;
+  border-radius: 14em;
+  clip-path: inset(0 0 calc(var(--cut) * 1em) 0 round 14em);
+  translate: 0 calc(var(--ty) * 1em);
+  opacity: 0;
+  @include cm-edge;
+
+  &::after {
+    inset: -1em;
+    padding: 1em;
+  }
+}
+
+.tl-task__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  img {
+    width: 16em;
+    height: 16em;
+  }
+}
+
+.tl-task__title {
+  display: flex;
+  flex-direction: column;
+  gap: 6em;
+  width: 159em;
+
+  .tl-meta span {
+    font-size: 9em;
+  }
+
+  .tl-meta .tl-meta__dot {
+    font-size: 1em;
+  }
+}
+
+.tl-task__name {
+  font-size: 12em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.tl-task__rule {
+  width: 222em;
+  height: 1em;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) -37.1%,
+    rgba(255, 255, 255, 0.2) 47.5%,
+    rgba(255, 255, 255, 0) 130.4%
+  );
+}
+
+.tl-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 4em;
+}
+
+.tl-step {
+  display: flex;
+  align-items: center;
+  gap: 6em;
+}
+
+.tl-check {
+  position: relative;
+  width: 18em;
+  height: 18em;
+
+  img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.tl-check__done {
+  opacity: 0;
+}
+
+// A step's words, struck through as it is ticked (--s).
+.tl-step__text {
+  position: relative;
+  font-size: 10em;
+  color: rgba(255, 255, 255, 0.8);
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 0;
+    left: 0;
+    height: 0.08em;
+    background: rgba(255, 255, 255, 0.8);
+    scale: var(--s, 0) 1;
+    transform-origin: 0 50%;
+  }
+}
+
+.tl-step__bar {
+  height: 8em;
+  background: rgba(217, 217, 217, 0.1);
+  border-radius: 88.534em;
+}
+
+// The progress (--p, 0–100): Figma's bar of white through lavender.
+.tl-progress {
+  --p: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 4em;
+}
+
+.tl-progress__track {
+  flex: 1 0 0;
+  height: 8em;
+  overflow: hidden;
+  background: #161616;
+  border-radius: 100em;
+}
+
+.tl-progress__fill {
+  display: block;
+  width: calc(var(--p) * 1%);
+  height: 100%;
+  background: linear-gradient(90deg, #2f2f2f, #6f6f94 79.302%, #fff);
+  border-radius: 88.534em;
+}
+
+// (as wide as "100%" all along, so the bar keeps its length as it counts)
+.tl-progress__value {
+  width: 2.1em;
+  font-size: 9em;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: right;
+}
+
 // Gallery (Figma 1734:399): 1360 × 2128, 200px below Principles. The photos
 // sit where Figma places them (--x, --y, --w, --h in Figma pixels).
 .about-gallery {
