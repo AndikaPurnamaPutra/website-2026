@@ -37,26 +37,61 @@ block content
         execution, execution, execution, execution
       ]
 
-    //- Board parts and their place in "P-1.3" (Figma 1785:3145), in Figma
-    //- pixels inside the window; src/js/principles-scroll.js plays the
-    //- Motion-01 storyboard from them. B is the card being moved.
-    -
-      var cards = { a: [9, 63], b: [148.35, 109.5], c: [9, 209], d: [145, 63], e: [283, 63], f: [283, 136] }
-      var adds = { 1: [9, 282], 2: [145, 136], 3: [283, 209] }
+    //- Illustration 01: the "Task Manager" board (Figma P-1 … P-5, 1950:5090,
+    //- 1950:5267, 2169:1649, 2169:1931, 2169:2256; docs/implementation/
+    //- 33-principles-01-task-manager.md). Built in HTML so it can move; 1em is
+    //- one Figma pixel. src/js/principles-scroll.js plays the storyboard.
+    mixin tmCard(card)
+      .tm-card(class=card.cls data-card=card.key)
+        .tm-card__top
+          span.tm-tag(class=`tm-tag--${card.tag.toLowerCase()}`)= card.tag
+          span.tm-card__title= card.title
+        .tm-card__bottom
+          .tm-card__meta
+            span.tm-due
+              img(src="assets/images/about/principles/tm/calendar-small.svg" width="8" height="8" alt="")
+              span= card.due
+            span.tm-avatars
+              img(src="assets/images/about/principles/tm/avatar-1.png" width="10" height="10" alt="")
+              img(src="assets/images/about/principles/tm/avatar-2.png" width="10" height="10" alt="")
+          if card.progress
+            .tm-progress
+              span.tm-progress__track
+                span.tm-progress__fill(style=`--fill: ${card.fill || card.progress}`)
+              span.tm-progress__value= `${card.progress}%`
+        +tmMark(card.check || "white", card.circle)
 
-    mixin cardContent(lit)
-      span.p-board__avatar
-        img(src=`assets/images/about/principles/${lit ? "avatar-lit" : "avatar"}.svg` width="14" height="14" alt="")
-        if lit
-          img.p-board__check(src="assets/images/about/principles/check.svg" width="14" height="14" alt="")
-      span.p-board__bars
-        span.p-board__bar
-        span.p-board__bar.p-board__bar--short
-      span.p-board__tags
-        span.p-board__tag
-        span.p-board__tag
-        span.p-board__tag
-        span.p-board__tag.p-board__tag--end
+    mixin tmSkeleton(check)
+      .tm-card.tm-card--skeleton
+        .tm-card__top
+          span.tm-sk.tm-sk--tag
+          span.tm-sk.tm-sk--line
+          span.tm-sk.tm-sk--short
+        .tm-card__meta
+          span.tm-sk-due
+            span.tm-sk.tm-sk--dot
+            span.tm-sk.tm-sk--due
+          span.tm-sk.tm-sk--pill
+        +tmMark(check || "grey")
+
+    //- The round mark at the top right: empty, then its tick.
+    mixin tmMark(check, circle)
+      span.tm-mark
+        img.tm-mark__circle(src=`assets/images/about/principles/tm/${circle || "circle-empty"}.svg` width="18" height="18" alt="")
+        img.tm-mark__check(src=`assets/images/about/principles/tm/check-${check}.svg` width="18" height="18" alt="")
+
+    mixin tmColumn(key, icon, label, count)
+      .tm-col(data-col=key)
+        .tm-col__head
+          img(src=`assets/images/about/principles/tm/${icon}.svg` width="12" height="12" alt="")
+          span.tm-col__label= label
+          span.tm-col__count= count
+        .tm-col__cards
+          block
+
+    -
+      var finalize = { key: "finalize", tag: "Design", title: "Finalize homepage design and interactions", due: "Due Nov 11", progress: 88, fill: 91 }
+      var build = { key: "build", tag: "Development", title: "Build product listing page and filtering", due: "Due Nov 11", progress: 50, fill: 59.5 }
 
     section.principles(data-principles data-header-theme="dark")
       .container.principles__inner
@@ -78,38 +113,46 @@ block content
                         br
                       = line
         .principles__figures
-          //- 01: the board, built in HTML so it can move. 1em = one Figma pixel.
+          //- 01: the "Task Manager" board (mixins above).
           .principles__figure.p-board.is-active(aria-hidden="true" data-board)
-            img.p-board__glow(src="assets/images/about/principles/glow.svg" width="779" height="1607" alt="")
-            .p-board__window
-              .p-board__bar-top
-                span.p-board__lights
-                  span.p-board__light.p-board__light--red
-                  span.p-board__light.p-board__light--yellow
-                  span.p-board__light.p-board__light--green
-                span.p-board__actions
-                  span.p-board__button
-                    span.p-board__button-label Impot/Export
-                    img(src="assets/images/about/principles/caret.svg" width="8" height="8" alt="")
-                  span.p-board__button.p-board__button--icon
-                    img(src="assets/images/about/principles/dots.svg" width="8" height="8" alt="")
-              img.p-board__line(src="assets/images/about/principles/hline.svg" width="410" height="1" alt="")
-              img.p-board__divider(src="assets/images/about/principles/vline1.svg" width="284" height="1" alt="" style="--x: 136")
-              img.p-board__divider(src="assets/images/about/principles/vline1.svg" width="284" height="1" alt="" style="--x: 271.84")
-              span.p-board__slot
-              each pos, key in adds
-                span.p-board__add(data-add=key style=`--x: ${pos[0]}; --y: ${pos[1]}`)
-                  img(src="assets/images/about/principles/plus.svg" width="8" height="8" alt="")
-              each pos, key in cards
-                span.p-board__card(data-card=key class=key === "b" ? "is-lit" : null style=`--x: ${pos[0]}; --y: ${pos[1]}`)
-                  +cardContent(false)
-                  span.p-board__card-lit
-                    img.p-board__card-glow(src="assets/images/about/principles/cardglow.svg" width="279" height="94" alt="")
-                    +cardContent(true)
-              span.p-board__progress
-                span.p-board__progress-fill
-              span.p-board__percent 40%
-            img.p-board__cursor(src="assets/images/about/principles/cursor.svg" width="27" height="27" alt="")
+            span.tm-dots
+            span.tm-glow
+              img(src="assets/images/about/principles/tm/glow-phone.svg" width="992" height="665" alt="")
+            .tm-frame
+              .tm-window
+                img.tm-light(src="assets/images/about/principles/tm/light.svg" width="1100" height="891" alt="")
+                .tm-head
+                  .tm-head__title
+                    span.tm-iconbox
+                      img(src="assets/images/about/principles/tm/calendar.svg" width="16" height="16" alt="")
+                    span.tm-head__label Task Manager
+                  .tm-head__actions
+                    span.tm-new
+                      img(src="assets/images/about/principles/tm/plus.svg" width="12" height="12" alt="")
+                      span New Task
+                    span.tm-iconbox
+                      img(src="assets/images/about/principles/tm/dots-vertical.svg" width="14" height="14" alt="")
+                .tm-cols
+                  +tmColumn("backlog", "backlog", "Backlog", "20")
+                    +tmCard({ key: "navigation", tag: "Design", title: "Create responsive mobile navigation", due: "Due Nov 12" })
+                    +tmSkeleton
+                    +tmSkeleton
+                  +tmColumn("progress", "in-progress", "In Progress", "3/8")
+                    +tmCard(build)
+                    span.tm-slot(data-slot)
+                    +tmCard(finalize)
+                  +tmColumn("done", "completed", "Completed", "4/20")
+                    .tm-insert(data-insert="finalize")
+                      +tmCard(Object.assign({}, finalize, { key: "finalize-done", progress: 100, fill: 100, cls: "tm-card--chosen" }))
+                    .tm-insert(data-insert="build")
+                      +tmCard(Object.assign({}, build, { key: "build-done", progress: 0 }))
+                    +tmSkeleton
+                    +tmSkeleton
+            //- The card while it is carried (P-3), and the pointer.
+            .tm-float
+              +tmCard(Object.assign({}, finalize, { key: "finalize-float", circle: "circle-lifted" }))
+            img.tm-cursor(src="assets/images/about/principles/tm/cursor.svg" width="46" height="46" alt="")
+            img.tm-grab(src="assets/images/about/principles/tm/grab.svg" width="13" height="13" alt="")
           each n in [2, 3, 4, 5, 6]
             img.principles__figure(src=`assets/images/about/principle-${n}.webp` width="670" height="420" alt="" loading="lazy")
 

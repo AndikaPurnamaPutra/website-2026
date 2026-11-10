@@ -301,124 +301,117 @@ function setup(section) {
   };
 }
 
-// Motion-01 (Figma 1781:1671, frames P-1 … P-1.5), in Figma pixels inside the
-// board's window (the custom properties of .p-board in _about.scss):
-// 1. the cursor goes to the middle card of the first column and picks it up
-//    (it tilts and lights up; a dashed place is left behind);
-// 2. it is moved to the second column and dropped there;
-// 3. the board narrows to two columns and the progress reaches 100%;
-// 4. it becomes a phone screen with three lit cards;
-// 5. a green tick appears on each card.
-// The storyboard's frames are not fully consistent with each other (cards
-// appear and disappear between frames), so the in-between steps are
-// smoothed: the cards that are not in the next frame fade out.
+// The "Task Manager" storyboard (Figma P-1 … P-5, 1950:5090 → 1950:5267 →
+// 2169:1649 → 2169:1931 → 2169:2256; docs/implementation/
+// 33-principles-01-task-manager.md), about 5s, in Figma pixels on the board
+// (its custom properties in _about.scss):
+// 1. the pointer comes to "Finalize homepage design…" in In Progress, which
+//    turns black and shows its mark (P-2);
+// 2. it is picked up: tilted, lifted, the board dims and a dashed place is
+//    left (P-3);
+// 3. it is carried to the top of Completed and put down, its progress full
+//    (between P-3 and P-4, not in Figma; user decision: option a);
+// 4. the board narrows to a phone with only Completed, "Build product
+//    listing…" joins it, every card shows its mark (P-4);
+// 5. the ticks appear, one after another (P-5). It stops there.
 function createBoardStory(board) {
   const q = (selector) => board.querySelector(selector);
-  const card = (key) => q(`[data-card="${key}"]`);
-  const lit = (key) => card(key).querySelector(".p-board__card-lit");
-  const add = (key) => q(`[data-add="${key}"]`);
-  const win = q(".p-board__window");
-  const barTop = q(".p-board__bar-top");
-  const line = q(".p-board__line");
-  const dividers = board.querySelectorAll(".p-board__divider");
-  const slot = q(".p-board__slot");
-  const fill = q(".p-board__progress-fill");
-  const progress = q(".p-board__progress");
-  const percent = q(".p-board__percent");
-  const cursor = q(".p-board__cursor");
-  const cards = ["a", "b", "c", "d", "e", "f"].map(card);
-  const adds = ["1", "2", "3"].map(add);
-  const shadow = (alpha) => `drop-shadow(0em ${4 * alpha}em ${4.85 * alpha}em rgba(0, 0, 0, ${0.25 * alpha}))`;
-  const touched = [win, line, slot, fill, progress, percent, cursor, ...dividers, ...cards, ...adds, ...cards.map((c) => c.querySelector(".p-board__card-lit")), ...board.querySelectorAll(".p-board__check, .p-board__card-lit .p-board__avatar img")];
-  // Their own style attributes hold the "P-1.3" places, restored on revert.
-  const styles = [barTop, ...touched].map((el) => el.getAttribute("style"));
-  const label = { value: 40 };
-  const writeLabel = () => (percent.textContent = `${Math.round(label.value)}%`);
+  const ctx = gsap.context(() => {}, board);
+  const frame = q(".tm-frame");
+  const win = q(".tm-window");
+  const head = q(".tm-head");
+  const cols = q(".tm-cols");
+  const done = q('[data-col="done"]');
+  const chosen = q('[data-card="finalize"]');
+  const slot = q("[data-slot]");
+  const float = q(".tm-float");
+  const floatCard = float.querySelector(".tm-card");
+  const cursor = q(".tm-cursor");
+  const grab = q(".tm-grab");
+  const label = float.querySelector(".tm-progress__value");
+  const percent = { value: 88 };
 
-  // First step (P-1, with the second column as in P-1.2, so the moved card
-  // fills its empty place).
-  const start = () => {
-    gsap.set(win, { "--bx": 130, "--by": 41, "--bw": 410, "--bh": 338 });
-    gsap.set(barTop, { "--tl": 19, "--tw": 370, autoAlpha: 1 });
-    gsap.set(line, { "--lw": 410, autoAlpha: 1 });
-    gsap.set([...dividers, ...cards, ...adds], { autoAlpha: 1 });
-    gsap.set(slot, { autoAlpha: 0 });
-    const places = { a: [9, 63], b: [9, 136], c: [9, 209], d: [145, 63], e: [283, 63], f: [283, 136] };
-    cards.forEach((el, i) => {
-      const [x, y] = Object.values(places)[i];
-      gsap.set(el, { "--x": x, "--y": y, "--w": 117, rotation: 0, filter: shadow(0) });
-    });
-    gsap.set(cards.map((c) => c.querySelector(".p-board__card-lit")), { opacity: 0 });
-    gsap.set(board.querySelectorAll(".p-board__check"), { opacity: 0, scale: 0.4 });
-    gsap.set(board.querySelectorAll(".p-board__card-lit .p-board__avatar img:first-child"), { opacity: 1 });
-    [[9, 282], [145, 136], [283, 209]].forEach(([x, y], i) => gsap.set(adds[i], { "--x": x, "--y": y, "--w": 117 }));
-    gsap.set(progress, { "--py": 309, "--pw": 391 });
-    gsap.set(fill, { "--fw": 162, backgroundColor: "#79816d" });
-    gsap.set(percent, { "--tx": 382, "--ty": 313 });
-    label.value = 40;
-    writeLabel();
-    gsap.set(cursor, { "--cx": 371.5, "--cy": 160.5, scale: 11 / 7, autoAlpha: 1 });
+  // Where the chosen card sits on the board, in Figma pixels (measured: the
+  // board's own layout puts it there).
+  const em = () => board.getBoundingClientRect().width / 670;
+  const place = (el) => {
+    const b = board.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    return { x: (r.left - b.left) / em(), y: (r.top - b.top) / em(), h: r.height / em() };
   };
-  start();
+  // The carried card in P-3: its centre at 380.5, 285.75, turned -13°; the
+  // hand at 425, 318.
+  const LIFT = { cx: 380.5, cy: 285.75, rotation: -13 };
+  const HAND = { x: 425, y: 318 };
+  const DONE_TOP = { x: 425.33, y: 146 }; // the first card's place in Completed
 
-  const fade = (targets, at, alpha = 0) => timeline.to(targets, { autoAlpha: alpha, duration: 0.3, ease: "power1.out" }, at);
-  // Not lazy: jumped straight to its end (reduced motion, a reload further
-  // down), every step must be drawn before the next one reads its start.
-  const timeline = gsap.timeline({ paused: true, defaults: { ease: "power2.inOut", lazy: false } });
+  let timeline;
+  ctx.add(() => {
+    const from = place(chosen);
+    const lifted = { x: LIFT.cx - 156.667 / 2, y: LIFT.cy - from.h / 2 };
+    const handOff = { x: HAND.x - lifted.x, y: HAND.y - lifted.y };
+    gsap.set(float, { "--fx": from.x, "--fy": from.y, rotation: 0, transformOrigin: "50% 50%" });
+    gsap.set(cursor, { "--cx": 520, "--cy": 420 });
+    gsap.set(grab, { "--gx": from.x + handOff.x - 45.5, "--gy": from.y + handOff.y + 6.75 });
 
-  // 1. To the card, press, pick it up.
-  timeline
-    .to(cursor, { "--cx": 214, "--cy": 234, duration: 0.7 }, 0.2)
-    .to(cursor, { scale: 1, duration: 0.2, ease: "power2.out" }, 0.75)
-    .to(card("b"), { "--x": 9.35, "--y": 134.5, rotation: -6.6, filter: shadow(1), duration: 0.35, ease: "power2.out" }, 1)
-    .to(lit("b"), { opacity: 1, duration: 0.35, ease: "power1.out" }, 1)
-    .to(slot, { autoAlpha: 1, duration: 0.3, ease: "power1.out" }, 1.05)
-    // 2. Across to the second column (P-1.3), and down into its place.
-    .to(card("b"), { "--x": 148.35, "--y": 109.5, duration: 0.7 }, 1.35)
-    .to(cursor, { "--cx": 353, "--cy": 209, duration: 0.7 }, 1.35)
-    .to(card("b"), { "--x": 145, "--y": 136, rotation: 0, duration: 0.35, ease: "power2.out" }, 2.05)
-    .to(cursor, { "--cx": 349.65, "--cy": 235.5, duration: 0.35, ease: "power2.out" }, 2.05)
-    .to(add("2"), { "--y": 209, duration: 0.35, ease: "power2.out" }, 2.05)
-    .to(cursor, { "--cx": 380, "--cy": 262, autoAlpha: 0, duration: 0.4, ease: "power1.in" }, 2.45)
-    .to(card("b"), { filter: shadow(0), duration: 0.4 }, 2.4);
-  fade([slot, card("c"), card("d"), add("1"), ...dividers], 2.4);
+    const writeLabel = () => (label.textContent = `${Math.round(percent.value)}%`);
+    const fill = float.querySelector(".tm-progress__fill");
+    const doneMarks = done.querySelectorAll(".tm-mark");
+    const doneChecks = done.querySelectorAll(".tm-mark__check");
+    const doneCircles = done.querySelectorAll(".tm-mark__circle");
 
-  // 3. Two columns (P-1.5, first frame); the progress fills up.
-  const MERGE = { duration: 0.75, ease: "power3.inOut" };
-  timeline
-    .to(win, { "--bx": 188, "--bw": 285, ...MERGE }, 2.5)
-    .to(barTop, { "--tl": 15, "--tw": 259, ...MERGE }, 2.5)
-    .to(line, { "--lw": 285, ...MERGE }, 2.5)
-    .to(card("a"), { "--w": 127.5, ...MERGE }, 2.5)
-    .to(card("b"), { "--x": 9, "--w": 127.5, ...MERGE }, 2.5)
-    .to([card("e"), card("f")], { "--x": 146.5, "--w": 127.5, ...MERGE }, 2.5)
-    .to(add("2"), { "--x": 9, "--w": 127.5, ...MERGE }, 2.5)
-    .to(add("3"), { "--x": 146.5, "--w": 127.5, ...MERGE }, 2.5)
-    .to(progress, { "--pw": 265, ...MERGE }, 2.5)
-    .to(fill, { "--fw": 231, backgroundColor: "#9fb67d", ...MERGE }, 2.5)
-    .to(percent, { "--tx": 253, ...MERGE }, 2.5)
-    .to(label, { value: 100, onUpdate: writeLabel, ...MERGE }, 2.5);
-
-  // 4. A phone screen (P-1.5, second frame): three lit cards.
-  const PHONE = { duration: 0.75, ease: "power3.inOut" };
-  timeline
-    .to(win, { "--bx": 261, "--by": 66, "--bw": 148, "--bh": 288, ...PHONE }, 3.4)
-    .to(card("a"), { "--y": 13, ...PHONE }, 3.4)
-    .to(card("b"), { "--y": 86, ...PHONE }, 3.4)
-    .to(card("e"), { "--x": 9, "--y": 159, ...PHONE }, 3.4)
-    .to(progress, { "--py": 259, "--pw": 128, ...PHONE }, 3.4)
-    .to(fill, { "--fw": 94, ...PHONE }, 3.4)
-    .to(percent, { "--tx": 116, "--ty": 263, ...PHONE }, 3.4)
-    .to([lit("a"), lit("e")], { opacity: 1, duration: 0.5, ease: "power1.out" }, 3.8)
-    .to([card("a"), card("b"), card("e")], { filter: shadow(1), duration: 0.5 }, 3.8);
-  fade([barTop, line, card("f"), add("2"), add("3")], 3.4);
-
-  // 5. The ticks (P-1.5, third frame).
-  ["a", "b", "e"].forEach((key, i) => {
-    const at = 4.3 + i * 0.12;
+    // Not lazy: jumped straight to its end (reduced motion, a reload further
+    // down), every step must be drawn before the next one reads its start.
+    timeline = gsap.timeline({ paused: true, defaults: { ease: "power2.inOut", lazy: false } });
     timeline
-      .to(lit(key).querySelector(".p-board__check"), { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, at)
-      .to(lit(key).querySelector(".p-board__avatar img:first-child"), { opacity: 0, duration: 0.2, ease: "power1.out" }, at);
+      // 1. The pointer comes in; the card turns black with its mark (P-2).
+      .to(cursor, { autoAlpha: 1, duration: 0.3, ease: "power1.out" }, 0.2)
+      .to(cursor, { "--cx": 368.5, "--cy": 336.6, duration: 0.8 }, 0.2)
+      .to(chosen, { backgroundColor: "#000", borderColor: "#191919", "--ring": 1, duration: 0.25, ease: "power1.out" }, 0.95)
+      .to(chosen.querySelector(".tm-mark"), { opacity: 1, duration: 0.25, ease: "power1.out" }, 0.95)
+      // 2. Pressed, the hand takes over; the card is lifted, the board dims (P-3).
+      .to(cursor, { scale: 0.9, duration: 0.12, ease: "power2.out" }, 1.3)
+      .to(cursor, { autoAlpha: 0, duration: 0.12 }, 1.42)
+      .to(grab, { autoAlpha: 1, duration: 0.12 }, 1.42)
+      .set(chosen, { display: "none" }, 1.45)
+      .set(slot, { display: "block", height: () => from.h * em(), borderWidth: () => em() }, 1.45)
+      .set(float, { autoAlpha: 1 }, 1.45)
+      .to(float, { "--fx": lifted.x, "--fy": lifted.y, rotation: LIFT.rotation, duration: 0.45, ease: "power2.out" }, 1.45)
+      .to(grab, { "--gx": HAND.x, "--gy": HAND.y, duration: 0.45, ease: "power2.out" }, 1.45)
+      .to(win, { backgroundColor: "#0f0f0f", opacity: 0.6, duration: 0.4, ease: "power1.out" }, 1.45)
+      .to(frame, { "--ring": 0, duration: 0.4, ease: "power1.out" }, 1.45)
+      .to([head, cols], { opacity: 0.6, duration: 0.4, ease: "power1.out" }, 1.45)
+      // 3. Carried to the top of Completed, which makes room; its progress fills.
+      .to(float, { "--fx": DONE_TOP.x, "--fy": DONE_TOP.y, rotation: 0, duration: 0.75 }, 2.1)
+      .to(grab, { "--gx": DONE_TOP.x + handOff.x, "--gy": DONE_TOP.y + handOff.y, duration: 0.75 }, 2.1)
+      .set(done.querySelector('[data-insert="finalize"]'), { display: "block" }, 2.3)
+      .to(done.querySelector('[data-insert="finalize"]'), { height: "auto", duration: 0.5 }, 2.3)
+      .to(percent, { value: 100, duration: 0.6, ease: "power1.inOut", onUpdate: writeLabel }, 2.2)
+      .to(fill, { "--fill": 100, duration: 0.6, ease: "power1.inOut" }, 2.2)
+      .to(win, { backgroundColor: "#000", opacity: 1, duration: 0.4, ease: "power1.inOut" }, 2.55)
+      .to(frame, { "--ring": 1, duration: 0.4, ease: "power1.inOut" }, 2.55)
+      .to([head, cols], { opacity: 1, duration: 0.4, ease: "power1.inOut" }, 2.55)
+      // Put down: the card is in its place; the hand goes; the gap closes.
+      .to(float, { autoAlpha: 0, duration: 0.15 }, 2.85)
+      .to(grab, { autoAlpha: 0, duration: 0.3, ease: "power1.in" }, 2.85)
+      .to(slot, { height: 0, borderWidth: 0, duration: 0.4 }, 2.9)
+      .set(slot, { display: "none" }, 3.3)
+      // 4. The phone (P-4): the window narrows, only Completed stays.
+      .to(frame, { "--wl": 181, "--ww": 308, duration: 0.8, ease: "power3.inOut" }, 3.2)
+      .to(head, { "--hw": 260, duration: 0.8, ease: "power3.inOut" }, 3.2)
+      .to([q(".tm-new"), q('[data-col="backlog"]'), q('[data-col="progress"]')], { autoAlpha: 0, duration: 0.3, ease: "power1.out" }, 3.2)
+      // "New Task" folds away, so the menu button keeps to the right edge.
+      .to(q(".tm-new"), { width: 0, paddingLeft: 0, paddingRight: 0, borderWidth: 0, marginRight: () => -4 * em(), duration: 0.8, ease: "power3.inOut" }, 3.2)
+      .to(done, { "--x": 0, "--w": 260, duration: 0.8, ease: "power3.inOut" }, 3.2)
+      .set(done.querySelector('[data-insert="build"]'), { display: "block" }, 3.45)
+      .to(done.querySelector('[data-insert="build"]'), { height: "auto", duration: 0.5 }, 3.45)
+      .to(q(".tm-light"), { opacity: 0, duration: 0.6, ease: "power1.out" }, 3.2)
+      .to(q(".tm-glow"), { opacity: 1, duration: 0.8, ease: "power1.out" }, 3.4)
+      .to(doneMarks, { opacity: 1, duration: 0.3, ease: "power1.out" }, 3.9)
+      // 5. The ticks (P-5).
+      .to(doneChecks, { opacity: 1, duration: 0.3, ease: "power1.out", stagger: 0.15 }, 4.3)
+      .fromTo(doneChecks, { scale: 0.4 }, { scale: 1, duration: 0.4, ease: "back.out(2)", stagger: 0.15, immediateRender: false }, 4.3)
+      .to(doneCircles, { opacity: 0, duration: 0.2, stagger: 0.15 }, 4.4);
   });
 
   return {
@@ -427,8 +420,8 @@ function createBoardStory(board) {
     finish: () => timeline.pause().progress(1),
     revert: () => {
       timeline.kill();
-      [barTop, ...touched].forEach((el, i) => (styles[i] === null ? el.removeAttribute("style") : el.setAttribute("style", styles[i])));
-      percent.textContent = "40%";
+      ctx.revert();
+      label.textContent = "88%";
     },
   };
 }

@@ -205,16 +205,20 @@
   }
 }
 
-// Illustration 01, the board (Figma "P-1.3" 1785:3145, and the Motion-01
-// storyboard 1781:1671). Its font-size is one Figma pixel at the site's
-// scale, so every size inside is in em straight from Figma (positions inside
-// the window's border). Places and sizes are custom properties in Figma
-// pixels, so src/js/principles-scroll.js can move them; the defaults are
-// "P-1.3".
+// Illustration 01, the "Task Manager" board (Figma P-1 1950:5090 … P-5
+// 2169:2256; docs/implementation/33-principles-01-task-manager.md). Its
+// font-size is one Figma pixel at the site's scale, so every size inside is in
+// em straight from Figma. Places that move are custom properties, in Figma
+// pixels, for src/js/principles-scroll.js; the defaults are P-1.
 .p-board {
   overflow: hidden;
   font-size: var(--px);
-  background: #000000;
+  font-family: var(--font-body);
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: normal;
+  color: var(--color-white);
+  background: #141414;
 
   img {
     display: block;
@@ -222,301 +226,520 @@
   }
 }
 
-// Soft grey light from the top right (Figma "Ellipse 9000", blurred in its SVG).
-.p-board__glow {
-  position: absolute;
-  left: calc(345em - 389.5em);
-  top: calc(200.4em - 803.5em);
-  width: 779em;
-  height: 1607em;
-  transform: rotate(42.51deg);
+// Each text is trimmed to its capitals and baseline, as in Figma.
+.p-board :is(.tm-head__label, .tm-new span, .tm-col__label, .tm-col__count, .tm-tag, .tm-card__title, .tm-due span, .tm-progress__value) {
+  text-box: trim-both cap alphabetic;
 }
 
-.p-board__window {
+.p-board :is(.tm-head__label, .tm-new span, .tm-col__label, .tm-col__count, .tm-tag, .tm-due span, .tm-progress__value) {
+  white-space: nowrap;
+}
+
+// Dot grid, 20% (Figma "Background pattern"): #98A2B3 dots 2.18 across,
+// 16.72 apart, fading out downwards from the top centre. Drawn in CSS: the
+// Figma export is a 1.2 MB SVG of the same dots.
+.tm-dots {
   position: absolute;
-  left: calc(var(--bx, 130) * 1em);
-  top: calc(var(--by, 41) * 1em);
-  width: calc(var(--bw, 410) * 1em);
-  height: calc(var(--bh, 338) * 1em);
-  background: #0d0d0f;
+  top: -207.7em;
+  left: 50%;
+  width: 1395.406em;
+  height: 1046.555em;
+  opacity: 0.2;
+  background-image: radial-gradient(circle, #98a2b3 1.09em, transparent 1.2em);
+  background-position: -4.361em -3.271em;
+  background-size: 16.7158em 16.7158em;
+  transform: translateX(-50%);
+  mask-image: radial-gradient(546.235em 1046.555em at 697.7em 0, #000, transparent 95.3125%);
+}
+
+// Light from below the phone (P-5 "Mask group"), flipped.
+.tm-glow {
+  position: absolute;
+  top: 11.82em;
+  left: -70.78em;
+  width: 811.555em;
+  height: 561.433em;
+  opacity: 0;
+  transform: scaleY(-1);
+
+  img {
+    position: absolute;
+    top: -16.2%;
+    left: -11.21%;
+    width: 992.365em;
+    height: 664.731em;
+  }
+}
+
+// The window's ring (its stroke in Figma, an angular gradient the code
+// export leaves out; sampled from the Figma renders): lavender at the top
+// right and the bottom left, dark between. Drawn by the frame around the
+// window, which clips its content.
+@mixin tm-ring($width, $stops) {
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -$width;
+    padding: $width;
+    pointer-events: none;
+    background: conic-gradient($stops);
+    border-radius: inherit;
+    opacity: var(--ring, 1);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
+}
+
+.tm-frame {
+  --wl: 64; // left
+  --ww: 542; // width
+
+  position: absolute;
+  top: 54em;
+  left: calc(var(--wl) * 1em);
+  width: calc(var(--ww) * 1em);
+  height: 446em;
+  border: 1.321em solid transparent;
+  border-radius: 20em;
+
+  @include tm-ring(1.321em, (
+    rgb(92 92 118) 0deg,
+    rgb(110 110 147) 34deg,
+    rgb(76 76 98) 60deg,
+    rgb(52 52 64) 90deg,
+    rgb(32 32 35) 124deg,
+    rgb(55 55 66) 180deg,
+    rgb(95 95 125) 214deg,
+    rgb(84 84 103) 243deg,
+    rgb(73 73 84) 276deg,
+    rgb(61 61 64) 304deg,
+    rgb(76 76 90) 330deg,
+    rgb(92 92 118) 360deg
+  ));
+}
+
+.tm-window {
+  position: absolute;
+  inset: 0;
   overflow: hidden;
-  border: 1em solid #2e2e30;
-  border-radius: 16em;
+  background: #000;
+  border-radius: 18.679em;
 }
 
-.p-board__bar-top {
+// Soft light from the bottom (Figma "Polygon 1", blurred in its SVG).
+.tm-light {
   position: absolute;
-  left: calc(var(--tl, 19) * 1em);
-  top: 15em;
+  top: -201.31em;
+  left: calc((var(--ww) - 542) / 2 * 1em - 293.67em);
+  width: 1100.11em;
+  height: 890.894em;
+}
+
+.tm-head {
+  --hw: 494; // width
+
+  position: absolute;
+  top: 18.68em;
+  left: 22.68em;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: calc(var(--tw, 370) * 1em);
+  width: calc(var(--hw) * 1em);
 }
 
-.p-board__lights {
-  display: flex;
-  gap: 6em;
-}
-
-.p-board__light {
-  width: 14em;
-  height: 14em;
-  border-radius: 50%;
-  box-shadow: inset 0 -1em 4em rgba(255, 255, 255, 0.5);
-
-  &--red {
-    background: rgba(255, 75, 69, 0.75);
-  }
-
-  &--yellow {
-    background: rgba(255, 175, 0, 0.75);
-  }
-
-  &--green {
-    background: rgba(0, 194, 0, 0.75);
-  }
-}
-
-.p-board__actions {
-  display: flex;
-  gap: 4em;
-}
-
-.p-board__button {
+.tm-head__title,
+.tm-head__actions {
   display: flex;
   align-items: center;
+}
+
+.tm-head__title {
+  gap: 8em;
+}
+
+.tm-head__actions {
   gap: 4em;
-  height: 22em;
-  padding: 0 8em;
+}
+
+.tm-head__label {
+  font-size: 16em;
+}
+
+.tm-iconbox,
+.tm-new {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32em;
   background: rgba(255, 255, 255, 0.02);
-  border: 1em solid #212123;
-  border-radius: 6em;
-  box-shadow: 0 4em 4em rgba(0, 0, 0, 0.25);
+  border: 1.2em solid #212123;
+  border-radius: 9.273em;
+  box-shadow: 0 6.182em 6.182em rgba(0, 0, 0, 0.25);
+}
+
+.tm-iconbox {
+  width: 32em;
+
+  img {
+    width: 16em;
+    height: 16em;
+  }
+}
+
+.tm-head__actions .tm-iconbox img {
+  width: 14em;
+  height: 14em;
+}
+
+.tm-new {
+  gap: 2em;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 10em;
+  border-width: 1em;
+  border-radius: 8em;
+  box-shadow: 0 5.286em 5.286em rgba(0, 0, 0, 0.25);
+
+  img {
+    width: 12em;
+    height: 12em;
+  }
+
+  span {
+    font-size: 12em;
+  }
+}
+
+// Columns: placed by --x / --w (Figma px), so the last one can slide and
+// widen into the phone (P-4).
+.tm-cols {
+  position: absolute;
+  top: 70.68em;
+  left: 22.68em;
+}
+
+.tm-col {
+  --w: 156.667;
+
+  position: absolute;
+  top: 0;
+  left: calc(var(--x) * 1em);
+  display: flex;
+  flex-direction: column;
+  gap: 8em;
+  width: calc(var(--w) * 1em);
+
+  &[data-col="backlog"] {
+    --x: 0;
+  }
+
+  &[data-col="progress"] {
+    --x: 168.667;
+  }
+
+  &[data-col="done"] {
+    --x: 337.333;
+  }
+}
+
+.tm-col__head {
+  display: flex;
+  gap: 4em;
+  align-items: center;
+  height: 12em;
+  color: rgba(255, 255, 255, 0.4);
+
+  img {
+    width: 12em;
+    height: 12em;
+  }
+}
+
+.tm-col__label {
+  flex: 1;
+  font-size: 10em;
+}
+
+.tm-col__count {
+  font-size: 8em;
+}
+
+.tm-col__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 4em;
+}
+
+// A card. P-2 on: the chosen card black with its mark.
+.tm-card {
+  --ring: 0;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16em;
+  padding: 8em;
+  background: rgba(26, 26, 26, 0.2);
+  border: 1em solid #202020;
+  border-radius: 8em;
+
+  // The chosen card's ring (its Figma stroke, as the window's): lavender at
+  // the bottom right and the top left. Shown on the chosen card (--ring).
+  @include tm-ring(1em, (
+    rgb(47 47 56) 0deg,
+    rgb(27 27 28) 65deg,
+    rgb(78 78 101) 125deg,
+    rgb(53 53 66) 180deg,
+    rgb(25 25 29) 245deg,
+    rgb(68 68 86) 305deg,
+    rgb(47 47 56) 360deg
+  ));
+}
+
+.tm-card--chosen {
+  --ring: 1;
+
+  background: #000;
+  border-color: #191919;
+}
+
+.tm-card__top,
+.tm-card__bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 6em;
+  align-items: flex-start;
+}
+
+.tm-card__title {
+  font-size: 10em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.tm-tag {
+  padding: 0.5em;
+  font-size: 8em;
+  border-radius: 12.5em;
+
+  &--design {
+    color: #733411;
+    background: rgba(107, 49, 17, 0.2);
+  }
+
+  &--development {
+    color: #0b6438;
+    background: rgba(9, 84, 46, 0.2);
+  }
+}
+
+.tm-sk-due {
+  display: flex;
+  gap: 2em;
+  align-items: center;
+}
+
+.tm-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+}
+
+.tm-due {
+  display: flex;
+  gap: 2em;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.4);
 
   img {
     width: 8em;
     height: 8em;
   }
 
-  &--icon {
-    justify-content: center;
-    width: 22em;
-    padding: 0;
+  span {
+    font-size: 8em;
   }
 }
 
-.p-board__button-label,
-.p-board__percent {
-  font-family: var(--font-body);
-  font-weight: 400;
-  font-size: 6em;
-  line-height: 1;
-  letter-spacing: 0;
-  white-space: nowrap;
-}
-
-// Dashed lines: under the top bar, and between the columns.
-.p-board__line {
-  position: absolute;
-  left: -1em;
-  top: 52.5em;
-  width: calc(var(--lw, 410) * 1em);
-  height: 1em;
-}
-
-.p-board__divider {
-  position: absolute;
-  left: calc(var(--x) * 1em + 0.5em);
-  top: 52.95em;
-  width: 284em;
-  height: 1em;
-  transform: rotate(90deg);
-  transform-origin: 0 0;
-}
-
-.p-board__slot,
-.p-board__card,
-.p-board__add {
-  position: absolute;
-  left: calc(var(--x) * 1em);
-  top: calc(var(--y) * 1em);
-  width: calc(var(--w, 117) * 1em);
-  border-radius: 6em;
-}
-
-// The empty place the moved card left.
-.p-board__slot {
-  --x: 9;
-  --y: 135;
-  height: 65em;
-  border: 1em dashed rgba(219, 219, 219, 0.09);
-}
-
-// Cards: the border is an inset shadow, so the lit layer can cover it.
-.p-board__card,
-.p-board__card-lit {
+.tm-avatars {
   display: flex;
-  flex-direction: column;
-  padding: 7em 7em 9em;
-  border-radius: 6em;
+
+  img {
+    width: 10em;
+    height: 10em;
+    border-radius: 50%;
+  }
+
+  img + img {
+    margin-left: -2em;
+  }
 }
 
-.p-board__card {
-  height: 65em;
+.tm-progress {
+  display: flex;
+  gap: 4em;
+  align-items: center;
+  align-self: stretch;
+}
+
+.tm-progress__track {
+  position: relative;
+  flex: 1;
+  height: 5em;
   overflow: hidden;
-  background: rgba(26, 26, 26, 0.2);
-  box-shadow: inset 0 0 0 1em #202020;
+  background: #161616;
+  border-radius: 100em;
 }
 
-// Lit (green light from below, brighter lines): shown on the moved card and
-// on the finished ones. Solid, as in Figma's render, where the card under
-// the moved one does not show through.
-.p-board__card-lit {
+// The bar's width: its share of the track (Figma 70 of 117.67 at 50%, 107 at
+// 88%, the whole track at 100%).
+.tm-progress__fill {
   position: absolute;
-  inset: 0;
-  overflow: hidden;
-  background: #0f0f11;
-  box-shadow: inset 0 0 0 1em #4f4f4f;
+  top: 0;
+  left: 0;
+  width: calc(var(--fill) * 1%);
+  height: 100%;
+  background: linear-gradient(90deg, #2f2f2f, #6f6f94 81.097%, #fff 111.43%);
+  border-radius: 100em;
+}
+
+.tm-progress__value {
+  font-size: 8em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+// Skeleton cards: blocks at 10%.
+.tm-card--skeleton .tm-card__top {
+  gap: 4em;
+}
+
+.tm-sk {
+  display: block;
+  height: 6em;
+  background: rgba(217, 217, 217, 0.1);
+  border-radius: 100em;
+
+  &--tag {
+    width: 38em;
+    height: 14em;
+    margin-bottom: 2em;
+  }
+
+  &--line {
+    align-self: stretch;
+  }
+
+  &--short {
+    width: 79em;
+  }
+
+  &--dot {
+    width: 8em;
+    height: 8em;
+  }
+
+  &--due {
+    width: 42em;
+  }
+
+  &--pill {
+    width: 22em;
+    height: 10em;
+  }
+}
+
+// The mark at the top right (P-2 on the chosen card, P-4 on every card in
+// the phone): an empty circle, then its tick (P-5).
+.tm-mark {
+  position: absolute;
+  top: 4em;
+  right: 4.33em;
+  width: 18em;
+  height: 18em;
   opacity: 0;
 
-  .p-board__bar {
-    background: rgba(217, 217, 217, 0.4);
-  }
-
-  .p-board__tag {
-    background: rgba(217, 217, 217, 0.3);
+  img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
   }
 }
 
-.p-board__card.is-lit {
-  filter: drop-shadow(0 4em 4.85em rgba(0, 0, 0, 0.25));
+.tm-mark__check {
+  opacity: 0;
+}
 
-  .p-board__card-lit {
+// The chosen card's place while it is carried (P-3).
+.tm-slot {
+  display: none;
+  height: 0;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1em dashed #202020;
+  border-width: 0;
+  border-radius: 8em;
+}
+
+// Cards that join the Completed column: closed until they arrive.
+.tm-insert {
+  display: none;
+  height: 0;
+  overflow: hidden;
+}
+
+// The carried card (P-3): placed over the chosen card, by its centre.
+.tm-float {
+  --ring: 1;
+
+  position: absolute;
+  top: calc(var(--fy, 0) * 1em);
+  left: calc(var(--fx, 0) * 1em);
+  width: 156.667em;
+  opacity: 0;
+  pointer-events: none;
+
+  .tm-card {
+    --ring: 1;
+
+    background: #000;
+    border-color: #3a3a3a;
+  }
+
+  .tm-mark {
     opacity: 1;
   }
 }
 
-// The moved card stays above the others.
-.p-board__card[data-card="b"] {
-  z-index: 1;
-  transform: rotate(-6.6deg);
-}
-
-.p-board__card-glow {
+// The pointer (P-2) and the grabbing hand (P-3), placed by their tip.
+.tm-cursor,
+.tm-grab {
   position: absolute;
-  left: calc(50% - 139em);
-  top: 5.5em;
-  width: 279em;
-  height: 94em;
-}
-
-.p-board__avatar {
-  position: relative;
-  width: 14em;
-  height: 14em;
-
-  img {
-    width: 14em;
-    height: 14em;
-  }
-}
-
-// The green tick of the last storyboard step, over the avatar.
-.p-board__check {
-  position: absolute;
-  inset: 0;
   opacity: 0;
 }
 
-.p-board__bars {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 3em;
-  margin-top: 6em;
+// The arrow's tip is 16.7 × 12.4 into its image (it includes a shadow).
+.tm-cursor {
+  top: calc(var(--cy, 0) * 1em - 12.4em);
+  left: calc(var(--cx, 0) * 1em - 16.7em);
 }
 
-.p-board__tags {
-  position: relative;
-  display: flex;
-  gap: 3em;
-  margin-top: 16em;
+.tm-grab {
+  top: calc(var(--gy, 0) * 1em);
+  left: calc(var(--gx, 0) * 1em);
 }
 
-.p-board__bar,
-.p-board__tag {
-  display: block;
-  height: 4em;
-  background: rgba(217, 217, 217, 0.1);
-  border-radius: 67em;
+.tm-cursor {
+  width: 45.608em;
+  height: 45.61em;
 }
 
-.p-board__bar--short {
-  width: 60em;
+.tm-grab {
+  width: 13.2em;
+  height: 12.6em;
 }
 
-.p-board__tag {
-  width: 8em;
-}
-
-.p-board__tag--end {
-  margin-left: auto;
-}
-
-.p-board__add {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 22em;
-  background: #0d0d0f;
-  border: 0.5em solid #161616;
-  box-shadow: inset 0 -2em 4.6em rgba(64, 64, 64, 0.25);
-
-  img {
-    width: 8em;
-    height: 8em;
-  }
-}
-
-.p-board__progress {
-  position: absolute;
-  left: 9em;
-  top: calc(var(--py, 309) * 1em);
-  width: calc(var(--pw, 391) * 1em);
-  height: 14em;
-  background: #171719;
-  border-radius: 58em;
-}
-
-.p-board__progress-fill {
-  position: absolute;
-  left: 5em;
-  top: 5em;
-  width: calc(var(--fw, 162) * 1em);
-  height: 4em;
-  background: #79816d;
-  border-radius: 58em;
-}
-
-// Its own font-size is 6em, so it is placed in Figma pixels (--px).
-.p-board__percent {
-  position: absolute;
-  left: calc(var(--tx, 382) * var(--px));
-  top: calc(var(--ty, 313) * var(--px));
-}
-
-// Placed by its tip (--cx, --cy, in the illustration); the arrow's tip is
-// 10.05 × 7.5 into the image (it includes a shadow).
-.p-board__cursor {
-  position: absolute;
-  left: calc(var(--cx, 353) * 1em - 10.05em);
-  top: calc(var(--cy, 209) * 1em - 7.5em);
-  width: 27.12em;
-  height: 27.12em;
-  z-index: 2;
-  transform-origin: 10.05em 7.5em;
-}
 
 // Gallery (Figma 1734:399): 1360 × 2128, 200px below Principles. The photos
 // sit where Figma places them (--x, --y, --w, --h in Figma pixels).
