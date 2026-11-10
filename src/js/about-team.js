@@ -56,123 +56,12 @@ export function initAboutTeam() {
     }),
   );
 
-  const stopPreview = initPreview(section, rows);
-
   return () => {
-    stopPreview();
     cancelled = true;
     triggers.forEach((trigger) => trigger.kill());
     gsap.killTweensOf([...rows, ...texts]);
     gsap.set(rows, { clearProps: "--line" });
     gsap.set(texts, { clearProps: "transform,clipPath" });
     lead?.revert();
-  };
-}
-
-// Over a row, a photo shows beside the cursor and follows it, changing as the
-// cursor moves from row to row (user's pick; set in the empty space right of
-// the list instead, it was dropped: user).
-// Placeholders until each member has a photo (user): the About photos in
-// turn. It opens from the bottom as it comes and closes as the cursor leaves
-// the list; it glides as the Our Work label (src/js/work-cursor.js). Mouse
-// only (the reduced-motion check is above).
-const PLACEHOLDERS = ["team", "gallery-1", "gallery-2", "gallery-3", "gallery-4", "gallery-5"];
-const FOLLOW = 0.6; // s, as the Our Work label
-const OFFSET = 32; // px right of the cursor
-const LINGER = 80; // ms off the list before it goes, as the Our Work label
-
-function initPreview(section, rows) {
-  if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return () => {};
-  const list = section.querySelector(".about-team__list");
-  const preview = document.createElement("div");
-  preview.className = "about-team__preview";
-  preview.setAttribute("aria-hidden", "true");
-  const pictures = PLACEHOLDERS.map((name) => {
-    const picture = document.createElement("img");
-    picture.src = `assets/images/about/${name}.webp`;
-    picture.alt = "";
-    picture.decoding = "async";
-    picture.loading = "lazy";
-    preview.append(picture);
-    return picture;
-  });
-  document.body.append(preview);
-
-  gsap.set(preview, { clipPath: "inset(100% 0% 0% 0%)", yPercent: -50 });
-  const toX = gsap.quickTo(preview, "x", { duration: FOLLOW, ease: "power3.out" });
-  const toY = gsap.quickTo(preview, "y", { duration: FOLLOW, ease: "power3.out" });
-  let shown = false;
-  let current = -1;
-  let hideTimer = 0;
-
-  const show = (on) => {
-    if (on === shown) return;
-    shown = on;
-    gsap.to(preview, {
-      clipPath: on ? "inset(0% 0% 0% 0%)" : "inset(0% 0% 100% 0%)",
-      duration: on ? 0.6 : 0.35,
-      ease: on ? "power3.out" : "power2.in",
-      overwrite: "auto",
-      onComplete: () => !on && gsap.set(preview, { clipPath: "inset(100% 0% 0% 0%)" }),
-    });
-  };
-  const pick = (i) => {
-    if (i === current) return;
-    current = i;
-    const k = i % pictures.length;
-    pictures.forEach((picture, j) => picture.classList.toggle("is-shown", j === k));
-    // The new photo settles from a little larger.
-    gsap.fromTo(pictures[k], { scale: 1.12 }, { scale: 1, duration: 0.6, ease: "power3.out", overwrite: true });
-  };
-
-  const events = new AbortController();
-  const on = (target, type, handler) => target.addEventListener(type, handler, { passive: true, signal: events.signal });
-  // The row under the cursor: read as the mouse moves, and as the page
-  // scrolls under a still cursor (the row lit up as it passed under it, but
-  // the photo stayed that of the last row; user).
-  const pointer = { x: -1, y: -1 };
-  const hide = () => {
-    if (!shown || hideTimer) return;
-    hideTimer = setTimeout(() => {
-      hideTimer = 0;
-      current = -1;
-      show(false);
-    }, LINGER);
-  };
-  const check = () => {
-    if (pointer.x < 0) return;
-    const row = document.elementFromPoint(pointer.x, pointer.y)?.closest(".about-team__member");
-    if (row && list.contains(row)) {
-      clearTimeout(hideTimer);
-      hideTimer = 0;
-      pick(rows.indexOf(row));
-      show(true);
-    } else hide();
-  };
-  on(window, "pointermove", (event) => {
-    if (event.pointerType !== "mouse") return;
-    pointer.x = event.clientX;
-    pointer.y = event.clientY;
-    const x = pointer.x + OFFSET;
-    const y = pointer.y;
-    if (!shown) {
-      toX(x, x);
-      toY(y, y);
-    }
-    toX(x);
-    toY(y);
-    check();
-  });
-  on(window, "scroll", check);
-  on(document.documentElement, "pointerleave", () => {
-    pointer.x = pointer.y = -1;
-    hide();
-  });
-
-  return () => {
-    events.abort();
-    clearTimeout(hideTimer);
-    gsap.killTweensOf([preview, ...pictures]);
-    preview.remove();
   };
 }
