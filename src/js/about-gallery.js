@@ -45,16 +45,25 @@ export function initAboutGallery() {
   const photos = [...document.querySelectorAll(".about-gallery__photo")];
   if (!photos.length || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return () => {};
 
+  // The rise in the gallery's own scale (its width over Figma's 1360), so it
+  // keeps the same share of the gaps when the composition is scaled down on
+  // tablets (plan 32, step 4c; the same as designPx() from the laptop up).
+  // On phones the photos are one column, 16 apart: all rise alike there, or
+  // a small photo rising past a large one would cover it.
+  const canvas = photos[0].parentElement;
+  const scale = () => canvas.offsetWidth / 1360;
+  const column = window.matchMedia("(max-width: 743.98px)").matches;
   const ctx = gsap.context(() => {
     photos.forEach((photo, i) => {
       const image = photo.querySelector(":scope > img");
-      const { rise, sink } = PHOTOS[i % PHOTOS.length];
+      const { sink } = PHOTOS[i % PHOTOS.length];
+      const rise = column ? LARGE.rise : PHOTOS[i % PHOTOS.length].rise;
       gsap
         .timeline({
           scrollTrigger: { trigger: photo, start: "top bottom", end: "bottom top", scrub: LAG, invalidateOnRefresh: true },
           defaults: { ease: "none" },
         })
-        .fromTo(photo, { y: () => rise * designPx() }, { y: () => -rise * designPx() }, 0)
+        .fromTo(photo, { y: () => rise * scale() }, { y: () => -rise * scale() }, 0)
         .fromTo(image, { yPercent: -sink }, { yPercent: sink }, 0);
 
       // The curtain.

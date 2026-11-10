@@ -2,6 +2,7 @@
 // Figma's percentage line-heights render as whole pixels (18px at 160% =
 // 29px lines), so they are written as px ratios.
 @use "../abstracts/functions" as *;
+@use "../abstracts/breakpoints" as *;
 
 // Above the footer, so the footer coin passes behind it (as on Contact).
 .about {
@@ -645,4 +646,205 @@
 // links (user).
 .about-team__list:hover .about-team__member:not(:hover) span {
   opacity: 0.3;
+}
+
+// ---------------------------------------------------------------------------
+// Tablet and phones (plan 32, step 4; no Figma).
+
+// 4a Intro: the photo taller than Figma's band (16:9 tablet, 4:3 phone), its
+// picture still taller than the frame so it can move in it.
+@include below-laptop {
+  .about-intro {
+    padding-bottom: fluid(160);
+  }
+
+  .about-intro__photo {
+    aspect-ratio: 16 / 9;
+
+    img {
+      height: 130%;
+      object-fit: cover;
+    }
+  }
+}
+
+@include mobile {
+  .about-intro {
+    padding-bottom: fluid(120);
+  }
+
+  .about-intro__title {
+    font-size: fs(32);
+  }
+
+  .about-intro__photo {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+// 4b Principles: they flow (no pin; src/js/principles-scroll.js) on tablets,
+// phones and every touch screen: the intro, then each principle with its
+// number before its title, followed by its illustration across the width.
+// The board (illustration 01, sized in em) takes one em per 1/670 of the
+// width.
+@include below-laptop-or-touch {
+  .principles,
+  .js .principles {
+    display: block;
+    height: auto;
+    padding-block: fluid(100);
+  }
+
+  .principles__inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    container-type: inline-size;
+    counter-reset: principle;
+  }
+
+  .principles__text,
+  .principles__detail,
+  .principles__items,
+  .principles__figures {
+    display: contents;
+  }
+
+  .principles__numbers {
+    display: none;
+  }
+
+  .principles__intro {
+    order: 0;
+    margin-bottom: fluid(48);
+  }
+
+  @for $i from 1 through 6 {
+    .principles__item:nth-child(#{$i}) {
+      order: $i * 2 - 1;
+    }
+
+    .principles__figure:nth-child(#{$i}) {
+      order: $i * 2;
+    }
+  }
+
+  // Each in a row of its own (the desktop puts them all in one cell).
+  .principles__item {
+    grid-area: auto;
+    margin-bottom: fluid(20);
+    visibility: visible;
+    counter-increment: principle;
+  }
+
+  .principles__title::before {
+    content: counter(principle, decimal-leading-zero) "  ";
+    white-space: pre;
+    opacity: 0.4;
+  }
+
+  .principles__figure {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 670 / 420;
+    margin-bottom: fluid(64);
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    visibility: visible;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .p-board {
+    font-size: calc(100cqw / 670);
+  }
+}
+
+@include mobile {
+  .principles,
+  .js .principles {
+    padding-block: fluid(80);
+  }
+
+  .principles__intro {
+    font-size: fs(24);
+  }
+
+  .principles__figure {
+    margin-bottom: fluid(48);
+  }
+}
+
+// 4c Gallery: on tablets Figma's composition scaled to the content width (one
+// Figma pixel = 1/1360 of it); on phones one column, each photo at its
+// Figma proportions.
+@include tablet {
+  .about-gallery {
+    padding-top: fluid(160);
+  }
+
+  .about-gallery .container {
+    container-type: inline-size;
+  }
+
+  .about-gallery__photos {
+    height: calc(2128 * 100cqw / 1360);
+  }
+
+  .about-gallery__photo {
+    left: calc(var(--x) * 100cqw / 1360);
+    top: calc(var(--y) * 100cqw / 1360);
+    width: calc(var(--w) * 100cqw / 1360);
+    height: calc(var(--h) * 100cqw / 1360);
+  }
+}
+
+@include mobile {
+  .about-gallery {
+    padding-top: fluid(120);
+  }
+
+  .about-gallery__photos {
+    display: flex;
+    flex-direction: column;
+    gap: fluid(16);
+    height: auto;
+  }
+
+  .about-gallery__photo {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    aspect-ratio: var(--w) / var(--h);
+  }
+}
+
+// 4d Team: on phones the role under the name.
+@include mobile {
+  .about-team {
+    padding-top: fluid(80);
+    padding-bottom: fluid(100);
+  }
+
+  .about-team__lead {
+    font-size: fs(16);
+  }
+
+  .about-team__list {
+    margin-top: fs(48);
+  }
+
+  .about-team__member {
+    grid-template-columns: 1fr;
+    row-gap: fs(2);
+
+    span + span {
+      font-size: fs(12);
+      color: var(--color-text-secondary);
+    }
+  }
 }

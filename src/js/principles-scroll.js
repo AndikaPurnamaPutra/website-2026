@@ -29,10 +29,36 @@ const TEXT_IN = 1.15; // s (1, as the Services cards' text, a little too fast; 1
 const TEXT_OUT = 0.4; // s the old text takes to rise out
 const CURTAIN = 1.1; // s an illustration takes to be revealed (0.9 a little too fast, 1.25 a little heavy; user)
 
+// The pin and its steps on hover-capable screens from the laptop width up
+// (plan 32, step 4b, as Services). Below that width and on every touch
+// screen the principles flow, each one followed by its illustration
+// (_about.scss), and the board plays its storyboard once as it comes into
+// view (flow below). gsap.matchMedia switches as the width crosses 1024.
 export function initPrinciplesScroll() {
   const section = document.querySelector("[data-principles]");
   if (!section) return () => {};
+  const media = gsap.matchMedia();
+  media.add("(min-width: 1024px) and (hover: hover)", () => setup(section));
+  media.add("(max-width: 1023.98px), (hover: none)", () => flow(section));
+  return () => media.revert();
+}
 
+function flow(section) {
+  const board = section.querySelector("[data-board]");
+  if (!board) return () => {};
+  const story = createBoardStory(board);
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    story.finish();
+    return () => story.revert();
+  }
+  const trigger = ScrollTrigger.create({ trigger: board, start: "top 75%", once: true, onEnter: () => story.play() });
+  return () => {
+    trigger.kill();
+    story.revert();
+  };
+}
+
+function setup(section) {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const numbers = [...section.querySelectorAll(".principles__number")];
   const items = [...section.querySelectorAll(".principles__item")];

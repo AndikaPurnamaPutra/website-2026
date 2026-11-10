@@ -696,7 +696,7 @@ Juga: efek tirai footer di HP (footer lebih tinggi dari layar) sengaja
 dimatikan (lihat pemeriksaan semua perangkat); usulan mengembalikannya
 ditolak pengguna ("tidak perlu").
 
-## Langkah 4 — About (usulan 9 Nov 2026, menunggu persetujuan)
+## Langkah 4 — About (disetujui dan dikerjakan 10 Nov 2026)
 
 Kondisi (screenshot 390 dan 834): halaman bisa digeser ke samping di HP dan
 tablet (lebar dokumen 1380 / 1392) karena galeri memakai posisi Figma
@@ -765,8 +765,25 @@ papan). Tanpa Pug/konten.
 About), papan proporsional, cerita papan jalan di HP, galeri bergerak, tim
 terbaca; 1440 identik piksel; rotasi 834 ↔ 1194 (pin/alur berganti).
 
-- [ ] Disetujui.
-- [ ] Dikerjakan dan dicek.
+Pengerjaan: seperti usulan. Principles memakai `gsap.matchMedia` (pin di
+layar hover ≥ 1024, alur di bawahnya dan di layar sentuh) dan tiap prinsip
+diberi baris sendiri (`grid-area: auto`; desktop menaruh semua di satu sel);
+nomor lewat `counter`. Galeri: naik-turun diskalakan dengan lebar galeri
+(lebarnya / 1360, sama dengan `designPx()` dari laptop ke atas); di HP semua
+foto naik sama jauh (foto kecil yang naik lebih jauh menutupi foto besar di
+kolom).
+
+Foto tim yang mengikuti kursor tetap hanya untuk mouse; di layar sentuh daftar
+hanya nama dan peran (keputusan pengguna 10 Nov 2026, "oke seperti
+sekarang"; pilihan ketuk-untuk-foto ditunda sampai ada foto asli tiap
+anggota — sekarang placeholder).
+
+- [x] Disetujui ("ya", 10 Nov 2026).
+- [x] Dikerjakan dan dicek (Chrome): 320, 390, 744, 834, 1194 (sentuh), 1024,
+      1440 tanpa scroll samping dan tanpa error; urutan Principles di HP
+      intro → (judul, ilustrasi) × 6; papan memutar ceritanya sampai 100% di
+      HP; 1440: keempat bagian identik piksel dengan commit sebelumnya,
+      Principles tetap di-pin dan melangkah.
 
 ## Langkah 7a — Preloader di HP (disetujui dan dikerjakan 9 Nov 2026)
 
