@@ -25,6 +25,47 @@
   pointer-events: none;
 }
 
+// On touch screens the browser moves it with the scroll itself
+// (src/js/footer-reveal.js sets the class, the view timeline on the section
+// above and --footer-reach): the same rise at half speed and the same fading
+// dark layer, over --footer-reach of scroll from when the section above
+// starts to leave the screen.
+body {
+  timeline-scope: --footer-above;
+}
+
+.site-footer.is-scroll-driven {
+  animation: footer-rise linear both;
+  animation-timeline: --footer-above;
+  animation-range: exit 0% exit var(--footer-reach);
+
+  &::after {
+    animation: footer-shade linear both;
+    animation-timeline: --footer-above;
+    animation-range: exit 0% exit var(--footer-reach);
+  }
+}
+
+@keyframes footer-rise {
+  from {
+    transform: translateY(calc(var(--footer-reach) * -0.5));
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+@keyframes footer-shade {
+  from {
+    opacity: 0.5;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
 .site-footer__inner {
   position: relative;
   max-width: calc(var(--container) + 2 * var(--page-gutter));

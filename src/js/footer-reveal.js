@@ -28,6 +28,29 @@ export function initFooterReveal() {
   // Over one screen it is uncovered just as its top reaches the top of the
   // screen. Checked on every refresh.
   const reach = () => Math.min(footer.offsetHeight, window.innerHeight);
+
+  // Touch screens scroll natively, on their own thread: moved by script, the
+  // footer was a frame behind the page and caught up, which read as jerky on
+  // phones (user). There the browser runs it itself, with the scroll
+  // (scroll-driven animation on the section above's view timeline,
+  // src/scss/components/_footer.scss); the script only measures the range.
+  if (window.matchMedia("(hover: none)").matches && CSS.supports("animation-timeline: view()") && above) {
+    above.style.setProperty("view-timeline-name", "--footer-above");
+    const measure = () => footer.style.setProperty("--footer-reach", `${reach()}px`);
+    measure();
+    footer.classList.add("is-scroll-driven");
+    const resize = new ResizeObserver(measure);
+    resize.observe(footer);
+    window.addEventListener("resize", measure);
+    return () => {
+      resize.disconnect();
+      window.removeEventListener("resize", measure);
+      above.style.removeProperty("view-timeline-name");
+      footer.classList.remove("is-scroll-driven");
+      footer.style.removeProperty("--footer-reach");
+    };
+  }
+
   const tween = gsap.fromTo(
     footer,
     { y: () => -LAG * reach(), "--footer-shade": SHADE },

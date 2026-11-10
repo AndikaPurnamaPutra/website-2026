@@ -47,3 +47,4 @@ Pengguna memberikan skrip Three.js mandiri (`~/Downloads/web-coin/main.js` denga
 ## Footer naik dari balik section juga di HP (10 Nov 2026, pengguna)
 - Sebelumnya footer yang lebih tinggi dari layar (HP) tidak dianimasikan. Sekarang animasinya sejauh satu tinggi layar (`footer-reveal.js`): footer naik setengah kecepatan dari balik section di atasnya dan terbuka penuh saat tepinya sampai di atas layar.
 - Dicek 390 × 664: geser −332 → −166 → 0, lapisan gelap 0,5 → 0,25 → 0; logo dan form terlihat.
+- **Halus di layar sentuh** (pengguna: "patah-patah di HP"): scroll bawaan HP berjalan di thread sendiri, dan footer yang digeser JS tertinggal satu frame lalu menyusul. Di layar sentuh yang mendukung `animation-timeline` gerak naik dan lapisan gelapnya kini dijalankan browser (view timeline `--footer-above` pada section di atasnya, `--footer-reach` dari JS); browser lama tetap memakai GSAP. Dicek 390 × 664 dan 834 (sentuh): nilai sama dengan versi GSAP.
