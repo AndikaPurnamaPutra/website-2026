@@ -832,6 +832,17 @@ tengah tombol info dengan geser −35% dan lebar maksimal selebar layar.
       Contact, Home, About 1440 dan Home 390/834 identik piksel dengan commit
       sebelumnya. iPhone pengguna tidak terjangkau saat itu.
 
+## Langkah 6 — Privacy Policy dan Terms (10 Nov 2026)
+
+Kondisi: tablet dan laptop sudah rapi; di HP baris info (Data Controller,
+Address) dipaksa satu baris sehingga halaman melebar ke 620–624px, dan isi
+tiap bagian menjorok di bawah nomornya. Perbaikan kecil (`_policy.scss`, HP
+saja): baris info membungkus, judul 32px, nomor di atas judul bagian (isi
+selebar layar), judul bagian 24px, isi 15px, jarak lebih rapat.
+
+- [x] Dikerjakan dan dicek: 320 dan 390 tanpa scroll samping di kedua
+      halaman; 834 dan 1440 identik piksel dengan commit sebelumnya.
+
 ## Langkah 7a — Preloader di HP (disetujui dan dikerjakan 9 Nov 2026)
 
 Keluhan pengguna: preloader terasa lama sekali di HP. Sebab: preloader

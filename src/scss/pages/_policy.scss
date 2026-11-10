@@ -3,6 +3,7 @@
 // spacing between text blocks follow the type scale; the page spacing (top,
 // title → sections, bottom) the layout scale.
 @use "../abstracts/functions" as *;
+@use "../abstracts/breakpoints" as *;
 
 .policy {
   // Above the footer, so the footer coin passes behind it, as behind the
@@ -137,4 +138,43 @@
 .policy__subsection .policy__group {
   flex: 1;
   min-width: 0;
+}
+
+// Phones (plan 32, step 6): the facts above wrap (the address ran off the
+// screen), the title smaller, and each section's number above its heading,
+// so the text has the whole width.
+@include mobile {
+  .policy {
+    padding-bottom: fluid(100);
+  }
+
+  .policy__title.text-heading-42 {
+    font-size: fs(32);
+  }
+
+  .policy__meta .policy__meta-row {
+    white-space: normal;
+  }
+
+  .policy__sections {
+    margin-top: fluid(64);
+  }
+
+  .policy__section {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .policy__number,
+  .policy__heading {
+    font-size: fs(24);
+  }
+
+  .policy__number {
+    flex: none;
+  }
+
+  .policy__body {
+    font-size: fs(15);
+  }
 }
