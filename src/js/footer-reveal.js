@@ -8,6 +8,8 @@ const LAG = 0.5; // share of the scroll the footer stays behind
 // A dark layer over it fades as it comes up, from dark to light (as on
 // sstr.tech; src/scss/components/_footer.scss).
 const SHADE = 0.5;
+// Share of the screen over which a footer taller than it comes up.
+const TALL_REACH = 0.5;
 
 export function initFooterReveal() {
   const footer = document.querySelector(".site-footer");
@@ -20,14 +22,15 @@ export function initFooterReveal() {
   // includes the shift, which made the range start too early and the footer
   // move with the page for most of it.
   const above = footer.previousElementSibling;
-  // Over the footer's height, or over one screen for a footer taller than
-  // the screen (phones and tablets: 816 of 699 on an iPhone 13). Over its
-  // whole height its top would still be behind the section above when it
-  // left the screen, so its logo and form were never seen (user report; it
-  // then just scrolled with the page, user: "add the animation there too").
-  // Over one screen it is uncovered just as its top reaches the top of the
-  // screen. Checked on every refresh.
-  const reach = () => Math.min(footer.offsetHeight, window.innerHeight);
+  // Over the footer's height, or, for a footer taller than the screen
+  // (phones: 816 of 699 on an iPhone 13), over half a screen: uncovered as
+  // its top reaches the middle of the screen. Over its whole height its top
+  // was still behind the section above when it left the screen, so its logo
+  // and form were never seen (user report); over a whole screen they were
+  // covered again as soon as one scrolled up a little from the bottom
+  // (user). Checked on every refresh.
+  const reach = () =>
+    footer.offsetHeight > window.innerHeight ? window.innerHeight * TALL_REACH : footer.offsetHeight;
 
   // Touch screens scroll natively, on their own thread: moved by script, the
   // footer was a frame behind the page and caught up, which read as jerky on
