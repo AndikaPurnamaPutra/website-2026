@@ -17,19 +17,22 @@ export function initHeader() {
   // lasts for the whole pinned scroll.
   const middle = () => `top ${header.offsetHeight / 2}px`;
   const middleEnd = () => `bottom ${header.offsetHeight / 2}px`;
+  // One set of reasons per class, shared by every trigger that sets it.
+  const reasons = {};
+  const mark = (className, reason, on) => {
+    const active = (reasons[className] ??= new Set());
+    if (on) active.add(reason);
+    else active.delete(reason);
+    header.classList.toggle(className, active.size > 0);
+  };
   const over = (selector, className, end = middleEnd) => {
-    const active = new Set();
     return [...document.querySelectorAll(selector)].map((section) => {
       const area = section.parentElement?.classList.contains("pin-spacer") ? section.parentElement : section;
       return ScrollTrigger.create({
         trigger: area,
         start: middle,
         end,
-        onToggle: (self) => {
-          if (self.isActive) active.add(section);
-          else active.delete(section);
-          header.classList.toggle(className, active.size > 0);
-        },
+        onToggle: (self) => mark(className, section, self.isActive),
       });
     });
   };
@@ -37,6 +40,30 @@ export function initHeader() {
   // screen's bottom): Motto runs on behind the footer to the end of the page,
   // and the header would not have come back there.
   const triggers = [...over("[data-header-theme='dark']", "is-dark"), ...over("[data-header-hide]", "is-hidden", "bottom bottom")];
+
+  // Also hidden over the footer (user decision, 10 Nov 2026: its logo right
+  // above the footer's own read as doubled, and the footer has the whole
+  // navigation): from when the footer's edge (the bottom of the content
+  // above it, which it comes up from behind) passes the middle of the
+  // screen, to the end of the page; back on the way up.
+  const footer = document.querySelector(".site-footer");
+  const above = footer?.previousElementSibling;
+  if (above) {
+    triggers.push(
+      ScrollTrigger.create({
+        trigger: above,
+        start: "bottom 50%",
+        end: "max",
+        // Measured after the pins above (Services, Motto), which lengthen
+        // the page; measured before them it began far too early.
+        refreshPriority: -1,
+        // By progress: at the very end of the page the trigger counts as
+        // left, and the header came back there.
+        onUpdate: (self) => mark("is-hidden", footer, self.progress > 0),
+        onRefresh: (self) => mark("is-hidden", footer, self.progress > 0),
+      }),
+    );
+  }
 
   return () => {
     triggers.forEach((trigger) => trigger.kill());

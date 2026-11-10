@@ -680,6 +680,22 @@ terlama 19–20 ms), kanvas 780px.
    Chrome (sentuh, 390×699): tenggelam di hero setelah 100px, jatuh dari
    balik Motto di footer.
 
+## Navbar di footer (pengguna 10 Nov 2026)
+
+Navbar di atas footer terlihat "dobel" (logonya tepat di atas logo footer;
+di HP juga menutupi form). Keputusan: navbar disembunyikan sejak tepi footer
+(bawah konten di atasnya) melewati tengah layar sampai akhir halaman, muncul
+lagi saat kembali naik; semua ukuran (`header.js`: alasan per kelas
+digabung agar Motto dan footer tidak saling menimpa; progres > 0 karena di
+ujung halaman pemicu dianggap lewat; `refreshPriority: -1` agar diukur
+setelah pin Services dan Motto). Dicek 390×699 (sentuh), 1440×900,
+1024×768: tampil di Trusted dan sebelum footer, tersembunyi setelah tepi
+footer lewat tengah dan di akhir, tampil lagi saat naik.
+
+Juga: efek tirai footer di HP (footer lebih tinggi dari layar) sengaja
+dimatikan (lihat pemeriksaan semua perangkat); usulan mengembalikannya
+ditolak pengguna ("tidak perlu").
+
 ## Langkah 4 — About (usulan 9 Nov 2026, menunggu persetujuan)
 
 Kondisi (screenshot 390 dan 834): halaman bisa digeser ke samping di HP dan
