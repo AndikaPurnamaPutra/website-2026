@@ -3,7 +3,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 import { stopSmoothScroll, startSmoothScroll } from "./smooth-scroll.js";
 import { designPx } from "./design-px.js";
-import { coinMotion, COIN_IN, COIN_EASE } from "./coin-motion.js";
+import { coinMotion, COIN_IN, COIN_EASE, NO_COIN } from "./coin-motion.js";
 
 gsap.registerPlugin(DrawSVGPlugin);
 
@@ -90,7 +90,8 @@ export function initPreloader() {
   // (user: letter by letter, it was out of step with them).
   const header = document.querySelector("[data-header]");
   const showreel = document.querySelector(".hero__showreel");
-  const coin = document.querySelector(".hero__coin");
+  // No coin on phones and tablets (NO_COIN): nothing to wait for or move.
+  const coin = window.matchMedia(NO_COIN).matches ? null : document.querySelector(".hero__coin");
 
   // Scroll held: the smooth scroll stops, and the native scroll (touch,
   // keys) is blocked without hiding the scrollbar, so nothing shifts.
@@ -206,7 +207,7 @@ export function initPreloader() {
     hang = box ? Math.min(below, Math.max(0, window.innerHeight - HANG_GAP * designPx() - coinEdge)) : 0;
     overlap = reel ? Math.max(0, coinEdge - reel.top) : 0; // in the design
     gsap.set(showreel, { y: below });
-    gsap.set(coin, { y: hang });
+    if (coin) gsap.set(coin, { y: hang });
   };
   const carryCoin = () => {
     const pushedBy = gsap.getProperty(showreel, "y");
@@ -218,7 +219,7 @@ export function initPreloader() {
   // The coin fades in as the curtain lifts (user); the 3D coin takes its fade
   // from src/js/coin-motion.js.
   coinMotion.fade = 0;
-  gsap.set(coin, { opacity: 0 });
+  if (coin) gsap.set(coin, { opacity: 0 });
 
   const intro = gsap
     .timeline({ paused: true, onComplete: finish })
@@ -233,7 +234,7 @@ export function initPreloader() {
     .to([logo, year.parentElement], { ...BLUR_OUT, y: () => -BLUR_SHIFT * designPx() }, "lift")
     .to(preloader, { yPercent: -100, duration: LIFT, ease: MOVE }, "lift")
     .to(coinMotion, { fade: 1, duration: COIN_IN, ease: COIN_EASE }, `lift+=${COIN_AT}`)
-    .to(coin, { opacity: 1, duration: COIN_IN, ease: COIN_EASE }, "<")
+    .to(coin ?? {}, { ...(coin && { opacity: 1 }), duration: COIN_IN, ease: COIN_EASE }, "<")
     .add(settle, `lift+=${SETTLED}`)
     // The showreel comes up from below right behind it, with no delay (user),
     // pushing the coin.

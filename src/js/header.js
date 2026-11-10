@@ -7,7 +7,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 // is over a section with data-header-theme="dark". It slides away over the
 // pinned Services and Motto (data-header-hide) while they are held, in both
 // directions, as it did before (user decision); not while a link in it has
-// keyboard focus or the Work menu is open.
+// keyboard focus or the Work menu is open. While the menu shows, the white
+// text follows what is really behind the bar (below).
 
 export function initHeader() {
   const header = document.querySelector("[data-header]");
@@ -23,8 +24,55 @@ export function initHeader() {
     const active = (reasons[className] ??= new Set());
     if (on) active.add(reason);
     else active.delete(reason);
-    header.classList.toggle(className, active.size > 0);
+    if (className === "is-dark") refreshDark();
+    else header.classList.toggle(className, active.size > 0);
   };
+
+  // White or dark text while the Work menu shows (the bar is drawn normally
+  // then, not inverted): by what is really behind it, read under the bar's
+  // middle at its logo, its middle and its links. The dark sections alone
+  // missed the page theme's dark (homepage: dark before Services' top came
+  // under the bar, light again while it was still there; user: the links and
+  // the logo vanished). Over a picture or a video, which cannot be read, the
+  // dark sections decide, as before.
+  const workItem = header.querySelector(".site-nav__item--work");
+  const behind = () => {
+    const y = header.getBoundingClientRect().top + header.offsetHeight / 2;
+    const levels = [];
+    for (const x of [0.08, 0.5, 0.9].map((f) => window.innerWidth * f)) {
+      for (const el of document.elementsFromPoint(x, y)) {
+        if (header.contains(el)) continue;
+        if (/^(IMG|VIDEO|CANVAS|PICTURE)$/.test(el.tagName)) return null;
+        const rgba = getComputedStyle(el).backgroundColor.match(/[\d.]+/g);
+        if (rgba && (rgba.length < 4 || +rgba[3] > 0.5)) {
+          levels.push(0.2126 * rgba[0] + 0.7152 * rgba[1] + 0.0722 * rgba[2]);
+          break;
+        }
+      }
+    }
+    return levels.length ? levels.reduce((a, b) => a + b) / levels.length : null;
+  };
+  const refreshDark = () => {
+    const level = workItem?.classList.contains("is-shown") ? behind() : null;
+    const dark = level === null ? (reasons["is-dark"]?.size ?? 0) > 0 : level < 128;
+    header.classList.toggle("is-dark", dark);
+  };
+  // As the menu shows, as the page moves under it while it shows, and once
+  // the page theme has eased to its new colours (0.35s; read at its start,
+  // the background was still the old one).
+  let settle = 0;
+  const check = () => {
+    if (!workItem?.classList.contains("is-shown")) return;
+    refreshDark();
+    clearTimeout(settle);
+    settle = setTimeout(refreshDark, 400);
+  };
+  const watch = new MutationObserver(refreshDark);
+  if (workItem) watch.observe(workItem, { attributes: true, attributeFilter: ["class"] });
+  const themeWatch = new MutationObserver(check);
+  themeWatch.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+  const onScroll = check;
+  window.addEventListener("scroll", onScroll, { passive: true });
   const over = (selector, className, end = middleEnd) => {
     return [...document.querySelectorAll(selector)].map((section) => {
       const area = section.parentElement?.classList.contains("pin-spacer") ? section.parentElement : section;
@@ -66,6 +114,10 @@ export function initHeader() {
   }
 
   return () => {
+    watch.disconnect();
+    themeWatch.disconnect();
+    clearTimeout(settle);
+    window.removeEventListener("scroll", onScroll);
     triggers.forEach((trigger) => trigger.kill());
     header.classList.remove("is-dark", "is-hidden");
   };

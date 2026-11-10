@@ -1,4 +1,5 @@
 import { afterPageShown } from "./page-transition.js";
+import { NO_COIN } from "./coin-motion.js";
 
 // Loads the 3D coin journey (src/js/coin-scene.js, with three.js) as its own
 // chunk once the page has loaded, so it never delays the first paint. On a
@@ -44,7 +45,17 @@ export function initCoin3d() {
     );
     observer.observe(anchors.footer.closest(".site-footer") ?? anchors.footer);
   };
-  const begin = () => afterPageShown(() => !cancelled && start());
+  // Not on phones and tablets (NO_COIN); loaded if the window grows past them.
+  const small = window.matchMedia(NO_COIN);
+  let started = false;
+  const begin = () =>
+    afterPageShown(() => {
+      if (cancelled || started || small.matches) return;
+      started = true;
+      start();
+    });
+  const onSize = () => !small.matches && document.readyState === "complete" && begin();
+  small.addEventListener("change", onSize);
   if (document.readyState === "complete") begin();
   else window.addEventListener("load", begin, { once: true });
 
@@ -52,6 +63,7 @@ export function initCoin3d() {
     cancelled = true;
     observer?.disconnect();
     window.removeEventListener("load", begin);
+    small.removeEventListener("change", onSize);
     pictures.forEach((picture) => picture.classList.remove("is-fallback"));
     cleanup();
   };

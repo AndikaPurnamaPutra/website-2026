@@ -20,15 +20,17 @@ export function initFooterReveal() {
   // includes the shift, which made the range start too early and the footer
   // move with the page for most of it.
   const above = footer.previousElementSibling;
-  // Not for a footer taller than the screen (phones: 816 of 699 on an
-  // iPhone 13): its top was still behind the section above while it rose,
-  // and had left the screen by the time it was uncovered, so its logo, the
-  // form's label and the coin were never seen (user report). It scrolls
-  // with the page there. Checked on every refresh.
-  const tall = () => footer.offsetHeight > window.innerHeight;
+  // Over the footer's height, or over one screen for a footer taller than
+  // the screen (phones and tablets: 816 of 699 on an iPhone 13). Over its
+  // whole height its top would still be behind the section above when it
+  // left the screen, so its logo and form were never seen (user report; it
+  // then just scrolled with the page, user: "add the animation there too").
+  // Over one screen it is uncovered just as its top reaches the top of the
+  // screen. Checked on every refresh.
+  const reach = () => Math.min(footer.offsetHeight, window.innerHeight);
   const tween = gsap.fromTo(
     footer,
-    { y: () => (tall() ? 0 : -LAG * footer.offsetHeight), "--footer-shade": () => (tall() ? 0 : SHADE) },
+    { y: () => -LAG * reach(), "--footer-shade": SHADE },
     {
       y: 0,
       "--footer-shade": 0,
@@ -36,7 +38,7 @@ export function initFooterReveal() {
       scrollTrigger: {
         trigger: above,
         start: "bottom bottom",
-        end: () => `+=${footer.offsetHeight}`,
+        end: () => `+=${reach()}`,
         scrub: true,
         invalidateOnRefresh: true,
         // Measured after the pins above (Services, Motto, the showreel), which

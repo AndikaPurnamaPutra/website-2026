@@ -1,3 +1,5 @@
+@use "../abstracts/breakpoints" as *;
+
 // Fixed layer for the 3D coin journey (src/js/coin-scene.js). First in
 // <body> with z-index 0, so every positioned part of the page (hero content,
 // showreel, .tone-shift / Motto, .policy, footer content) paints above it:
@@ -23,5 +25,16 @@
 @media (prefers-reduced-motion: no-preference) {
   .js :is(img.hero__coin, img.site-footer__coin):not(.is-fallback) {
     visibility: hidden;
+  }
+}
+
+// No coin on phones and tablets (user, 10 Nov 2026): neither picture nor the
+// 3D layer (src/js/coin-3d.js does not load it there; NO_COIN in
+// src/js/coin-motion.js).
+@include below-laptop {
+  img.hero__coin,
+  img.site-footer__coin,
+  .coin-stage {
+    display: none;
   }
 }

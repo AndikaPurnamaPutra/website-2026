@@ -38,3 +38,12 @@ Pengguna memberikan skrip Three.js mandiri (`~/Downloads/web-coin/main.js` denga
 - Sekarang, dengan JS dan tanpa reduced motion, PNG disembunyikan sejak gambar pertama (`.js img.hero__coin:not(.is-fallback)`, kelas `js` dipasang di `<head>`), dan hanya koin 3D yang memudar masuk (0,6 detik). PNG kembali (`is-fallback`) kalau WebGL tidak tersedia, file adegan gagal dimuat, atau GLB error.
 - Terukur setelah reload (setiap 150 ms): PNG tersembunyi di semua frame, 3D 0 → 0,42 → 0,71 → 0,92 → 1. Reduced motion: PNG terlihat, tanpa 3D. GLB dihapus sementara: PNG kembali terlihat.
 - **HDR untuk HP (9 Nov 2026):** `white-studio-512.hdr` (351 KB), setengah ukuran dari yang 1k (rata-rata 2×2 piksel, skrip sekali pakai), dipakai di lebar < 744 (`coin-scene.js`); desktop tetap 1k. Lihat `docs/implementation/32-responsive.md`, langkah 7a.
+
+## Tanpa koin di HP dan tablet (10 Nov 2026, pengguna)
+- Di bawah 1024 px koin dihilangkan total (3D maupun gambar PNG), di Hero dan Footer: `below-laptop` di `_coin-stage.scss`, `NO_COIN` di `coin-motion.js`.
+- File 3D (adegan, GLB, HDR) tidak dimuat di sana (`coin-3d.js`); dimuat jika jendela dilebarkan melewati 1024. Preloader tidak menunggu koin.
+- Dicek: 390, 834 → 0 file 3D, koin tak tampil; 1440 → koin 3D seperti sebelumnya.
+
+## Footer naik dari balik section juga di HP (10 Nov 2026, pengguna)
+- Sebelumnya footer yang lebih tinggi dari layar (HP) tidak dianimasikan. Sekarang animasinya sejauh satu tinggi layar (`footer-reveal.js`): footer naik setengah kecepatan dari balik section di atasnya dan terbuka penuh saat tepinya sampai di atas layar.
+- Dicek 390 × 664: geser −332 → −166 → 0, lapisan gelap 0,5 → 0,25 → 0; logo dan form terlihat.
