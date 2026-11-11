@@ -86,9 +86,14 @@ function stack(section) {
   const images = [...section.querySelectorAll(".services__image")];
   if (!inner || !cards.length || cards.length !== images.length) return () => {};
 
+  // The panels in a box of their own that ends with the last one: they let
+  // go of the screen together as the last one sticks, and the note below
+  // follows them up instead of running under the stuck pile (user report).
+  const pile = document.createElement("div");
+  pile.className = "services__stack";
+  label.after(pile);
   const names = [];
   const built = [];
-  let after = label;
   cards.forEach((card, i) => {
     // A mark in the flow right above the panel, where the panel's top would
     // be without sticking: the panel before it steps back while it comes up
@@ -102,26 +107,45 @@ function stack(section) {
       names.push(name);
       built[i - 1].panel.style.setProperty("animation-timeline", name);
       built[i - 1].panel.classList.add("is-covered");
-      after.after(mark);
-      after = mark;
+      pile.append(mark);
     }
     const panel = document.createElement("div");
     panel.className = "services__panel";
     panel.style.setProperty("--panel", i);
     panel.append(card, images[i]);
-    after.after(panel);
-    after = panel;
+    pile.append(panel);
     built.push({ panel });
   });
   inner.style.setProperty("timeline-scope", names.join(", "));
   section.classList.add("is-stacked");
 
+  // Released together: a stuck panel is pushed off only once its margin box
+  // meets the box's end (the last panel's bottom), so the panels higher in
+  // the pile or shorter than the last stayed while the others went, out of
+  // order (a title showed above the pile). Each panel's bottom margin
+  // reaches down to where the last one's bottom sticks.
+  const panels = built.map(({ panel }) => panel);
+  const measure = () => {
+    panels.forEach((panel) => panel.style.removeProperty("margin-bottom"));
+    const end = (panel) => parseFloat(getComputedStyle(panel).top) + panel.offsetHeight;
+    const last = end(panels[panels.length - 1]);
+    panels.slice(0, -1).forEach((panel) => {
+      const base = parseFloat(getComputedStyle(panel).marginBottom);
+      panel.style.marginBottom = `${base + last - end(panel)}px`;
+    });
+  };
+  measure();
+  const resize = new ResizeObserver(measure);
+  panels.forEach((panel) => resize.observe(panel));
+
   return () => {
+    resize.disconnect();
+    panels.forEach((panel) => panel.style.removeProperty("margin-bottom"));
     section.classList.remove("is-stacked");
     inner.style.removeProperty("timeline-scope");
     cards.forEach((card) => cardGroup.append(card));
     images.forEach((image) => mediaGroup.insertBefore(image, link));
-    section.querySelectorAll(".services__panel, .services__mark").forEach((el) => el.remove());
+    pile.remove();
   };
 }
 

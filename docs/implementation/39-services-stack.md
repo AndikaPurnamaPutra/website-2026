@@ -36,3 +36,18 @@ menempel di posisi yang sama dan hanya saling menutupi. Versi ini berbeda:
 - Tanpa error.
 
 Perlu dicek pengguna di iPhone (Safari 26 mendukung scroll-driven animation).
+
+## Perbaikan (11 Nov 2026, laporan pengguna)
+
+- **Catatan "Visual trends…" bertumpuk dengan panel**: panel menempel sampai
+  akhir section, jadi catatan naik di bawah tumpukan yang masih menempel.
+  Panel kini di wadah sendiri (`.services__stack`) yang berakhir di panel
+  terakhir: seluruh tumpukan ikut tergulir pergi begitu panel terakhir
+  menempel, catatan menyusul di bawahnya.
+- **Tumpukan pergi tidak bersamaan** (ditemukan saat cek): panel yang lebih
+  tinggi di tumpukan atau lebih pendek dari panel terakhir tetap menempel
+  sementara yang lain pergi, judulnya mengintip di atas. Jarak bawah tiap
+  panel kini diukur (JS, ResizeObserver) supaya tepi bawahnya sampai ke
+  titik tepi bawah panel terakhir menempel: semua lepas pada saat yang sama.
+- Dicek 390×844, 375×667, 834×1194 (40/24 posisi scroll): catatan selalu
+  ≥ 38px di bawah panel, urutan tumpukan tidak pernah terbalik, tanpa error.
