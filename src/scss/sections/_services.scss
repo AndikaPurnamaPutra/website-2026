@@ -282,15 +282,29 @@
       border-radius: 0;
     }
 
+    // On the screen whole (--room: from where it sticks to the screen's
+    // bottom, src/js/scroll-stack.js): on a short screen the picture is
+    // cut shorter (cropped), the card as it is.
+    .services__panel {
+      max-height: var(--room, none);
+    }
+
+    .services__panel .services__card {
+      flex-shrink: 0;
+    }
+
     // Out of .services__media now: placed in the panel's flow, under the card.
     .services__panel .services__image {
       position: static;
       display: block;
+      flex: 0 1 auto;
       width: 100%;
       height: auto;
+      min-height: 0;
       aspect-ratio: 4 / 3;
       margin-bottom: 0;
       border-radius: 0;
+      object-fit: cover;
       opacity: 1;
       visibility: visible;
 
@@ -301,6 +315,49 @@
 
     .services__note {
       margin-top: fluid(16);
+    }
+
+    // Not wider than a tablet's (user: at 1024 a panel across the screen
+    // read as too wide, the card's words on one long line), in the middle.
+    .services__panel {
+      align-self: center;
+      width: min(100%, 770px);
+    }
+
+    // Tall tablets (an iPad Pro upright): the panel takes more of the
+    // screen, its picture growing (cropped), so less of the screen stands
+    // empty around it (user).
+    @media (min-width: 744px) and (orientation: portrait) {
+      .services__panel {
+        min-height: min(var(--room, 0px), 72svh);
+      }
+
+      .services__panel .services__image {
+        flex: 1 1 auto;
+      }
+    }
+
+    // Wide, short screens (a Nest Hub, 1024 × 600; tablets turned): the
+    // card beside its picture, as on the desktop, so the panel fits the
+    // screen with its picture whole.
+    @media (min-width: 900px) and (orientation: landscape) {
+      .services__panel {
+        flex-direction: row;
+        width: 100%;
+      }
+
+      .services__panel .services__card {
+        flex: 0 0 36%;
+      }
+
+      .services__panel .services__image {
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
+        height: auto;
+        max-height: var(--room, none);
+        aspect-ratio: 16 / 9;
+      }
     }
   }
 }

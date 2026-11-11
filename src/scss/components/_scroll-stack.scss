@@ -18,7 +18,7 @@
 
     .#{$block}__panel {
       position: sticky;
-      top: calc(var(--stack-top) + var(--panel) * var(--stack-step));
+      top: calc(var(--stack-top) + var(--stack-shift, 0px) + var(--panel) * var(--stack-step));
       display: flex;
       flex-direction: column;
       margin-bottom: fluid(24);

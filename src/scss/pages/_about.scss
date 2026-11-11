@@ -4084,9 +4084,50 @@
     .principles__stack {
       counter-reset: principle;
     }
+    // On the screen whole (--room: from where it sticks to the screen's
+    // bottom; --lead: the principle's words; src/js/scroll-stack.js): on a
+    // short screen the illustration is smaller, in the middle (it is drawn
+    // in em of its own width, so it is scaled whole).
+    // Not wider than a tablet's, in the middle (as Services).
+    .principles__panel {
+      --pw: min(100cqw, 770px);
+
+      align-self: center;
+      width: var(--pw);
+    }
+
     .principles__panel .principles__figure {
-      margin-bottom: 0;
+      --fw: min(var(--pw), calc((var(--room, 100vh) - var(--lead, 0px)) * 670 / 420));
+
+      width: var(--fw);
+      margin: 0 auto;
       border-radius: 0;
+    }
+
+    .principles__panel .p-board {
+      font-size: calc(var(--fw) / 670);
+    }
+
+    // Wide, short screens: the words beside the illustration (as
+    // Services), the illustration as large as the panel's height allows.
+    @media (min-width: 900px) and (orientation: landscape) {
+      .principles__panel {
+        --pw: 100cqw;
+
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .principles__panel .principles__item {
+        flex: 0 0 36%;
+        align-self: stretch;
+      }
+
+      .principles__panel .principles__figure {
+        --fw: min(calc(var(--pw) * 0.64), calc(var(--room, 100vh) * 670 / 420));
+
+        flex: 0 0 auto;
+      }
     }
   }
 }

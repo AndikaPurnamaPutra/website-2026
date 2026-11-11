@@ -72,32 +72,74 @@ export function buildStack({ section, block, scope, after, pairs }) {
     });
   };
 
-  // Released together: a stuck panel is pushed off only once its margin box
-  // meets the box's end (the last panel's bottom), so the panels higher in
-  // the pile or shorter than the last stayed while the others went, out of
-  // order (a title showed above the pile). Each panel's bottom margin
-  // reaches down to where the last one's bottom sticks.
+  // One at a time, released together, always on the screen (user: on a
+  // tall screen the next one already showed below the one stuck, as if
+  // leaking; on a short one, 1024 × 600, a panel was taller than the screen
+  // and the next covered its picture before it was seen):
+  // - --room (from where a panel sticks to the screen's bottom, less GAP) and
+  //   --lead (its first part's height) let the section's CSS fit it on the
+  //   screen (a shorter picture, a smaller illustration);
+  // - each panel's bottom margin reaches the screen's bottom when it is
+  //   stuck, so the next one comes up from below the screen as it sticks;
+  // - that is the same line for every panel (a stuck panel is pushed off
+  //   once its margin box meets the box's end, the last panel's), so they
+  //   let go together, as the last one sticks (a panel whose margin ended
+  //   higher stayed while the others went, its title showing above).
+  // The screen's height without the browser's bars (svh), so the room does
+  // not change as they show and hide while scrolling.
+  const GAP = 16;
+  const probe = document.createElement("div");
+  probe.style.cssText = "position:absolute;top:0;left:0;width:0;height:100svh;visibility:hidden;pointer-events:none";
+  pile.append(probe);
+  // On tablets and up the pile is held in the middle of the screen (user:
+  // on a tall screen, iPad Pro, a large empty space showed below the stuck
+  // panel): --stack-shift lowers it by half the room left (phones keep it
+  // at the top).
+  const centred = window.matchMedia("(min-width: 744px)");
   const measure = () => {
-    panels.forEach((panel) => panel.style.removeProperty("margin-bottom"));
-    const end = (panel) => parseFloat(getComputedStyle(panel).top) + panel.offsetHeight;
-    const last = end(panels[panels.length - 1]);
-    panels.slice(0, -1).forEach((panel) => {
-      const base = parseFloat(getComputedStyle(panel).marginBottom);
-      panel.style.marginBottom = `${base + last - end(panel)}px`;
-    });
+    const screen = probe.offsetHeight || window.innerHeight;
+    const top = (panel) => parseFloat(getComputedStyle(panel).top);
+    const fit = () =>
+      panels.forEach((panel) => {
+        panel.style.removeProperty("margin-bottom");
+        panel.style.setProperty("--room", `${screen - top(panel) - GAP}px`);
+        panel.style.setProperty("--lead", `${panel.firstElementChild.offsetHeight}px`);
+      });
+    pile.style.setProperty("--stack-shift", "0px");
+    fit();
+    if (centred.matches) {
+      const pileEnd = Math.max(...panels.map((panel) => top(panel) + panel.offsetHeight));
+      const shift = Math.max(0, (screen - pileEnd - GAP) / 2);
+      if (shift > 1) {
+        pile.style.setProperty("--stack-shift", `${shift}px`);
+        fit();
+      }
+    }
+    const end = (panel) => top(panel) + panel.offsetHeight;
+    const base = parseFloat(getComputedStyle(panels[0]).marginBottom);
+    const line = Math.max(screen, ...panels.map((panel) => end(panel) + base));
+    panels.forEach((panel) => (panel.style.marginBottom = `${line - end(panel)}px`));
+    // What follows the stack comes as close as before: it is pulled up by
+    // the room added below the last panel (it then shows below the last one
+    // while the pile is still held, and moves on with it).
+    const last = panels[panels.length - 1];
+    pile.style.marginBottom = `${-(line - end(last) - base)}px`;
     if (stepBack) deepen(end);
   };
   measure();
   const resize = new ResizeObserver(measure);
   panels.forEach((panel) => resize.observe(panel));
+  resize.observe(probe);
 
   return () => {
     resize.disconnect();
     panels.forEach((panel) =>
-      ["animation-name", "animation-timeline", "animation-range", "margin-bottom"].forEach((name) => panel.style.removeProperty(name)),
+      ["animation-name", "animation-timeline", "animation-range", "margin-bottom", "--room", "--lead"].forEach((name) => panel.style.removeProperty(name)),
     );
     section.classList.remove("is-stacked");
     scope.style.removeProperty("timeline-scope");
+    pile.style.removeProperty("margin-bottom");
+    pile.style.removeProperty("--stack-shift");
     moves.reverse().forEach(([el, parent, next]) => parent.insertBefore(el, next));
     pile.remove();
   };
