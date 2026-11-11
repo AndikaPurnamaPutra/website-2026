@@ -162,3 +162,4 @@ ke grab terlihat kasar".
   - Cursor keluar ke bawah board lalu baru memudar, dan putaran baru masuk dari luar tepi bawah (552, 478; board memotong isinya), jadi meluncur masuk, tidak muncul di atas board. Geser tambahannya lewat `top`/`left` (`--ax`/`--ay`): `translate` diambil alih GSAP sehingga cursor sebelumnya hanya memudar di tempat.
   - Backlog dan In Progress disembunyikan selama HP melebar (`--co`) dan muncul bersama kartunya, jadi tidak lagi menimpa Completed yang sedang bergeser.
   - Bug: geser cursor, pudarnya, dan `--co` sebagai tween tidak kembali saat loop mengulang, sehingga cursor dan dua kolom itu hilang di putaran berikutnya. Kini dihitung dari waktu loop tiap frame (`loopBits`). Dicek: putaran 1 dan 2 identik (selisih ≤ 0,36 per kanal).
+- **Kamera tidak mengikuti cursor** (pengguna, saat 02: "karena menjadi terpotong"): tetap di tengah dan hanya mendekat sedikit (maks. 1,02×).

@@ -184,3 +184,12 @@ Tiap langkah kini tumbuh dari langkah sebelumnya (±12,8 s per putaran):
   tergambar menyusuri jalurnya dari alat, lewat sudut, sampai OWW (satu
   garis putus SVG yang memanjang, ±240 px/s), dan cahaya berwarna hanya
   tampil di bagian yang sudah tergambar (masker SVG yang mengikuti garis).
+
+## Revisi: gaya motion design (pengguna, 11 Nov 2026)
+Sama seperti 01 ("masih terlalu kaku, terlalu AI"):
+- **Kamera** (`.tm-camera` membungkus semua kecuali titik, cahaya dan gelap; `cameraPath()` dihitung dari waktu cerita, jadi tiap putaran sama): hanya bergeser sedikit dari tengah (maks. 1,02×), tidak mengikuti cursor (pengguna: "kamera tidak perlu mengikuti cursor karena menjadi terpotong"); mendekat 1,06× hanya saat OWW memenuhi layar, kembali ke 1× di bawah gelap. Titik latar ikut 30%.
+- **Kurva** `oww-move` / `oww-settle` seperti 01.
+- **Alat**: naik sedikit melewati tempatnya lalu mengendap; saat menunggu tiap alat melayang dengan irama sendiri (tidak lagi seragam). Masuk ke OWW bergiliran (6,25 / 6,34 / 6,43 s), makin cepat (`power3.in`), dan OWW berdenyut kecil tiap kali satu masuk, tiap denyut berbeda.
+- **Cursor**: masuk dari luar tepi bawah board dalam satu lengkungan dengan irama tangan, diam sebentar, menekan (OWW tertekan lalu memantul), keluar ke bawah board.
+- **Saling menyambung**: OWW ke tengah saat alat terakhir masuk, grid menyebar sebelum OWW selesai, centang digambar melingkar (`--sweep`) mulai 9,3 s.
+- Dicek tiap 0,1 s: tanpa lompatan dan error (perubahan terbesar 4 saat alat naik); putaran 1 dan 2 identik (selisih ≤ 0,3); tidak ada yang terpotong.

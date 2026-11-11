@@ -706,6 +706,11 @@
   transform-origin: 0 0;
 }
 
+// 02's ticks are drawn round their circles too (--sweep 0 → 1).
+.int-cell img {
+  mask-image: conic-gradient(from -90deg, #000 calc(var(--sweep, 1) * 1turn), transparent 0);
+}
+
 // 01: Backlog and In Progress kept hidden while the phone widens back to
 // the board (--co), so they do not run into Completed on its way.
 .p-board .tm-col {

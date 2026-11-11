@@ -13,6 +13,39 @@ CustomEase.create("oww-move", "M0,0 C0.62,0 0.12,1 1,1");
 CustomEase.create("oww-settle", "M0,0 C0.18,0.9 0.3,1 1,1");
 CustomEase.create("oww-cam", "M0,0 C0.5,0 0.12,1 1,1");
 
+// A camera over an illustration, worked out from its story's time (so a
+// loop always finds it where it should be): from the frame as it is
+// (looking at 335, 210, Figma px, at 1×), each shot moves it to a point
+// and a closeness over its time; a shot with `cut` puts it straight back
+// (hidden by something). Drawn on --kfx, --kfy, --kz (.tm-camera, and the
+// dots behind it, which follow less).
+const FRAME = { fx: 335, fy: 210, z: 1 };
+function cameraPath(shots) {
+  const ease = gsap.parseEase("oww-cam");
+  return (t) => {
+    let s = FRAME;
+    for (const shot of shots) {
+      if (t <= shot.at) break;
+      if (shot.cut) {
+        s = FRAME;
+        continue;
+      }
+      const k = ease(Math.min(1, (t - shot.at) / shot.time));
+      s = { fx: s.fx + (shot.fx - s.fx) * k, fy: s.fy + (shot.fy - s.fy) * k, z: s.z + (shot.z - s.z) * k };
+    }
+    return s;
+  };
+}
+const aim = (els, s) =>
+  els.forEach((el) => {
+    el.style.setProperty("--kfx", s.fx);
+    el.style.setProperty("--kfy", s.fy);
+    el.style.setProperty("--kz", s.z);
+  });
+// A pointer moved by a person: it speeds up quickly and slows down over
+// longer (its peak early).
+const HUMAN_PACE = (t) => gsap.parseEase("power2.inOut")(t ** 0.72);
+
 // About: Principles (Figma 1734:383; plans: docs/implementation/19-about.md,
 // 30-about-motion.md). In step with Services on the homepage (user: the
 // swipe-per-principle hold felt heavy, long and stuck): the section is pinned
@@ -419,9 +452,11 @@ function createBoardStory(board) {
   // look at, in Figma px, and how close.
   const camera = q(".tm-camera");
   const lens = [camera, q(".tm-dots")];
+  // It stays on the middle and barely comes closer (it does not follow the
+  // pointer: going in to it cut the board off; user).
   const SHOTS = [
-    { at: 0.1, time: 1.5, fx: 350, fy: 262, z: 1.05 },
-    { at: 1.7, time: 1.9, fx: 384, fy: 226, z: 1.06 },
+    { at: 0.1, time: 1.5, fx: 335, fy: 214, z: 1.015 },
+    { at: 1.7, time: 1.9, fx: 338, fy: 212, z: 1.02 },
     { at: 3.5, time: 1.8, fx: 335, fy: 210, z: 1 },
   ];
   ctx.add(() => {
@@ -717,6 +752,10 @@ function createIntegrationsStory(figure) {
     clickup: [[515, 119, 0], [519, 215, 0], [517, 285, 0], [485, 312, 0], [375, 309, 0]],
   };
   const STILL = 10.1; // s: P-5, shown with reduced motion
+  // When each tool sets off down its line into OWW (Figma, Webflow,
+  // ClickUp: not together), and so when it reaches it.
+  const SLIDE = [6.25, 6.43, 6.34];
+  const REACH = SLIDE.map((at) => at + 0.85);
   const SPEED = 230; // Figma px a second the coloured light flows at
   const TAIL = 82.47; // its length (Figma's "Vector 3268")
   const GAP = 150; // Figma px from one light to the next on a line
@@ -740,7 +779,35 @@ function createIntegrationsStory(figure) {
       { paths: [path, q(`mask [data-wire="${path.dataset.wire}"]`)], length: path.getTotalLength() },
     ]),
   );
+  // The camera (user: alive, as motion): it stays on the middle and only
+  // drifts a little closer, never following the pointer (going in to it
+  // cut the tools off; user); it comes in more only as OWW fills the
+  // frame, and is put back under the dark the next round lifts from.
+  const lens = [q(".tm-camera"), q(".tm-dots")];
+  const camera = cameraPath([
+    { at: 0.4, time: 2.6, fx: 335, fy: 206, z: 1.015 },
+    { at: 3.0, time: 2.4, fx: 335, fy: 214, z: 1.02 },
+    { at: 7.0, time: 1.6, fx: 335, fy: 210, z: 1 },
+    { at: 8.9, time: 1.4, fx: 335, fy: 210, z: 1 },
+    { at: 10.6, time: 2.0, fx: 335, fy: 210, z: 1.06 },
+    { at: 12.7, cut: true },
+  ]);
+  // The pointer: in from below the board's edge (it clips) along one curve
+  // at a person's pace, a moment's rest, the press, and out down off the
+  // board along another.
+  const cursor = q(".tm-cursor");
+  const POINT = { x: 375, y: 351 }; // where it presses OWW
+  const IN = { at: 4.65, time: 1.2 };
+  const OUT = { at: 6.4, time: 0.95 };
+  const wayIn = smoothPath([[470, 482], [432, 418], [POINT.x, POINT.y]]);
+  const wayOut = smoothPath([[POINT.x, POINT.y], [404, 404], [446, 492]]);
   const place = () => {
+    const now = timeline?.time() ?? 0;
+    aim(lens, camera(now));
+    const along = (span, ease) => ease(gsap.utils.clamp(0, 1, (now - span.at) / span.time));
+    const [cx, cy] = now < OUT.at ? wayIn(along(IN, HUMAN_PACE)) : wayOut(along(OUT, gsap.parseEase("power2.in")));
+    cursor.style.setProperty("--cx", cx);
+    cursor.style.setProperty("--cy", cy);
     ways.forEach(({ tool, up, down, p, m, d }) => {
       const [x, y, r] = m > 0 ? down(m) : up(p);
       tool.style.setProperty("--tx", x);
@@ -762,7 +829,6 @@ function createIntegrationsStory(figure) {
   };
 
   ctx.add(() => {
-    const cursor = q(".tm-cursor");
     const cover = q(".int-cover");
     const links = q(".int-links");
     gsap.set(links, { clipPath: "none" }); // drawn by its lines instead (place)
@@ -799,7 +865,7 @@ function createIntegrationsStory(figure) {
     timeline = gsap.timeline({
       paused: true,
       repeat: -1,
-      defaults: { ease: "power2.inOut", lazy: false, immediateRender: false },
+      defaults: { ease: "oww-move", lazy: false, immediateRender: false },
       onUpdate: place,
     });
     timeline
@@ -813,10 +879,11 @@ function createIntegrationsStory(figure) {
       .fromTo(q(".tm-dots"), { "--z": 1.05 }, { "--z": 1, duration: 2.6, ease: "power2.out" }, 0.3);
     ways.forEach((way, i) =>
       timeline
-        .fromTo(way, { p: 0 }, { p: 1, duration: 2.9, ease: "power2.inOut" }, 0.4 + [0.08, 0, 0.16][i])
+        .fromTo(way, { p: 0 }, { p: 1, duration: 2.9, ease: "oww-move" }, 0.4 + [0.08, 0, 0.16][i])
         // Its line runs down along its way at one pace, as the tool settles.
         .fromTo(way, { d: 0 }, { d: 1, duration: wires[way.tool.dataset.tool].length / 240, ease: "sine.inOut" }, 3.0 + [0.06, 0, 0.12][i])
-        .fromTo(way, { m: 0 }, { m: 1, duration: 1, ease: "power2.inOut" }, 6.25 + [0, 0.06, 0.03][i]),
+        // Pulled into OWW, faster and faster.
+        .fromTo(way, { m: 0 }, { m: 1, duration: 0.85, ease: "power3.in" }, SLIDE[i]),
     );
     timeline
       .fromTo(tools, { autoAlpha: 1, scale: 1 }, { autoAlpha: 1, scale: 1, duration: 0.01 }, 0)
@@ -824,8 +891,10 @@ function createIntegrationsStory(figure) {
       .fromTo(particles, { "--py": 340 }, { "--py": 10, duration: 3.2, ease: "power2.inOut" }, 0.4)
       .fromTo(particles, { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "sine.inOut" }, 0.4)
       .fromTo(particles, { opacity: 1 }, { opacity: 0, duration: 1, ease: "sine.inOut" }, 2.6)
-      // While they wait, the tools float a little, one after another.
-      .fromTo(tools, { yPercent: 0 }, { yPercent: -4, duration: 1.1, ease: "sine.inOut", yoyo: true, repeat: 1, stagger: 0.2 }, 3.5)
+      // They come up a little past their places and settle; while they
+      // wait each floats at its own pace, barely.
+      .fromTo(tools, { yPercent: 0 }, { yPercent: -6, duration: 0.35, ease: "power2.out", stagger: { each: 0.08, from: "center" } }, 3.05)
+      .fromTo(tools, { yPercent: -6 }, { yPercent: 0, duration: 0.7, ease: "power2.inOut", stagger: { each: 0.08, from: "center" } }, 3.4)
       // 2. The lines run down; OWW rises to meet them; the light, twice.
       // (autoAlpha on both ends: a value only in the start is not set again
       // when the story starts over from the middle; user: the lines were
@@ -834,10 +903,13 @@ function createIntegrationsStory(figure) {
       .fromTo(
         oww,
         { autoAlpha: 0, scale: 0.94, "--ox": 335, "--oy": 345, "--s": 116, "--r": 32, "--b": 1.5, "--l": 63.359, "--sa": 0.25, backgroundColor: "rgba(0, 0, 0, 0.25)" },
-        { autoAlpha: 1, scale: 1, "--ox": 335, "--oy": 305, "--s": 116, "--r": 32, "--b": 1.5, "--l": 63.359, "--sa": 0.25, backgroundColor: "rgba(0, 0, 0, 0.25)", duration: 1.1, ease: "power2.out" },
+        { autoAlpha: 1, scale: 1, "--ox": 335, "--oy": 305, "--s": 116, "--r": 32, "--b": 1.5, "--l": 63.359, "--sa": 0.25, backgroundColor: "rgba(0, 0, 0, 0.25)", duration: 1.1, ease: "oww-settle" },
         3.3,
       )
       .fromTo(logo, { autoAlpha: 1 }, { autoAlpha: 1, duration: 0.01 }, 3.3);
+    tools.forEach((tool, i) =>
+      timeline.fromTo(tool, { yPercent: 0 }, { yPercent: [-3, -2, -3.5][i], duration: [0.9, 1.0, 0.85][i], ease: "sine.inOut", yoyo: true, repeat: 1 }, [4.35, 4.2, 4.45][i]),
+    );
     // The dots and streaks glide up, each on its own beat and pace, a
     // little faster than the tools, fading in and out (P-2; user).
     const sparks = qa(".int-spark");
@@ -859,35 +931,45 @@ function createIntegrationsStory(figure) {
       .fromTo(streams, { opacity: 1 }, { opacity: 1, duration: 0.01 }, 0)
       .to(streams, { opacity: 0, duration: 0.35, ease: "sine.in" }, 6.2);
     timeline
-      // 3. The pointer curves in (its two axes eased apart) and presses OWW,
-      // which turns solid; the tools slide down their lines into it, the
-      // lines rolling up behind them.
-      .fromTo(cursor, { autoAlpha: 0, scale: 1 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: "sine.out" }, 4.75)
-      .fromTo(cursor, { "--cx": 480 }, { "--cx": 375, duration: 1.2, ease: "power2.inOut" }, 4.75)
-      .fromTo(cursor, { "--cy": 455 }, { "--cy": 351, duration: 1.2, ease: "power1.out" }, 4.75)
-      .to(cursor, { scale: 0.88, duration: 0.15, ease: "sine.out" }, 6.0)
-      .to(oww, { scale: 0.95, duration: 0.15, ease: "sine.out" }, 6.0)
-      .to([cursor, oww], { scale: 1, duration: 0.5, ease: "power2.out" }, 6.15)
+      // 3. The pointer comes in (IN, placed by place()), rests a moment
+      // and presses OWW, which gives and turns solid; it leaves down off
+      // the board (OUT). The tools are pulled down their lines into OWW one
+      // after another, the lines rolling up behind them, and OWW gives a
+      // little pulse as each comes in, each a little different.
+      .fromTo(cursor, { autoAlpha: 0, scale: 1 }, { autoAlpha: 1, scale: 1, duration: 0.01 }, IN.at)
+      .to(cursor, { scale: 0.86, duration: 0.11, ease: "power2.out" }, 6.0)
+      .to(oww, { scale: 0.95, duration: 0.11, ease: "power2.out" }, 6.0)
+      .to(cursor, { scale: 1, duration: 0.4, ease: "power2.out" }, 6.11)
+      .to(oww, { scale: 1, duration: 0.45, ease: "back.out(2.2)" }, 6.11)
       .to(oww, { backgroundColor: "#0f0f0f", duration: 0.45, ease: "sine.out" }, 6.05)
-      .to(tools, { scale: 0.45, duration: 1, ease: "power2.inOut" }, 6.25)
-      .to(tools, { autoAlpha: 0, duration: 0.35, ease: "sine.in" }, 6.95)
-      .to(links, { autoAlpha: 0, duration: 0.3, ease: "sine.in" }, 6.95)
-      .to(cursor, { autoAlpha: 0, "--cx": 395, "--cy": 380, duration: 0.6, ease: "sine.out" }, 6.35)
+      .fromTo(cursor, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.01 }, OUT.at + OUT.time);
+    tools.forEach((tool, i) =>
+      timeline
+        .to(tool, { scale: 0.45, duration: 0.85, ease: "power2.in" }, SLIDE[i])
+        .to(tool, { autoAlpha: 0, duration: 0.15, ease: "sine.in" }, REACH[i] - 0.12)
+        .to(oww, { scale: [1.07, 1.05, 1.06][i], duration: 0.08, ease: "power2.out" }, REACH[i])
+        .to(oww, { scale: 1, duration: 0.42, ease: "back.out(3)" }, REACH[i] + 0.08),
+    );
+    timeline
+      .to(links, { autoAlpha: 0, duration: 0.3, ease: "sine.in" }, 7.05)
       .to(glow, { opacity: 0, duration: 1.4, ease: "sine.inOut" }, 6.6)
-      // 4. OWW to the middle; the grid spreads out from behind it (P-4).
-      .to(oww, { "--oy": 210, duration: 1.1, ease: "power2.inOut" }, 7.15)
-      .fromTo(grid, { "--k": 0, "--s": 116, "--p": 132, opacity: 1, scale: 1 }, { "--k": 1, "--s": 116, "--p": 132, opacity: 1, scale: 1, duration: 1.3, ease: "power3.out" }, 7.95)
-      .fromTo(inner, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "sine.out", stagger: fromCentre(0.06) }, 7.95)
+      // 4. OWW to the middle as the last tool is in; the grid spreads out
+      // from behind it before it has settled (P-4).
+      .to(oww, { "--oy": 210, duration: 1.1 }, 7.3)
+      .fromTo(grid, { "--k": 0, "--s": 116, "--p": 132, opacity: 1, scale: 1 }, { "--k": 1, "--s": 116, "--p": 132, opacity: 1, scale: 1, duration: 1.3, ease: "oww-settle" }, 7.8)
+      .fromTo(inner, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "sine.out", stagger: fromCentre(0.06) }, 7.8)
       // 5. Narrower, the outer tiles and the edges, the ticks (P-5).
-      .to(grid, { "--s": 90, "--p": 106, duration: 1.2, ease: "power2.inOut" }, 8.9)
-      .to(oww, { "--s": 90, "--r": 24, "--b": 1.14, "--l": 48.168, "--sa": 0.5, duration: 1.2, ease: "power2.inOut" }, 8.9)
+      .to(grid, { "--s": 90, "--p": 106, duration: 1.2 }, 8.9)
+      .to(oww, { "--s": 90, "--r": 24, "--b": 1.14, "--l": 48.168, "--sa": 0.5, duration: 1.2 }, 8.9)
       .fromTo(outer, { opacity: 0 }, { opacity: 1, duration: 0.9, ease: "sine.inOut" }, 9.1)
       .fromTo(q(".int-fade"), { opacity: 0 }, { opacity: 1, duration: 0.9, ease: "sine.inOut" }, 9.0)
-      .fromTo(ticks, { opacity: 0 }, { opacity: 0.1, duration: 0.4, ease: "sine.out", stagger: fromCentre(0.1) }, 9.5)
+      // The ticks drawn round their circles (a sweep, _about.scss), from the
+      // middle out, while the grid still settles.
+      .fromTo(ticks, { opacity: 0, "--sweep": 0 }, { opacity: 0.1, "--sweep": 1, duration: 0.5, ease: "power2.inOut", stagger: fromCentre(0.1) }, 9.3)
       // 6. OWW grows through P-6 and fills the frame (P-7), all one move
       // (the ends are chosen so that it passes P-6: 174.18, corners 46.448,
       // stroke 2.207, logo 93.22); the grid comes towards us and fades.
-      .to(oww, { "--s": 900, "--r": 240, "--b": 11.4, "--l": 481.7, duration: 2.1, ease: "power2.inOut" }, 10.6)
+      .to(oww, { "--s": 900, "--r": 240, "--b": 11.4, "--l": 481.7, duration: 2.1 }, 10.6)
       .to(logo, { autoAlpha: 0, duration: 0.4, ease: "sine.inOut" }, 10.75)
       .to(grid, { scale: 1.3, opacity: 0, duration: 1.4, ease: "power2.in" }, 11.1)
       // The dark the next round lifts from.
@@ -910,6 +992,7 @@ function createIntegrationsStory(figure) {
     finish: () => {
       timeline.pause(STILL);
       place();
+      aim(lens, FRAME);
     },
     revert: () => {
       timeline.kill();
