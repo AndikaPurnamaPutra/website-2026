@@ -73,3 +73,14 @@ disetujui lead.
 
 - [x] Disetujui.
 - [x] Dikerjakan dan dicek.
+
+## Revisi: gaya motion design (pengguna, 11 Nov 2026)
+Sama seperti 01 dan 02 ("masih terlalu kaku, terlalu AI"); pengguna juga bertanya "dari awal cursor seperti menarik grid?". Tombol grid sempat dicoba lalu dibatalkan ("tanpa toggle grid, cukup aneh"): UI designer mengklik di wireframe, di dalam jendela (228, 196).
+- **Cursor** (`pointerTrack()`, dihitung dari waktu cerita): tiap orang masuk dari luar tepi board (board memotong isinya) dalam satu lengkungan dengan irama tangan, diam sebentar, klik (tertekan lalu memantul), dan keluar melewati tepi; tidak lagi memudar. Saat drag, pojok foto mengikuti sedikit terlambat (0,04 s), foto kedua lebih lambat lagi.
+- **Kamera**: hanya mendekat sedikit dari tengah (maks. 1,02×), tidak mengikuti cursor.
+- **Grid**: kolom tumbuh dari tengah (`oww-settle`); blok wireframe menempel ke kolom dengan pantulan kecil (`back.out`), bergiliran tidak rata.
+- **Desain**: jendela membuka dengan `oww-move`, bagian-bagiannya masuk bergiliran tidak rata; teks lama dan baru saling tumpang tindih saat layout berganti.
+- **Approved by Lead**: badge turun seperti cap (dari 1,25× dan −6° ke 1×).
+- **Kembali ke wireframe** dalam satu gerakan: bagian desain turun dan hilang bergiliran saat jendela menutup, blok wireframe naik di tempatnya.
+- Dicek tiap 0,1 s: tanpa error; perubahan terbesar (±9,5) saat layout berganti, seperti sebelumnya; putaran 1 dan 2 identik (selisih ≤ 0,26).
+- **Cursor di dalam jendela** (pengguna: "cursornya masih di luar"): brand designer kini mengklik di foto (412, 150; sebelumnya 243, 37 di atas jendela), UI designer mengklik di blok wireframe dan menunggu di dalam jendela (452, 292 / 480, 330 / 470, 318; sebelumnya di tepi bawahnya).

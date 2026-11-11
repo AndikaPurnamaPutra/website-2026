@@ -224,125 +224,127 @@ block content
             span.tm-dots
             span.tm-glow.ds-glow
               img(src="assets/images/about/principles/tm/glow-phone.svg" width="992" height="665" alt="")
-            .ds-window
-              //- Everything on the screen (dimmed together in P-6).
-              .ds-screen
-                img.ds-light(src="assets/images/about/principles/des/light.svg" width="1209" height="891" alt="")
-                span.ds-dots
-                  span
-                  span
-                  span
-                span.ds-rule
-                //- P-1: the wireframe.
-                .ds-wire
-                  span.ds-bar(style="--x: 30.68; --y: 84.68; --w: 226; --h: 16")
-                  span.ds-bar(style="--x: 30.68; --y: 104.68; --w: 140; --h: 16")
-                  span.ds-bar(style="--x: 30.68; --y: 132.68; --w: 226; --h: 8")
-                  span.ds-bar(style="--x: 30.68; --y: 144.68; --w: 199; --h: 8")
-                  span.ds-bar(style="--x: 30.68; --y: 176.68; --w: 103; --h: 32")
-                //- P-2: the layout grid and its note.
-                .ds-grid
-                  each k in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-                    span.ds-col
-                  .ds-note
-                    span.ds-note__title grid-desktop-1440px
-                    span.ds-note__rule
-                    span.ds-note__row
-                      span margin-all
-                      span 80px
-                    span.ds-note__row
-                      span Gutter
-                      span 20px
-                //- P-3: "Designing Spaces"; its photo grows out of the
-                //- wireframe's picture.
-                .ds-page(data-page="spaces")
-                  .ds-nav
-                    img(src="assets/images/about/principles/des/logo.svg" width="16" height="16" alt="")
-                    span.ds-nav__links
-                      span PROJECTS
-                      span STUDIO
-                      span JOURNAL
-                      span CONTACT
-                    span.ds-nav__cta
-                      span ENQUIRE
-                      img(src="assets/images/about/principles/des/arrow.svg" width="10" height="10" alt="")
-                  p.ds-title.ds-title--spaces
-                    span.ds-title__plain Designing Spaces
-                    = " "
-                    span.ds-title__serif Shaping Experiences.
-                  .ds-intro
-                    .ds-intro__text
-                      span.ds-intro__index
-                        span.ds-intro__line
-                        span 01
-                      span.ds-copy We create thoughtful architectural spaces that balance aesthetics, functionality, and sustainability.
-                      span.ds-link
-                        span VIEW PROJECTS
+            //- The camera (src/js/principles-scroll.js): all but the dots and the glow.
+            .tm-camera
+              .ds-window
+                //- Everything on the screen (dimmed together in P-6).
+                .ds-screen
+                  img.ds-light(src="assets/images/about/principles/des/light.svg" width="1209" height="891" alt="")
+                  span.ds-dots
+                    span
+                    span
+                    span
+                  span.ds-rule
+                  //- P-1: the wireframe.
+                  .ds-wire
+                    span.ds-bar(style="--x: 30.68; --y: 84.68; --w: 226; --h: 16")
+                    span.ds-bar(style="--x: 30.68; --y: 104.68; --w: 140; --h: 16")
+                    span.ds-bar(style="--x: 30.68; --y: 132.68; --w: 226; --h: 8")
+                    span.ds-bar(style="--x: 30.68; --y: 144.68; --w: 199; --h: 8")
+                    span.ds-bar(style="--x: 30.68; --y: 176.68; --w: 103; --h: 32")
+                  //- P-2: the layout grid and its note.
+                  .ds-grid
+                    each k in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+                      span.ds-col
+                    .ds-note
+                      span.ds-note__title grid-desktop-1440px
+                      span.ds-note__rule
+                      span.ds-note__row
+                        span margin-all
+                        span 80px
+                      span.ds-note__row
+                        span Gutter
+                        span 20px
+                  //- P-3: "Designing Spaces"; its photo grows out of the
+                  //- wireframe's picture.
+                  .ds-page(data-page="spaces")
+                    .ds-nav
+                      img(src="assets/images/about/principles/des/logo.svg" width="16" height="16" alt="")
+                      span.ds-nav__links
+                        span PROJECTS
+                        span STUDIO
+                        span JOURNAL
+                        span CONTACT
+                      span.ds-nav__cta
+                        span ENQUIRE
                         img(src="assets/images/about/principles/des/arrow.svg" width="10" height="10" alt="")
-                //- P-4: "Transforming Ideas".
-                .ds-page(data-page="ideas")
-                  .ds-nav
-                    img(src="assets/images/about/principles/des/logo.svg" width="16" height="16" alt="")
-                    span.ds-nav__links
-                      span Home
-                      span About Us
-                      span Services
-                      span Projects
-                    span.ds-pill
-                      span Contact Us
-                  .ds-hero
-                    p.ds-title.ds-title--ideas Transforming Ideas Into Digital Impact.
-                    .ds-hero__side
-                      span.ds-copy We help businesses move forward through innovative technology, strategic thinking, and digital solutions designed to create lasting value.
-                      span.ds-button.ds-button--small
-                        span Get Started Today!
-                //- P-5: "Rise to the victory".
-                .ds-page(data-page="victory")
-                  .ds-nav
-                    img(src="assets/images/about/principles/des/logo.svg" width="16" height="16" alt="")
-                    span.ds-nav__links
-                      span Home
-                      span Programs
-                      span Community
-                      span About Us
-                    span.ds-pill
-                      span Join Now
-                  p.ds-title.ds-title--victory Rise to the victory, stay focused.
-                  span.ds-button.ds-button--victory
-                    span Get Started
-                  span.ds-copy.ds-copy--victory Harness your determination, stay committed to your goals, and push beyond every limit. With consistency, discipline, and the right mindset, every step brings you closer to victory.
-                  span.ds-pager
-                    span.ds-pill.ds-pill--prev
-                      img(src="assets/images/about/principles/des/arrow-small.svg" width="8" height="8" alt="")
-                      span Previous
-                    span.ds-pill
-                      span Next
-                      img(src="assets/images/about/principles/des/arrow-small.svg" width="8" height="8" alt="")
-                //- The designs' photos: two frames that move and change shape
-                //- from one design to the next (user decision), each holding
-                //- the photos it shows. The first is the wireframe's picture
-                //- in P-1.
-                .ds-shot
-                  span.ds-shot__pics
-                    img(src="assets/images/about/principles/des/spaces.webp" width="492" height="444" alt="" data-pic="spaces")
-                    img(src="assets/images/about/principles/des/desk.webp" width="1004" height="296" alt="" data-pic="desk")
-                    img(src="assets/images/about/principles/des/lift.webp" width="216" height="310" alt="" data-pic="lift")
-                  img.ds-shot__icon(src="assets/images/about/principles/des/image.svg" width="24" height="24" alt="")
-                .ds-shot2
-                  img(src="assets/images/about/principles/des/stairs.webp" width="354" height="236" alt="" data-pic="stairs")
-                  img(src="assets/images/about/principles/des/run.webp" width="266" height="420" alt="" data-pic="run")
-            //- P-6: approved.
-            span.ds-badge
-              img(src="assets/images/about/principles/des/check.svg" width="20" height="20" alt="")
-              span Approved by Lead
-            //- The designers at work (Figma's multiplayer pointers) and the lead.
-            span.ds-pointer(data-pointer="brand")
-              img(src="assets/images/about/principles/des/pointer.svg" width="13" height="13" alt="")
-              span Brand Designer
-            span.ds-pointer(data-pointer="ui")
-              img(src="assets/images/about/principles/des/pointer.svg" width="13" height="13" alt="")
-              span UI Designer
-            img.tm-cursor(src="assets/images/about/principles/tm/cursor.svg" width="46" height="46" alt="")
+                    p.ds-title.ds-title--spaces
+                      span.ds-title__plain Designing Spaces
+                      = " "
+                      span.ds-title__serif Shaping Experiences.
+                    .ds-intro
+                      .ds-intro__text
+                        span.ds-intro__index
+                          span.ds-intro__line
+                          span 01
+                        span.ds-copy We create thoughtful architectural spaces that balance aesthetics, functionality, and sustainability.
+                        span.ds-link
+                          span VIEW PROJECTS
+                          img(src="assets/images/about/principles/des/arrow.svg" width="10" height="10" alt="")
+                  //- P-4: "Transforming Ideas".
+                  .ds-page(data-page="ideas")
+                    .ds-nav
+                      img(src="assets/images/about/principles/des/logo.svg" width="16" height="16" alt="")
+                      span.ds-nav__links
+                        span Home
+                        span About Us
+                        span Services
+                        span Projects
+                      span.ds-pill
+                        span Contact Us
+                    .ds-hero
+                      p.ds-title.ds-title--ideas Transforming Ideas Into Digital Impact.
+                      .ds-hero__side
+                        span.ds-copy We help businesses move forward through innovative technology, strategic thinking, and digital solutions designed to create lasting value.
+                        span.ds-button.ds-button--small
+                          span Get Started Today!
+                  //- P-5: "Rise to the victory".
+                  .ds-page(data-page="victory")
+                    .ds-nav
+                      img(src="assets/images/about/principles/des/logo.svg" width="16" height="16" alt="")
+                      span.ds-nav__links
+                        span Home
+                        span Programs
+                        span Community
+                        span About Us
+                      span.ds-pill
+                        span Join Now
+                    p.ds-title.ds-title--victory Rise to the victory, stay focused.
+                    span.ds-button.ds-button--victory
+                      span Get Started
+                    span.ds-copy.ds-copy--victory Harness your determination, stay committed to your goals, and push beyond every limit. With consistency, discipline, and the right mindset, every step brings you closer to victory.
+                    span.ds-pager
+                      span.ds-pill.ds-pill--prev
+                        img(src="assets/images/about/principles/des/arrow-small.svg" width="8" height="8" alt="")
+                        span Previous
+                      span.ds-pill
+                        span Next
+                        img(src="assets/images/about/principles/des/arrow-small.svg" width="8" height="8" alt="")
+                  //- The designs' photos: two frames that move and change shape
+                  //- from one design to the next (user decision), each holding
+                  //- the photos it shows. The first is the wireframe's picture
+                  //- in P-1.
+                  .ds-shot
+                    span.ds-shot__pics
+                      img(src="assets/images/about/principles/des/spaces.webp" width="492" height="444" alt="" data-pic="spaces")
+                      img(src="assets/images/about/principles/des/desk.webp" width="1004" height="296" alt="" data-pic="desk")
+                      img(src="assets/images/about/principles/des/lift.webp" width="216" height="310" alt="" data-pic="lift")
+                    img.ds-shot__icon(src="assets/images/about/principles/des/image.svg" width="24" height="24" alt="")
+                  .ds-shot2
+                    img(src="assets/images/about/principles/des/stairs.webp" width="354" height="236" alt="" data-pic="stairs")
+                    img(src="assets/images/about/principles/des/run.webp" width="266" height="420" alt="" data-pic="run")
+              //- P-6: approved.
+              span.ds-badge
+                img(src="assets/images/about/principles/des/check.svg" width="20" height="20" alt="")
+                span Approved by Lead
+              //- The designers at work (Figma's multiplayer pointers) and the lead.
+              span.ds-pointer(data-pointer="brand")
+                img(src="assets/images/about/principles/des/pointer.svg" width="13" height="13" alt="")
+                span Brand Designer
+              span.ds-pointer(data-pointer="ui")
+                img(src="assets/images/about/principles/des/pointer.svg" width="13" height="13" alt="")
+                span UI Designer
+              img.tm-cursor(src="assets/images/about/principles/tm/cursor.svg" width="46" height="46" alt="")
           //- 04: a client's comment, answered and done (Figma P-1 2095:5591 …
           //- P-4 2129:6457; docs/implementation/36-principles-04-feedback.md):
           //- the team round the client, the comment thread, the designer at
