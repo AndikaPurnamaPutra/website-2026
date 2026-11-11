@@ -633,187 +633,189 @@ block content
             span.tm-dots
             span.tm-glow.sy-glow
               img(src="assets/images/about/principles/tm/glow-phone.svg" width="992" height="665" alt="")
-            //- P-2: the app's parts tied to their tokens (dashed, drawn).
-            svg.sy-links(viewBox="0 0 670 420" fill="none")
-              defs
+            //- The camera (as 02 and 03): everything but the dots and the light.
+            .tm-camera
+              //- P-2: the app's parts tied to their tokens (dashed, drawn).
+              svg.sy-links(viewBox="0 0 670 420" fill="none")
+                defs
+                  each link in [["left", "M267 139H243Q235 139 235 147V286Q235 294 243 294H267"], ["short", "M211 217H235"], ["right", "M415 350H494Q502 350 502 342V262"]]
+                    mask(id=`sy-draw-${link[0]}` maskUnits="userSpaceOnUse" x="0" y="0" width="670" height="420")
+                      path(d=link[1] stroke="#fff" stroke-width="3" data-link-mask=link[0])
                 each link in [["left", "M267 139H243Q235 139 235 147V286Q235 294 243 294H267"], ["short", "M211 217H235"], ["right", "M415 350H494Q502 350 502 342V262"]]
-                  mask(id=`sy-draw-${link[0]}` maskUnits="userSpaceOnUse" x="0" y="0" width="670" height="420")
-                    path(d=link[1] stroke="#fff" stroke-width="3" data-link-mask=link[0])
-              each link in [["left", "M267 139H243Q235 139 235 147V286Q235 294 243 294H267"], ["short", "M211 217H235"], ["right", "M415 350H494Q502 350 502 342V262"]]
-                path.sy-link(d=link[1] mask=`url(#sy-draw-${link[0]})`)
-              each dot in [[211, 217], [415, 350], [502, 262]]
-                circle.sy-dot(cx=dot[0] cy=dot[1] r="2.667")
-            span.sy-token(data-token="component")
-              span.sy-token__name main-component
-              span.sy-token__bars
-                span
-                span
-              span.sy-token__bars
-                span
-                span
-            span.sy-token(data-token="bg")
-              span.sy-token__name bg-default
-              span.sy-token__value
-                span.sy-swatch
-                span.sy-token__hex #050505
-                span.sy-token__alpha 100%
-            //- The window: the design system first (P-1), then the app it is
-            //- applied to (P-2, P-3): --x, --y, --w, --h, corners --r.
-            .sy-box
-              .sy-screen
-                //- P-1: the design system.
-                .sy-panel
-                  span.sy-head
-                    span.sy-head__title
-                      span.sy-key
-                        img(src="assets/images/about/principles/sy/palette.svg" width="14" height="14" alt="")
-                      span.sy-head__name Design System
-                    span.sy-apply
-                      span Apply
-                      img(src="assets/images/about/principles/sy/caret-r.svg" width="12" height="12" alt="")
-                  span.sy-rule
-                  span.sy-controls
-                    span.sy-control
-                      span.sy-label Colors
-                      img.sy-colors(src="assets/images/about/principles/sy/colors.svg" width="74" height="26" alt="")
-                    span.sy-control
-                      span.sy-label Theme
-                      span.sy-pill
-                        img(src="assets/images/about/principles/sy/sun.svg" width="16" height="16" alt="")
-                        span.sy-pill__on
-                          img(src="assets/images/about/principles/sy/moon.svg" width="16" height="16" alt="")
-                          span Dark
-                    span.sy-control.sy-control--font
-                      span.sy-label Font Style
-                      span.sy-pill.sy-pill--font
-                        span Inter Display
-                        img(src="assets/images/about/principles/sy/caret-d.svg" width="8" height="8" alt="")
-                    span.sy-control
-                      span.sy-label Device
-                      span.sy-pill.sy-pill--device
-                        span.sy-pill__mark
-                        img(src="assets/images/about/principles/sy/desktop.svg" width="16" height="16" alt="" data-device="desktop")
-                        img(src="assets/images/about/principles/sy/tablet.svg" width="16" height="16" alt="" data-device="tablet")
-                        img.sy-pill__phone(src="assets/images/about/principles/sy/mobile.svg" width="16" height="16" alt="" data-device="mobile")
-                  span.sy-lines
-                    span
-                    span
-                  span.sy-type
-                    img.sy-type__light(src="assets/images/about/principles/sy/aa-glow.svg" width="277" height="204" alt="")
-                    span.sy-type__top
-                      span.sy-type__aa Aa
-                      span.sy-type__weights
-                        span.sy-w300 Light
-                        span.sy-w400 Regular
-                        span.sy-w500 Medium
-                        span.sy-w700 Bold
-                    span.sy-type__foot
-                      span.sy-type__sample
-                        span Aa Bb Cc Dd
-                        span 1234567890
-                      span.sy-type__name Inter Display
-                  span.sy-space
-                    span.sy-space__title Spacing
-                    span.sy-space__steps
-                      each w in [4, 8, 12, 16, 20, 24]
-                        span.sy-step
-                          span.sy-step__bar(style=`width: ${w}em`)
-                          span.sy-step__label= w + "px"
-                //- P-2 and P-3: the app.
-                .sy-app
-                  span.sy-brand
-                    img(src="assets/images/about/principles/sy/logo.svg" width="34" height="16" alt="")
-                    span OWW Studio
-                  span.sy-app-rule
-                  span.sy-app-rule.sy-app-rule--foot
-                  span.sy-search
-                    img(src="assets/images/about/principles/cm/search.svg" width="12" height="12" alt="")
-                    span.sy-search__hint Search...
-                    span.sy-kbd
-                      img(src="assets/images/about/principles/cm/command.svg" width="10" height="10" alt="")
-                      span K
-                  span.sy-nav
-                    span.sy-nav__group General
-                    span.sy-item.sy-item--on
-                      img(src="assets/images/about/principles/sy/house.svg" width="12" height="12" alt="")
-                      span Overview
-                    span.sy-item.sy-item--dim
-                      img(src="assets/images/about/principles/sy/notepad.svg" width="12" height="12" alt="")
-                      span Daily tasks
-                    each sub in ["High Priority", "Medium Priority", "Low Priority"]
-                      span.sy-item.sy-item--dim.sy-item--sub
-                        img(src="assets/images/about/principles/sy/dot-outline.svg" width="12" height="12" alt="")
-                        span= sub
-                    each w in [54, 80]
-                      span.sy-item
-                        span.sy-item__dot
-                        span.sy-item__bar(style=`width: ${w}em`)
-                  span.sy-foot
-                    span.sy-foot__bars
+                  path.sy-link(d=link[1] mask=`url(#sy-draw-${link[0]})`)
+                each dot in [[211, 217], [415, 350], [502, 262]]
+                  circle.sy-dot(cx=dot[0] cy=dot[1] r="2.667")
+              span.sy-token(data-token="component")
+                span.sy-token__name main-component
+                span.sy-token__bars
+                  span
+                  span
+                span.sy-token__bars
+                  span
+                  span
+              span.sy-token(data-token="bg")
+                span.sy-token__name bg-default
+                span.sy-token__value
+                  span.sy-swatch
+                  span.sy-token__hex #050505
+                  span.sy-token__alpha 100%
+              //- The window: the design system first (P-1), then the app it is
+              //- applied to (P-2, P-3): --x, --y, --w, --h, corners --r.
+              .sy-box
+                .sy-screen
+                  //- P-1: the design system.
+                  .sy-panel
+                    span.sy-head
+                      span.sy-head__title
+                        span.sy-key
+                          img(src="assets/images/about/principles/sy/palette.svg" width="14" height="14" alt="")
+                        span.sy-head__name Design System
+                      span.sy-apply
+                        span Apply
+                        img(src="assets/images/about/principles/sy/caret-r.svg" width="12" height="12" alt="")
+                    span.sy-rule
+                    span.sy-controls
+                      span.sy-control
+                        span.sy-label Colors
+                        img.sy-colors(src="assets/images/about/principles/sy/colors.svg" width="74" height="26" alt="")
+                      span.sy-control
+                        span.sy-label Theme
+                        span.sy-pill
+                          img(src="assets/images/about/principles/sy/sun.svg" width="16" height="16" alt="")
+                          span.sy-pill__on
+                            img(src="assets/images/about/principles/sy/moon.svg" width="16" height="16" alt="")
+                            span Dark
+                      span.sy-control.sy-control--font
+                        span.sy-label Font Style
+                        span.sy-pill.sy-pill--font
+                          span Inter Display
+                          img(src="assets/images/about/principles/sy/caret-d.svg" width="8" height="8" alt="")
+                      span.sy-control
+                        span.sy-label Device
+                        span.sy-pill.sy-pill--device
+                          span.sy-pill__mark
+                          img(src="assets/images/about/principles/sy/desktop.svg" width="16" height="16" alt="" data-device="desktop")
+                          img(src="assets/images/about/principles/sy/tablet.svg" width="16" height="16" alt="" data-device="tablet")
+                          img.sy-pill__phone(src="assets/images/about/principles/sy/mobile.svg" width="16" height="16" alt="" data-device="mobile")
+                    span.sy-lines
                       span
                       span
-                    span.sy-upgrade
-                      span Upgrade
-            //- P-3: the code, for the developers (typed in, line by line).
-            .sy-dev
-              span.sy-dev__head
-                span.sy-key.sy-key--small
-                  img(src="assets/images/about/principles/sy/code.svg" width="14" height="14" alt="")
-                span.sy-dev__name Developer View
-              span.sy-rule.sy-rule--dev
-              span.sy-dev__body
-                span.sy-tab
-                  img(src="assets/images/about/principles/sy/stack.svg" width="10" height="10" alt="")
-                  span Button.tsx
-                  img(src="assets/images/about/principles/sy/x.svg" width="8" height="8" alt="")
-                span.sy-code
-                  span.sy-code__screen
-                    span.sy-line
-                      span.sy-k= "export"
-                      span.sy-t= " "
-                      span.sy-f= "function"
-                      span.sy-t= " "
-                      span.sy-n= "Button"
-                      span.sy-t= "({"
-                    span.sy-line
-                      span.sy-t= "  children,"
-                    span.sy-line
-                      span.sy-t= "  variant = "
-                      span.sy-s= "\"primary\""
-                    span.sy-line
-                      span.sy-t= "}) {"
-                    span.sy-line
-                      span.sy-t= "  "
-                      span.sy-k= "return"
-                      span.sy-t= " ("
-                    span.sy-line
-                      span.sy-t= "    "
-                      span.sy-p= "<"
-                      span.sy-g= "button"
-                      span.sy-t= " "
-                      span.sy-a= "className"
-                      span.sy-t= "="
-                      span.sy-n= "\"btn-amber\""
-                      span.sy-p= ">"
-                    span.sy-line
-                      span.sy-t= "      {children}"
-                    span.sy-line
-                      span.sy-t= "    "
-                      span.sy-p= "</"
-                      span.sy-g= "button"
-                      span.sy-p= ">"
-                    span.sy-line
-                      span.sy-t= "  );"
-                    span.sy-line
-                      span.sy-t= "}"
-                    span.sy-code__foot
-                      span TypeScript / React
-                      span.sy-copy Copy TSX
-            //- P-4: ready.
-            span.ds-badge.sy-badge
-              img(src="assets/images/about/principles/des/check.svg" width="20" height="20" alt="")
-              span Ready to develop
-            img.tm-cursor(src="assets/images/about/principles/tm/cursor.svg" width="46" height="46" alt="")
+                    span.sy-type
+                      img.sy-type__light(src="assets/images/about/principles/sy/aa-glow.svg" width="277" height="204" alt="")
+                      span.sy-type__top
+                        span.sy-type__aa Aa
+                        span.sy-type__weights
+                          span.sy-w300 Light
+                          span.sy-w400 Regular
+                          span.sy-w500 Medium
+                          span.sy-w700 Bold
+                      span.sy-type__foot
+                        span.sy-type__sample
+                          span Aa Bb Cc Dd
+                          span 1234567890
+                        span.sy-type__name Inter Display
+                    span.sy-space
+                      span.sy-space__title Spacing
+                      span.sy-space__steps
+                        each w in [4, 8, 12, 16, 20, 24]
+                          span.sy-step
+                            span.sy-step__bar(style=`width: ${w}em`)
+                            span.sy-step__label= w + "px"
+                  //- P-2 and P-3: the app.
+                  .sy-app
+                    span.sy-brand
+                      img(src="assets/images/about/principles/sy/logo.svg" width="34" height="16" alt="")
+                      span OWW Studio
+                    span.sy-app-rule
+                    span.sy-app-rule.sy-app-rule--foot
+                    span.sy-search
+                      img(src="assets/images/about/principles/cm/search.svg" width="12" height="12" alt="")
+                      span.sy-search__hint Search...
+                      span.sy-kbd
+                        img(src="assets/images/about/principles/cm/command.svg" width="10" height="10" alt="")
+                        span K
+                    span.sy-nav
+                      span.sy-nav__group General
+                      span.sy-item.sy-item--on
+                        img(src="assets/images/about/principles/sy/house.svg" width="12" height="12" alt="")
+                        span Overview
+                      span.sy-item.sy-item--dim
+                        img(src="assets/images/about/principles/sy/notepad.svg" width="12" height="12" alt="")
+                        span Daily tasks
+                      each sub in ["High Priority", "Medium Priority", "Low Priority"]
+                        span.sy-item.sy-item--dim.sy-item--sub
+                          img(src="assets/images/about/principles/sy/dot-outline.svg" width="12" height="12" alt="")
+                          span= sub
+                      each w in [54, 80]
+                        span.sy-item
+                          span.sy-item__dot
+                          span.sy-item__bar(style=`width: ${w}em`)
+                    span.sy-foot
+                      span.sy-foot__bars
+                        span
+                        span
+                      span.sy-upgrade
+                        span Upgrade
+              //- P-3: the code, for the developers (typed in, line by line).
+              .sy-dev
+                span.sy-dev__head
+                  span.sy-key.sy-key--small
+                    img(src="assets/images/about/principles/sy/code.svg" width="14" height="14" alt="")
+                  span.sy-dev__name Developer View
+                span.sy-rule.sy-rule--dev
+                span.sy-dev__body
+                  span.sy-tab
+                    img(src="assets/images/about/principles/sy/stack.svg" width="10" height="10" alt="")
+                    span Button.tsx
+                    img(src="assets/images/about/principles/sy/x.svg" width="8" height="8" alt="")
+                  span.sy-code
+                    span.sy-code__screen
+                      span.sy-line
+                        span.sy-k= "export"
+                        span.sy-t= " "
+                        span.sy-f= "function"
+                        span.sy-t= " "
+                        span.sy-n= "Button"
+                        span.sy-t= "({"
+                      span.sy-line
+                        span.sy-t= "  children,"
+                      span.sy-line
+                        span.sy-t= "  variant = "
+                        span.sy-s= "\"primary\""
+                      span.sy-line
+                        span.sy-t= "}) {"
+                      span.sy-line
+                        span.sy-t= "  "
+                        span.sy-k= "return"
+                        span.sy-t= " ("
+                      span.sy-line
+                        span.sy-t= "    "
+                        span.sy-p= "<"
+                        span.sy-g= "button"
+                        span.sy-t= " "
+                        span.sy-a= "className"
+                        span.sy-t= "="
+                        span.sy-n= "\"btn-amber\""
+                        span.sy-p= ">"
+                      span.sy-line
+                        span.sy-t= "      {children}"
+                      span.sy-line
+                        span.sy-t= "    "
+                        span.sy-p= "</"
+                        span.sy-g= "button"
+                        span.sy-p= ">"
+                      span.sy-line
+                        span.sy-t= "  );"
+                      span.sy-line
+                        span.sy-t= "}"
+                      span.sy-code__foot
+                        span TypeScript / React
+                        span.sy-copy Copy TSX
+              //- P-4: ready.
+              span.ds-badge.sy-badge
+                img(src="assets/images/about/principles/des/check.svg" width="20" height="20" alt="")
+                span Ready to develop
+              img.tm-cursor(src="assets/images/about/principles/tm/cursor.svg" width="46" height="46" alt="")
 
     //- Gallery (Figma 1734:399): five photos placed freely, [x, y, width,
     //- height] in Figma pixels. "Play Video" is only a label for now (user

@@ -1747,14 +1747,27 @@ function createHandoffStory(figure) {
   const q = (selector) => figure.querySelector(selector);
   const qa = (selector) => [...figure.querySelectorAll(selector)];
   const ctx = gsap.context(() => {}, figure);
-  const STILL = 10.9; // s: P-4, shown with reduced motion
+  const STILL = 11.3; // s: P-4, clicked, shown with reduced motion
   // The window as the design system (P-1), the app (P-2), the app aside
   // (P-3), and the badge's place (where it opens back from).
   const PANEL = { "--x": 143, "--y": 56, "--w": 383, "--h": 309, "--r": 20 };
   const APP = { "--x": 267, "--y": 46, "--w": 160, "--h": 327, "--r": 12 };
   const BADGE = { "--x": 249, "--y": 188, "--w": 172, "--h": 44, "--r": 16 };
+  // Motion-design pass as 01–05 (user: alive, not stiff): the pointer on
+  // human-paced curves in from beyond the board's edge and out past it
+  // (pointerTrack), soft clicks, parts and code coming in on an uneven
+  // beat, settling without bounce; a camera that barely comes closer.
+  // The camera, on the middle (it never follows the pointer: going in cut
+  // the frame off; user).
+  const camera = cameraPath([
+    { at: 0.3, time: 2.2, fx: 340, fy: 206, z: 1.015 },
+    { at: 2.85, time: 1.4, fx: 335, fy: 210, z: 1 },
+    { at: 6.2, time: 2.6, fx: 335, fy: 210, z: 1.02 },
+    { at: 9.4, time: 1.3, fx: 335, fy: 210, z: 1 },
+  ]);
 
   let timeline;
+  let place = () => {};
   ctx.add(() => {
     const em = () => figure.getBoundingClientRect().width / 670;
     const F = figure.getBoundingClientRect();
@@ -1766,9 +1779,14 @@ function createHandoffStory(figure) {
     const panel = q(".sy-panel");
     const app = q(".sy-app");
     const parts = qa(".sy-brand, .sy-app-rule, .sy-search, .sy-nav > *, .sy-foot");
-    const mark = q(".sy-pill--device");
-    const phone = centre(q('[data-device="mobile"]'));
-    const apply = centre(q(".sy-apply"));
+    const mark = q(".sy-pill__mark");
+    const device = q(".sy-pill--device");
+    const desktop = q('[data-device="desktop"]');
+    const others = qa('[data-device="tablet"], [data-device="mobile"]');
+    const mobile = q('[data-device="mobile"]');
+    const phone = centre(mobile);
+    const applyButton = q(".sy-apply");
+    const apply = centre(applyButton);
     const masks = qa("[data-link-mask]");
     const dots = qa(".sy-dot");
     const tokens = qa(".sy-token");
@@ -1779,8 +1797,9 @@ function createHandoffStory(figure) {
     const check = badge.querySelector("img");
     const cursor = q(".tm-cursor");
     const glow = q(".sy-glow");
+    const lens = [q(".tm-camera"), q(".tm-dots")];
     gsap.set(cursor, { transformOrigin: "36.6% 27.2%" });
-    gsap.set([badge, check, dev, ...tokens, ...dots], { transformOrigin: "50% 50%" });
+    gsap.set([badge, check, dev, mark, applyButton, ...tokens, ...dots], { transformOrigin: "50% 50%" });
     // Each line is drawn along by its mask (one dash along it).
     masks.forEach((path) => {
       const length = path.getTotalLength();
@@ -1789,91 +1808,129 @@ function createHandoffStory(figure) {
     });
     const lengthOf = (_, path) => +path.dataset.length;
 
-    timeline = gsap.timeline({ paused: true, repeat: -1, defaults: { ease: "power2.inOut", lazy: false, immediateRender: false } });
-    const glide = (at, x, y, duration = 0.8) =>
+    // The pointer: in from below the board to the phone, on to Apply, out
+    // past the right edge; later in again to the badge and out below.
+    const pointerAt = pointerTrack([560, 470], [
+      { at: 0.3, time: 1.0, x: phone.x + 2, y: phone.y + 6, bow: 0.16 },
+      { at: 1.65, time: 0.85, x: apply.x, y: apply.y, bow: 0.12 },
+      { at: 2.85, time: 0.8, x: 610, y: 480, ease: "power2.in", bow: 0.06 },
+      { at: 9.6, time: 0.001, x: 470, y: 482 },
+      { at: 9.7, time: 1.05, x: 377, y: 226, bow: 0.16 },
+      { at: 11.65, time: 0.85, x: 430, y: 490, ease: "power2.in", bow: 0.06 },
+    ]);
+    place = () => {
+      const now = timeline.time();
+      const [x, y] = pointerAt(now);
+      cursor.style.setProperty("--cx", x);
+      cursor.style.setProperty("--cy", y);
+      aim(lens, camera(now));
+    };
+
+    timeline = gsap.timeline({ paused: true, repeat: -1, defaults: { ease: "oww-move", lazy: false, immediateRender: false }, onUpdate: () => place() });
+    // A click: a small press and a settling release (as 01, 02 and 05);
+    // what is clicked gives a little too.
+    const click = (at, target, give = 0.96) => {
       timeline
-        .to(cursor, { "--cx": x, duration, ease: "power2.inOut" }, at)
-        .to(cursor, { "--cy": y, duration, ease: "sine.inOut" }, at);
-    const click = (el, at) =>
-      timeline
-        .to(el, { scale: 0.85, duration: 0.12, ease: "sine.out" }, at)
-        .to(el, { scale: 1, duration: 0.3, ease: "power2.out" }, at + 0.12);
+        .to(cursor, { scale: 0.9, duration: 0.14, ease: "power2.out" }, at)
+        .to(cursor, { scale: 1, duration: 0.45, ease: "oww-settle" }, at + 0.14);
+      if (target)
+        timeline
+          .to(target, { scale: give, duration: 0.14, ease: "power2.out" }, at + 0.02)
+          .to(target, { scale: 1, duration: 0.5, ease: "oww-settle" }, at + 0.16);
+    };
+    // An uneven beat: offsets that add up a pattern of gaps.
+    const beat = (count, gaps) => {
+      let sum = 0;
+      return Array.from({ length: count }, (_, i) => {
+        const at = sum;
+        sum += gaps[i % gaps.length];
+        return at;
+      });
+    };
+    const partsAt = beat(parts.length, [0.05, 0.07, 0.04, 0.06, 0.05, 0.08]);
+    const linesAt = beat(lines.length, [0.14, 0.2, 0.11, 0.26, 0.13, 0.17, 0.3, 0.12, 0.18, 0.15]);
     // Every round starts from P-1 (a tween of its own each).
     const start = (targets, vars) => timeline.fromTo(targets, vars, { ...vars, duration: 0.01 }, 0);
     start(box, { ...PANEL, opacity: 1, backgroundColor: "#000000", "--ring": 1 });
     start(panel, { opacity: 1 });
     start(app, { opacity: 0 });
     start(parts, { opacity: 0, y: 0 });
-    start(mark, { "--dm": 0 });
+    start(mark, { "--dm": 0, scale: 1 });
+    start(desktop, { opacity: 1 });
+    start(others, { opacity: 0.4 });
+    start(applyButton, { scale: 1 });
     start(masks, { attr: { "stroke-dashoffset": lengthOf } });
     start(dots, { opacity: 0, scale: 1 });
-    start(tokens, { opacity: 0, scale: 1 });
+    start(tokens, { opacity: 0, scale: 1, y: 0 });
     start(dev, { opacity: 0, y: 0, scale: 1 });
     start(lines, { "--t": 0 });
     start(codeFoot, { opacity: 0 });
     start(badge, { opacity: 0, scale: 1 });
     start(check, { opacity: 0.35, scale: 1 });
-    start(cursor, { autoAlpha: 0, scale: 1, "--cx": 540, "--cy": 400 });
+    start(cursor, { autoAlpha: 1, scale: 1 });
     start(glow, { opacity: 1 });
 
-    // 1. The phone, then Apply (P-1).
-    timeline.to(cursor, { autoAlpha: 1, duration: 0.3, ease: "sine.out" }, 0.3);
-    glide(0.3, phone.x, phone.y, 0.85);
-    click(cursor, 1.15);
-    timeline.to(mark, { "--dm": 44, duration: 0.4, ease: "power2.inOut" }, 1.2);
-    glide(1.55, apply.x, apply.y, 0.7);
-    click(cursor, 2.3);
-    // 2. The panel turns into the app, built top to bottom; its parts tied to
-    // their tokens (P-2).
+    // 1. The phone, then Apply (P-1). The mark slides under the phone,
+    // which lights up as the desktop dims (user: the one picked did not
+    // show).
+    click(1.4, mark, 0.9);
     timeline
-      .to(cursor, { autoAlpha: 0, duration: 0.3, ease: "sine.in" }, 2.5)
-      .to(box, { ...APP, duration: 0.95, ease: "power3.inOut" }, 2.45)
-      .to(panel, { opacity: 0, duration: 0.25, ease: "sine.in" }, 2.45)
-      .to(app, { opacity: 1, duration: 0.01 }, 2.55)
+      .to(mark, { "--dm": 44, duration: 0.5 }, 1.45)
+      .to(desktop, { opacity: 0.4, duration: 0.35, ease: "sine.inOut" }, 1.5)
+      .to(mobile, { opacity: 1, duration: 0.35, ease: "sine.inOut" }, 1.62);
+    click(2.6, applyButton);
+    // 2. The panel turns into the app, built top to bottom on an uneven
+    // beat; its parts tied to their tokens (P-2).
+    timeline
+      .to(box, { ...APP, duration: 1.0 }, 2.85)
+      .to(panel, { opacity: 0, duration: 0.25, ease: "sine.in" }, 2.85)
+      .to(app, { opacity: 1, duration: 0.01 }, 2.95)
       // (each to its own strength: Daily tasks and its three at 40%; they
       // come in while the window still changes, so it is never empty)
-      .fromTo(parts, { y: 5 }, { opacity: (_, el) => (el.matches(".sy-item--dim") ? 0.4 : 1), y: 0, duration: 0.4, ease: "power2.out", stagger: 0.05 }, 2.6)
-      .to(masks, { attr: { "stroke-dashoffset": 0 }, duration: 0.7, ease: "power2.inOut", stagger: 0.15 }, 3.95)
-      .fromTo(dots, { scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)", stagger: 0.1 }, 3.95)
-      .fromTo(tokens, { scale: 0.92 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.6)", stagger: 0.25 }, 4.35)
-      // 3. Aside and dim; the developer's view, its code typed in (P-3).
-      .to([...tokens, ...dots], { opacity: 0, duration: 0.4, ease: "sine.in" }, 5.6)
-      .to(masks, { attr: { "stroke-dashoffset": lengthOf }, duration: 0.4, ease: "sine.in" }, 5.6)
-      .to(box, { "--x": 169, backgroundColor: "#0f0f0f", "--ring": 0, duration: 0.8, ease: "power2.inOut" }, 5.7)
-      .to(app, { opacity: 0.2, duration: 0.8, ease: "sine.inOut" }, 5.7)
-      .fromTo(dev, { y: 14, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power2.out" }, 5.95)
-      .to(lines, { "--t": 1, duration: 0.22, ease: "power1.out", stagger: 0.16 }, 6.5)
-      .to(codeFoot, { opacity: 1, duration: 0.3, ease: "sine.out" }, 8.15)
-      // 4. Ready to develop, clicked (P-4).
-      .to(dev, { opacity: 0, scale: 0.7, duration: 0.5, ease: "power2.in" }, 9.0)
-      .to(box, { opacity: 0, duration: 0.45, ease: "sine.in" }, 9.0)
-      .to(glow, { opacity: 0, duration: 1, ease: "sine.inOut" }, 9.0)
-      .fromTo(badge, { scale: 0.92 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.4)" }, 9.35)
-      .set(cursor, { "--cx": 520, "--cy": 330 }, 9.35)
-      .to(cursor, { autoAlpha: 1, duration: 0.3, ease: "sine.out" }, 9.4);
-    glide(9.4, 377, 226, 0.9);
-    click(cursor, 10.4);
+      .fromTo(parts, { y: 5 }, { opacity: (_, el) => (el.matches(".sy-item--dim") ? 0.4 : 1), y: 0, duration: 0.5, ease: "oww-settle", stagger: (i) => partsAt[i] }, 3.0)
+      .to(masks, { attr: { "stroke-dashoffset": 0 }, duration: 0.75, stagger: { each: 0.17 } }, 4.35)
+      .fromTo(dots, { scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.4, ease: "oww-settle", stagger: 0.12 }, 4.35)
+      .fromTo(tokens, { scale: 0.96, y: 4 }, { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "oww-settle", stagger: 0.28 }, 4.75)
+      // 3. Aside and dim; the developer's view, its code typed in on a
+      // person's uneven beat (P-3).
+      .to([...tokens, ...dots], { opacity: 0, duration: 0.4, ease: "sine.in" }, 6.0)
+      .to(masks, { attr: { "stroke-dashoffset": lengthOf }, duration: 0.4, ease: "sine.in" }, 6.0)
+      .to(box, { "--x": 169, backgroundColor: "#0f0f0f", "--ring": 0, duration: 0.9 }, 6.1)
+      .to(app, { opacity: 0.2, duration: 0.8, ease: "sine.inOut" }, 6.1)
+      .fromTo(dev, { y: 14, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "oww-settle" }, 6.35)
+      .to(lines, { "--t": 1, duration: 0.22, ease: "sine.out", stagger: (i) => linesAt[i] }, 6.9)
+      .to(codeFoot, { opacity: 1, duration: 0.3, ease: "sine.out" }, 8.9)
+      // 4. Ready to develop: the pointer comes in and clicks; the tick comes
+      // down like a stamp and the badge gives a little (P-4).
+      .to(dev, { opacity: 0, scale: 0.7, duration: 0.5, ease: "power2.in" }, 9.4)
+      .to(box, { opacity: 0, duration: 0.45, ease: "sine.in" }, 9.4)
+      .to(glow, { opacity: 0, duration: 1, ease: "sine.inOut" }, 9.4)
+      .fromTo(badge, { scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.6, ease: "oww-settle" }, 9.75);
+    click(10.85, badge, 0.98);
     timeline
-      .to(check, { opacity: 1, duration: 0.2, ease: "sine.out" }, 10.45)
-      .fromTo(check, { scale: 1.3 }, { scale: 1, duration: 0.45, ease: "back.out(2)" }, 10.45)
-      // 5. Back into the design system, and again.
-      .to(cursor, { autoAlpha: 0, duration: 0.3, ease: "sine.in" }, 11.5)
-      .to(badge, { opacity: 0, scale: 0.96, duration: 0.3, ease: "sine.in" }, 11.5)
-      .set(panel, { opacity: 0 }, 11.5)
-      .set(app, { opacity: 0 }, 11.5)
-      .set(parts, { opacity: 0 }, 11.5)
-      .set(mark, { "--dm": 0 }, 11.5)
-      .set([dev, codeFoot], { opacity: 0 }, 11.5)
-      .set(lines, { "--t": 0 }, 11.5)
-      .set(box, { ...BADGE, backgroundColor: "#000000", "--ring": 1 }, 11.5)
-      .to(box, { opacity: 1, duration: 0.2, ease: "sine.out" }, 11.55)
-      .to(box, { ...PANEL, duration: 0.9, ease: "power3.inOut" }, 11.55)
-      .to(panel, { opacity: 1, duration: 0.4, ease: "sine.out" }, 11.8)
-      .to(glow, { opacity: 1, duration: 1, ease: "sine.inOut" }, 11.6)
-      .set({}, {}, 13.2);
+      .to(check, { opacity: 1, duration: 0.15, ease: "sine.out" }, 10.9)
+      .fromTo(check, { scale: 1.35 }, { scale: 1, duration: 0.3, ease: "power3.in" }, 10.9)
+      // 5. Back into the design system, and again (the pointer leaves down
+      // off the board: pointerAt).
+      .to(badge, { opacity: 0, scale: 0.96, duration: 0.3, ease: "sine.in" }, 11.9)
+      .set(panel, { opacity: 0 }, 11.9)
+      .set(app, { opacity: 0 }, 11.9)
+      .set(parts, { opacity: 0 }, 11.9)
+      .set(mark, { "--dm": 0 }, 11.9)
+      .set(desktop, { opacity: 1 }, 11.9)
+      .set(others, { opacity: 0.4 }, 11.9)
+      .set([dev, codeFoot], { opacity: 0 }, 11.9)
+      .set(lines, { "--t": 0 }, 11.9)
+      .set(box, { ...BADGE, backgroundColor: "#000000", "--ring": 1 }, 11.9)
+      .to(box, { opacity: 1, duration: 0.2, ease: "sine.out" }, 11.95)
+      .to(box, { ...PANEL, duration: 1.2 }, 11.95)
+      .to(panel, { opacity: 1, duration: 0.5, ease: "sine.out" }, 12.3)
+      .to(glow, { opacity: 1, duration: 1, ease: "sine.inOut" }, 12.0)
+      .set({}, {}, 13.6);
 
     // Shown at its first step at once (as the other stories).
     timeline.time(0.02).pause(0);
+    place();
   });
 
   return {
@@ -1881,8 +1938,15 @@ function createHandoffStory(figure) {
     play: () => timeline.restart(),
     resume: () => timeline.play(),
     pause: () => timeline.pause(),
-    reset: () => timeline.pause(0),
-    finish: () => timeline.pause(STILL),
+    reset: () => {
+      timeline.pause(0);
+      place();
+    },
+    finish: () => {
+      timeline.pause(STILL);
+      place();
+      aim([q(".tm-camera"), q(".tm-dots")], FRAME);
+    },
     revert: () => {
       timeline.kill();
       ctx.revert();

@@ -73,3 +73,31 @@ disiapkan untuk developer, lalu dinyatakan siap dikembangkan.
 
 - [x] Disetujui.
 - [x] Dikerjakan dan dicek.
+
+## Perapian gerak (11 Nov 2026, seperti 01–05)
+
+Permintaan pengguna: merapikan gerak 06 seperti 01–05, dan "di P-1 bagian
+klik device, yang active seperti tidak terlihat".
+
+- **Device aktif terlihat**: penanda #171717 di pill hitam hampir tak
+  terlihat → penanda #2b2b2b dengan tepi #3d3d3d; ikon yang tidak dipilih
+  redup (40%), yang dipilih putih penuh (desktop meredup, HP menyala saat
+  diklik). Titik klik sedikit di bawah ikon dan kursor segera pergi ke
+  Apply, jadi perubahan tidak tertutup kursor.
+- **Kursor**: `pointerTrack` — masuk dari bawah papan ke HP, ke Apply,
+  keluar melewati tepi kanan; lalu masuk lagi ke badge dan keluar ke bawah.
+  Tidak lagi memudar di tengah papan.
+- **Klik lembut** (0,9, lepas `oww-settle`); penanda HP, tombol Apply, dan
+  badge ikut sedikit tertekan.
+- **Kurva** `oww-move` / `oww-settle`, tanpa pantulan (`back.out` dihapus):
+  bagian aplikasi masuk dengan jeda tidak seragam, titik dan label token
+  mengendap, kode diketik dengan irama tidak seragam.
+- **Centang "Ready to develop"** turun seperti stempel (seperti 03).
+- **Kamera halus** (`cameraPath`, maks. 1,02×, tidak mengikuti kursor): isi
+  ilustrasi dibungkus `.tm-camera` di `about.pug`.
+- Kembali dari badge ke panel 1,2 s (1,0 terasa cepat). Putaran 13,6 s
+  (dari 13,2); diam (reduced motion) di 11,3 s.
+
+Cek: satu putaran tiap 0,05 s tanpa lompatan (terbesar 5,2 rata-rata per
+kanal, bertahap, saat panel membuka kembali); putaran 1 dan 2 identik
+(0,00); tanpa error.
