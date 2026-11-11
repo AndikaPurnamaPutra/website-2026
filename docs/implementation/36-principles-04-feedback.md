@@ -78,3 +78,9 @@ halaman tetap (salinan 01) sampai ada teks asli.
 
 - [x] Disetujui.
 - [x] Dikerjakan dan dicek.
+
+## Garis ke tim mengalir (pengguna, 11 Nov 2026)
+"Pada garis yang mengalir ke seluruh user, ada animasinya"; putih "terlalu aneh warnanya"; titik-titik bulat sempat dicoba ("lebih baik sebelumnya").
+- Cahaya kecil abu-abu (#a8a8a8, 1 px, maks. 55%) dengan ekor memudar mengalir dari klien ke tiap anggota tim selama garis tampil (0,3–2,9 s): tiga garis putus pendek berkepala sama per busur (`g.cm-pulse`, memakai masker gambar busur yang sama, jadi hanya tampak di bagian yang sudah tergambar), 170 px/s, satu cahaya tiap 170 px, tiap busur bergeser 47 px; memudar saat busur ditarik kembali.
+- Pola putus-putus busur ikut bergeser pelan ke arah anggota (36 px dalam 3 s).
+- Dicek: cahaya terlihat di keempat busur; putaran 1 dan 2 identik.

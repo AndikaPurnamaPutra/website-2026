@@ -1662,6 +1662,27 @@
   stroke-dasharray: 3 2.9;
 }
 
+// The light flowing along the arcs (04): the arcs' own grey, lit a little
+// (white looked out of place; user), fading back to its tail.
+.cm-pulse path {
+  fill: none;
+  stroke: #a8a8a8;
+  stroke-width: 1;
+  stroke-linecap: round;
+
+  &:nth-child(1) {
+    opacity: 0.12;
+  }
+
+  &:nth-child(2) {
+    opacity: 0.25;
+  }
+
+  &:nth-child(3) {
+    opacity: 0.55;
+  }
+}
+
 // The team: glass discs (--dx, --dy, --k to move and shrink them), over the
 // window (the client flies into it).
 .cm-member {
@@ -2402,6 +2423,8 @@
 
   position: absolute;
   inset: 0;
+  // Its own layer with its mask, kept apart from the rest of the board.
+  will-change: transform;
   mask-image: radial-gradient(
     calc((250.957 + var(--mr) * 2000) * 1em) calc((156 + var(--mr) * 2000) * 1em) at 338em 226em,
     #000,
@@ -2432,6 +2455,10 @@
   scale: var(--zs, 1);
   transform-origin: 0 0;
   opacity: 0;
+  // Its own layer, so the soft round window (.tl-view's mask) can change
+  // without the whole timeline being drawn again each frame (it stuttered;
+  // user).
+  will-change: transform;
   @include cm-edge;
 }
 
@@ -2747,6 +2774,9 @@
   --cut: 0;
 
   position: absolute;
+  // Its own layer, so opening it does not redraw the timeline (05
+  // stuttered; user).
+  will-change: transform;
   top: 137em;
   left: 263em;
   display: flex;

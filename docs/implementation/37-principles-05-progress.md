@@ -77,3 +77,9 @@ sampai 100%.
 
 - [x] Disetujui.
 - [x] Dikerjakan dan dicek.
+
+## Revisi: lebih halus (pengguna, 11 Nov 2026)
+"Masih terlalu kasar dan banyak bug, banyak patah-patah."
+- **Frame jatuh**: diukur dengan CPU 4× lebih lambat (rAF): frame jatuh terbanyak saat zoom ke Frontend, karena masker jendela bulat (`.tl-view`, `--mr`) menggambar ulang seluruh timeline tiap frame (tanpa animasi masker: mulus). Kini `.tl-box`, `.tl-task` dan `.tl-view` punya lapisan sendiri (`will-change: transform`), jadi yang berubah hanya maskernya; zoom umumnya tidak lagi menjatuhkan frame (pengukuran di Chrome headless bising, tetap perlu dicek di perangkat pengguna).
+- **Gerak**: kurva `oww-move` / `oww-settle` seperti 01–03; cursor bergerak satu gerakan dengan irama tangan (dua sumbu bersama), masuk dan keluar dari luar tepi bawah board (tidak muncul atau memudar di tengah); klik halus (0,9×, tanpa pantulan); centang langkah muncul dari 0,7× tanpa pantulan, jedanya tidak rata (7,0 / 7,6 / 8,27 / 8,82 s); progres naik dan mengendap; batang timeline masuk bergiliran tidak rata.
+- Dicek tiap 0,05 s: tanpa lompatan dan error; putaran 1 dan 2 identik (≤ 0,13).

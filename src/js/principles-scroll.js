@@ -1362,6 +1362,21 @@ function createFeedbackStory(figure) {
       path.setAttribute("stroke-dasharray", `${length} ${length}`);
     });
     const arcLength = (_, path) => +path.dataset.length;
+    // The light flowing along each arc, from the client out to its person
+    // (user: the lines to the team should move): a few dashes of falling
+    // length with their heads together (the tail fades), one after another
+    // every GAP along the arc, at an even pace; and the dashes of the arc
+    // itself moving slowly the same way.
+    const pulses = qa(".cm-pulse");
+    const lines = qa(".cm-arc");
+    const PULSE = { speed: 170, gap: 170, tail: 34 };
+    const dashOf = (k) => (PULSE.tail * (k + 1)) / 3;
+    pulses.forEach((pulse) =>
+      pulse.querySelectorAll("path").forEach((path, k) => {
+        const dash = dashOf(2 - k);
+        path.setAttribute("stroke-dasharray", `${dash} ${PULSE.gap - dash}`);
+      }),
+    );
 
     timeline = gsap.timeline({
       paused: true,
@@ -1382,6 +1397,7 @@ function createFeedbackStory(figure) {
     start(members, { opacity: (i, el) => (el === member("client") ? 1 : 0), "--dx": 0, "--dy": 0, "--k": (i, el) => (el === member("client") ? 1 : 0.6) });
     start(tags, { opacity: (i, el) => (el.dataset.tag === "client" ? 1 : 0), y: 0 });
     start(arcs, { attr: { "stroke-dashoffset": arcLength } });
+    start(pulses, { opacity: 1 });
     start(box, { ...THREAD, opacity: 0, backgroundColor: "#000000", "--ring": 1 });
     start(thread, { opacity: 1 });
     start(chrome, { opacity: 0, y: 0 });
@@ -1405,8 +1421,18 @@ function createFeedbackStory(figure) {
     const others = ["lead", "designer-a", "designer-b", "pmo"];
     timeline
       .to(arcs, { attr: { "stroke-dashoffset": 0 }, duration: 0.8, ease: "power2.out", stagger: 0.1 }, 0.3)
+      .fromTo(lines, { attr: { "stroke-dashoffset": 0 } }, { attr: { "stroke-dashoffset": -36 }, duration: 3, ease: "none" }, 0.3)
+      .to(pulses, { opacity: 0, duration: 0.35, ease: "sine.in" }, 2.55)
       .to(others.map(member), { opacity: 1, "--k": 1, duration: 0.55, ease: "back.out(1.5)", stagger: 0.1 }, 0.75)
       .fromTo(tags.filter((tag) => tag.dataset.tag !== "client"), { y: 4 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out", stagger: 0.08 }, 1.2);
+
+    pulses.forEach((pulse, i) =>
+      pulse.querySelectorAll("path").forEach((path, k) => {
+        const dash = dashOf(2 - k);
+        const from = dash - i * 47;
+        timeline.fromTo(path, { attr: { "stroke-dashoffset": from } }, { attr: { "stroke-dashoffset": from - PULSE.speed * 2.6 }, duration: 2.6, ease: "none" }, 0.3);
+      }),
+    );
 
     // 2. The team becomes the people at work: the arcs draw back into the
     // client, the PMO and a designer shrink into their pointers, the others
@@ -1577,17 +1603,17 @@ function createProgressStory(figure) {
     timeline = gsap.timeline({
       paused: true,
       repeat: -1,
-      defaults: { ease: "power2.inOut", lazy: false, immediateRender: false },
+      defaults: { ease: "oww-move", lazy: false, immediateRender: false },
       onUpdate: writeValue,
     });
-    const glide = (at, x, y, duration = 0.8) =>
-      timeline
-        .to(cursor, { "--cx": x, duration, ease: "power2.inOut" }, at)
-        .to(cursor, { "--cy": y, duration, ease: "sine.inOut" }, at);
+    // The pointer glides at a person's pace (both axes together: one
+    // smooth move, not two eased apart); a click is a small press and a
+    // settling release (user: too rough, stuttering).
+    const glide = (at, x, y, duration = 0.8) => timeline.to(cursor, { "--cx": x, "--cy": y, duration, ease: HUMAN_PACE }, at);
     const click = (el, at) =>
       timeline
-        .to(el, { scale: 0.85, duration: 0.12, ease: "sine.out" }, at)
-        .to(el, { scale: 1, duration: 0.3, ease: "power2.out" }, at + 0.12);
+        .to(el, { scale: 0.9, duration: 0.14, ease: "power2.out" }, at)
+        .to(el, { scale: 1, duration: 0.45, ease: "oww-settle" }, at + 0.14);
     // Every round starts from P-1 (a tween of its own each).
     const start = (targets, vars) => timeline.fromTo(targets, vars, { ...vars, duration: 0.01 }, 0);
     start(list, { opacity: 1 });
@@ -1605,12 +1631,12 @@ function createProgressStory(figure) {
     start(texts, { "--s": 0 });
     start(progress, { "--p": 0 });
     start(done, { p: 0 });
-    start(cursor, { autoAlpha: 0, scale: 1, "--cx": 520, "--cy": 430 });
+    // (it comes in from below the board's edge, which clips it)
+    start(cursor, { autoAlpha: 1, scale: 1, "--cx": 540, "--cy": 475 });
 
     // 1. The pointer comes to Finova, which lifts as it gets onto it (P-2),
     // and clicks it (the arrow: it clicks, it does not grab; user).
-    timeline.to(cursor, { autoAlpha: 1, duration: 0.3, ease: "sine.out" }, 0.3);
-    glide(0.3, PRESS.x, PRESS.y, 1.0);
+    glide(0.2, PRESS.x, PRESS.y, 1.15);
     timeline
       .to(finova, { "--hk": 1.2178, "--hs": 1, backgroundColor: "#1a1a1a", duration: 0.45, ease: "power2.out" }, ON_CARD)
       .to(open, { opacity: 1, duration: 0.3, ease: "sine.out" }, ON_CARD + 0.1);
@@ -1622,57 +1648,61 @@ function createProgressStory(figure) {
       .to(list, { opacity: 0, duration: 0.4, ease: "sine.inOut" }, 2.1)
       // (the light from below is only round the projects, P-1 and P-2)
       .to(q(".tl-glow"), { opacity: 0, duration: 1, ease: "sine.inOut" }, 2.1)
-      .to(cursor, { autoAlpha: 0, duration: 0.3, ease: "sine.in" }, 2.15)
-      .to(box, { ...WIN, duration: 1.05, ease: "power3.inOut" }, 2.1)
+      .to(box, { ...WIN, duration: 1.1 }, 2.1)
       .to(chip, { opacity: 0, duration: 0.3, ease: "sine.in" }, 2.1)
       .to(timelineLayer, { opacity: 1, duration: 0.5, ease: "sine.out" }, 2.32)
-      .to(today, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.7, ease: "power2.out" }, 2.95)
-      .to(bars, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.6, ease: "power2.out", stagger: 0.08 }, 3.0)
-      // 3. Closer on Frontend Development; the pointer clicks it (P-4).
-      .to(box, { ...CLOSE, duration: 1.1, ease: "power2.inOut" }, 4.4)
-      .to(view, { "--mr": 0, duration: 1.1, ease: "power2.inOut" }, 4.4)
-      .set(cursor, { "--cx": 520, "--cy": 400 }, 4.75)
-      .to(cursor, { autoAlpha: 1, duration: 0.3, ease: "sine.out" }, 4.8);
-    glide(4.8, 418, 229, 0.9);
+      .to(today, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.7, ease: "oww-settle" }, 2.95)
+      .to(bars, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.7, ease: "oww-settle", stagger: (i) => [0, 0.07, 0.17, 0.22, 0.31, 0.37][i] ?? i * 0.07 }, 3.0)
+      // 3. Closer on Frontend Development; the pointer comes back in from
+      // below and clicks it (P-4).
+      .to(box, { ...CLOSE, duration: 1.2 }, 4.4)
+      .to(view, { "--mr": 0, duration: 1.2 }, 4.4)
+      .set(cursor, { "--cx": 520, "--cy": 475 }, 4.7);
+    glide(4.75, 418, 229, 1.05);
+    // The pointer leaves down off the board as the card opens.
+    timeline.to(cursor, { "--cx": 560, "--cy": 480, duration: 0.6, ease: "power2.in" }, 2.0);
     click(cursor, 5.8);
     // 4. Its bar opens into the task (P-5).
     timeline
       .set(task, { opacity: 1 }, 5.95)
       .set(frontend, { opacity: 0 }, 5.95)
-      .to(task, { ...OPEN, duration: 0.8, ease: "power3.inOut" }, 5.95);
-    // 5. Its steps ticked one by one, to 100% (P-6).
+      .to(task, { ...OPEN, duration: 0.85 }, 5.95);
+    // 5. Its steps ticked one by one, on a person's uneven beat, to 100%
+    // (P-6); each tick comes in softly.
+    const tickAt = [7.0, 7.6, 8.27, 8.82];
     ticks.forEach((tick, k) => {
-      const at = 7.0 + k * 0.65;
-      glide(at - 0.5, tick.x, tick.y, 0.42);
+      const at = tickAt[k] ?? 7 + k * 0.6;
+      glide(at - 0.5, tick.x, tick.y, 0.44);
       click(cursor, at);
       timeline
         .to(checks[k], { opacity: 1, duration: 0.2, ease: "sine.out" }, at + 0.05)
-        .fromTo(checks[k], { scale: 1.3 }, { scale: 1, duration: 0.4, ease: "back.out(2)" }, at + 0.05)
-        .to(progress, { "--p": (k + 1) * 25, duration: 0.4, ease: "power2.out" }, at + 0.05)
-        .to(done, { p: (k + 1) * 25, duration: 0.4, ease: "power2.out" }, at + 0.05);
-      if (texts[k]) timeline.to(texts[k], { "--s": 1, duration: 0.3, ease: "power2.out" }, at + 0.1);
+        .fromTo(checks[k], { scale: 0.7 }, { scale: 1, duration: 0.45, ease: "oww-settle" }, at + 0.05)
+        .to(progress, { "--p": (k + 1) * 25, duration: 0.5, ease: "oww-settle" }, at + 0.05)
+        .to(done, { p: (k + 1) * 25, duration: 0.5, ease: "oww-settle" }, at + 0.05);
+      if (texts[k]) timeline.to(texts[k], { "--s": 1, duration: 0.35, ease: "oww-settle" }, at + 0.1);
     });
-    // (Figma's P-6 has no pointer: it goes once the last step is ticked)
-    timeline.to(cursor, { autoAlpha: 0, duration: 0.4, ease: "sine.in" }, 9.55);
+    // (Figma's P-6 has no pointer: it leaves down off the board once the
+    // last step is ticked)
+    timeline.to(cursor, { "--cx": 470, "--cy": 480, duration: 0.7, ease: "power2.in" }, 9.4);
     // 6. Back to the quarter's projects, and again.
     timeline
-      .to(task, { ...IN_BAR, duration: 0.6, ease: "power2.inOut" }, 10.6)
+      .to(task, { ...IN_BAR, duration: 0.65 }, 10.55)
       .set(frontend, { opacity: 1 }, 11.2)
       .set(task, { opacity: 0 }, 11.2)
       .set(checks, { opacity: 0 }, 11.3)
       .set(texts, { "--s": 0 }, 11.3)
       .set(progress, { "--p": 0 }, 11.3)
       .set(done, { p: 0 }, 11.3)
-      .to(box, { ...FAR, duration: 0.9, ease: "power2.inOut" }, 11.2)
-      .to(view, { "--mr": 1, duration: 0.9, ease: "power2.inOut" }, 11.2)
-      .to(timelineLayer, { opacity: 0, duration: 0.3, ease: "sine.in" }, 12.1)
+      .to(box, { ...FAR, duration: 1 }, 11.2)
+      .to(view, { "--mr": 1, duration: 1 }, 11.2)
+      .to(timelineLayer, { opacity: 0, duration: 0.3, ease: "sine.in" }, 12.0)
       .to(chip, { opacity: 1, duration: 0.3, ease: "sine.out" }, 12.4)
-      .to(box, { ...CARD, duration: 0.9, ease: "power3.inOut" }, 12.1)
+      .to(box, { ...CARD, duration: 0.95 }, 12.1)
       .to(list, { opacity: 1, duration: 0.5, ease: "sine.inOut" }, 12.4)
       .to(q(".tl-glow"), { opacity: 1, duration: 1, ease: "sine.inOut" }, 12.2)
       .set(finova, { opacity: 1 }, 13.0)
       .set(box, { opacity: 0 }, 13.0)
-      .to(finova, { "--hk": 1, "--hs": 0, backgroundColor: "rgba(26, 26, 26, 0.2)", duration: 0.5, ease: "power2.inOut" }, 13.05)
+      .to(finova, { "--hk": 1, "--hs": 0, backgroundColor: "rgba(26, 26, 26, 0.2)", duration: 0.55, ease: "oww-settle" }, 13.05)
       .to(open, { opacity: 0, duration: 0.3, ease: "sine.in" }, 13.05)
       .set({}, {}, 13.8);
 
