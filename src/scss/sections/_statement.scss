@@ -235,17 +235,39 @@ body.is-dark .statement {
     }
   }
 
+  // In the flow of the text without making their lines taller (user: the
+  // lines with them stood further apart, and the folder left a wider gap):
+  // centred on the line, their boxes pulled in to one line's height
+  // (negative margins top and bottom), so every line is as far from the
+  // next; the folder (its parts in fs(), Figma's 120 × 78) scaled whole,
+  // and pulled in on the right by what the scaling took off, so it takes
+  // no more room than it shows. Sizes: --icon-w, --icon-h, --folder-s.
+  .statement__text {
+    --icon-w: #{fs(53)};
+    --icon-h: #{fs(42)};
+    --folder-s: 0.8;
+  }
+
   // Inline again (the reset makes svg a block).
   .statement__icon {
     display: inline-block;
-    margin: 0 fs(12);
-    vertical-align: middle;
+    width: var(--icon-w);
+    height: var(--icon-h);
+    margin: calc((1lh - var(--icon-h)) / 2) fs(10);
+    // Its pulled-in box is the line's own height, set at the line's top:
+    // centred on the line exactly (middle centres it on the letters' middle,
+    // a few px off, and the line grew by those).
+    vertical-align: top;
   }
 
   .statement__folder {
     display: inline-block;
-    margin: 0 fs(12);
-    vertical-align: middle;
+    width: fs(120);
+    height: fs(78);
+    margin: calc((1lh - #{fs(78)}) / 2) calc(#{fs(10)} - (1 - var(--folder-s)) * #{fs(120)}) calc((1lh - #{fs(78)}) / 2) fs(10);
+    vertical-align: top;
+    transform: scale(var(--folder-s));
+    transform-origin: left center;
   }
 }
 
@@ -254,24 +276,14 @@ body.is-dark .statement {
     padding-block: fluid(80) fluid(120);
   }
 
+  // The icon and the folder smaller with the text (the folder as it
+  // showed before, half of Figma's).
   .statement__text {
+    --icon-w: #{fs(40)};
+    --icon-h: #{fs(32)};
+    --folder-s: 0.5;
+
     font-size: fs(24);
-  }
-
-  // The icon and the folder at 0.7×; the folder's parts are in fs(), so it
-  // is scaled whole.
-  .statement__icon {
-    width: fs(46);
-    height: fs(36);
-    margin-top: 0;
-  }
-
-  .statement__folder {
-    width: fs(84);
-    height: fs(55);
-    margin-top: 0;
-    transform: scale(0.7);
-    transform-origin: left center;
   }
 }
 
@@ -291,17 +303,27 @@ body.is-dark .statement {
     line-height: 1.4;
   }
 
-  .statement__icon {
-    width: fs(46);
-    height: fs(36);
-    margin-top: 0;
+  .statement__text {
+    --icon-w: #{fs(40)};
+    --icon-h: #{fs(32)};
+    --folder-s: 0.5;
   }
 
-  .statement__folder {
-    width: fs(84);
-    height: fs(55);
-    margin-top: 0;
-    transform: scale(0.7);
-    transform-origin: left center;
+  // From the laptop width up the lines are Figma's fixed ones: the icon and
+  // the folder at 0.7× there.
+  @media (min-width: $laptop) {
+    .statement__icon {
+      width: fs(46);
+      height: fs(36);
+      margin-top: 0;
+    }
+
+    .statement__folder {
+      width: fs(84);
+      height: fs(55);
+      margin-top: 0;
+      transform: scale(0.7);
+      transform-origin: left center;
+    }
   }
 }

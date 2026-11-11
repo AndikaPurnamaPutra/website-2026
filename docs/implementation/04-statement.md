@@ -198,3 +198,18 @@ Varian terang tombol (untuk section Motto) dibuat saat section Motto dikerjakan,
 - **Ikon dan folder lebih singkat** (30 Okt 2026, masukan pengguna: muncul sedikit terlalu lama), dengan urutan dan kurva yang sama:
   - Ikon ±2,7 → **±1,9 detik**: garis 0,8, solid 0,5 mulai 0,6, membelah 0,8 mulai 1,1.
   - Folder ±1,75 → **±1,3 detik**: saku 0,5, folder naik 1,0 mulai 0,3.
+
+## Jarak baris rata di HP & tablet (11 Nov 2026, laporan pengguna)
+"Asset-nya terlalu besar sehingga ada line height yang berbeda, atau lebih
+lebar." Di bawah 1024 kalimat mengalir dan ikon serta folder ada di dalam
+baris; keduanya lebih tinggi dari tinggi baris, jadi barisnya ikut melebar
+(HP: 39/36/36/43/48/36 px, seharusnya 36; tablet 54/60/66, seharusnya 48),
+dan folder di HP memakan 84px padahal yang terlihat 59px.
+- Kotak ikon dan folder ditarik ke tinggi satu baris (margin negatif atas
+  dan bawah, `1lh`), diletakkan di atas baris (`vertical-align: top`) jadi
+  tepat di tengah baris; folder diskalakan utuh dan sisi kanannya ditarik
+  sebanyak yang hilang karena skala.
+- Ukuran: tablet ikon 53 × 42, folder 0,8× (96 × 62); HP ikon 40 × 32,
+  folder 0,5× (60 × 39). Variabel `--icon-w`, `--icon-h`, `--folder-s`.
+- Dicek: 390 dan 375 → 37/36/36/36/36/36 (selisih 1px pembulatan); 744 dan
+  834 → 49/48/48(/48); desktop 1440 tetap 78/77/77.
