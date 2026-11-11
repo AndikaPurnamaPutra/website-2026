@@ -118,41 +118,43 @@ block content
             span.tm-dots
             span.tm-glow
               img(src="assets/images/about/principles/tm/glow-phone.svg" width="992" height="665" alt="")
-            .tm-frame
-              .tm-window
-                img.tm-light(src="assets/images/about/principles/tm/light.svg" width="1100" height="891" alt="")
-                .tm-head
-                  .tm-head__title
-                    span.tm-iconbox
-                      img(src="assets/images/about/principles/tm/calendar.svg" width="16" height="16" alt="")
-                    span.tm-head__label Task Manager
-                  .tm-head__actions
-                    span.tm-new
-                      img(src="assets/images/about/principles/tm/plus.svg" width="12" height="12" alt="")
-                      span New Task
-                    span.tm-iconbox
-                      img(src="assets/images/about/principles/tm/dots-vertical.svg" width="14" height="14" alt="")
-                .tm-cols
-                  +tmColumn("backlog", "backlog", "Backlog", "20")
-                    +tmCard({ key: "navigation", tag: "Design", title: "Create responsive mobile navigation", due: "Due Nov 12" })
-                    +tmSkeleton
-                    +tmSkeleton
-                  +tmColumn("progress", "in-progress", "In Progress", "3/8")
-                    +tmCard(build)
-                    span.tm-slot(data-slot)
-                    +tmCard(finalize)
-                  +tmColumn("done", "completed", "Completed", "4/20")
-                    .tm-insert(data-insert="finalize")
-                      +tmCard(Object.assign({}, finalize, { key: "finalize-done", progress: 100, fill: 100, cls: "tm-card--chosen" }))
-                    .tm-insert(data-insert="build")
-                      +tmCard(Object.assign({}, build, { key: "build-done", progress: 0 }))
-                    +tmSkeleton
-                    +tmSkeleton
-            //- The card while it is carried (P-3), and the pointer.
-            .tm-float
-              +tmCard(Object.assign({}, finalize, { key: "finalize-float", circle: "circle-lifted" }))
-            img.tm-cursor(src="assets/images/about/principles/tm/cursor.svg" width="46" height="46" alt="")
-            img.tm-grab(src="assets/images/about/principles/tm/grab.svg" width="13" height="13" alt="")
+            //- The camera (src/js/principles-scroll.js): all but the dots and the glow.
+            .tm-camera
+              .tm-frame
+                .tm-window
+                  img.tm-light(src="assets/images/about/principles/tm/light.svg" width="1100" height="891" alt="")
+                  .tm-head
+                    .tm-head__title
+                      span.tm-iconbox
+                        img(src="assets/images/about/principles/tm/calendar.svg" width="16" height="16" alt="")
+                      span.tm-head__label Task Manager
+                    .tm-head__actions
+                      span.tm-new
+                        img(src="assets/images/about/principles/tm/plus.svg" width="12" height="12" alt="")
+                        span New Task
+                      span.tm-iconbox
+                        img(src="assets/images/about/principles/tm/dots-vertical.svg" width="14" height="14" alt="")
+                  .tm-cols
+                    +tmColumn("backlog", "backlog", "Backlog", "20")
+                      +tmCard({ key: "navigation", tag: "Design", title: "Create responsive mobile navigation", due: "Due Nov 12" })
+                      +tmSkeleton
+                      +tmSkeleton
+                    +tmColumn("progress", "in-progress", "In Progress", "3/8")
+                      +tmCard(build)
+                      span.tm-slot(data-slot)
+                      +tmCard(finalize)
+                    +tmColumn("done", "completed", "Completed", "4/20")
+                      .tm-insert(data-insert="finalize")
+                        +tmCard(Object.assign({}, finalize, { key: "finalize-done", progress: 100, fill: 100, cls: "tm-card--chosen" }))
+                      .tm-insert(data-insert="build")
+                        +tmCard(Object.assign({}, build, { key: "build-done", progress: 0 }))
+                      +tmSkeleton
+                      +tmSkeleton
+              //- The card while it is carried (P-3), and the pointer.
+              .tm-float
+                +tmCard(Object.assign({}, finalize, { key: "finalize-float", circle: "circle-lifted" }))
+              img.tm-cursor(src="assets/images/about/principles/tm/cursor.svg" width="46" height="46" alt="")
+              img.tm-grab(src="assets/images/about/principles/tm/grab.svg" width="13" height="13" alt="")
           //- 02: Figma, Webflow and ClickUp join OWW (Figma P-1 1950:6117 …
           //- P-7 1957:7774; docs/implementation/34-principles-02-integrations.md).
           //- The cells: a 7 × 5 grid around OWW (--i, --j from its centre); the

@@ -1,9 +1,17 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
+import { CustomEase } from "gsap/CustomEase";
 import { getSmoothScroll } from "./smooth-scroll.js";
 
-gsap.registerPlugin(SplitText);
+gsap.registerPlugin(SplitText, CustomEase);
+
+// Motion-design curves for illustration 01 (user: too stiff, too "AI"):
+// moves set off boldly and settle over a long tail; the camera eases in
+// and settles softly.
+CustomEase.create("oww-move", "M0,0 C0.62,0 0.12,1 1,1");
+CustomEase.create("oww-settle", "M0,0 C0.18,0.9 0.3,1 1,1");
+CustomEase.create("oww-cam", "M0,0 C0.5,0 0.12,1 1,1");
 
 // About: Principles (Figma 1734:383; plans: docs/implementation/19-about.md,
 // 30-about-motion.md). In step with Services on the homepage (user: the
@@ -380,133 +388,265 @@ function createBoardStory(board) {
   let timeline;
   let loop;
   let moveCard = () => {};
-  const carry = { p: 0 }; // the carried card along its way
+  let placeCursor = () => {};
+  let settleLoop = () => {};
+  // The carried card along its way (t: 0 → 1 in even time; its ease is
+  // applied when it is placed, so its speed is known), and its feel: how
+  // much it is pressed, lifted or squashed (s).
+  const carry = { t: 0 };
+  const feel = { s: 1 };
   const PACE = 1.25; // the story plays this much faster (user: too slow)
-  const HOLD = 1.2; // s on P-5
-  const TICKS = 4.45; // s (story time): before the ticks
-  const BOARD = 3.3; // s (story time): the card is in Completed, the board still full
+  const HOLD = 1.4; // s on P-5
+  const NARROW = 3.7; // s (story time): the card is in, the board turns into the phone
+  const TICKS = 4.55; // s (story time): before the ticks
+  const PHONE = 4.9; // s (story time): the phone has formed (NARROW + 1.2)
+  const CARRY = 1.75; // s (story time) the card is carried for
+  const CARRY_EASE = gsap.parseEase("oww-move");
+  // Where the pointer rests after letting go, beside the phone (P-4, P-5).
+  const REST = { x: 531, y: 322 };
+  // Where it comes in from: below the board's edge (it clips), so it glides
+  // in instead of showing up on the board (user).
+  const START = { x: 552, y: 478 };
+  // A hand's pace: it speeds up quickly and slows down over longer, as a
+  // pointer moved by a person (its peak early, not in the middle).
+  const HUMAN = (t) => gsap.parseEase("power2.inOut")(t ** 0.72);
+  const IN = { at: 0.18, time: 1.2 }; // s (story time): the pointer's way in
+  const OUT = { at: 3.62, time: 1.05 }; // and its way aside after letting go
+  // The camera (user: alive, as motion, not as a program running): the
+  // board comes a little closer to the card as the pointer nears it,
+  // follows it to Completed, and draws back as the phone forms; the dots
+  // behind move less (_about.scss, .tm-camera and .tm-dots). A point to
+  // look at, in Figma px, and how close.
+  const camera = q(".tm-camera");
+  const lens = [camera, q(".tm-dots")];
+  const SHOTS = [
+    { at: 0.1, time: 1.5, fx: 350, fy: 262, z: 1.05 },
+    { at: 1.7, time: 1.9, fx: 384, fy: 226, z: 1.06 },
+    { at: 3.5, time: 1.8, fx: 335, fy: 210, z: 1 },
+  ];
   ctx.add(() => {
     const from = place(chosen);
     const lifted = { x: LIFT.cx - 156.667 / 2, y: LIFT.cy - from.h / 2 };
     gsap.set(float, { "--fx": from.x, "--fy": from.y, rotation: 0, transformOrigin: "50% 50%" });
-    gsap.set(cursor, { "--cx": 520, "--cy": 420 });
+    // Pressed and scaled at its tip.
+    gsap.set(cursor, { "--cx": START.x, "--cy": START.y, transformOrigin: "36.6% 27.2%" });
     gsap.set(grab, { transformOrigin: "50% 50%" });
+    gsap.set(chosen, { transformOrigin: "50% 50%" });
+    gsap.set(lens, { "--kfx": 335, "--kfy": 210, "--kz": 1 });
 
     const writeLabel = () => (label.textContent = `${Math.round(percent.value)}%`);
     // The carried card's way: from its place, through its lifted place
-    // (turned), to the top of Completed, as one smooth move (carry.p); it
-    // rises a little towards us on the way and settles as it lands. The
-    // hand stays where the pointer pressed the card, turning with it.
+    // (turned), to the top of Completed, as one smooth move; it rises a
+    // little towards us on the way. It has some weight: it leans into the
+    // way it goes, the faster the more, trails the hand a little and blurs
+    // a touch at its fastest. The hand holds it where the pointer pressed.
     const W = 156.667; // the card's width
     const way = smoothPath([[from.x, from.y, 0], [lifted.x, lifted.y, LIFT.rotation], [DONE_TOP.x, DONE_TOP.y, 0]]);
     const PRESS = { x: 368.5, y: 336.6 }; // where the pointer presses
     const grip = { x: PRESS.x - (from.x + W / 2), y: PRESS.y - (from.y + from.h / 2) };
-    moveCard = () => {
-      const [x, y, r] = way(carry.p);
-      const lift = 1 + 0.04 * Math.sin(Math.PI * carry.p);
-      float.style.setProperty("--fx", x);
-      float.style.setProperty("--fy", y);
-      gsap.set(float, { rotation: r, scale: lift });
+    const LEAN = 0.022; // degrees per Figma px/s sideways
+    const TRAIL = 0.03; // s the card trails the hand by
+    const handAt = (x, y, r, scale) => {
       const a = (r * Math.PI) / 180;
-      const gx = x + W / 2 + lift * (grip.x * Math.cos(a) - grip.y * Math.sin(a));
-      const gy = y + from.h / 2 + lift * (grip.x * Math.sin(a) + grip.y * Math.cos(a));
+      return [x + W / 2 + scale * (grip.x * Math.cos(a) - grip.y * Math.sin(a)), y + from.h / 2 + scale * (grip.x * Math.sin(a) + grip.y * Math.cos(a))];
+    };
+    moveCard = () => {
+      const t = carry.t;
+      const p = CARRY_EASE(t);
+      // Its speed along the way (Figma px a second).
+      const h = 0.004;
+      const t0 = Math.max(0, t - h);
+      const t1 = Math.min(1, t + h);
+      const [xa, ya] = way(CARRY_EASE(t0));
+      const [xb, yb] = way(CARRY_EASE(t1));
+      const dt = (t1 - t0) * CARRY || 1;
+      const vx = (xb - xa) / dt;
+      const vy = (yb - ya) / dt;
+      const [x, y, r] = way(p);
+      const lean = gsap.utils.clamp(-6, 6, vx * LEAN);
+      const scale = feel.s * (1 + 0.04 * Math.sin(Math.PI * p));
+      float.style.setProperty("--fx", x - vx * TRAIL);
+      float.style.setProperty("--fy", y - vy * TRAIL);
+      float.style.setProperty("--mb", gsap.utils.clamp(0, 0.9, (Math.hypot(vx, vy) - 120) * 0.004));
+      gsap.set(float, { rotation: r + lean, scale });
+      const [gx, gy] = handAt(x, y, r + lean, scale);
       // The hand's centre on that point (its image is 13.2 × 12.6).
       grab.style.setProperty("--gx", gx - 6.6);
       grab.style.setProperty("--gy", gy - 6.3);
+    };
+    // Where the hand lets go: the card in its place in Completed.
+    const [letGoX, letGoY] = handAt(DONE_TOP.x, DONE_TOP.y, 0, 1);
+    // The pointer's two ways, each one smooth curve: in from below the
+    // board to the card, and from where the hand let go aside to beside the
+    // phone. Placed by the story's time (so going back or jumping places it
+    // right too).
+    const wayIn = smoothPath([[START.x, START.y], [462, 404], [PRESS.x, PRESS.y]]);
+    const wayOut = smoothPath([[letGoX, letGoY], [letGoX + 26, letGoY + 74], [REST.x, REST.y]]);
+    placeCursor = () => {
+      const now = timeline.time();
+      const along = (span) => HUMAN(gsap.utils.clamp(0, 1, (now - span.at) / span.time));
+      const [x, y] = now < OUT.at - 0.2 ? wayIn(along(IN)) : wayOut(along(OUT));
+      cursor.style.setProperty("--cx", x);
+      cursor.style.setProperty("--cy", y);
     };
     const fill = float.querySelector(".tm-progress__fill");
     const doneMarks = done.querySelectorAll(".tm-mark");
     const doneChecks = done.querySelectorAll(".tm-mark__check");
     const doneCircles = done.querySelectorAll(".tm-mark__circle");
     const insert = (key) => done.querySelector(`[data-insert="${key}"]`);
+    const landed = insert("finalize").firstElementChild; // the card in Completed
+    // The ticks come one after another, not on an even beat.
+    const tickAt = (i) => [0, 0.17, 0.38, 0.52][i] ?? i * 0.17;
 
     // Not lazy: jumped straight to its end (reduced motion, a reload further
     // down), every step must be drawn before the next one reads its start.
-    // Every step overlaps the next and eases in and out gently (user:
-    // seamless, not stepped).
-    timeline = gsap.timeline({ paused: true, defaults: { ease: "power2.inOut", lazy: false } });
+    // Each step starts while the one before still settles (user: seamless,
+    // as motion).
+    timeline = gsap.timeline({ paused: true, defaults: { ease: "oww-move", lazy: false }, onUpdate: () => placeCursor() });
     timeline
-      // 1. The pointer curves in (its two axes eased apart), the card
-      // lighting up as it nears (P-2), and presses it as it settles.
-      .to(cursor, { autoAlpha: 1, duration: 0.35, ease: "sine.out" }, 0.15)
-      .to(cursor, { "--cx": PRESS.x, duration: 1, ease: "power2.inOut" }, 0.15)
-      .to(cursor, { "--cy": PRESS.y, duration: 1, ease: "power3.out" }, 0.15)
-      .to(chosen, { backgroundColor: "#000", borderColor: "#191919", "--ring": 1, duration: 0.35, ease: "sine.inOut" }, 0.8)
-      .to(chosen.querySelector(".tm-mark"), { opacity: 1, duration: 0.35, ease: "sine.inOut" }, 0.8)
-      .to(cursor, { scale: 0.88, duration: 0.15, ease: "sine.out" }, 1.05)
+      // 1. The pointer comes in along one curve (IN, placed by
+      // placeCursor), quickly and then slowing down as it nears the card,
+      // which lights up (P-2); it rests a moment and presses: the card
+      // gives a little.
+      .to(cursor, { autoAlpha: 1, duration: 0.3, ease: "sine.out" }, 0.15)
+      .to(chosen, { backgroundColor: "#000", borderColor: "#191919", "--ring": 1, duration: 0.3, ease: "power1.out" }, 0.98)
+      .to(chosen.querySelector(".tm-mark"), { opacity: 1, duration: 0.4, ease: "power1.out" }, 1.04)
+      // Its way is drawn as the story's time runs (a tween to keep it long
+      // enough).
+      .set({}, {}, IN.at + IN.time)
+      .to(cursor, { scale: 0.86, duration: 0.11, ease: "power2.out" }, 1.6)
+      .to(chosen, { scale: 0.975, duration: 0.11, ease: "power2.out" }, 1.6)
+      .set(feel, { s: 0.975 }, 1.6)
       // The arrow becomes the hand on the same spot: one shrinks away as the
       // other grows in.
-      .call(moveCard, null, 1.1)
-      .to(cursor, { autoAlpha: 0, scale: 0.7, duration: 0.2, ease: "sine.in" }, 1.15)
-      .fromTo(grab, { scale: 0.7 }, { scale: 1, duration: 0.3, ease: "power2.out" }, 1.15)
-      .to(grab, { autoAlpha: 1, duration: 0.2, ease: "sine.out" }, 1.15)
-      // 2.–3. The card goes in one move: lifted and turned (P-3) on its way
-      // to the top of Completed, the board dimming and brightening again;
-      // its place closes behind it, Completed makes room, the progress fills.
-      .set(chosen, { display: "none" }, 1.2)
-      .set(slot, { display: "block", height: () => from.h * em(), borderWidth: () => em() }, 1.2)
-      .set(float, { autoAlpha: 1 }, 1.2)
-      .fromTo(carry, { p: 0 }, { p: 1, duration: 1.75, ease: "power2.inOut" }, 1.2)
-      .to(win, { backgroundColor: "#0f0f0f", opacity: 0.6, duration: 0.5, ease: "sine.inOut" }, 1.2)
-      .to(frame, { "--ring": 0, duration: 0.5, ease: "sine.inOut" }, 1.2)
-      .to([head, cols], { opacity: 0.6, duration: 0.5, ease: "sine.inOut" }, 1.2)
-      .to(slot, { height: 0, borderWidth: 0, duration: 0.6, ease: "sine.inOut" }, 1.9)
-      .set(slot, { display: "none" }, 2.5)
-      .set(insert("finalize"), { display: "block" }, 1.9)
-      .to(insert("finalize"), { height: "auto", duration: 0.6, ease: "sine.inOut" }, 1.9)
-      .to(percent, { value: 100, duration: 0.8, ease: "sine.inOut", onUpdate: writeLabel }, 1.9)
-      .to(fill, { "--fill": 100, duration: 0.8, ease: "sine.inOut" }, 1.9)
-      .to(win, { backgroundColor: "#000", opacity: 1, duration: 0.5, ease: "sine.inOut" }, 2.45)
-      .to(frame, { "--ring": 1, duration: 0.5, ease: "sine.inOut" }, 2.45)
-      .to([head, cols], { opacity: 1, duration: 0.5, ease: "sine.inOut" }, 2.45)
-      // Put down: the card is in its place (the carried copy gives way to
-      // it); the hand lets go.
-      .to(float, { autoAlpha: 0, duration: 0.2, ease: "sine.inOut" }, 2.9)
-      .to(grab, { autoAlpha: 0, scale: 0.8, duration: 0.35, ease: "sine.in" }, 2.9)
-      // 4. The phone (P-4): the window narrows, only Completed stays.
-      .to(frame, { "--wl": 181, "--ww": 308, duration: 1.1, ease: "power2.inOut" }, 3.3)
-      .to(head, { "--hw": 260, duration: 1.1, ease: "power2.inOut" }, 3.3)
-      .to([q(".tm-new"), q('[data-col="backlog"]'), q('[data-col="progress"]')], { autoAlpha: 0, duration: 0.45, ease: "sine.inOut" }, 3.3)
+      .call(moveCard, null, 1.65)
+      .to(cursor, { autoAlpha: 0, scale: 0.7, duration: 0.18, ease: "sine.in" }, 1.68)
+      .fromTo(grab, { scale: 0.7 }, { scale: 1, duration: 0.32, ease: "back.out(2)" }, 1.68)
+      .to(grab, { autoAlpha: 1, duration: 0.18, ease: "sine.out" }, 1.68)
+      // 2.–3. The card is lifted (it comes up a little past its size and
+      // settles) and goes in one move, turned (P-3), to the top of
+      // Completed; the board dims a beat before it goes and brightens as it
+      // nears; its place closes after it, the progress fills.
+      .set(chosen, { display: "none" }, 1.75)
+      .set(slot, { display: "block", height: () => from.h * em(), borderWidth: () => em() }, 1.75)
+      .set(float, { autoAlpha: 1 }, 1.75)
+      .to(feel, { s: 1.035, duration: 0.3, ease: "power2.out" }, 1.75)
+      .to(feel, { s: 1, duration: 0.7, ease: "sine.inOut" }, 2.05)
+      .fromTo(carry, { t: 0 }, { t: 1, duration: CARRY, ease: "none" }, 1.8)
+      .to(win, { backgroundColor: "#0f0f0f", opacity: 0.6, duration: 0.45, ease: "power1.out" }, 1.7)
+      .to(frame, { "--ring": 0, duration: 0.45, ease: "power1.out" }, 1.7)
+      .to([head, cols], { opacity: 0.6, duration: 0.45, ease: "power1.out" }, 1.7)
+      .to(slot, { height: 0, borderWidth: 0, duration: 0.6 }, 2.35)
+      .set(slot, { display: "none" }, 2.95)
+      // Completed opens an empty place as the card nears it; the card in
+      // it shows only as the carried one lands (user: it showed in
+      // Completed while still being carried).
+      .fromTo(landed, { opacity: 0 }, { opacity: 0, duration: 0.01 }, 0)
+      .set(insert("finalize"), { display: "block" }, 2.75)
+      .to(insert("finalize"), { height: "auto", duration: 0.75 }, 2.75)
+      .to(percent, { value: 100, duration: 0.95, ease: "oww-settle", onUpdate: writeLabel }, 2.5)
+      .to(fill, { "--fill": 100, duration: 0.95, ease: "oww-settle" }, 2.5)
+      .to(win, { backgroundColor: "#000", opacity: 1, duration: 0.6, ease: "power2.out" }, 3.05)
+      .to(frame, { "--ring": 1, duration: 0.6, ease: "power2.out" }, 3.05)
+      .to([head, cols], { opacity: 1, duration: 0.6, ease: "power2.out" }, 3.05)
+      // Put down: the card in its place takes over from the carried one
+      // (the same picture there), gives a little and settles; the hand lets
+      // go and turns back into the arrow, which then moves aside along one
+      // curve (OUT) to wait beside the phone.
+      .set(float, { autoAlpha: 0 }, 3.55)
+      .set(landed, { opacity: 1 }, 3.55)
+      .fromTo(landed, { scale: 1 }, { scale: 0.982, duration: 0.09, ease: "power2.out", transformOrigin: "50% 50%" }, 3.55)
+      .to(landed, { scale: 1, duration: 0.5, ease: "back.out(2.4)" }, 3.64)
+      .to(grab, { autoAlpha: 0, scale: 0.8, duration: 0.2, ease: "sine.in" }, 3.48)
+      .set(cursor, { scale: 0.8 }, 3.5)
+      .to(cursor, { autoAlpha: 1, scale: 1, duration: 0.25, ease: "power2.out" }, 3.5)
+      // 4. The phone (P-4), while the card still settles: the window
+      // narrows, the other columns slide out to the left one after the
+      // other, only Completed stays.
+      .to(frame, { "--wl": 181, "--ww": 308, duration: 1.2 }, NARROW)
+      .to(head, { "--hw": 260, duration: 1.2 }, NARROW)
+      .to([q('[data-col="backlog"]'), q('[data-col="progress"]')], { x: () => -28 * em(), autoAlpha: 0, duration: 0.55, ease: "power2.in", stagger: 0.07 }, NARROW)
+      .to(q(".tm-new"), { autoAlpha: 0, duration: 0.3, ease: "power1.out" }, NARROW)
       // "New Task" folds away, so the menu button keeps to the right edge.
-      .to(q(".tm-new"), { width: 0, paddingLeft: 0, paddingRight: 0, borderWidth: 0, marginRight: () => -4 * em(), duration: 1.1, ease: "power2.inOut" }, 3.3)
-      .to(done, { "--x": 0, "--w": 260, duration: 1.1, ease: "power2.inOut" }, 3.3)
-      .set(insert("build"), { display: "block" }, 3.6)
-      .to(insert("build"), { height: "auto", duration: 0.6, ease: "sine.inOut" }, 3.6)
-      .to(q(".tm-light"), { opacity: 0, duration: 0.8, ease: "sine.inOut" }, 3.3)
-      .to(q(".tm-glow"), { opacity: 1, duration: 1, ease: "sine.inOut" }, 3.5)
-      .to(doneMarks, { opacity: 1, duration: 0.4, ease: "sine.inOut" }, 4.1)
-      // 5. The ticks (P-5), one after another, growing in softly.
-      .to(doneChecks, { opacity: 1, duration: 0.35, ease: "sine.out", stagger: 0.18 }, 4.5)
-      .fromTo(doneChecks, { scale: 0.6 }, { scale: 1, duration: 0.5, ease: "back.out(1.3)", stagger: 0.18, immediateRender: false }, 4.5)
-      .to(doneCircles, { opacity: 0, duration: 0.3, ease: "sine.inOut", stagger: 0.18 }, 4.6);
+      .to(q(".tm-new"), { width: 0, paddingLeft: 0, paddingRight: 0, borderWidth: 0, marginRight: () => -4 * em(), duration: 1.2 }, NARROW)
+      .to(done, { "--x": 0, "--w": 260, duration: 1.2 }, NARROW)
+      .set(insert("build"), { display: "block" }, NARROW + 0.3)
+      .to(insert("build"), { height: "auto", duration: 0.6, ease: "oww-settle" }, NARROW + 0.3)
+      .to(q(".tm-light"), { opacity: 0, duration: 0.8, ease: "sine.inOut" }, NARROW)
+      .to(q(".tm-glow"), { opacity: 1, duration: 1.1, ease: "sine.out" }, NARROW + 0.2)
+      .to(doneMarks, { opacity: 1, duration: 0.4, ease: "power1.out", stagger: 0.05 }, NARROW + 0.6)
+      // 5. The ticks (P-5), as the phone settles: each drawn round its
+      // circle (a sweep, _about.scss), one after another on an uneven beat.
+      .fromTo(doneChecks, { opacity: 1, "--sweep": 0, scale: 0.9 }, { opacity: 1, "--sweep": 1, scale: 1, duration: 0.5, ease: "power2.inOut", stagger: tickAt, immediateRender: false }, TICKS + 0.05)
+      .to(doneCircles, { opacity: 0, duration: 0.3, ease: "sine.inOut", stagger: tickAt }, TICKS + 0.25);
 
-    // The loop (user: seamless, on repeat): the story runs, holds on P-5,
-    // runs back to the full board (the ticks go, the phone widens), the
-    // cards fade out and back in as they were (the story's start), and it
-    // begins again. The story is played by its time, so going back is the
-    // exact reverse of going forward.
+    // The loop (user: seamless, on repeat): the story runs and holds on
+    // P-5, the pointer barely moving and the camera drifting a little
+    // closer, then the pointer leaves down off the board (where it comes in
+    // from next time). It does not run the story back (user: from P-5 to
+    // P-1 looked odd, as rewound): the cards fade, the phone widens to the
+    // board with its columns empty, and the cards come back in their first
+    // places, one column after another. The pointer's own moves here go on
+    // --ax/--ay/--ao (in _about.scss), not on the story's; the camera is
+    // moved by the loop, on the story's beats.
     const end = timeline.duration();
     const forward = end / PACE; // s the story takes going forward
-    const back = forward + HOLD + 2.5; // s: back at the full board
-    // The cards fade, not the columns (the story fades those itself).
+    const H = forward + HOLD; // s: the way back starts
     const cards = board.querySelectorAll(".tm-col__cards");
-    loop = gsap
-      .timeline({
-        paused: true,
-        repeat: -1,
-        onUpdate: () => {
-          writeLabel();
-          moveCard();
-        },
-      })
-      .to(timeline, { time: end, duration: forward, ease: "none" })
-      // Back, calmly: first the ticks go, then the phone widens to the board.
-      .to(timeline, { time: TICKS, duration: 0.7, ease: "sine.inOut" }, forward + HOLD)
-      .to(timeline, { time: BOARD, duration: 1.8, ease: "sine.inOut" }, forward + HOLD + 0.7)
-      .to(cards, { opacity: 0, duration: 0.4, ease: "sine.inOut" }, back + 0.2)
-      .to(timeline, { time: 0, duration: 0.01 }, back + 0.65)
-      .to(cards, { opacity: 1, duration: 0.5, ease: "sine.inOut" }, back + 0.7)
-      .set({}, {}, back + 1.4);
+    const sideCols = [q('[data-col="backlog"]'), q('[data-col="progress"]')];
+    // The pointer's own moves at the end of a round (idling, leaving down
+    // off the board, back in place for the next) and Backlog and In
+    // Progress kept hidden while the phone widens: worked out from the
+    // loop's time on every frame, not tweened (as tweens they were not set
+    // back when the loop began again: the pointer and both columns stayed
+    // hidden in the next rounds).
+    const ramp = (now, at, time, ease) => gsap.parseEase(ease)(gsap.utils.clamp(0, 1, (now - at) / time));
+    const loopBits = () => {
+      const now = loop.time();
+      const back = now >= H + 2.07;
+      const idle = back ? 0 : ramp(now, forward, HOLD * 0.75, "sine.inOut");
+      const away = back ? 0 : ramp(now, H - 0.35, 0.85, "power2.in");
+      cursor.style.setProperty("--ax", 2.5 * idle + 13.5 * away);
+      cursor.style.setProperty("--ay", -1.5 * idle + 171.5 * away);
+      cursor.style.setProperty("--ao", back ? 1 : 1 - ramp(now, H + 0.35, 0.2, "sine.in"));
+      sideCols.forEach((col, i) => {
+        const shown = now < H + 0.46 ? 1 : ramp(now, H + 2.1 + 0.09 * i, 0.6, "oww-settle");
+        col.style.setProperty("--co", shown);
+      });
+    };
+    loop = gsap.timeline({
+      paused: true,
+      repeat: -1,
+      onUpdate: () => {
+        writeLabel();
+        moveCard();
+        placeCursor();
+        loopBits();
+      },
+    });
+    settleLoop = loopBits;
+    loop.to(timeline, { time: end, duration: forward, ease: "none" });
+    SHOTS.forEach((shot, i) => {
+      const to = { "--kfx": shot.fx, "--kfy": shot.fy, "--kz": shot.z, duration: shot.time / PACE, ease: "oww-cam" };
+      if (i === 0) loop.fromTo(lens, { "--kfx": 335, "--kfy": 210, "--kz": 1 }, { ...to, immediateRender: false }, shot.at / PACE);
+      else loop.to(lens, to, shot.at / PACE);
+    });
+    loop
+      .to(lens, { "--kz": 1.012, duration: HOLD + 0.6, ease: "sine.inOut" }, forward - 0.2)
+      .to(lens, { "--kz": 1, duration: 1.6, ease: "sine.inOut" }, H + 0.5)
+      .to(cards, { opacity: 0, duration: 0.45, ease: "power1.in" }, H)
+      // Back to where the phone has just formed (the ticks are hidden with
+      // the cards; before it the phone was still narrowing and its width
+      // jumped: user), then widened by the story's own curves alone (an
+      // ease over them made it start slow and end abruptly).
+      // Backlog and In Progress stay hidden while it widens (user: they
+      // ran into Completed on its way) and come in with the cards
+      // (loopBits).
+      .to(timeline, { time: PHONE, duration: 0 }, H + 0.47)
+      .to(timeline, { time: NARROW, duration: 1.5, ease: "none" }, H + 0.5)
+      .to(timeline, { time: 0, duration: 0 }, H + 2.05)
+      .fromTo(cards, { opacity: 0, y: () => 6 * em() }, { opacity: 1, y: 0, duration: 0.6, ease: "oww-settle", stagger: 0.09, immediateRender: false }, H + 2.1)
+      .set({}, {}, H + 3.2);
   });
 
   return {
@@ -514,8 +654,17 @@ function createBoardStory(board) {
     play: () => loop.restart(),
     resume: () => loop.play(),
     pause: () => loop.pause(),
-    reset: () => loop.pause(0),
-    finish: () => loop.pause(timeline.duration() / PACE),
+    reset: () => {
+      loop.pause(0);
+      settleLoop();
+    },
+    // P-5 as in Figma: without the pointer.
+    finish: () => {
+      loop.pause(timeline.duration() / PACE);
+      settleLoop();
+      gsap.set(cursor, { autoAlpha: 0 });
+      gsap.set(lens, { "--kfx": 335, "--kfy": 210, "--kz": 1 });
+    },
     revert: () => {
       loop.kill();
       timeline.kill();

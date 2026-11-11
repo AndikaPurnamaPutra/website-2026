@@ -134,3 +134,31 @@ ke grab terlihat kasar".
   antar frame kecil (cursor ≤29, kartu dan tangan ≤13 px/s per frame); frame
   rate 60 fps juga dengan CPU 4× lebih lambat; About 320–1920 tanpa error
   dan scroll samping.
+
+## Revisi: lebih manusiawi (pengguna, 11 Nov 2026)
+"Sudah sangat bagus, tapi masih terlalu kaku dan terlihat seperti buatan AI."
+- **Cursor**: datang cepat lalu melambat (sumbu x `power3.out`, y `power2.inOut`), sedikit lewat dari kartu (3,5 / 2,2 px) lalu membetulkan, diam ±0,15 s, baru menekan. Kartu ikut tertekan (97,5%).
+- **Kartu punya berat**: saat diangkat sedikit melewati ukurannya (103,5%) lalu tenang; selama dibawa miring mengikuti arah dan kecepatannya (maks. 6°) dan tertinggal sedikit dari tangan (0,03 s); saat mendarat menekan sedikit (98,5%) dan memantul halus.
+- **Irama tidak seragam**: tiap jenis gerak punya ease sendiri; papan meredup sedikit sebelum kartu berangkat; kolom lain hilang bergiliran; progres 88 → 100% cepat lalu melambat; centang muncul dengan putaran kecil pada jarak tak sama (0 / 0,17 / 0,38 / 0,52 s).
+- **Cursor tetap ada**: setelah tangan melepas, panah muncul lagi di titik itu dan bergeser pelan ke samping HP, bergerak sedikit selama jeda P-5, lalu memudar bersama kartu saat putaran kembali. Reduced motion: P-5 tanpa cursor, seperti Figma.
+- Putaran ±10,6 s (sebelumnya ±9,9). Dicek tiap 50 ms satu putaran penuh: tanpa lompatan; perubahan terbesar antar frame tetap di pudarnya kartu saat kembali, seperti sebelumnya.
+
+### Penyesuaian (pengguna: "dari P5 ke P1 aneh; cursor juga aneh")
+- **Tanpa diputar mundur**: setelah jeda P-5, isi kartu memudar, HP melebar kembali ke papan dengan kolom kosong, lalu kartu muncul di tempat awal per kolom (naik 6 px, bergiliran 0,09 s). Sebelumnya seluruh cerita diputar mundur (centang menyusut, cursor mundur) sehingga terlihat seperti rewind. Lompatan waktu kini instan (sebelumnya 0,01 s, satu frame bisa tertangkap di tengahnya); HP mulai menyempit di 4,0 s setelah kartu yang dibawa hilang.
+- **Cursor**: tiap perjalanan satu lengkungan halus (`smoothPath`) dengan irama tangan (cepat di awal, melambat panjang; ease `power2.inOut` atas `t^0,72`), ditempatkan menurut waktu cerita; tanpa koreksi lewat-kembali dan tanpa goyangan bolak-balik. Setelah melepas: panah muncul di titik tangan dan menyingkir satu lengkungan ke samping HP; saat jeda bergeser sangat kecil, lalu keluar ke bawah papan, tempat ia masuk di putaran berikutnya (`--ax`/`--ay`/`--ao` di `.tm-cursor`).
+- Dicek tiap 50 ms satu putaran (±9,2 s): tanpa lompatan dan error; perubahan terbesar antar frame (4,8) saat HP menyempit.
+- **Kartu tidak muncul dua kali** (pengguna: "saat di-grab sudah muncul di Completed"): Completed kini membuka tempat kosong saat kartu mendekat (2,75 s, sebelumnya 2,42 s), dan kartu di dalamnya baru tampak saat kartu yang dibawa mendarat (3,78 s). Dicek ulang tiap 50 ms: tanpa lompatan.
+
+## Revisi: gaya motion design (pengguna, 11 Nov 2026)
+"Masih cukup kaku dan tidak seamless selayaknya motion, masih terlalu AI"; tanpa referensi.
+- **Kamera**: semua kecuali titik dan cahaya dibungkus `.tm-camera` (titik pandang `--kfx/--kfy`, kedekatan `--kz`). Mendekat ke kartu saat cursor datang (350, 262; 1,05), mengikuti kartu ke Completed (384, 226; 1,06), mundur saat HP terbentuk (1,0); saat jeda P-5 sedikit mendekat (1,012) lalu kembali. Titik latar ikut 30% (paralaks). Kamera digerakkan oleh loop, jadi selalu kembali ke 1,0 sebelum putaran baru; reduced motion: tanpa kamera.
+- **Kurva**: `CustomEase` `oww-move` (berangkat tegas, mengendap panjang) untuk perpindahan, `oww-settle` untuk yang masuk, `oww-cam` untuk kamera.
+- **Saling menyambung**: kartu asli menggantikan kartu yang dibawa tepat saat mendarat (3,55 s) lalu memantul; HP mulai terbentuk di 3,7 s saat kartu masih mengendap; kolom Backlog dan In Progress bergeser keluar ke kiri bergiliran; centang mulai saat HP hampir jadi.
+- **Centang digambar melingkar** (`mask-image: conic-gradient` dengan `--sweep`), bergiliran tidak rata.
+- **Motion blur** kecil pada kartu yang dibawa saat paling cepat (`--mb`, maks. 0,9 px).
+- Putaran ±8,8 s. Dicek tiap 50 ms: tanpa lompatan dan error; perubahan terbesar antar frame (±7) saat kamera mendekat, merata dari frame ke frame (gerak, bukan loncatan).
+- **Melebar tanpa patah** (pengguna: "masih ada patah di akhir dari kecil ke besar"): balik ke 4,9 s (HP sudah terbentuk; sebelumnya 4,55 s saat HP masih menyempit, sehingga lebarnya meloncat), lalu melebar 1,5 s hanya dengan kurva cerita sendiri (sebelumnya ditambah `power2.inOut` di luar: awal sangat lambat, akhir mendadak). Dicek tiap 25 ms: perubahan per frame naik dan turun merata, tanpa lonjakan.
+- **Akhir putaran** (pengguna: "cursor tiba-tiba muncul lalu menghilang; Completed seperti bertabrakan"):
+  - Cursor keluar ke bawah board lalu baru memudar, dan putaran baru masuk dari luar tepi bawah (552, 478; board memotong isinya), jadi meluncur masuk, tidak muncul di atas board. Geser tambahannya lewat `top`/`left` (`--ax`/`--ay`): `translate` diambil alih GSAP sehingga cursor sebelumnya hanya memudar di tempat.
+  - Backlog dan In Progress disembunyikan selama HP melebar (`--co`) dan muncul bersama kartunya, jadi tidak lagi menimpa Completed yang sedang bergeser.
+  - Bug: geser cursor, pudarnya, dan `--co` sebagai tween tidak kembali saat loop mengulang, sehingga cursor dan dua kolom itu hilang di putaran berikutnya. Kini dihitung dari waktu loop tiap frame (`loopBits`). Dicek: putaran 1 dan 2 identik (selisih ≤ 0,36 per kanal).

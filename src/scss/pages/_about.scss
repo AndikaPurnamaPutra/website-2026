@@ -249,7 +249,10 @@
   background-position: -4.361em -3.271em;
   background-size: 16.7158em 16.7158em;
   transform: translateX(-50%);
-  scale: var(--z, 1); // 02 lets them settle as each round begins
+  // 02 lets them settle as each round begins; in 01 they follow the camera
+  // (.tm-camera) at a third of its move.
+  translate: calc((335 - var(--kfx, 335)) * 0.3em) calc((210 - var(--kfy, 210)) * 0.3em);
+  scale: var(--z, calc(1 + (var(--kz, 1) - 1) * 0.3));
   mask-image: radial-gradient(546.235em 1046.555em at 697.7em 0, #000, transparent 95.3125%);
 }
 
@@ -672,6 +675,8 @@
 
 .tm-mark__check {
   opacity: 0;
+  // Drawn round the circle as it comes (01's ticks, --sweep 0 → 1).
+  mask-image: conic-gradient(from -90deg, #000 calc(var(--sweep, 1) * 1turn), transparent 0);
 }
 
 // The chosen card's place while it is carried (P-3).
@@ -691,8 +696,26 @@
   overflow: hidden;
 }
 
-// The carried card (P-3): placed over the chosen card, by its centre.
+// 01's camera: the board seen from a point (--kfx, --kfy, Figma px) at a
+// closeness (--kz), set by src/js/principles-scroll.js; the dots follow it
+// less (.tm-dots).
+.tm-camera {
+  position: absolute;
+  inset: 0;
+  transform: translate(335em, 210em) scale(var(--kz, 1)) translate(calc(var(--kfx, 335) * -1em), calc(var(--kfy, 210) * -1em));
+  transform-origin: 0 0;
+}
+
+// 01: Backlog and In Progress kept hidden while the phone widens back to
+// the board (--co), so they do not run into Completed on its way.
+.p-board .tm-col {
+  filter: opacity(var(--co, 1));
+}
+
+// The carried card (P-3): placed over the chosen card, by its centre; a
+// touch blurred at its fastest (--mb).
 .tm-float {
+  filter: blur(calc(var(--mb, 0) * 1em));
   --ring: 1;
 
   position: absolute;
@@ -723,8 +746,12 @@
 
 // The arrow's tip is 16.7 × 12.4 into its image (it includes a shadow).
 .tm-cursor {
-  top: calc(var(--cy, 0) * 1em - 12.4em);
-  left: calc(var(--cx, 0) * 1em - 16.7em);
+  // Plus moves of its own on top of the story's (--ax, --ay: 01 idling and
+  // leaving at the end of a round; src/js/principles-scroll.js). Not on
+  // `translate`, which GSAP takes over into its transform.
+  top: calc((var(--cy, 0) + var(--ay, 0)) * 1em - 12.4em);
+  left: calc((var(--cx, 0) + var(--ax, 0)) * 1em - 16.7em);
+  filter: opacity(var(--ao, 1));
 }
 
 .tm-grab {
