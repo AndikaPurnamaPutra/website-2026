@@ -256,4 +256,115 @@
       margin-bottom: fluid(48);
     }
   }
+
+  // The stack (user, 11 Nov 2026; plan 39; src/js/services-scroll.js joins
+  // each card and its picture into a panel). Each panel sticks STEP lower
+  // than the one before, so the top edges of those behind stay in view as a
+  // pile; the header is away over this section (src/js/header.js). The
+  // grid's gaps go: the marks between the panels are cells too.
+  .services.is-stacked {
+    --stack-top: #{fluid(16)};
+    --stack-step: #{fluid(10)};
+
+    .services__inner {
+      row-gap: 0;
+      // Chrome jumped as the panels stuck (sticky stack tried on 9 Nov).
+      overflow-anchor: none;
+    }
+
+    .services__label {
+      margin-bottom: fluid(40);
+    }
+
+    .services__panel {
+      position: sticky;
+      top: calc(var(--stack-top) + var(--panel) * var(--stack-step));
+      display: flex;
+      flex-direction: column;
+      margin-bottom: fluid(24);
+      overflow: hidden;
+      // The card's colour over the whole panel, so the strip that peeks
+      // from behind reads as the card's top.
+      background: color-mix(in srgb, var(--theme-bg), var(--theme-fg) 4%);
+      border-radius: var(--radius-sm);
+      transform-origin: 50% 0;
+
+      // Darker as it is covered (an overlay's opacity: no repaint).
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: var(--theme-bg);
+        opacity: 0;
+        pointer-events: none;
+      }
+    }
+
+    .services__card:nth-child(n) {
+      background: none;
+      border-radius: 0;
+    }
+
+    // Out of .services__media now: placed in the panel's flow, under the card.
+    .services__panel .services__image {
+      position: static;
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 4 / 3;
+      margin-bottom: 0;
+      border-radius: 0;
+      opacity: 1;
+      visibility: visible;
+
+      @media (min-width: $tablet) {
+        aspect-ratio: 16 / 9;
+      }
+    }
+
+    .services__mark {
+      height: 0;
+    }
+
+    .services__note {
+      margin-top: fluid(16);
+    }
+  }
+
+  // The panel being covered steps back while the next comes up: from the
+  // next one's top entering the screen to its sticking (the mark above it,
+  // on its own timeline: animation-timeline set by the script).
+  @supports (animation-timeline: view()) {
+    .services.is-stacked .services__panel.is-covered {
+      animation: services-step-back linear both;
+      animation-range: cover 0%
+        cover calc(100% - var(--stack-top) - (var(--panel) + 1) * var(--stack-step));
+
+      &::after {
+        animation: services-dim linear both;
+        animation-timeline: inherit;
+        animation-range: inherit;
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .services.is-stacked .services__panel.is-covered,
+    .services.is-stacked .services__panel.is-covered::after {
+      animation: none;
+    }
+  }
+}
+
+@keyframes services-step-back {
+  to {
+    scale: 0.94;
+  }
+}
+
+@keyframes services-dim {
+  to {
+    opacity: 0.55;
+  }
 }

@@ -63,7 +63,66 @@ export function initServicesScroll() {
   if (!section) return () => {};
   const media = gsap.matchMedia();
   media.add("(min-width: 1024px) and (hover: hover)", () => setup(section));
+  media.add("(max-width: 1023.98px), (hover: none)", () => stack(section));
   return () => media.revert();
+}
+
+// Phones, tablets and touch screens (user, 11 Nov 2026; plan 39): each card
+// and its picture are joined into one panel; the panels stick to the top one
+// a little lower than the last, so the top edges of those behind stay in
+// view as a pile, and the one being covered steps back (smaller, darker).
+// The script only builds the panels (the markup keeps the cards and the
+// pictures in two groups for the desktop) and names the scroll timelines;
+// the sticking and the stepping back are CSS, run by the browser with the
+// scroll (_services.scss), as the footer on phones: moved by script they
+// were a frame behind the page. Without the script the section flows.
+function stack(section) {
+  const inner = section.querySelector(".services__inner");
+  const label = section.querySelector(".services__label");
+  const cardGroup = section.querySelector(".services__cards");
+  const mediaGroup = section.querySelector(".services__media");
+  const link = section.querySelector("[data-services-link]");
+  const cards = [...section.querySelectorAll(".services__card")];
+  const images = [...section.querySelectorAll(".services__image")];
+  if (!inner || !cards.length || cards.length !== images.length) return () => {};
+
+  const names = [];
+  const built = [];
+  let after = label;
+  cards.forEach((card, i) => {
+    // A mark in the flow right above the panel, where the panel's top would
+    // be without sticking: the panel before it steps back while it comes up
+    // (a stuck panel's own view of the scroll stands still).
+    if (i > 0) {
+      const mark = document.createElement("div");
+      mark.className = "services__mark";
+      mark.setAttribute("aria-hidden", "true");
+      const name = `--services-panel-${i}`;
+      mark.style.setProperty("view-timeline-name", name);
+      names.push(name);
+      built[i - 1].panel.style.setProperty("animation-timeline", name);
+      built[i - 1].panel.classList.add("is-covered");
+      after.after(mark);
+      after = mark;
+    }
+    const panel = document.createElement("div");
+    panel.className = "services__panel";
+    panel.style.setProperty("--panel", i);
+    panel.append(card, images[i]);
+    after.after(panel);
+    after = panel;
+    built.push({ panel });
+  });
+  inner.style.setProperty("timeline-scope", names.join(", "));
+  section.classList.add("is-stacked");
+
+  return () => {
+    section.classList.remove("is-stacked");
+    inner.style.removeProperty("timeline-scope");
+    cards.forEach((card) => cardGroup.append(card));
+    images.forEach((image) => mediaGroup.insertBefore(image, link));
+    section.querySelectorAll(".services__panel, .services__mark").forEach((el) => el.remove());
+  };
 }
 
 function setup(section) {

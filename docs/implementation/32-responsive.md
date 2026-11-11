@@ -418,6 +418,9 @@ di bawah tiap kartu, kartu naik dan gambar membuka seperti tirai saat masuk
 layar), dibuat dan terukur berjalan, tapi pengguna melihatnya statis di
 localhost dan meminta kembali ke versi sebelumnya.
 
+> 11 Nov 2026: HP & tablet kini memakai tumpukan panel, lihat
+> [39-services-stack.md](39-services-stack.md).
+
 **Keputusan akhir (pengguna, 9 Nov 2026): tablet mengikuti HP.** HP, tablet,
 dan semua layar sentuh (mixin `below-laptop-or-touch`): satu kolom, kartu
 lalu gambarnya, gambar 4:3 di HP dan 16:9 dari 744 ke atas, jarak
