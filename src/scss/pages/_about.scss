@@ -3,6 +3,7 @@
 // 29px lines), so they are written as px ratios.
 @use "../abstracts/functions" as *;
 @use "../abstracts/breakpoints" as *;
+@use "../components/scroll-stack" as *;
 
 // Above the footer, so the footer coin passes behind it (as on Contact).
 .about {
@@ -4057,6 +4058,36 @@
 
   .p-board {
     font-size: calc(100cqw / 670);
+  }
+
+  // The stack (user, 11 Nov 2026; plan 40; src/js/scroll-stack.js joins
+  // each principle and its illustration into a panel; as Services). The
+  // header stays over this section, so the pile sticks below it (64 + 12).
+  // The panel a touch lighter than the section, as the Services cards.
+  @include scroll-stack(principles, 76px, color-mix(in srgb, var(--color-ink), var(--color-white) 4%), var(--color-ink));
+
+  .principles.is-stacked {
+    .principles__inner {
+      // Chrome jumped as panels stuck (Services, 9 Nov).
+      overflow-anchor: none;
+    }
+
+    .principles__panel .principles__item {
+      margin-bottom: 0;
+      padding: fluid(20) fluid(20) fluid(24);
+    }
+
+    // The numbers counted in the stack: .principles__inner (a container)
+    // keeps its own reset from what is inside, and with each principle in
+    // a panel of its own every one read 01. (No container on the panel
+    // either; the board's em follows .principles__inner, as wide.)
+    .principles__stack {
+      counter-reset: principle;
+    }
+    .principles__panel .principles__figure {
+      margin-bottom: 0;
+      border-radius: 0;
+    }
   }
 }
 

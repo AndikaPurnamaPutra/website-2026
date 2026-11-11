@@ -1,0 +1,104 @@
+// A stack on phones, tablets and touch screens (plans 39 and 40;
+// src/js/scroll-stack.js builds the panels): each panel sticks a step lower
+// than the one before, so the top edges of those behind stay in view as a
+// pile, and the one being covered steps back (smaller, darker) while the
+// next comes up, on the scroll (CSS scroll-driven animation, run by the
+// browser). Without support they still stick and pile, without stepping
+// back. Used inside the section's below-laptop-or-touch rules.
+@use "../abstracts/functions" as *;
+
+// $block: the section's class; $top: where the first panel sticks;
+// $background: the panel's (the strip that peeks from behind shows it);
+// $shade: the darkening.
+@mixin scroll-stack($block, $top, $background, $shade) {
+  .#{$block}.is-stacked {
+    --stack-top: #{$top};
+    // (10, and the edges behind barely showed on the dark page; user)
+    --stack-step: 16px;
+
+    .#{$block}__panel {
+      position: sticky;
+      top: calc(var(--stack-top) + var(--panel) * var(--stack-step));
+      display: flex;
+      flex-direction: column;
+      margin-bottom: fluid(24);
+      overflow: hidden;
+      background: $background;
+      border-radius: var(--radius-sm);
+      transform-origin: 50% 0;
+
+      // A light edge all round, over the darkening, so each panel behind
+      // shows as a line in the pile (user: the pile barely showed; an
+      // edge on top only looked odd).
+      &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        border: 1px solid rgb(255 255 255 / 0.12);
+        border-radius: inherit;
+        pointer-events: none;
+      }
+
+      // Darker as it is covered (an overlay's opacity: no repaint).
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: $shade;
+        opacity: 0;
+        pointer-events: none;
+      }
+    }
+
+    .#{$block}__mark {
+      height: 0;
+    }
+
+    // Ends with the last panel (and its margin, as every panel's reaches
+    // there: src/js/scroll-stack.js), so the pile lets go as it sticks.
+    .#{$block}__stack {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  // Stepping back (the names, timelines and ranges written by the script:
+  // one per panel above, added together) and darkening as the first comes
+  // over it (the ::after takes the first of its timelines and ranges).
+  @supports (animation-timeline: view()) {
+    .#{$block}.is-stacked .#{$block}__panel.is-covered {
+      animation-duration: auto;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-composition: add;
+
+      &::after {
+        animation: stack-dim linear both;
+        animation-timeline: inherit;
+        animation-range: inherit;
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .#{$block}.is-stacked .#{$block}__panel.is-covered,
+    .#{$block}.is-stacked .#{$block}__panel.is-covered::after {
+      animation: none;
+    }
+  }
+}
+
+// One step back per panel above (added: 0.95, 0.90, 0.86 …).
+@keyframes stack-step-back {
+  to {
+    transform: scale(0.95);
+  }
+}
+
+@keyframes stack-dim {
+  to {
+    opacity: 0.35;
+  }
+}

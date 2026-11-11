@@ -1,6 +1,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { designPx, typePx } from "./design-px.js";
+import { buildStack } from "./scroll-stack.js";
 
 // Pinned "What we do" section (Figma storyboard 1516:2229).
 // Each scroll step makes the next service card active and swaps the image;
@@ -68,85 +69,15 @@ export function initServicesScroll() {
 }
 
 // Phones, tablets and touch screens (user, 11 Nov 2026; plan 39): each card
-// and its picture are joined into one panel; the panels stick to the top one
-// a little lower than the last, so the top edges of those behind stay in
-// view as a pile, and the one being covered steps back (smaller, darker).
-// The script only builds the panels (the markup keeps the cards and the
-// pictures in two groups for the desktop) and names the scroll timelines;
-// the sticking and the stepping back are CSS, run by the browser with the
-// scroll (_services.scss), as the footer on phones: moved by script they
-// were a frame behind the page. Without the script the section flows.
+// and its picture joined into one panel, the panels stacked
+// (src/js/scroll-stack.js). Without the script the section flows.
 function stack(section) {
-  const inner = section.querySelector(".services__inner");
-  const label = section.querySelector(".services__label");
-  const cardGroup = section.querySelector(".services__cards");
-  const mediaGroup = section.querySelector(".services__media");
-  const link = section.querySelector("[data-services-link]");
   const cards = [...section.querySelectorAll(".services__card")];
   const images = [...section.querySelectorAll(".services__image")];
-  if (!inner || !cards.length || cards.length !== images.length) return () => {};
-
-  // The panels in a box of their own that ends with the last one: they let
-  // go of the screen together as the last one sticks, and the note below
-  // follows them up instead of running under the stuck pile (user report).
-  const pile = document.createElement("div");
-  pile.className = "services__stack";
-  label.after(pile);
-  const names = [];
-  const built = [];
-  cards.forEach((card, i) => {
-    // A mark in the flow right above the panel, where the panel's top would
-    // be without sticking: the panel before it steps back while it comes up
-    // (a stuck panel's own view of the scroll stands still).
-    if (i > 0) {
-      const mark = document.createElement("div");
-      mark.className = "services__mark";
-      mark.setAttribute("aria-hidden", "true");
-      const name = `--services-panel-${i}`;
-      mark.style.setProperty("view-timeline-name", name);
-      names.push(name);
-      built[i - 1].panel.style.setProperty("animation-timeline", name);
-      built[i - 1].panel.classList.add("is-covered");
-      pile.append(mark);
-    }
-    const panel = document.createElement("div");
-    panel.className = "services__panel";
-    panel.style.setProperty("--panel", i);
-    panel.append(card, images[i]);
-    pile.append(panel);
-    built.push({ panel });
-  });
-  inner.style.setProperty("timeline-scope", names.join(", "));
-  section.classList.add("is-stacked");
-
-  // Released together: a stuck panel is pushed off only once its margin box
-  // meets the box's end (the last panel's bottom), so the panels higher in
-  // the pile or shorter than the last stayed while the others went, out of
-  // order (a title showed above the pile). Each panel's bottom margin
-  // reaches down to where the last one's bottom sticks.
-  const panels = built.map(({ panel }) => panel);
-  const measure = () => {
-    panels.forEach((panel) => panel.style.removeProperty("margin-bottom"));
-    const end = (panel) => parseFloat(getComputedStyle(panel).top) + panel.offsetHeight;
-    const last = end(panels[panels.length - 1]);
-    panels.slice(0, -1).forEach((panel) => {
-      const base = parseFloat(getComputedStyle(panel).marginBottom);
-      panel.style.marginBottom = `${base + last - end(panel)}px`;
-    });
-  };
-  measure();
-  const resize = new ResizeObserver(measure);
-  panels.forEach((panel) => resize.observe(panel));
-
-  return () => {
-    resize.disconnect();
-    panels.forEach((panel) => panel.style.removeProperty("margin-bottom"));
-    section.classList.remove("is-stacked");
-    inner.style.removeProperty("timeline-scope");
-    cards.forEach((card) => cardGroup.append(card));
-    images.forEach((image) => mediaGroup.insertBefore(image, link));
-    pile.remove();
-  };
+  const label = section.querySelector(".services__label");
+  const inner = section.querySelector(".services__inner");
+  if (!inner || !label || cards.length !== images.length) return () => {};
+  return buildStack({ section, block: "services", scope: inner, after: label, pairs: cards.map((card, i) => [card, images[i]]) });
 }
 
 function setup(section) {

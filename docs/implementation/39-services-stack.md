@@ -37,6 +37,10 @@ menempel di posisi yang sama dan hanya saling menutupi. Versi ini berbeda:
 
 Perlu dicek pengguna di iPhone (Safari 26 mendukung scroll-driven animation).
 
+> Sejak plan 40 kode tumpukan ada di modul bersama `src/js/scroll-stack.js`
+> dan `src/scss/components/_scroll-stack.scss`; panel kini mundur mulai saat
+> panel berikutnya menyentuh tepi bawahnya.
+
 ## Perbaikan (11 Nov 2026, laporan pengguna)
 
 - **Catatan "Visual trends…" bertumpuk dengan panel**: panel menempel sampai

@@ -3,6 +3,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 import { CustomEase } from "gsap/CustomEase";
 import { getSmoothScroll } from "./smooth-scroll.js";
+import { buildStack } from "./scroll-stack.js";
 
 gsap.registerPlugin(SplitText, CustomEase);
 
@@ -119,9 +120,20 @@ const STORIES = {
 };
 const createStory = (figure) => STORIES[figure.dataset.story]?.(figure) ?? null;
 
-// Each storyboard plays once as its illustration comes into view.
+// Each storyboard plays once as its illustration comes into view. The
+// principles are stacked as the Services cards (user, 11 Nov 2026; plan 40):
+// each with its illustration in a panel (src/js/scroll-stack.js), built
+// before the stories measure their places.
 function flow(section) {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const items = [...section.querySelectorAll(".principles__item")];
+  const figures = [...section.querySelectorAll(".principles__figure")];
+  const intro = section.querySelector(".principles__intro");
+  const inner = section.querySelector(".principles__inner");
+  const unstack =
+    intro && inner && items.length === figures.length
+      ? buildStack({ section, block: "principles", scope: inner, after: intro, pairs: items.map((item, i) => [item, figures[i]]) })
+      : () => {};
   const cleanups = [...section.querySelectorAll("[data-story]")].map((figure) => {
     const story = createStory(figure);
     if (!story) return () => {};
@@ -139,7 +151,10 @@ function flow(section) {
       story.revert();
     };
   });
-  return () => cleanups.forEach((cleanup) => cleanup());
+  return () => {
+    cleanups.forEach((cleanup) => cleanup());
+    unstack();
+  };
 }
 
 function setup(section) {
