@@ -193,3 +193,4 @@ Sama seperti 01 ("masih terlalu kaku, terlalu AI"):
 - **Cursor**: masuk dari luar tepi bawah board dalam satu lengkungan dengan irama tangan, diam sebentar, menekan (OWW tertekan lalu memantul), keluar ke bawah board.
 - **Saling menyambung**: OWW ke tengah saat alat terakhir masuk, grid menyebar sebelum OWW selesai, centang digambar melingkar (`--sweep`) mulai 9,3 s.
 - Dicek tiap 0,1 s: tanpa lompatan dan error (perubahan terbesar 4 saat alat naik); putaran 1 dan 2 identik (selisih ≤ 0,3); tidak ada yang terpotong.
+- **Klik lebih elegan** (pengguna: "animasi tombolnya tidak elegan", efek klik di 01 dan 02; 03 dikembalikan ke versi commit 966c598 atas permintaan pengguna): tekanan lebih kecil (cursor 0,9×, elemen 0,97–0,985×, 0,14 s) dan kembali dengan `oww-settle` tanpa pantulan (`back.out` dihapus); denyut OWW di 02 lebih lembut (1,02–1,03×).

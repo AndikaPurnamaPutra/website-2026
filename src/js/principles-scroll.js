@@ -572,14 +572,14 @@ function createBoardStory(board) {
       // Its way is drawn as the story's time runs (a tween to keep it long
       // enough).
       .set({}, {}, IN.at + IN.time)
-      .to(cursor, { scale: 0.86, duration: 0.11, ease: "power2.out" }, 1.6)
-      .to(chosen, { scale: 0.975, duration: 0.11, ease: "power2.out" }, 1.6)
-      .set(feel, { s: 0.975 }, 1.6)
+      .to(cursor, { scale: 0.9, duration: 0.14, ease: "power2.out" }, 1.6)
+      .to(chosen, { scale: 0.985, duration: 0.14, ease: "power2.out" }, 1.6)
+      .set(feel, { s: 0.985 }, 1.6)
       // The arrow becomes the hand on the same spot: one shrinks away as the
       // other grows in.
       .call(moveCard, null, 1.65)
       .to(cursor, { autoAlpha: 0, scale: 0.7, duration: 0.18, ease: "sine.in" }, 1.68)
-      .fromTo(grab, { scale: 0.7 }, { scale: 1, duration: 0.32, ease: "back.out(2)" }, 1.68)
+      .fromTo(grab, { scale: 0.85 }, { scale: 1, duration: 0.4, ease: "oww-settle" }, 1.68)
       .to(grab, { autoAlpha: 1, duration: 0.18, ease: "sine.out" }, 1.68)
       // 2.–3. The card is lifted (it comes up a little past its size and
       // settles) and goes in one move, turned (P-3), to the top of
@@ -588,7 +588,7 @@ function createBoardStory(board) {
       .set(chosen, { display: "none" }, 1.75)
       .set(slot, { display: "block", height: () => from.h * em(), borderWidth: () => em() }, 1.75)
       .set(float, { autoAlpha: 1 }, 1.75)
-      .to(feel, { s: 1.035, duration: 0.3, ease: "power2.out" }, 1.75)
+      .to(feel, { s: 1.03, duration: 0.4, ease: "oww-settle" }, 1.75)
       .to(feel, { s: 1, duration: 0.7, ease: "sine.inOut" }, 2.05)
       .fromTo(carry, { t: 0 }, { t: 1, duration: CARRY, ease: "none" }, 1.8)
       .to(win, { backgroundColor: "#0f0f0f", opacity: 0.6, duration: 0.45, ease: "power1.out" }, 1.7)
@@ -613,8 +613,8 @@ function createBoardStory(board) {
       // curve (OUT) to wait beside the phone.
       .set(float, { autoAlpha: 0 }, 3.55)
       .set(landed, { opacity: 1 }, 3.55)
-      .fromTo(landed, { scale: 1 }, { scale: 0.982, duration: 0.09, ease: "power2.out", transformOrigin: "50% 50%" }, 3.55)
-      .to(landed, { scale: 1, duration: 0.5, ease: "back.out(2.4)" }, 3.64)
+      .fromTo(landed, { scale: 1 }, { scale: 0.99, duration: 0.12, ease: "power2.out", transformOrigin: "50% 50%" }, 3.55)
+      .to(landed, { scale: 1, duration: 0.5, ease: "oww-settle" }, 3.67)
       .to(grab, { autoAlpha: 0, scale: 0.8, duration: 0.2, ease: "sine.in" }, 3.48)
       .set(cursor, { scale: 0.8 }, 3.5)
       .to(cursor, { autoAlpha: 1, scale: 1, duration: 0.25, ease: "power2.out" }, 3.5)
@@ -960,18 +960,18 @@ function createIntegrationsStory(figure) {
       // after another, the lines rolling up behind them, and OWW gives a
       // little pulse as each comes in, each a little different.
       .fromTo(cursor, { autoAlpha: 0, scale: 1 }, { autoAlpha: 1, scale: 1, duration: 0.01 }, IN.at)
-      .to(cursor, { scale: 0.86, duration: 0.11, ease: "power2.out" }, 6.0)
-      .to(oww, { scale: 0.95, duration: 0.11, ease: "power2.out" }, 6.0)
-      .to(cursor, { scale: 1, duration: 0.4, ease: "power2.out" }, 6.11)
-      .to(oww, { scale: 1, duration: 0.45, ease: "back.out(2.2)" }, 6.11)
+      .to(cursor, { scale: 0.9, duration: 0.14, ease: "power2.out" }, 6.0)
+      .to(oww, { scale: 0.97, duration: 0.14, ease: "power2.out" }, 6.0)
+      .to(cursor, { scale: 1, duration: 0.45, ease: "oww-settle" }, 6.14)
+      .to(oww, { scale: 1, duration: 0.5, ease: "oww-settle" }, 6.14)
       .to(oww, { backgroundColor: "#0f0f0f", duration: 0.45, ease: "sine.out" }, 6.05)
       .fromTo(cursor, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.01 }, OUT.at + OUT.time);
     tools.forEach((tool, i) =>
       timeline
         .to(tool, { scale: 0.45, duration: 0.85, ease: "power2.in" }, SLIDE[i])
         .to(tool, { autoAlpha: 0, duration: 0.15, ease: "sine.in" }, REACH[i] - 0.12)
-        .to(oww, { scale: [1.07, 1.05, 1.06][i], duration: 0.08, ease: "power2.out" }, REACH[i])
-        .to(oww, { scale: 1, duration: 0.42, ease: "back.out(3)" }, REACH[i] + 0.08),
+        .to(oww, { scale: [1.03, 1.02, 1.025][i], duration: 0.12, ease: "power2.out" }, REACH[i])
+        .to(oww, { scale: 1, duration: 0.5, ease: "oww-settle" }, REACH[i] + 0.12),
     );
     timeline
       .to(links, { autoAlpha: 0, duration: 0.3, ease: "sine.in" }, 7.05)

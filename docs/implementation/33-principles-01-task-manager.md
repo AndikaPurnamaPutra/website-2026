@@ -163,3 +163,4 @@ ke grab terlihat kasar".
   - Backlog dan In Progress disembunyikan selama HP melebar (`--co`) dan muncul bersama kartunya, jadi tidak lagi menimpa Completed yang sedang bergeser.
   - Bug: geser cursor, pudarnya, dan `--co` sebagai tween tidak kembali saat loop mengulang, sehingga cursor dan dua kolom itu hilang di putaran berikutnya. Kini dihitung dari waktu loop tiap frame (`loopBits`). Dicek: putaran 1 dan 2 identik (selisih ≤ 0,36 per kanal).
 - **Kamera tidak mengikuti cursor** (pengguna, saat 02: "karena menjadi terpotong"): tetap di tengah dan hanya mendekat sedikit (maks. 1,02×).
+- **Klik lebih elegan** (pengguna: "animasi tombolnya tidak elegan", efek klik di 01 dan 02; 03 dikembalikan ke versi commit 966c598 atas permintaan pengguna): tekanan lebih kecil (cursor 0,9×, elemen 0,97–0,985×, 0,14 s) dan kembali dengan `oww-settle` tanpa pantulan (`back.out` dihapus); denyut OWW di 02 lebih lembut (1,02–1,03×).
