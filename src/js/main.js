@@ -26,6 +26,7 @@ import { initWorkMenu } from "./work-menu.js";
 import { initMobileMenu } from "./mobile-menu.js";
 import { initFooterForm } from "./footer-form.js";
 import { initFooterReveal } from "./footer-reveal.js";
+import { initSkeleton } from "./skeleton.js";
 import { initSmoothScroll } from "./smooth-scroll.js";
 import { initBackLink } from "./back-link.js";
 import { initContactForm } from "./contact-form.js";
@@ -78,6 +79,7 @@ function initPage(first) {
   cleanups.push(initMobileMenu());
   cleanups.push(initFooterForm());
   cleanups.push(initFooterReveal());
+  cleanups.push(initSkeleton());
   cleanups.push(initBackLink());
   cleanups.push(initContactForm());
   cleanups.push(initContactIntro());

@@ -1,0 +1,47 @@
+// Skeleton (user, 12 Nov 2026: "kept quiet, not overdone"): while a large
+// picture or a video's poster is still loading, its box shows a soft grey
+// that breathes slowly, so the layout never shows an empty hole; once in,
+// the picture fades in over it (where no animation of its own uses its
+// opacity). src/js/skeleton.js sets the classes; without JS, nothing.
+// On the element itself (its background, under the picture), not a layer
+// over it: the Services pictures move into the stack panels on touch
+// screens (their box is display: contents there) and are faded by
+// src/js/services-scroll.js on desktop.
+:root {
+  --skeleton-from: #f2f2f2;
+  --skeleton-to: #e9e9e9;
+}
+
+// Dark sections (Services): a light grey on the dark ground.
+[data-header-theme="dark"] {
+  --skeleton-from: rgba(255, 255, 255, 0.05);
+  --skeleton-to: rgba(255, 255, 255, 0.09);
+}
+
+.is-skeleton {
+  background-color: var(--skeleton-from);
+  animation: skeleton-breathe 1.4s ease-in-out infinite alternate;
+}
+
+.is-skeleton-in {
+  animation: skeleton-in 0.5s ease-out;
+}
+
+@keyframes skeleton-breathe {
+  to {
+    background-color: var(--skeleton-to);
+  }
+}
+
+@keyframes skeleton-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-skeleton,
+  .is-skeleton-in {
+    animation: none;
+  }
+}
