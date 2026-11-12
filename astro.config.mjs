@@ -6,14 +6,22 @@ import { defineConfig } from "astro/config";
 export default defineConfig({
   output: "static",
   outDir: "dist",
+  // Keep the markup's whitespace as written: Astro would collapse runs of
+  // spaces (the "©2026  /  One Week Wonders Studio" lines are white-space:
+  // pre) and the gaps between inline elements, which Pug kept.
+  compressHTML: false,
   build: {
     // about.html, not about/index.html: links and Barba use .html.
     format: "file",
     // One stylesheet, not inlined into the page.
     inlineStylesheets: "never",
   },
-  // Production: no source maps (AGENTS.md §15).
   vite: {
-    build: { sourcemap: false },
+    // The CSS is compressed by Sass itself, as Gulp did, and left as it is:
+    // Vite's own minifier rewrote it (rounded numbers, merged rules), which
+    // moved lines of text by a pixel on wide screens (pixel check, 12 Nov
+    // 2026). Production: no source maps (AGENTS.md §15).
+    css: { preprocessorOptions: { scss: { style: "compressed" } } },
+    build: { sourcemap: false, cssMinify: false },
   },
 });

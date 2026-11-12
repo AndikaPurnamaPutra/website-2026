@@ -1,0 +1,9 @@
+---
+// CTA button from Figma (Contact CTA 1523:3282).
+// Idle shows the label and caption; hover/focus reveals the frame and arrow.
+// variant "light" (Motto, Figma 1527:4247) is white on dark.
+const { label, href, caption, variant } = Astro.props;
+---
+<div class:list={["cta", variant && `cta--${variant}`]}><a class="cta__button" href={href}><span class="cta__label text-18">{label}</span><span class="cta__icon"><img src={variant === "light" ? "assets/icons/arrow-circle-white.svg" : "assets/icons/arrow-circle.svg"} width="32" height="32" alt=""></span></a>
+  {caption && <p class="cta__caption text-14 text-medium">{caption}</p>}
+</div>

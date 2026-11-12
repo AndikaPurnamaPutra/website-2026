@@ -1,0 +1,12 @@
+---
+import Default from "../layouts/Default.astro";
+import PageMeta from "../components/PageMeta.astro";
+import HeaderBack from "../components/HeaderBack.astro";
+import Policy from "../components/Policy.astro";
+import { title, meta, sections } from "../data/privacy-policy.js";
+---
+<Default>
+  <PageMeta slot="meta" title="Privacy Policy — OWW" description="How One Week Wonders Studio™ collects, uses and protects the personal information you share with us through our website and services." path="privacy-policy.html" />
+  <HeaderBack slot="header" />
+  <Policy title={title} meta={meta} sections={sections} />
+</Default>

@@ -1,0 +1,42 @@
+---
+// Figma: Footer 1574:1193 (homepage 1574:796). Shared by all pages via the
+// layout. src/js/footer-form.js opens a mailto: link with the visitor's email
+// in the subject. Without JS the form leads to the Contact page: a mailto:
+// action on an https page counts as an insecure form (Lighthouse, 12 Nov
+// 2026: "mixed content", Best Practices 75 on every page). The input is the
+// visitor's email (user; it was the company name), shown as an example
+// address (user's pick).
+import ButtonText from "./ButtonText.astro";
+import { footerColumns, legalLinks } from "../data/navigation.js";
+---
+<footer class="site-footer">
+  <div class="site-footer__inner"><a class="site-footer__logo" href="index.html" aria-label="One Week Wonders — Home"><img src="assets/images/logo.svg" width="50.25" height="24" alt=""></a><img class="site-footer__coin" src="assets/images/hero/coin.webp" width="366" height="344" alt="" loading="lazy">
+    <form class="site-footer__form" action="contact.html" method="get" data-footer-form>
+      <label class="site-footer__label" for="footer-email">Get in Touch</label>
+      <input class="site-footer__input" id="footer-email" type="email" name="subject" placeholder="you@company.com" autocomplete="email" required>
+      <button class="button button--small" type="submit"><ButtonText text="Send email" />
+      </button>
+    </form>
+    <nav class="site-footer__columns" aria-label="Footer">
+      {footerColumns.map((column) => (
+        <div class="site-footer__column">
+          <p class="site-footer__title">{column.title}</p>
+          <ul class="site-footer__links">
+            {column.links.map(([name, href]) => (
+              <li><a class="site-footer__link" href={href}>{name}</a></li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </nav>
+    <p class="site-footer__about">Agency with incredible design and development expertise.<br>Based in Yogyakarta, Indonesia.</p>
+    <div class="site-footer__bottom">
+      <p class="site-footer__copy">©2026  /  One Week Wonders Studio</p><span class="site-footer__line"></span>
+      <ul class="site-footer__legal">
+        {legalLinks.map(([name, href]) => (
+          <li><a class="site-footer__link" href={href}>{name}</a></li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</footer>

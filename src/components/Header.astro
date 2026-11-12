@@ -1,0 +1,62 @@
+---
+// The navbar, with the Work mega menu (Figma "Dropdown - Expand" 1596:442;
+// src/js/work-menu.js), and the phone menu (src/js/mobile-menu.js).
+import { navLinks, workCategories, workSets } from "../data/navigation.js";
+import { socialLinks } from "../data/site-links.js";
+---
+<header class="site-header" data-header>
+  <div class="container site-header__inner"><a class="site-header__logo" href="index.html" aria-label="One Week Wonders — Home"><img src="assets/images/logo.svg" width="50.25" height="24" alt=""></a>
+    <nav aria-label="Main">
+      <ul class="site-nav">
+        <li class="site-nav__item site-nav__item--work" data-work-menu><a class="site-nav__link" href="#" aria-expanded="false" aria-controls="work-menu">Work<img src="assets/icons/chevron-down.svg" width="16" height="16" alt=""></a>
+          <div class="work-menu" id="work-menu"><span class="work-menu__bg" aria-hidden="true"></span>
+            <div class="work-menu__content">
+              <div class="work-menu__brand">
+                <p class="work-menu__title">Digital<br>Expertise</p>
+                <p class="work-menu__copy">©2026  /  One Week Wonders Studio</p>
+              </div>
+              <ul class="work-menu__links">
+                {workCategories.map(([name, count]) => (
+                  <li><a class="work-menu__link" href="#"><span>{name}</span><span class="work-menu__count">{count}</span></a></li>
+                ))}
+              </ul>
+              <div class="work-menu__featured">
+                <div class="work-menu__sets">
+                  {workSets.map((set, k) => (
+                    <div class:list={["work-menu__set", k === 0 && "is-active"]} aria-hidden={k === 0 ? undefined : "true"}>{set.map((image) => (<a class="work-menu__card" href="#" tabindex={k === 0 ? undefined : "-1"}><img src={`assets/images/${image}`} alt="" loading="lazy"><span class="work-menu__badge">New</span></a>))}
+                    </div>
+                  ))}
+                </div>
+                <div class="work-menu__dots" role="tablist" aria-label="Featured projects">
+                  {workSets.map((_, k) => (
+                    <button class="work-menu__dot" type="button" role="tab" aria-selected={k === 0 ? "true" : "false"} aria-label={`Projects ${k + 1}`}></button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        {navLinks.map(([name, href]) => (
+          <li class="site-nav__item"><a class="site-nav__link" href={href}>{name}</a></li>
+        ))}
+      </ul>
+    </nav>
+    <button class="site-header__menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle><span class="site-header__menu-label"><span>Menu</span><span aria-hidden="true">Close</span></span></button>
+  </div>
+</header>
+<div class="mobile-menu" id="mobile-menu" data-mobile-menu hidden>
+  <nav class="mobile-menu__inner" aria-label="Menu">
+    <ul class="mobile-menu__links">
+      {[["Work", "#"], ...navLinks].map(([name, href]) => (
+        <li><a class="mobile-menu__link" href={href}><span>{name}</span></a></li>
+      ))}
+    </ul>
+    <div class="mobile-menu__info">
+      <ul class="mobile-menu__list mobile-menu__list--row">
+        {socialLinks.map(([name, href]) => (
+          <li><a href={href}>{name}</a></li>
+        ))}
+      </ul>
+    </div>
+  </nav>
+</div>

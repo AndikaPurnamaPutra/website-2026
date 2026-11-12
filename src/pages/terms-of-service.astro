@@ -1,0 +1,12 @@
+---
+import Default from "../layouts/Default.astro";
+import PageMeta from "../components/PageMeta.astro";
+import HeaderBack from "../components/HeaderBack.astro";
+import Policy from "../components/Policy.astro";
+import { title, meta, sections } from "../data/terms-of-service.js";
+---
+<Default>
+  <PageMeta slot="meta" title="Terms of Service — OWW" description="The terms that apply when you use the One Week Wonders Studio™ website and when you work with us on a project." path="terms-of-service.html" />
+  <HeaderBack slot="header" />
+  <Policy title={title} meta={meta} sections={sections} />
+</Default>

@@ -1,0 +1,42 @@
+---
+// The page frame (was src/pug/layouts/default.pug). Barba
+// (src/js/page-transition.js): the body holds the pages, <main> is the part
+// swapped; the navbar and the footer stay. Slots: "meta" (title and
+// description, src/components/PageMeta.astro), "preloader-start" and
+// "preloader" (the homepage's preloader), "header" (Privacy and Terms have
+// their own bar).
+import "../scss/main.scss";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import PageMeta from "../components/PageMeta.astro";
+
+const { namespace = "page" } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <slot name="meta"><PageMeta title="One Week Wonders Studio" description="One Week Wonders Studio™ is a design and development agency in Yogyakarta, Indonesia." /></slot>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="assets/images/meta/apple-touch-icon.png">
+    <meta name="theme-color" content="#ffffff">
+    {/* Marks JS as available before the first paint, so styles for the JS
+        versions (e.g. the Motto lights, hidden until their step) apply at once. */}
+    <script is:inline>document.documentElement.classList.add("js");</script>
+    <slot name="preloader-start" />
+    {/* The fonts of the first screen (the headings, the menu), fetched with
+        the page rather than once the CSS is read (AGENTS.md §15). */}
+    <link rel="preload" href="assets/fonts/GeneralSans-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/Inter-Medium.woff2" as="font" type="font/woff2" crossorigin>
+  </head>
+  <body data-barba="wrapper">
+    <slot name="preloader" />
+    <slot name="header"><Header /></slot>
+    <main data-barba="container" data-barba-namespace={namespace}>
+      <slot />
+    </main>
+    <Footer />
+    <script>import "../js/main.js";</script>
+  </body>
+</html>

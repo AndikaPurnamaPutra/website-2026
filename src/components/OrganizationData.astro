@@ -1,0 +1,25 @@
+---
+// The studio for search engines (schema.org), on the homepage.
+import { siteUrl, siteName } from "../data/site.js";
+
+const data = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: siteName,
+  email: "owwstudio@gmail.com",
+  telephone: "+62 878 869 785 4",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Jl. Raya Tajem No.A09 RT.05 RW.27 Kenayan, Wedomartani, Kec. Ngemplak",
+    addressLocality: "Kab. Sleman",
+    addressRegion: "Daerah Istimewa Yogyakarta",
+    postalCode: "55584",
+    addressCountry: "ID",
+  },
+};
+if (siteUrl) {
+  data.url = siteUrl;
+  data.logo = `${siteUrl}/assets/images/logo.svg`;
+}
+---
+<script type="application/ld+json" is:inline set:html={JSON.stringify(data)} />

@@ -1,0 +1,7 @@
+---
+// The plain button's text ("More Work", "Send email"): the text, and a light
+// and a dark copy over it that the hover's sweep swaps (_cta-button.scss).
+// The copies are hidden from screen readers.
+const { text } = Astro.props;
+---
+{text}<span class="button__light" aria-hidden="true">{text}</span><span class="button__ink" aria-hidden="true">{text}</span>

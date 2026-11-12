@@ -1,0 +1,38 @@
+---
+// Legal page body shared by Privacy Policy (Figma 1611:7774) and Terms of
+// Service (1611:11735). Styles: src/scss/pages/_policy.scss.
+// title: the h1 lines; meta: [label, value] rows; sections: { title, groups }.
+// Groups are 8px apart, the items of a group 2px apart.
+import PolicyItem from "./PolicyItem.astro";
+
+const { title, meta, sections } = Astro.props;
+---
+<article class="policy">
+  <div class="container">
+    <header class="policy__header">
+      <h1 class="policy__title text-heading-42">{title.map((line, i) => (<>{i > 0 && <br>}{line}</>))}</h1>
+      <dl class="policy__meta">
+        {meta.map(([label, value]) => (
+          <div class="policy__meta-row">
+            <dt>{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </header>
+    <ol class="policy__sections">
+      {sections.map((section, index) => (
+        <li class="policy__section"><span class="policy__number" aria-hidden="true">{`${index + 1}.`}</span>
+          <div class="policy__body">
+            <h2 class="policy__heading">{section.title}</h2>
+            {section.groups.map((group) => (
+              <div class="policy__group">
+                {group.map((item) => <PolicyItem item={item} />)}
+              </div>
+            ))}
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</article>

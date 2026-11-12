@@ -265,8 +265,21 @@ scripts/
   lagi bisa build setelah aset dipindah). Dicek: 226 file aset hasil skrip
   identik byte demi byte dengan hasil Gulp; dev server membuka
   `nama.html` (200).
-- [ ] Langkah 2 — layout + komponen bersama.
-- [ ] Langkah 3 — halaman per halaman.
+- [x] **Langkah 2 — layout + komponen bersama** (12 Nov 2026):
+  `layouts/Default.astro` (slot `meta`, `preloader-start`, `preloader`,
+  `header`), `Header`, `HeaderBack`, `Footer`, `PageMeta`,
+  `OrganizationData`, `CtaButton`, `ButtonText`; data `src/data/site.js`,
+  `site-links.js`, `navigation.js`. `compressHTML: false` (Astro merapatkan
+  spasi; "©2026  /  …" memakai `white-space: pre`). CSS dikompres Sass
+  sendiri, `cssMinify: false`: pengecil CSS Vite menulis ulang angka dan
+  aturan, teks bergeser 1 px di 1920. URL di SCSS `../assets/` → `/assets/`
+  (9). Sesudah: CSS identik dengan Gulp selain 9 URL itu. JS: Vite
+  menggabung `main.js` + chunk bersama (299 KB), `coin-scene` tetap terpisah.
+- [ ] Langkah 3 — halaman per halaman:
+  - [x] Privacy, Terms (`Policy`, `PolicyItem`; data
+    `src/data/privacy-policy.js`, `terms-of-service.js`): HTML identik dengan
+    Pug, piksel identik di 375 / 768 / 1024 / 1440 / 1920, tanpa error JS.
+  - [ ] Styleguide, Contact, Home, About.
 - [ ] Langkah 4 — cek, hapus Pug + Gulp.
 
 ### Belum pasti

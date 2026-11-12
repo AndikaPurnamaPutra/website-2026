@@ -1,0 +1,33 @@
+---
+// One item of a legal page (Privacy Policy, Terms of Service; Policy.astro).
+// Item types:
+//   p    lines ("" = empty line)
+//   lead [bold lead-in, text]: one paragraph starting in bold
+//   sub  bold subheading
+//   ul / ol  entries: "text" or [bold label, text]
+//   html paragraph with inline markup
+//   num  { num: "3.1", items: [...] }: numbered subsection
+const { item } = Astro.props;
+const List = item.ul ? "ul" : "ol";
+---
+{item.p ? (
+  <p>{item.p.map((line, i) => (<>{i > 0 && <br>}{line}</>))}</p>
+) : item.lead ? (
+  <p><strong>{item.lead[0]}</strong> {item.lead[1]}</p>
+) : item.sub ? (
+  <p class="policy__sub">{item.sub}</p>
+) : item.ul || item.ol ? (
+  <List class:list={["policy__list", item.ol && "policy__list--numbered"]}>
+    {(item.ul || item.ol).map((entry) => (
+      <li>{Array.isArray(entry) ? (<><strong>{entry[0]}</strong> {entry[1]}</>) : entry}</li>
+    ))}
+  </List>
+) : item.html ? (
+  <p set:html={item.html} />
+) : item.num ? (
+  <div class="policy__subsection"><span class="policy__subnumber">{item.num}</span>
+    <div class="policy__group">
+      {item.items.map((child) => <Astro.self item={child} />)}
+    </div>
+  </div>
+) : null}

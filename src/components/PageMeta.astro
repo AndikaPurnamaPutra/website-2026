@@ -1,0 +1,28 @@
+---
+// Page head for SEO and link previews (AGENTS.md §15,
+// docs/implementation/29-seo-performance.md): title, description, Open
+// Graph and Twitter Card, canonical. siteUrl is the live site's address, set
+// once the domain is known (user: later); until then the tags that need a
+// full address (canonical, og:url, og:image) are left out.
+import { siteUrl, siteName } from "../data/site.js";
+
+const { title, description, path = "", noindex = false } = Astro.props;
+const url = siteUrl ? `${siteUrl}/${path}` : null;
+const image = siteUrl ? `${siteUrl}/assets/images/meta/og-image.png` : null;
+---
+<title>{title}</title>
+<meta name="description" content={description}>
+{noindex && <meta name="robots" content="noindex">}
+{url && <link rel="canonical" href={url}>}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content={siteName}>
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+{url && <meta property="og:url" content={url}>}
+{image && <meta property="og:image" content={image}>}
+{image && <meta property="og:image:width" content="1200">}
+{image && <meta property="og:image:height" content="630">}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content={title}>
+<meta name="twitter:description" content={description}>
+{image && <meta name="twitter:image" content={image}>}
