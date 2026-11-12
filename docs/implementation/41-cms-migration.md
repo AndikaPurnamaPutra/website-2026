@@ -167,6 +167,97 @@ Pratinjau draf (Sanity Presentation) bisa ditambahkan nanti.
    sebagai SVG tunggal dari tampilan sekarang saat migrasi, sampai desainer
    memberi versi resminya; field "flip" dan kasus khusus GAN tidak ada.
 
+## Tahap 2 — Pug + Gulp → Astro, tanpa CMS (rencana implementasi)
+
+Status: **menunggu persetujuan pengguna**. Branch `astro/migration` (dari
+`dev`, 12 Nov 2026). Astro 7 (terbaru saat ini 7.4.x, dikunci di
+`package.json`).
+
+### Lingkup
+- Semua 6 halaman (`index`, `about`, `contact`, `privacy-policy`,
+  `terms-of-service`, `styleguide`), layout, 11 partial dan 4 mixin Pug
+  (±4.100 baris, `about.pug` saja 888) ditulis ulang sebagai komponen Astro.
+- Build Gulp diganti Astro (Vite). Pipeline gambar (JPG/PNG → WebP,
+  `IMAGE_STRETCH`, `IMAGE_WIDTHS`) dipindah ke skrip kecil yang jalan sebelum
+  `astro dev` / `astro build`.
+- **Tidak berubah:** semua `src/js/*.js`, semua `src/scss/**`, aset, Vercel.
+- **Di luar lingkup:** Sanity (tahap 3), tampilan atau animasi baru.
+
+### Struktur baru
+```
+src/
+  pages/        index.astro, about.astro, contact.astro, privacy-policy.astro,
+                terms-of-service.astro, styleguide.astro
+  layouts/      Default.astro            (dari layouts/default.pug)
+  components/   Header, Footer, Hero, Statement, Services, OurWork,
+                TrustedClients, Milestone, Motto, Preloader, WorkCarousel,
+                CtaButton (buttonText), Policy, PageMeta …
+  data/         services.js, work.js, clients.js, site-links.js …
+                (array yang sekarang di atas file Pug; tahap 3 diganti data
+                Sanity di tempat yang sama)
+  js/, scss/    tetap
+public/         src/static (favicon, robots.txt) + src/assets (font, ikon,
+                model, video, gambar) — URL tetap `assets/…`
+scripts/
+  images.mjs    JPG/PNG → WebP (sama seperti gulp `images`), ke public/
+```
+`src/pug/` dan `gulpfile.js` dihapus di akhir tahap, setelah lolos cek.
+
+### Langkah (satu commit per langkah, tiap langkah dicek)
+1. **Kerangka:** pasang `astro` (+ `sass` yang sudah ada); `astro.config.mjs`
+   (`build.format: "file"`, `outDir: dist`, tanpa integrasi lain);
+   `scripts/images.mjs`; npm scripts `dev` / `build` (images → astro).
+   Aset ke `public/`. Gulp tetap ada sementara untuk pembanding.
+2. **Layout + komponen bersama:** `Default.astro` (head, skrip inline `js`,
+   preload font, `<main data-barba="container">`, Header, Footer), PageMeta,
+   CtaButton. SCSS diimpor sekali; `url("../assets/…")` di SCSS menjadi
+   `/assets/…` (font, noise, mark GAN). `main.js` dimuat sekali di layout.
+3. **Halaman per halaman**, dari yang sederhana: Privacy → Terms → Styleguide
+   → Contact → Home (preloader + 7 section) → About (terbesar). Data array
+   pindah ke `src/data/`.
+4. **Cek tiap halaman** (lihat Verifikasi). Lolos semua → hapus Pug + Gulp,
+   perbarui AGENTS.md (§ build), `docs/`, `vercel.json` bila perlu.
+
+### Hal teknis yang diperhatikan
+- **Barba:** tidak memakai `ClientRouter` Astro; atribut `data-barba`
+  sama.
+- **URL `.html`:** `build.format: "file"` → `dist/about.html`. Di dev server
+  dicek `about.html` tetap terbuka (Barba dan link memakai `.html`).
+- **Skrip:** `main.js` lewat `<script>` Astro dibundel Vite ke `/_astro/…`
+  (module, defer, sama seperti sekarang). `import("./coin-scene.js")` tetap
+  terpisah (code splitting Vite). Skrip inline (`js`, `is-preloading`) pakai
+  `is:inline`.
+- **CSS:** satu file, global, tanpa style scoped; nama file berubah (hash)
+  — tidak ada yang merujuknya selain layout.
+- **Spasi antar elemen inline:** Pug (`pretty`) dan Astro memperlakukan
+  spasi berbeda; celah antar inline-block bisa berubah → dibandingkan
+  piksel (Verifikasi).
+- **`!=` Pug** (HTML mentah: kutipan testimonial, teks policy) → `set:html`.
+- **Gambar WebP** dibuat ke `public/assets/images/` (diabaikan git, seperti
+  `dist/` sekarang); sumber JPG/PNG tetap di `src/assets/`.
+
+### Verifikasi dan kriteria selesai
+1. **HTML sama:** untuk tiap halaman, HTML hasil Pug dan Astro dibandingkan
+   secara otomatis (urutan elemen, class, atribut, teks; spasi dan urutan
+   atribut diabaikan). Beda yang tersisa hanya yang disengaja (path CSS/JS
+   ber-hash, atribut Astro bila ada) dan dicatat.
+2. **Piksel sama:** screenshot tiap halaman di 375, 768, 1024, 1440, 1920
+   (reduced motion, supaya diam), Pug vs Astro, dibandingkan.
+3. **Cek otomatis langkah 8** (5 halaman × 19 ukuran): tanpa error JS, 404,
+   scroll samping, elemen keluar layar.
+4. **Animasi:** preloader, hero, Services pin/stack, Our Work carousel,
+   Trusted marquee, Motto, Principles, galeri, footer reveal, transisi
+   halaman (Barba), koin 3D — dicek di browser dan oleh pengguna.
+5. Lighthouse mobile tidak turun dibanding `dev`.
+6. `npm run dev` dan `npm run build` berjalan; Vercel preview branch ini
+   tampil sama dengan preview `dev`.
+
+### Belum pasti
+- Apakah dev server Astro 7 membuka `about.html` (bukan hanya `/about`).
+  Bila tidak: dicari jalan lain sebelum langkah 3, dilaporkan dulu.
+- Celah spasi inline: bila ada beda piksel yang tidak bisa dihindari,
+  dilaporkan per kasus.
+
 ## Tahapan
 1. ~~Selesaikan responsive (Pug).~~ Selesai 12 Nov 2026.
 2. Pindah ke Astro **tanpa CMS**, hasil sama persis (lihat ukuran

@@ -17,14 +17,22 @@ Treat Figma as the source of truth for layout, typography, colors, spacing, asse
 
 ## 3. Required Tech Stack
 
-- Gulp for the development workflow and build process.
-- Pug for HTML templates.
+- Astro for HTML templates and the build, with static output (plain HTML pages). It replaces Pug + Gulp (user decision, 12 Nov 2026; reasons in `docs/implementation/41-cms-migration.md`). Until the migration on `astro/migration` is finished, `src/pug/` and `gulpfile.js` stay only as a reference for comparison; do not add to them.
+- Sanity as the headless CMS. Its content is fetched at build time only; no CMS code runs in the visitor's browser. Sanity Studio is hosted separately, not inside the website.
 - Sass (SCSS) for styling.
 - Vanilla JavaScript for DOM interactions.
 - GSAP and ScrollTrigger for animations when required by the design.
 - Barba.js for page transitions when required by the design.
 
-Do not introduce React, Vue, Tailwind CSS, TypeScript, or other frameworks unless explicitly requested.
+Do not introduce React, Vue, Tailwind CSS, TypeScript, or other frameworks unless explicitly requested. This includes Astro's UI integrations (`@astrojs/react`, `@astrojs/vue` and the like).
+
+### Astro rules
+
+- Do not use Astro's View Transitions / `ClientRouter`: page transitions stay with Barba.js (`src/js/page-transition.js`).
+- Keep `build.format: "file"`, so pages stay at `about.html` (links and Barba use `.html`).
+- No scoped `<style>` in components: all styles stay in `src/scss/`.
+- Load `src/js/main.js` once, in the layout. Inline scripts that must run before the first paint use `is:inline`.
+- Content arrays live in `src/data/`, not inside components; for sections managed in Sanity, the same place takes the Sanity data.
 Do not introduce GrapesJS or another visual page builder unless explicitly requested.
 
 ## 4. Keep the Code Simple
@@ -33,18 +41,21 @@ Do not introduce GrapesJS or another visual page builder unless explicitly reque
 - Prefer straightforward, readable solutions.
 - Do not create unnecessary abstractions, components, files, dependencies, or configuration.
 - Do not install a library when a simple existing solution is sufficient.
-- Use reusable Pug layouts and partials when they genuinely reduce duplication.
+- Use reusable Astro layouts and components when they genuinely reduce duplication.
 - Keep styles in SCSS and scripts in JavaScript.
 - Follow the existing project structure and build workflow.
 - Do not replace the existing stack or rewrite working configuration without a clear reason.
 
 ## 5. Project Structure
 
-- Pug pages: `src/pug/pages/`
-- Pug layouts: `src/pug/layouts/`
-- Pug partials: `src/pug/partials/`
+- Pages: `src/pages/`
+- Layouts: `src/layouts/`
+- Components: `src/components/`
+- Content data: `src/data/`
 - SCSS: `src/scss/`
 - JavaScript: `src/js/`
+- Files served as they are (fonts, icons, models, videos, favicon, robots.txt): `public/`
+- Picture sources (JPG/PNG, converted to WebP by `scripts/images.mjs`): `src/assets/images/`
 - Generated website: `dist/`
 
 Create additional folders only when necessary.
@@ -65,6 +76,9 @@ Do not manually edit generated files inside `dist/`.
 - Match the provided responsive designs.
 - If a breakpoint or mobile layout is not specified, use the existing design as guidance and ask when a major layout decision is unclear.
 - Do not assume the desktop layout should simply be scaled down.
+- Text is never smaller than 12px at any screen size: use `fs-text()` for text set at 12–13 in Figma.
+- Touch targets are at least 44 × 44 on touch screens: add the element to the invisible layer in `src/scss/components/_tap-area.scss` rather than making it look larger.
+- Check every layout change at the standard sizes (320, 360, 375, 390, 412, 430, 744, 820, 834, 1024, 1180, 1280, 1366, 1440, 1512, 1920, 2560, and a phone held sideways): no sideways scroll, nothing off the screen.
 
 ## 8. Code Quality
 
@@ -96,6 +110,7 @@ Do not implement the entire website in one large, unreviewed change.
 - Explain important technical decisions in simple language.
 - Ask for clarification when required information is missing.
 - Never claim the design matches Figma without checking it.
+- Reply to the user in simple Bahasa Indonesia; explain technical terms briefly.
 
 
 ## 11. Planning Before Implementation
@@ -201,6 +216,7 @@ For each section:
   - `main`: production. Vercel deploys it to the live site. Only finished, approved work.
   - `dev`: daily work. Every task is committed and pushed here (Vercel makes a preview deployment).
   - `preloader/v1`, `preloader/v2`, …: one branch per preloader version, made from `dev`, each with its own Vercel preview. The chosen version is merged into `dev` (after confirmation); the others are deleted or kept as an archive.
+  - `astro/migration`: the move from Pug + Gulp to Astro (and later Sanity), made from `dev`; merged into `dev` once every check in `docs/implementation/41-cms-migration.md` passes, after confirmation.
 - Commit each completed task separately on `dev`, with a clear message.
 - **Always ask the user for confirmation before committing and pushing.** After a task is finished and verified, summarize the changes and the proposed commit message, then wait for explicit approval.
 - **Merge `dev` into `main` only when the user says the work is final**, and ask for confirmation before merging and pushing `main`.
@@ -231,3 +247,13 @@ Apply these to every page, new or changed. Where a page does not meet them yet, 
 - Animations: animate `transform`, `opacity` and `clip-path`; avoid animating layout properties; respect `prefers-reduced-motion`.
 - Do not add a dependency or an asset without considering its weight.
 - Check new or changed pages with Lighthouse (or an equivalent) and report the scores; aim for 90+ in Performance, Accessibility, Best Practices and SEO, and explain any gap.
+
+## 16. Content from the CMS
+
+Once a section's content comes from Sanity:
+
+- Every field has limits (text length, number of items, picture size), so that the longest or largest allowed content cannot break the layout.
+- The layout stays tidy at the smallest and the largest allowed number of items (for example 4 and 20 client logos).
+- Editors never enter layout numbers (px, crops, positions): use the image hotspot and the options the schema offers.
+- Alt text is required for every picture.
+- Change that section's content in Sanity only, not in the code.
