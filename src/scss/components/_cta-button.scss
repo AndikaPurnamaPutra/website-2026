@@ -100,7 +100,7 @@ $button-sweep: 0.5s cubic-bezier(0.33, 1, 0.68, 1);
 .button--small {
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fs(12);
+  font-size: fs-text(12);
   line-height: fs(15);
   letter-spacing: -0.02em;
   border: 0;

@@ -253,7 +253,7 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
 }
 
 .contact__note {
-  font-size: fs(13);
+  font-size: fs-text(13);
   line-height: calc(22 / 13);
   color: $color-hint;
 
@@ -476,7 +476,7 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
   max-width: fs(260);
   padding: fs(8) fs(12);
   font-weight: 400;
-  font-size: fs(12);
+  font-size: fs-text(12);
   line-height: calc(18 / 12);
   color: var(--color-white);
   background: var(--color-ink);
@@ -624,7 +624,7 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
   position: absolute;
   right: 0;
   bottom: fs(8);
-  font-size: fs(12);
+  font-size: fs-text(12);
   line-height: calc(19 / 12);
   opacity: 0.5;
   pointer-events: none;
@@ -676,7 +676,7 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
 
 .contact-form__dropzone-title,
 .contact-form__file-name {
-  font-size: fs(13);
+  font-size: fs-text(13);
   line-height: calc(20 / 13);
 }
 
@@ -688,7 +688,7 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
 
 .contact-form__dropzone-hint,
 .contact-form__file-size {
-  font-size: fs(12);
+  font-size: fs-text(12);
   line-height: calc(18 / 12);
   color: $color-hint;
 }
@@ -844,7 +844,7 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
 
 .contact-form__privacy {
   font-weight: 500;
-  font-size: fs(13);
+  font-size: fs-text(13);
   line-height: calc(22 / 13);
   color: $color-hint; // grey as the hints (was opacity, so the link can go dark)
 

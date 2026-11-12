@@ -950,6 +950,50 @@ yang paling mungkin, khusus layar sentuh (`hover: none`), desktop tak berubah:
 - [ ] Dicek di HP pengguna (showreel halus, koin tampil atau gambar
       penggantinya).
 
+## Langkah 8 — Cek akhir (12 Nov 2026)
+
+Alat: Chrome headless lewat DevTools Protocol, `dist/` lewat
+`python3 -m http.server`; 5 halaman × 19 ukuran (320×640, 360×780, 375×667,
+390×844, 412×915, 430×932, 844×390, 744×1133, 820×1180, 834×1194,
+1024×1366, 1180×820 — sentuh; 1024×768, 1280×720, 1366×768, 1440×900,
+1512×982, 1920×1080, 2560×1440 — mouse), tiap halaman digulir ½ layar demi
+½ layar dari atas ke bawah; dicek di tiap langkah: lebar dokumen, elemen
+keluar layar (yang tidak terpotong bingkainya), error JS, permintaan gagal,
+teks < 12px, area sentuh < 44px; screenshot di 8 ukuran.
+
+Hasil pertama: tanpa error JS, tanpa 404, tanpa scroll samping, tanpa elemen
+keluar layar. Temuan (semua disetujui pengguna dan diperbaiki):
+1. **Footer 1024–±1110:** teks "Agency with incredible design…" 3 baris,
+   menimpa baris ©2026 (kotaknya ikut `fluid`, hurufnya berhenti mengecil di
+   1280). Lebar kotak `max(fluid(548), fs(548))`; ≥ 1280 sama seperti dulu.
+   Diukur: jarak ke baris bawah 1024: −8 → 16, 1100: −2 → 22, 1280 dan 1440
+   tetap 36 dan 40.
+2. **Teks < 12px di tata letak desktop 1024–1366** (iPad tidur dan iPad Pro
+   juga): judul kartu Our Work, nama dan jabatan testimonial, teks kecil form
+   Contact, tombol kecil (10,7–11,6px). `fs-text()` (abstracts/_functions):
+   `max(0.75rem, fs(n))`, dipakai untuk semua `font-size: fs(12|13)`. Badge
+   8–10px tetap (disengaja). 1280–1439: teks 12 Figma 11,4 → 12px.
+3. **Koin hero menimpa "venture" di iPad tidur (1180×820 sentuh):** bukan
+   tata letak; kamera three.js menghitung sudut pandang sekali dari rasio
+   layar, lalu di layar sentuh kanvas di halaman menjadi tegak → koin 1,4×
+   terlalu besar di layar sentuh mendatar ≥ 1024 (dan di desktop setelah
+   jendela diubah ukurannya). `coin-scene.js`: `setAspect()` mengatur ulang
+   panjang fokus setiap rasio berubah. Sesudah: iPad tidur sama dengan
+   mouse 1180. Di bawah 1024 memang tanpa koin (keputusan 10 Nov).
+4. **Area sentuh < 44px di layar sentuh:** kategori Our Work (16), link footer
+   (22), panah carousel (26), link navbar tablet (17), dll. Lapisan
+   tak terlihat `::after` 44 × 44 (atau ukurannya sendiri bila lebih besar),
+   hanya `(hover: none)` (`components/_tap-area.scss`); tampilan tidak
+   berubah. Tidak untuk input dan tombol Submit Contact (`::after` terpakai).
+
+Dicek ulang (95 kombinasi): tanpa error, 404, scroll samping, elemen keluar
+layar, teks < 12px. Belum: Lighthouse mobile (perlu `npx lighthouse` atau
+DevTools), Safari iOS di iPhone pengguna, kehalusan animasi.
+
+- [x] Dikerjakan dan dicek (Chrome headless).
+- [ ] Lighthouse mobile.
+- [ ] Safari iOS (iPhone pengguna).
+
 ## Kriteria selesai
 - Tidak ada scroll ke samping di lebar mana pun dari 320px.
 - Teks terbaca tanpa zoom (≥ 12px), area sentuh ≥ 44px.

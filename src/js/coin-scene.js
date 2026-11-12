@@ -95,7 +95,18 @@ export function mountCoin(anchors, fallback) {
   const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
   camera.position.set(0, 0, 3.15);
   camera.lookAt(0, 0, 0);
-  camera.setFocalLength(120);
+  // The field of view follows from the focal length and the aspect ratio at
+  // the time it is set, so it is set again whenever the aspect changes
+  // (setAspect): kept from the first one, a canvas that changed from wider
+  // than tall to taller than wide (touch screens held sideways: the canvas
+  // on the page is tall) drew the coin 1.4 × too large (iPad sideways: over
+  // the headline; final check, 12 Nov 2026), and so did a resized window.
+  const FOCAL = 120;
+  camera.setFocalLength(FOCAL);
+  const setAspect = (aspect) => {
+    camera.aspect = aspect;
+    camera.setFocalLength(FOCAL);
+  };
 
   // The entrance starts only once the studio light (HDRI) and the model are
   // both in and the shaders are compiled (with a first, hidden frame): else
@@ -431,7 +442,7 @@ export function mountCoin(anchors, fallback) {
     view.h = Math.round(bottom - placedTop);
     Object.assign(stage.style, { position: "absolute", inset: "auto", left: "0", top: `${placedTop}px`, width: `${view.w}px`, height: `${view.h}px` });
     renderer.setSize(view.w, view.h);
-    camera.aspect = view.w / view.h;
+    setAspect(view.w / view.h);
     placed = where;
     justPlaced = true;
   };
@@ -444,7 +455,7 @@ export function mountCoin(anchors, fallback) {
     view.w = window.innerWidth;
     view.h = window.innerHeight;
     renderer.setSize(view.w, view.h);
-    camera.aspect = view.w / view.h;
+    setAspect(view.w / view.h);
   };
   window.addEventListener("resize", onResize);
 

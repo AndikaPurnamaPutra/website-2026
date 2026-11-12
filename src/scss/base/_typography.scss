@@ -90,7 +90,7 @@
 .text-13 {
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fs(13);
+  font-size: fs-text(13);
   line-height: 1;
   letter-spacing: -0.02em;
 }
@@ -98,7 +98,7 @@
 .text-12 {
   font-family: var(--font-body);
   font-weight: 400;
-  font-size: fs(12);
+  font-size: fs-text(12);
   line-height: 1.4;
   letter-spacing: -0.02em;
 }

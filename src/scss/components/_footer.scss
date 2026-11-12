@@ -207,7 +207,11 @@ body {
   position: absolute;
   top: fluid(415);
   left: var(--page-gutter);
-  width: fluid(548);
+  // At least as wide as its text needs (fs): the box narrows with the layout
+  // but the type stops shrinking at 1280, so at 1024–1110 it ran to three
+  // lines over the copyright line (final check, 12 Nov 2026). The same as
+  // before from 1280 up.
+  width: max(#{fluid(548)}, #{fs(548)});
   font-family: var(--font-display);
   font-size: fs(20);
   line-height: calc(27 / 20);

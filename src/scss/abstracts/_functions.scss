@@ -9,3 +9,11 @@
 @function fs($value) {
   @return calc(#{$value} * var(--type-px));
 }
+
+// fs() for small text (12 and 13 in Figma): never under 12px (0.75rem), the
+// smallest size read without zoom (plan 32, final check, 12 Nov 2026: on the
+// desktop layout at 1024–1366 the type scale's floor took them to 10.7–11.6).
+// Not for sizes other than text, nor the badges set smaller on purpose.
+@function fs-text($value) {
+  @return max(0.75rem, #{fs($value)});
+}

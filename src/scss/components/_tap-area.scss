@@ -1,0 +1,26 @@
+// Touch targets at least 44 × 44 (plan 32, final check, 12 Nov 2026: on touch
+// screens the category links were 16 tall, the footer links 22, the carousel
+// arrows 26, the tablet navbar links 17). Not by making them larger, which
+// would change the design: an invisible layer 44 × 44 (or the link's own
+// size when larger) centred on each, on touch screens only. Their ::after
+// is free (checked); position: relative under :where(), so the ones placed
+// absolutely (the footer logo on wider screens, the showreel button) keep it.
+// Not the inputs (no ::after on an input) nor the Contact submit button
+// (its ::after is taken; 39 tall).
+$tap-targets: ".our-work__category, .site-footer__link, .site-footer__logo, .work-carousel__arrow, .site-nav__link, .site-header__logo, .site-header__back, .contact__office-link, .contact-form__info-button, .button, .cta__button, .hero__showreel-button";
+
+@media (hover: none) {
+  :where(#{$tap-targets}) {
+    position: relative;
+  }
+
+  :is(#{$tap-targets})::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+}

@@ -4212,7 +4212,7 @@
     row-gap: fs(2);
 
     span + span {
-      font-size: fs(12);
+      font-size: fs-text(12);
       color: var(--color-text-secondary);
     }
   }
