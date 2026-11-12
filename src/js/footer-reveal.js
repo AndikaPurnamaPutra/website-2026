@@ -54,30 +54,42 @@ export function initFooterReveal() {
     };
   }
 
-  const tween = gsap.fromTo(
-    footer,
-    { y: () => -LAG * reach(), "--footer-shade": SHADE },
-    {
-      y: 0,
-      "--footer-shade": 0,
-      ease: "none",
-      scrollTrigger: {
-        trigger: above,
-        start: "bottom bottom",
-        end: () => `+=${reach()}`,
-        scrub: true,
-        invalidateOnRefresh: true,
-        // Measured after the pins above (Services, Motto, the showreel), which
-        // lengthen the page: measured before them, it ended about 7,500px too
-        // early and the footer no longer came up from behind.
-        refreshPriority: -1,
-      },
-    },
-  );
+  // Read from where the section above actually ends on screen, every frame,
+  // not from a scroll position worked out at the last refresh: the page's
+  // length changes after it (pictures and videos loading, pins measured
+  // again, a page shown by a transition), and a stale start left the footer
+  // short of its place at the end of the page, its content still behind the
+  // section above and the dark layer still over it (user: sometimes the
+  // footer's content did not show, the dark layer hung). Measured so, the
+  // footer is always fully up and clear at the bottom of the page.
+  let height = reach();
+  const measure = () => {
+    height = reach();
+  };
+  const resize = new ResizeObserver(measure);
+  resize.observe(footer);
+  window.addEventListener("resize", measure);
+
+  const setY = gsap.quickSetter(footer, "y", "px");
+  let last = -1;
+  const update = () => {
+    if (!above || !height) return;
+    const passed = window.innerHeight - above.getBoundingClientRect().bottom;
+    const progress = Math.min(Math.max(passed / height, 0), 1);
+    if (progress === last) return;
+    last = progress;
+    setY(-LAG * height * (1 - progress));
+    footer.style.setProperty("--footer-shade", String(SHADE * (1 - progress)));
+  };
+  update();
+  // After ScrollTrigger and the smooth scroll have moved the page this frame.
+  gsap.ticker.add(update);
 
   return () => {
-    tween.scrollTrigger?.kill();
-    tween.kill();
-    gsap.set(footer, { clearProps: "transform,--footer-shade" });
+    gsap.ticker.remove(update);
+    resize.disconnect();
+    window.removeEventListener("resize", measure);
+    gsap.set(footer, { clearProps: "transform" });
+    footer.style.removeProperty("--footer-shade");
   };
 }

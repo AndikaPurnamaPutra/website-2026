@@ -125,9 +125,12 @@ export function initPageTransitions({ setUp, tearDown }) {
   });
 }
 
-// The page's sections (and the footer) on screen.
+// The page's sections (and the footer) on screen. The footer's content, not
+// the footer itself: the footer is moved by its reveal (src/js/footer-
+// reveal.js), and faded and moved here as well, the two fought over it and
+// the clearProps at the end wiped the reveal's place (it hung out of place).
 function inView(container) {
-  const parts = [...container.children, document.querySelector(".site-footer")].filter(Boolean);
+  const parts = [...container.children, document.querySelector(".site-footer__inner")].filter(Boolean);
   return parts.filter((part) => {
     const box = part.getBoundingClientRect();
     return box.bottom > 0 && box.top < window.innerHeight && box.height > 0;
