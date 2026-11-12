@@ -1,0 +1,57 @@
+---
+// Figma: "About" 1734:317 (docs/implementation/19-about.md).
+import Default from "../layouts/Default.astro";
+import PageMeta from "../components/PageMeta.astro";
+import ButtonText from "../components/ButtonText.astro";
+import Principles from "../components/about/Principles.astro";
+import { photos, team } from "../data/about.js";
+---
+<Default>
+  <PageMeta slot="meta" title="About — OWW" description="Meet One Week Wonders Studio™: the team behind brand identities, websites and apps for digital leaders. See how we work and the principles we work by." path="about.html" />
+  <div class="about">
+    <section class="about-intro">
+      <div class="container">
+        <h1 class="about-intro__title text-heading-42">We Are the Team We Wished<br>We Could Hire.</h1>
+        {/* Its frame opens as the picture rises in it (src/js/about-intro.js).
+            The picture is taller than the frame (more of Figma's original
+            photo above Figma's crop), so it can move in it as the page
+            scrolls. */}
+        <div class="about-intro__photo"><img src="assets/images/about/team.webp" srcset="assets/images/about/team-800.webp 800w, assets/images/about/team-1400.webp 1400w, assets/images/about/team.webp 2000w" sizes="100vw" width="1360" height="728" fetchpriority="high" alt="The One Week Wonders team together outdoors"></div>
+        <div class="about-intro__body">
+          <div class="about-intro__text">
+            <p class="about-intro__lead">One Week Wonders is a fast-moving creative team built to eliminate the long meetings and endless alignment meeting that keep great ideas grounded.</p>
+            <p class="about-intro__note">We work right alongside you, turning months of traditional planning into focused, one-week design sprints that deliver high-end websites, sharp visuals, and digital products ready for the real world.</p>
+          </div>
+          {/* Calendly comes later (as on Contact); Contact for now. */}
+          <div class="about-intro__cta"><a class="button text-18" href="contact.html"><ButtonText text="Schedule a call" /></a>
+            <p class="about-intro__cta-caption">Free 15min call</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <Principles />
+    {/* Gallery: "Play Video" is only a label for now (user decision: the
+        video comes later). No title in Figma: one for screen readers and
+        search engines only. */}
+    <section class="about-gallery">
+      <h2 class="visually-hidden">Gallery</h2>
+      <div class="container">
+        <div class="about-gallery__photos">
+          {photos.map(([file, [x, y, w, h], alt], i) => (
+            <figure class="about-gallery__photo" style={`--x: ${x}; --y: ${y}; --w: ${w}; --h: ${h}`}><img src={`assets/images/about/${file}`} width={w} height={h} alt={alt} loading="lazy">{i === 0 && <span class="about-gallery__play glass-button"><span class="text-14 text-medium">Play Video</span><img src="assets/icons/play.svg" width="16" height="16" alt=""></span>}
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+    <section class="about-team">
+      <h2 class="visually-hidden">Our team</h2>
+      <div class="container">
+        <p class="about-team__lead">The Engine only works because of the specialists behind the wheel. We don’t pass projects off to interns or hide behind account managers. Everyone assigned to your sprint is an active builder.</p>
+        <ul class="about-team__list">
+          {team.map(([name, role]) => <li class="about-team__member"><span>{name}</span><span>{role}</span></li>)}
+        </ul>
+      </div>
+    </section>
+  </div>
+</Default>

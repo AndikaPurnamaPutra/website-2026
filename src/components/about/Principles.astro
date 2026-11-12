@@ -1,0 +1,44 @@
+---
+// Principles (Figma 1734:383 and "Principles - 1…6" 1678:615 – 1678:660):
+// the section's heading; each principle's title under it (h3); one
+// illustration each (figures/), played by src/js/principles-scroll.js.
+import Tasks from "./figures/Tasks.astro";
+import Integrations from "./figures/Integrations.astro";
+import Design from "./figures/Design.astro";
+import Feedback from "./figures/Feedback.astro";
+import Progress from "./figures/Progress.astro";
+import Handoff from "./figures/Handoff.astro";
+import { principles } from "../../data/about.js";
+---
+<section class="principles" data-principles data-header-theme="dark">
+  <div class="container principles__inner">
+    <div class="principles__text">
+      <h2 class="principles__intro">Hundreds of products later, we’ve cut the noise. Here are the core principles we design by.</h2>
+      <div class="principles__detail">
+        <ol class="principles__numbers">
+          {principles.map((_, i) => (
+            <li>
+              <button class:list={["principles__number", i === 0 && "is-active"]} type="button">{String(i + 1).padStart(2, "0")}</button>
+            </li>
+          ))}
+        </ol>
+        <div class="principles__items">
+          {principles.map(([title, lines], i) => (
+            <div class:list={["principles__item", i === 0 && "is-active"]}>
+              <h3 class="principles__title">({title})</h3>
+              <p class="principles__description">{lines.map((line, k) => (<>{k > 0 && <br>}{line}</>))}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+    <div class="principles__figures">
+      <Tasks />
+      <Integrations />
+      <Design />
+      <Feedback />
+      <Progress />
+      <Handoff />
+    </div>
+  </div>
+</section>

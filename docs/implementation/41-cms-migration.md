@@ -275,7 +275,7 @@ scripts/
   aturan, teks bergeser 1 px di 1920. URL di SCSS `../assets/` → `/assets/`
   (9). Sesudah: CSS identik dengan Gulp selain 9 URL itu. JS: Vite
   menggabung `main.js` + chunk bersama (299 KB), `coin-scene` tetap terpisah.
-- [ ] Langkah 3 — halaman per halaman:
+- [x] Langkah 3 — halaman per halaman (12 Nov 2026):
   - [x] Privacy, Terms (`Policy`, `PolicyItem`; data
     `src/data/privacy-policy.js`, `terms-of-service.js`): HTML identik dengan
     Pug, piksel identik di 375 / 768 / 1024 / 1440 / 1920, tanpa error JS.
@@ -297,7 +297,17 @@ scripts/
     sama persis dengan Pug di 7 ukuran (pin Services / Motto sama); tanpa
     error JS; koin 3D tampil. Alat pembanding piksel kini menunggu semua
     gambar (lazy) termuat dulu: beda awal di Our Work hanya soal waktu.
-  - [ ] About.
+  - [x] About (`components/about/Principles.astro`; data
+    `src/data/about.js`: prinsip, foto galeri, tim). Keenam ilustrasi
+    Principles (`components/about/figures/`: Tasks, Integrations, Design,
+    Feedback, Progress, Handoff) diambil langsung dari HTML hasil Pug
+    (dekoratif, ratusan elemen kecil; `{ }` ditulis sebagai entitas): mixin
+    Pug-nya (`tmCard` dll.) tidak dipertahankan. HTML identik; piksel
+    identik di 5 ukuran; tinggi halaman sama dengan Pug di 7 ukuran; tanpa
+    error JS.
+  - [x] Transisi halaman (Barba) di build Astro: Home → About → Contact →
+    Privacy tanpa muat ulang, `<main>` berganti, tanpa error — sama dengan
+    build Pug.
 - [ ] Langkah 4 — cek, hapus Pug + Gulp.
 
 ### Belum pasti
