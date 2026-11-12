@@ -1,0 +1,92 @@
+---
+// Figma: "Contact - Idle" 1611:1042; states 1611:1972 – 1611:7579
+// (docs/implementation/17-contact.md). The form is not sent anywhere yet
+// (user decision): src/js/contact-form.js only plays its states.
+import Default from "../layouts/Default.astro";
+import PageMeta from "../components/PageMeta.astro";
+import ButtonText from "../components/ButtonText.astro";
+import TextField from "../components/contact/TextField.astro";
+import Chips from "../components/contact/Chips.astro";
+import { scopes, budgets, types, gallery, mapsUrl } from "../data/contact.js";
+---
+<Default>
+  <PageMeta slot="meta" title="Contact — OWW" description="Tell us about your project: your goals, timeline and budget. Or schedule a free 15-minute call with One Week Wonders Studio™ in Yogyakarta, Indonesia." path="contact.html" />
+  <section class="contact">
+    <div class="container contact__inner">
+      <div class="contact__aside">
+        <div class="contact__intro">
+          <div class="contact__heading">
+            <h1 class="text-heading-42">We’d love to hear from you. Tell us all the things.</h1>
+            <p class="contact__lead">Have an ambitious idea or a product ready to scale? Tell us about your goals, timeline, and vision—we’ll help you bring it to life.</p>
+          </div>
+          <div class="contact__cta"><a class="button text-18" href="#"><ButtonText text="Schedule a call" /></a>
+            <p class="contact__cta-caption">Free 15min call</p>
+          </div>
+        </div>
+        <div class="contact__office"><img class="contact__office-image" src="assets/images/contact/office.webp" width="210" height="122" alt="">
+          <div class="contact__office-info">
+            {/* Its hover: src/js/contact-office.js and _contact.scss. */}
+            <a class="contact__office-link" href={mapsUrl} target="_blank" rel="noopener" data-office-link><span class="contact__office-text">Office HQ</span><span class="contact__office-arrow"><img src="assets/icons/arrow-down-right.svg" width="9.5" height="9.5" alt=""></span></a>
+            <p class="contact__address">Jl. Raya Tajem No.A09 RT.05 RW.27 Kenayan,<br>Wedomartani, Kec. Ngemplak, Kab. Sleman<br>Daerah Istimewa Yogyakarta 55584</p>
+          </div>
+          <p class="contact__note">Not a full-scale project? No problem—reach out at <a href="mailto:owwstudio@gmail.com">owwstudio@gmail.com</a> and let’s see how we can collaborate.</p>
+        </div>
+      </div>
+      <form class="contact-form" novalidate data-contact-form>
+        <h2 class="contact-form__title">Start a project?</h2>
+        <div class="contact-form__fields">
+          <TextField name="company" label="Company Name" placeholder="Your company name" type="text" autocomplete="organization" />
+          <TextField name="name" label="Your Name" placeholder="Your name" type="text" autocomplete="name" />
+          <TextField name="email" label="Email" placeholder="Your email" type="email" autocomplete="email" />
+          <Chips name="scope" legend="Project Scope" options={scopes} type="checkbox" required />
+          <Chips name="budget" legend="Project Budget (USD)" options={budgets} type="radio" />
+          <Chips name="type" legend="Project Type" options={types} type="radio" required><span class="contact-form__info">
+<button class="contact-form__info-button" type="button" aria-describedby="contact-type-tip"><img src="assets/icons/info.svg" width="24" height="24" alt="About project types"></button><span class="contact-form__tip" id="contact-type-tip" role="tooltip">Inquiries: a one-off project. Partnership: ongoing work with our team.</span></span></Chips>
+          {/* Shown once a Project Type is chosen; its options follow the type. */}
+          <div class="contact-form__field" data-field="turnaround" hidden><span class="contact-form__label" id="contact-turnaround-label">Turnaround<span class="contact-form__required">*</span></span>
+            <div class="contact-form__select">
+              <input type="hidden" name="turnaround">
+              <button class="contact-form__select-button" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="contact-turnaround-label contact-turnaround-value"><span class="contact-form__select-value" id="contact-turnaround-value" data-placeholder="Select timeline">Select timeline</span><img src="assets/icons/caret-down.svg" width="24" height="24" alt=""></button>
+              <div class="contact-form__options" hidden>
+                <ul class="contact-form__option-list" role="listbox" aria-labelledby="contact-turnaround-label" tabindex="-1"></ul>
+                <div class="contact-form__deadline" hidden>
+                  <input class="contact-form__input" name="deadline" type="text" placeholder="write your deadline" aria-label="Your deadline">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="contact-form__field">
+            <label class="contact-form__label" for="contact-message">Tell us about your project...</label>
+            <div class="contact-form__message">
+              <textarea class="contact-form__input contact-form__textarea" id="contact-message" name="message" maxlength="200" placeholder="Give us a quick overview of your project, key goals, and any details we should know."></textarea>
+              <p class="contact-form__count" aria-live="polite"><span data-count>0</span>/200</p>
+            </div>
+          </div>
+          <div class="contact-form__field"><span class="contact-form__label">Document Attachment</span>
+            <label class="contact-form__dropzone" data-dropzone>
+              <input class="contact-form__file" type="file" name="attachment" accept=".pdf,.doc,.docx,.ppt,.pptx,image/*,video/*,audio/*"><img src="assets/icons/upload.svg" width="32" height="32" alt=""><span class="contact-form__dropzone-text"><span class="contact-form__dropzone-title">Drag and drop here or click to upload</span><span class="contact-form__dropzone-hint">PDF, DOC, PPTX or Media (max. 100mb)</span></span>
+            </label>
+            <div class="contact-form__upload" data-upload hidden><span class="contact-form__file-icon"><img src="assets/icons/file.svg" width="32" height="40" alt=""><span class="contact-form__file-type" data-file-type></span></span><span class="contact-form__file-info"><span class="contact-form__file-name" data-file-name></span><span class="contact-form__file-size" data-file-size></span><span class="contact-form__progress" data-progress><span class="contact-form__progress-track"><span class="contact-form__progress-fill" data-progress-fill></span></span><span class="contact-form__progress-value" data-progress-value>0%</span></span></span>
+              <button class="contact-form__file-remove" type="button" data-file-remove aria-label="Remove file" hidden><img src="assets/icons/close.svg" width="20" height="20" alt=""></button>
+            </div>
+          </div>
+        </div>
+        <div class="contact-form__divider"></div>
+        {/* Placeholder until Cloudflare Turnstile is set up (user decision). */}
+        <img class="contact-form__turnstile" src="assets/images/contact/turnstile-placeholder.webp" width="297" height="63" alt="">
+        <div class="contact-form__submit-row">
+          {/* data-label: the light copy its hover sweeps in (_contact.scss). */}
+          <button class="contact-form__submit" type="submit" data-label="Submit"><span data-submit-label>Submit</span><img class="contact-form__submit-check" src="assets/icons/check.svg" width="20" height="20" alt="" hidden></button>
+          <p class="contact-form__privacy">Your details are safe with us. By sending this, you agree to our <a href="privacy-policy.html">Privacy Policy</a>.</p>
+        </div>
+        <p class="contact-form__error" role="alert" hidden></p>
+        <button class="contact-form__again" type="button" data-again hidden>Submit another form</button>
+      </form>
+    </div>
+    {/* Endless marquee pushed by the scroll, stops on hover (src/js/marquee.js,
+        user decisions). */}
+    <div class="contact-gallery" data-marquee="pause scroll" data-marquee-speed="75" data-marquee-push="1.5" data-marquee-max="1500">
+      <div class="contact-gallery__track" data-marquee-track>{gallery.map((item, i) => (<a class="contact-gallery__item" href="#" style={`--w: ${item.size[0]}; --h: ${item.size[1]}`}><span class="contact-gallery__media"><img src={`assets/images/contact/gallery-${i + 1}.webp`} width={item.size[0]} height={item.size[1]} alt="" loading="lazy"></span><span class="contact-gallery__title text-13"><span>{item.title}</span></span></a>))}</div>
+    </div>
+  </section>
+</Default>

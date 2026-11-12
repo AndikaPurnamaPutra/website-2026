@@ -29,7 +29,7 @@ import { socialLinks } from "../data/site-links.js";
                 </div>
                 <div class="work-menu__dots" role="tablist" aria-label="Featured projects">
                   {workSets.map((_, k) => (
-                    <button class="work-menu__dot" type="button" role="tab" aria-selected={k === 0 ? "true" : "false"} aria-label={`Projects ${k + 1}`}></button>
+                    <>{k > 0 && "\n"}<button class="work-menu__dot" type="button" role="tab" aria-selected={k === 0 ? "true" : "false"} aria-label={`Projects ${k + 1}`}></button></>
                   ))}
                 </div>
               </div>

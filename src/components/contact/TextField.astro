@@ -1,0 +1,8 @@
+---
+const { name, label, placeholder, type, autocomplete } = Astro.props;
+---
+<div class="contact-form__field" data-field={name}>
+  <label class="contact-form__label" for={`contact-${name}`}>{label}<span class="contact-form__required">*</span>
+  </label>
+  <input class="contact-form__input" id={`contact-${name}`} name={name} type={type} placeholder={placeholder} autocomplete={autocomplete}>
+</div>

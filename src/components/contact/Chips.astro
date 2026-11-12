@@ -1,0 +1,14 @@
+---
+// A group of chips (checkboxes or radio buttons). The default slot goes
+// after the legend (the Project Type info button).
+const { name, legend, options, type, required = false } = Astro.props;
+---
+<fieldset class="contact-form__field" data-field={name}>
+  <legend class="contact-form__label">{legend}{required && <span class="contact-form__required">*</span>}<slot />
+  </legend>
+  <div class="contact-form__chips">
+    {options.map((option) => (
+      <>{"\n"}<label class="contact-form__chip">{"\n"}<input type={type} name={name} value={option}><span data-text={option}>{option}</span>{"\n"}</label></>
+    ))}
+  </div>
+</fieldset>

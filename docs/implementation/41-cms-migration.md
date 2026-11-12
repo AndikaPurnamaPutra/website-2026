@@ -279,7 +279,14 @@ scripts/
   - [x] Privacy, Terms (`Policy`, `PolicyItem`; data
     `src/data/privacy-policy.js`, `terms-of-service.js`): HTML identik dengan
     Pug, piksel identik di 375 / 768 / 1024 / 1440 / 1920, tanpa error JS.
-  - [ ] Styleguide, Contact, Home, About.
+  - [x] Styleguide, Contact (`contact/TextField`, `contact/Chips`; data
+    `src/data/contact.js`): HTML identik. Piksel: Styleguide identik;
+    Contact identik di 375 / 768 / 1024, di 1440 / 1920 22–27 piksel di
+    dalam foto galeri (penskalaan foto, tampak sama). Tanpa error JS.
+    Catatan: Pug menaruh baris baru di sekitar `label`, `input`, `button`,
+    `legend` (bukan elemen inline baginya); Astro meniru itu dengan `"\n"`
+    di tempat yang sama, supaya celah antar elemen tidak berubah.
+  - [ ] Home, About.
 - [ ] Langkah 4 — cek, hapus Pug + Gulp.
 
 ### Belum pasti
