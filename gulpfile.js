@@ -65,15 +65,36 @@ export const assets = () =>
 // stay PNG (the link preview and touch icon in images/meta) are left as they
 // are.
 const IMAGE_MAX = 2000;
+// Smaller copies for srcset (name-<width>.webp), where a large picture is
+// shown much smaller on phones (Lighthouse, 12 Nov 2026: the About team photo,
+// 2000px, was fetched whole by a 412px-wide phone).
+const IMAGE_WIDTHS = { "about/team.jpg": [800, 1400] };
+// Pictures that Figma stretches into a box of another shape (no object-fit):
+// written in that shape, so the browser has nothing to stretch (the same
+// look; Lighthouse flagged the wrong aspect ratio). The coin: 1024 × 576
+// into 448 × 420.
+const IMAGE_STRETCH = { "hero/coin.png": [1024, 960] };
 export const images = async () => {
   for await (const file of glob("src/assets/images/**/*.{jpg,jpeg,png}")) {
     if (file.includes("/meta/")) continue;
-    const out = `${paths.dist}/assets/images/${relative("src/assets/images", file).replace(/\.(jpe?g|png)$/i, ".webp")}`;
+    const name = relative("src/assets/images", file);
+    const out = `${paths.dist}/assets/images/${name.replace(/\.(jpe?g|png)$/i, ".webp")}`;
     await mkdir(dirname(out), { recursive: true });
+    const stretch = IMAGE_STRETCH[name];
     await sharp(file)
-      .resize({ width: IMAGE_MAX, height: IMAGE_MAX, fit: "inside", withoutEnlargement: true })
+      .resize(
+        stretch
+          ? { width: stretch[0], height: stretch[1], fit: "fill" }
+          : { width: IMAGE_MAX, height: IMAGE_MAX, fit: "inside", withoutEnlargement: true },
+      )
       .webp({ quality: 80 })
       .toFile(out);
+    for (const width of IMAGE_WIDTHS[name] ?? []) {
+      await sharp(file)
+        .resize({ width, withoutEnlargement: true })
+        .webp({ quality: 80 })
+        .toFile(out.replace(/\.webp$/, `-${width}.webp`));
+    }
   }
 };
 

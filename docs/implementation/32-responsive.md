@@ -991,7 +991,36 @@ layar, teks < 12px. Belum: Lighthouse mobile (perlu `npx lighthouse` atau
 DevTools), Safari iOS di iPhone pengguna, kehalusan animasi.
 
 - [x] Dikerjakan dan dicek (Chrome headless).
-- [ ] Lighthouse mobile.
+- [x] Lighthouse mobile (12 Nov 2026, Lighthouse 12, lihat di bawah).
+
+### Lighthouse mobile
+Preview Vercel (`responsive/plan`, sebelum perbaikan di bawah):
+
+| Halaman | Perf | A11y | BP | SEO |
+|---|---|---|---|---|
+| Home | 55 | 96 | 75 | 66 |
+| About | 68 | 100 | 71 | 66 |
+| Contact | 85 | 100 | 75 | 66 |
+| Privacy | 96 | 100 | 75 | 66 |
+
+- **SEO 66 hanya di preview:** Vercel memberi `x-robots-tag: noindex` pada
+  deploy preview. Lokal / produksi: 100.
+- **A11y 96 (Home):** kontras kalimat kedua Milestone (`#a0a0a0`, 2,6:1).
+  Dibiarkan sesuai desain (keputusan pengguna).
+- Diperbaiki:
+  - Form footer `action="mailto:…"` di halaman https = form tidak aman
+    ("mixed content", BP turun di semua halaman). Cadangan tanpa JS kini ke
+    `contact.html`; dengan JS tetap membuka mailto (`footer-form.js`).
+  - Gambar koin (`coin.webp`) ditarik dari 1024 × 576 ke kotak 448 × 420
+    (Figma): ditulis langsung 1024 × 960 oleh gulp (`IMAGE_STRETCH`),
+    tampilan sama, 34 KB.
+  - Foto tim About (LCP): `srcset` 800 / 1400 / 2000 (gulp `IMAGE_WIDTHS`);
+    HP mengunduh 94 KB, bukan ±500 KB. Lokal: LCP About 10,1 → 8,0 s.
+- Lokal sesudah: BP Home 100, About 96 (teks kecil di ilustrasi Principles:
+  tiruan aplikasi, bukan teks bacaan; dibiarkan).
+- Performance Home dibatasi oleh preloader (menunggu layar pertama, termasuk
+  video showreel 1,5 MB yang jadi LCP) dan logo/teks preloader yang baru
+  tampil setelah JS jalan (FCP). Belum diubah: keputusan desain.
 - [ ] Safari iOS (iPhone pengguna).
 
 ## Kriteria selesai
