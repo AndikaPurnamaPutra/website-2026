@@ -1048,6 +1048,10 @@ layar, berebut dengan file penting (FCP 3,8 s). Diperbaiki:
 - Ikon Behance (PNG 800 × 528 untuk 32 × 21): 96 px lebar, 22 → 2,5 KB.
 Lokal sesudah: "offscreen images" kosong, "responsive images" 4 KB; Home di
 320 / 390 / 834 / 1180 / 1440 tanpa error dan tanpa elemen keluar layar.
+Preview `dev` sesudah (`72e317c`), 8×: langsung setelah deploy 80 / 75 / 81
+(cache CDN masih dingin); beberapa menit kemudian 95 / 99 / 78 / 97 / 95
+(FCP 1,1–1,4 s, LCP 2,1–2,9 s). Yang 78: server lambat (TTFB ±2 s, biasanya
+±0,7 s). Unduhan di 1,5 s pertama: ±2 MB → 0,5–1,1 MB.
 - [x] Safari iOS (iPhone pengguna, 12 Nov 2026): lancar dari atas sampai
       footer di semua halaman (dicek pengguna sendiri). Lewat `safaridriver`
       sesi otomasi putus dua kali di y ≈ 11.400 (Milestone → Motto); dicek
