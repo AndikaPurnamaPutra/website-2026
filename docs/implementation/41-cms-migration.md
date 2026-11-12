@@ -1,5 +1,8 @@
 # 41 — Migrasi ke Astro + Sanity (rancangan, belum dikerjakan)
 
+Versi terakhir sebelum migrasi (Pug + Gulp) disimpan di branch
+**`archive/pug-final`** (= `dev` di `b0c059a`, 12 Nov 2026).
+
 Status: **rancangan lengkap, siap dikerjakan (12 Nov 2026)**. Responsive
 selesai dan digabung ke `dev` (12 Nov 2026); keputusan desain konten sudah
 dijawab (di bawah). Migrasi belum dimulai. Branch nanti: `astro/migration`
@@ -319,7 +322,13 @@ scripts/
   - [x] Cek otomatis 5 halaman × 19 ukuran: tanpa error JS, 404, scroll
     samping, elemen keluar layar, teks < 12px; tinggi halaman sama dengan
     build Pug di 95 kombinasi.
-  - [ ] Preview Vercel `astro/migration` + Lighthouse dibanding `dev`.
+  - [x] Preview Vercel `astro/migration` (5 halaman 200) + Lighthouse
+    mobile, diukur bergantian dengan `dev`. Home 7×: Astro 55 / 93 / 66 /
+    65 / 93 / 98 / 97, dev 86 / 89 / 89 / 89 / 82 / 97 / 97. Tiga yang awal
+    tepat setelah deploy (cache CDN masih dingin: FCP sampai 14,6 s);
+    sesudahnya setara, sisa angka rendah dari jaringan (fase TTFB LCP 3,4 s
+    di keduanya). About 77 / 81, Contact 83 / 75, Privacy 98 / 99. A11y
+    96–100, BP 96–100 di keduanya; SEO 66 = `noindex` preview.
   - [ ] Animasi dicek pengguna di preview.
 
 ### Belum pasti
