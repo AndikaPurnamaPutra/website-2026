@@ -1,0 +1,38 @@
+---
+// The homepage. The preloader plays here only (user): is-preloading shows it
+// from the first paint (not with reduced motion); src/js/preloader.js
+// removes it when done. Milestone and Motto share one wrapper whose
+// background turns from light to dark across the whole screen
+// (src/js/motto-scroll.js), with a screen-sized texture that stays in view
+// across it, so the dark background and its texture arrive together.
+import Default from "../layouts/Default.astro";
+import PageMeta from "../components/PageMeta.astro";
+import OrganizationData from "../components/OrganizationData.astro";
+import Preloader from "../components/home/Preloader.astro";
+import Hero from "../components/home/Hero.astro";
+import Statement from "../components/home/Statement.astro";
+import Services from "../components/home/Services.astro";
+import OurWork from "../components/home/OurWork.astro";
+import TrustedClients from "../components/home/TrustedClients.astro";
+import Milestone from "../components/home/Milestone.astro";
+import Motto from "../components/home/Motto.astro";
+---
+<Default>
+  <Fragment slot="meta">
+    <PageMeta title="Home — OWW" description="One Week Wonders Studio™ is a design and development agency in Yogyakarta, Indonesia, crafting brand identities, websites, apps and AI-powered products." />
+    <OrganizationData />
+  </Fragment>
+  <script slot="preloader-start" is:inline>
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("is-preloading");
+  </script>
+  <Preloader slot="preloader" />
+  <Hero />
+  <Statement />
+  <Services />
+  <OurWork />
+  <TrustedClients />
+  <div class="tone-shift" data-tone-shift><img class="tone-shift__texture" src="assets/images/motto/texture.webp" alt="" loading="lazy">
+    <Milestone />
+    <Motto />
+  </div>
+</Default>

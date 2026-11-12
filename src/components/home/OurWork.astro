@@ -1,0 +1,27 @@
+---
+import WorkCarousel from "../WorkCarousel.astro";
+import ButtonText from "../ButtonText.astro";
+import { categories, recentlyAdded, selectedWork } from "../../data/work.js";
+---
+<section class="our-work">
+  <div class="container our-work__header">
+    <div class="our-work__heading">
+      <p class="our-work__eyebrow text-16 text-muted">( Our Work )</p>
+      <h2 class="text-heading-42">Thoughtful Design,<br>Real Impact</h2>
+    </div>
+    <ul class="our-work__categories">
+      {categories.map((category) => <li><a class="our-work__category text-16" href="#">{category}</a></li>)}
+    </ul>
+  </div>
+  <div class="container">
+    <hr class="divider">
+  </div>
+  <div class="our-work__carousels">
+    <WorkCarousel title="Recently Added" items={recentlyAdded} />
+    <WorkCarousel title="Selected Work" items={selectedWork} />
+  </div>
+  <div class="container">
+    <hr class="divider">
+  </div>
+  <div class="container"><a class="button text-18" href="#"><ButtonText text="More Work" /></a></div>
+</section>

@@ -286,7 +286,18 @@ scripts/
     Catatan: Pug menaruh baris baru di sekitar `label`, `input`, `button`,
     `legend` (bukan elemen inline baginya); Astro meniru itu dengan `"\n"`
     di tempat yang sama, supaya celah antar elemen tidak berubah.
-  - [ ] Home, About.
+  - [x] Home (`components/home/`: Preloader, Hero, Statement, Services,
+    OurWork, TrustedClients, Milestone, Motto; `WorkCarousel`; data
+    `src/data/services.js`, `work.js`, `clients.js`, `milestone-motto.js`,
+    `preloader.js`; ikon Dribbble inline dari `components/icons/`): HTML
+    identik selain 8 atribut kosong (`data-work-carousel`, `-viewport`,
+    `-prev`, `-next`: Pug menulis `="data-work-…"`, Astro tanpa nilai; JS
+    hanya memeriksa keberadaannya). Piksel identik di 375 / 768 / 1440 /
+    1920, 20 piksel tersebar di 1024 (penskalaan gambar). Tinggi halaman
+    sama persis dengan Pug di 7 ukuran (pin Services / Motto sama); tanpa
+    error JS; koin 3D tampil. Alat pembanding piksel kini menunggu semua
+    gambar (lazy) termuat dulu: beda awal di Our Work hanya soal waktu.
+  - [ ] About.
 - [ ] Langkah 4 — cek, hapus Pug + Gulp.
 
 ### Belum pasti

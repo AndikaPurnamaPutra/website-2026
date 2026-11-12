@@ -1,0 +1,21 @@
+---
+// Preloader v2 (docs/implementation/20-preloader.md; Figma 1860:244 →
+// 1880:663 → 1880:803 → 1880:759 → 1880:836): white (Figma: black; user),
+// with the logo in the middle and "©2026 / One Week Wonders Studio" below;
+// it lifts off the page. The logo is drawn twice: an outline that follows the
+// loading, then a solid fill. src/js/preloader.js plays it; shown only while
+// <html> has is-preloading (set in <head>). The line below is in a window,
+// so it can rise into view.
+import { logoPaths } from "../../data/preloader.js";
+---
+<div class="preloader" aria-hidden="true" data-preloader>
+  <svg class="preloader__logo" viewBox="0 0 206 98" fill="none">
+    <g class="preloader__outline">
+      {logoPaths.map((d, i) => <>{i > 0 && "\n"}<path d={d}></path></>)}
+    </g>
+    <g class="preloader__solid">
+      {logoPaths.map((d, i) => <>{i > 0 && "\n"}<path d={d}></path></>)}
+    </g>
+  </svg>
+  <p class="preloader__year text-14 text-medium"><span>©2026  /  One Week Wonders Studio</span></p>
+</div>

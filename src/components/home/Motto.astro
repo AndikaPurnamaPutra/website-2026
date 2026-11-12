@@ -1,0 +1,27 @@
+---
+// Figma: storyboard "CTA - Darkmode" 1527:4259 (steps 1527:4134 → 4169 →
+// 4185 → 4201 → 4219 → 4241). Without JS the last frame (4241) is shown;
+// src/js/motto-scroll.js pins the section and plays the steps on scroll.
+// JS lays per-letter copies over the accent text so the gradient can arrive
+// letter by letter while the text itself keeps its kerning. The label
+// changes with motto 3 (Figma 1527:4219 / 4241). The glow from below (Figma
+// Ellipse 8998, 1527:4169 / 4201) is CSS gradients.
+import CtaButton from "../CtaButton.astro";
+import { mottos } from "../../data/milestone-motto.js";
+---
+<section class="motto" data-motto data-header-theme="dark" data-header-hide>
+  <div class="motto__backdrop">
+    <div class="motto__bg"></div>
+    <div class="motto__bg motto__bg--diagonal"></div><img class="motto__texture" src="assets/images/motto/texture.webp" alt="" loading="lazy">
+  </div>
+  <div class="motto__inner">
+    <p class="motto__label text-16"><span class="motto__label-text">( Our Motto’s )</span><span class="motto__label-text">( Got an idea? Let’s work with us )</span></p>
+    <div class="motto__lines">
+      {mottos.map((motto) => (
+        <p class="motto__line" style={`--motto-gradient: linear-gradient(${motto.gradient});`}>{motto.segments.map((segment) => segment.accent ? <span class="motto__accent">{segment.text}</span> : segment.text)}</p>
+      ))}
+    </div>
+    <CtaButton label="Get a Quote" href="contact.html" caption="Free 15min call" variant="light" />
+  </div>
+  <div class="motto__ellipse"></div>
+</section>

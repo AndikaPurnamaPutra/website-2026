@@ -1,0 +1,24 @@
+---
+// Project carousel from Figma (Our Work 1523:3330 / 1523:3359).
+// Each item: { title, image, crop: { w, h, x, y, round? }, inner? }
+// crop is the image box in Figma px, centered in the 325x244 frame and
+// shifted by x/y; inner is an extra crop inside that box (Figma "fill"
+// offsets).
+const { title, items } = Astro.props;
+---
+<div class="work-carousel" data-work-carousel>
+  <div class="container work-carousel__header">
+    <h3 class="work-carousel__title text-heading-28">{title}</h3>
+    <div class="work-carousel__nav">
+      <button class="work-carousel__arrow work-carousel__arrow--prev" type="button" aria-label={`Previous ${title}`} data-work-prev><img src="assets/icons/caret-right.svg" width="24" height="24" alt=""></button>
+      <button class="work-carousel__arrow" type="button" aria-label={`Next ${title}`} data-work-next><img src="assets/icons/caret-right.svg" width="24" height="24" alt=""></button>
+    </div>
+  </div>
+  <div class="work-carousel__viewport" data-work-viewport>
+    <ul class="work-carousel__track">
+      {items.map((item) => (
+        <li class="work-card"><a class="work-card__link" href="#"><span class="work-card__media"><span class:list={["work-card__crop", item.crop.round && "work-card__crop--round"]} style={`--w: ${item.crop.w}; --h: ${item.crop.h}; --x: ${item.crop.x}; --y: ${item.crop.y};`}><img class:list={["work-card__image", item.inner && "work-card__image--inner"]} src={item.image} alt="" loading="lazy" decoding="async" style={item.inner || undefined}></span></span><span class="work-card__title text-13">{item.title}</span></a></li>
+      ))}
+    </ul>
+  </div>
+</div>

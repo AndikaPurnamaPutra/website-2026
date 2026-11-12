@@ -1,0 +1,38 @@
+---
+// Without JS the testimonial row sits centered like Figma; JS duplicates it
+// into a marquee (src/js/marquee.js), always at its own pace: the page
+// scroll no longer pushes it (user).
+import { clients, testimonials } from "../../data/clients.js";
+---
+<section class="trusted">
+  <div class="trusted__inner">
+    <div class="trusted__header">
+      <p class="trusted__eyebrow text-16 text-muted">( Trusted Clients )</p>
+      <h2 class="text-heading-42">Helping startups and enterprises build scalable, future-ready digital products.</h2>
+    </div>
+    <div class="trusted__clients">
+      <ul class="trusted__logos">
+        {clients.map((client) => (
+          <li class="trusted__logo" style={`--w: ${client.w}; --h: ${client.h};`}><a class="trusted__logo-link" href="#"><img src={`assets/images/clients/${client.file}.svg`} alt={client.name} loading="lazy"><span class="trusted__logo-more">See More</span></a></li>
+        ))}
+      </ul>
+      <p class="trusted__more text-16 text-muted">and hundred more...</p>
+    </div>
+    <hr class="divider">
+  </div>
+  <div class="trusted__marquee" data-marquee="" data-marquee-speed="55">
+    <ul class="trusted__track" data-marquee-track>
+      {testimonials.map((item, i) => (
+        <li class:list={["testimonial-card", item.noise && "testimonial-card--noise"]}>
+          {item.logo.goodAtNumbers ? (
+            <span class="testimonial-card__logo testimonial-card__logo--gan" role="img" aria-label={item.company}><span class="testimonial-card__gan-mark"></span><img src="assets/images/testimonials/good-at-numbers-text.svg" alt="" loading="lazy"></span>
+          ) : (
+            <img class:list={["testimonial-card__logo", item.logo.flip && "testimonial-card__logo--flip"]} src={`assets/images/testimonials/${item.logo.file}`} alt={item.company} loading="lazy" style={`--w: ${item.logo.w}; --h: ${item.logo.h};`}>
+          )}
+          <p class="testimonial-card__quote" set:html={item.quote}></p>
+          <div class="testimonial-card__author"><img class="testimonial-card__avatar" src={`assets/images/testimonials/avatar-${i + 1}.webp`} alt="" loading="lazy"><span class="testimonial-card__person"><span class="testimonial-card__name">{item.name}</span><span class="testimonial-card__role">{item.role}</span></span></div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

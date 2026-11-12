@@ -1,0 +1,53 @@
+---
+// data-inview-area: the showreel video plays while this is on screen, the
+// showreel grown past its own box included (src/js/hero-showreel.js,
+// src/js/inview-videos.js). One span per line (Figma's lines, in the title
+// and the description), so src/js/hero-intro.js can raise them one by one
+// after the preloader. The accent is black at rest (user decision);
+// src/js/hero-highlight.js runs a brand-gradient wave through it on load and
+// on hover. The Dribbble icon is inline (same paths as
+// assets/icons/dribbble.svg, in currentColor) so the hover can recolour it.
+// The showreel preview is a light copy without sound (AGENTS.md §15); the
+// pop-up (reference: manual.studio) plays the full one; hero-showreel.js
+// moves the pop-up to <body>.
+import dribbble from "../icons/dribbble.svg?raw";
+---
+<section class="hero" data-inview-area>
+  <div class="container hero__inner"><img class="hero__coin" src="assets/images/hero/coin.webp" width="448" height="420" alt="" loading="lazy">
+    <div class="hero__content">
+      <div class="hero__intro">
+        <h1 class="hero__title text-display-80"><span class="hero__line"><span class="hero__line-text"><span class="hero__title-accent">Elite digital</span> products</span></span><span class="hero__line"><span class="hero__line-text">designed at venture</span></span><span class="hero__line"><span class="hero__line-text">speed</span></span></h1>
+        <ul class="hero__social">
+          <li><a class="hero__social-link hero__social-link--behance" href="https://www.behance.net" target="_blank" rel="noopener" aria-label="Behance"><img class="hero__social-icon--behance" src="assets/icons/behance.png" width="32" height="21" alt=""></a></li>
+          <li><a class="hero__social-link hero__social-link--dribbble" href="https://dribbble.com" target="_blank" rel="noopener" aria-label="Dribbble"><Fragment set:html={dribbble} /></a></li>
+        </ul>
+      </div>
+      <div class="hero__info">
+        <p class="hero__description text-14 text-medium"><span class="hero__line"><span class="hero__line-text">Strategy, visual systems, branding,</span></span><span class="hero__line"><span class="hero__line-text">and high-end web design. We define your identity</span></span><span class="hero__line"><span class="hero__line-text">and support your growth at every touchpoint.</span></span></p>
+        <div class="hero__datetime">
+          <p class="hero__date text-14 text-medium" data-hero-date>Wednesday, October 14</p>
+          <div class="hero__timezone"><span class="hero__timezone-label text-14 text-medium">IDN  /  GMT +7</span><span class="hero__time" data-hero-time>03:38PM</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="hero__showreel">
+      <video class="hero__showreel-image" poster="assets/images/hero/showreel-poster.webp" muted loop playsinline preload="metadata" aria-label="Showreel preview" data-inview-video>
+        <source src="assets/images/hero/showreel-preview.mp4" type="video/mp4">
+      </video>
+      <button class="hero__showreel-button glass-button" type="button"><span class="text-14 text-medium">Play Showreel</span><img src="assets/icons/play.svg" width="16" height="16" alt=""></button>
+    </div>
+  </div>
+  <div class="showreel-lightbox" data-showreel-lightbox role="dialog" aria-modal="true" aria-label="Showreel" aria-hidden="true">
+    <div class="showreel-lightbox__backdrop"></div>
+    <div class="showreel-lightbox__stage">
+      <video class="showreel-lightbox__video" poster="assets/images/hero/showreel-poster.webp" controls playsinline preload="none">
+        <source src="assets/images/hero/showreel.mp4" type="video/mp4">
+      </video>
+    </div>
+    <button class="showreel-lightbox__close" type="button" aria-label="Close">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+      </svg>
+    </button>
+  </div>
+</section>
