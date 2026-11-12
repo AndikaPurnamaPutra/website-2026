@@ -68,7 +68,14 @@ const IMAGE_MAX = 2000;
 // Smaller copies for srcset (name-<width>.webp), where a large picture is
 // shown much smaller on phones (Lighthouse, 12 Nov 2026: the About team photo,
 // 2000px, was fetched whole by a 412px-wide phone).
-const IMAGE_WIDTHS = { "about/team.jpg": [800, 1400] };
+const IMAGE_WIDTHS = {
+  "about/team.jpg": [800, 1400],
+  // Services pictures: full width on phones and tablets (Lighthouse, Home:
+  // the illustration, 269 KB, shown at phone width).
+  "services/illustration.jpg": [800],
+  "services/ui-ux.jpg": [800],
+  "services/ai-web.jpg": [800],
+};
 // Pictures that Figma stretches into a box of another shape (no object-fit):
 // written in that shape, so the browser has nothing to stretch (the same
 // look; Lighthouse flagged the wrong aspect ratio). The coin: 1024 × 576

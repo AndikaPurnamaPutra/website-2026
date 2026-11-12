@@ -37,7 +37,7 @@ section.trusted
         each client in clients
           li.trusted__logo(style=`--w: ${client.w}; --h: ${client.h};`)
             a.trusted__logo-link(href="#")
-              img(src=`assets/images/clients/${client.file}.svg` alt=client.name)
+              img(src=`assets/images/clients/${client.file}.svg` alt=client.name loading="lazy")
               span.trusted__logo-more See More
       p.trusted__more.text-16.text-muted and hundred more...
 
@@ -52,12 +52,12 @@ section.trusted
           if item.logo.goodAtNumbers
             span.testimonial-card__logo.testimonial-card__logo--gan(role="img" aria-label=item.company)
               span.testimonial-card__gan-mark
-              img(src="assets/images/testimonials/good-at-numbers-text.svg" alt="")
+              img(src="assets/images/testimonials/good-at-numbers-text.svg" alt="" loading="lazy")
           else
-            img.testimonial-card__logo(src=`assets/images/testimonials/${item.logo.file}` alt=item.company style=`--w: ${item.logo.w}; --h: ${item.logo.h};` class=item.logo.flip ? "testimonial-card__logo--flip" : null)
+            img.testimonial-card__logo(src=`assets/images/testimonials/${item.logo.file}` alt=item.company loading="lazy" style=`--w: ${item.logo.w}; --h: ${item.logo.h};` class=item.logo.flip ? "testimonial-card__logo--flip" : null)
           p.testimonial-card__quote!= item.quote
           .testimonial-card__author
-            img.testimonial-card__avatar(src=`assets/images/testimonials/avatar-${i + 1}.webp` alt="")
+            img.testimonial-card__avatar(src=`assets/images/testimonials/avatar-${i + 1}.webp` alt="" loading="lazy")
             span.testimonial-card__person
               span.testimonial-card__name= item.name
               span.testimonial-card__role= item.role

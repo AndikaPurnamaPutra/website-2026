@@ -1036,6 +1036,18 @@ Preview Vercel sesudah perbaikan (`8a9107b`):
 Performance naik-turun antar pengukuran (pengukuran pertama kemungkinan
 cache CDN masih dingin), jadi tidak semua kenaikan dari perbaikan.
 Target (A11y, BP, SEO ≥ 90 di produksi) tercapai.
+
+Performance Home (pengguna, 12 Nov 2026): diukur 3× di preview `dev`: 93,
+67, 98. Yang 67: ±2 MB diunduh di 1,5 s pertama, kebanyakan gambar di bawah
+layar, berebut dengan file penting (FCP 3,8 s). Diperbaiki:
+- `loading="lazy"` untuk gambar Our Work (10, ±750 KB), logo klien, logo dan
+  avatar testimonial, gambar koin hero dan footer (di HP koin disembunyikan
+  tapi gambarnya tetap diunduh).
+- Gambar Services `srcset` 800 / 2000 (gulp `IMAGE_WIDTHS`): ilustrasi di HP
+  269 → 89 KB, UI/UX 61 → 20 KB.
+- Ikon Behance (PNG 800 × 528 untuk 32 × 21): 96 px lebar, 22 → 2,5 KB.
+Lokal sesudah: "offscreen images" kosong, "responsive images" 4 KB; Home di
+320 / 390 / 834 / 1180 / 1440 tanpa error dan tanpa elemen keluar layar.
 - [x] Safari iOS (iPhone pengguna, 12 Nov 2026): lancar dari atas sampai
       footer di semua halaman (dicek pengguna sendiri). Lewat `safaridriver`
       sesi otomasi putus dua kali di y ≈ 11.400 (Milestone → Motto); dicek

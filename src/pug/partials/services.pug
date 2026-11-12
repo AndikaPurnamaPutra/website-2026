@@ -33,7 +33,7 @@ section.services(data-services data-header-theme="dark" data-header-hide)
           video.services__image(poster=`assets/images/services/${service.video}-poster.webp` muted loop playsinline preload="metadata" aria-label=service.alt data-inview-video)
             source(src=`assets/images/services/${service.video}.mp4` type="video/mp4")
         else
-          img.services__image(src=`assets/images/services/${service.image}.webp` alt=service.alt loading="lazy")
+          img.services__image(src=`assets/images/services/${service.image}.webp` srcset=`assets/images/services/${service.image}-800.webp 800w, assets/images/services/${service.image}.webp 2000w` sizes="(max-width: 1023.98px) 100vw, 65vw" alt=service.alt loading="lazy" decoding="async")
       //- One link over the pictures (each wrapped, the top one would take
       //- every click); src/js/services-scroll.js points it at the service in
       //- view. Placeholder pages until the service pages exist.

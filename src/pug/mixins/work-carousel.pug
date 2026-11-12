@@ -18,5 +18,5 @@ mixin workCarousel(title, items)
             a.work-card__link(href="#")
               span.work-card__media
                 span.work-card__crop(style=`--w: ${item.crop.w}; --h: ${item.crop.h}; --x: ${item.crop.x}; --y: ${item.crop.y};` class=item.crop.round ? "work-card__crop--round" : null)
-                  img.work-card__image(src=item.image alt="" style=item.inner || null class=item.inner ? "work-card__image--inner" : null)
+                  img.work-card__image(src=item.image alt="" loading="lazy" decoding="async" style=item.inner || null class=item.inner ? "work-card__image--inner" : null)
               span.work-card__title.text-13= item.title
