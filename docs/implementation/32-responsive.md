@@ -1036,7 +1036,11 @@ Preview Vercel sesudah perbaikan (`8a9107b`):
 Performance naik-turun antar pengukuran (pengukuran pertama kemungkinan
 cache CDN masih dingin), jadi tidak semua kenaikan dari perbaikan.
 Target (A11y, BP, SEO ≥ 90 di produksi) tercapai.
-- [ ] Safari iOS (iPhone pengguna).
+- [x] Safari iOS (iPhone pengguna, 12 Nov 2026): lancar dari atas sampai
+      footer di semua halaman (dicek pengguna sendiri). Lewat `safaridriver`
+      sesi otomasi putus dua kali di y ≈ 11.400 (Milestone → Motto); dicek
+      tanpa otomasi: tanpa reload, pesan error atau layar kosong, jadi yang
+      putus sambungan otomasinya.
 
 ## Kriteria selesai
 - Tidak ada scroll ke samping di lebar mana pun dari 320px.
@@ -1051,4 +1055,5 @@ Target (A11y, BP, SEO ≥ 90 di produksi) tercapai.
       langkahnya).
 - [x] Referensi navbar dari pengguna; usulan navbar disetujui.
 - [x] Langkah 1–2 (dasar; navbar + menu HP; footer).
-- [ ] Langkah 3–8.
+- [x] Langkah 3–8 (12 Nov 2026). Masih terbuka: cek pengguna Services di
+      iPad (3f), showreel dan koin di HP (7b).
