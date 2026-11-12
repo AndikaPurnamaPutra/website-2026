@@ -109,7 +109,7 @@ export function initPrinciplesScroll() {
   return () => media.revert();
 }
 
-// The illustrations that play a storyboard (data-story in about.pug).
+// The illustrations that play a storyboard (data-story in src/components/about/figures/).
 const STORIES = {
   tasks: createBoardStory,
   integrations: createIntegrationsStory,

@@ -1,6 +1,6 @@
 // Footer "Get in Touch" form (approved proposal): opens the visitor's email app
 // addressed to the studio, with the visitor's email in the subject. Without JS
-// the form leads to the Contact page (src/pug/partials/footer.pug).
+// the form leads to the Contact page (src/components/Footer.astro).
 export function initFooterForm() {
   const form = document.querySelector("[data-footer-form]");
   if (!form) return () => {};

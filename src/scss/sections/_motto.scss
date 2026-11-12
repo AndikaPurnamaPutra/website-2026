@@ -45,7 +45,7 @@
   visibility: hidden;
 }
 
-// Milestone + Motto wrapper (src/pug/pages/index.pug). It takes the page
+// Milestone + Motto wrapper (src/pages/index.astro). It takes the page
 // theme's background, which turns dark as Motto comes in
 // (src/js/page-theme.js), and from then on stays dark on its own (is-night),
 // also once the page turns light again for the footer: it hides the footer,

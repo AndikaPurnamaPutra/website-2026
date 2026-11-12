@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "images": "node scripts/images.mjs",
     "dev": "node scripts/images.mjs && astro dev",
@@ -11,10 +14,6 @@
   },
   "devDependencies": {
     "astro": "7.4.11",
-    "esbuild": "^0.28.2",
-    "gulp": "^5.0.0",
-    "gulp-pug": "^5.0.0",
-    "gulp-sass": "^6.0.0",
     "sass": "^1.83.0",
     "sharp": "^0.33.5"
   },

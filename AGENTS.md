@@ -17,7 +17,7 @@ Treat Figma as the source of truth for layout, typography, colors, spacing, asse
 
 ## 3. Required Tech Stack
 
-- Astro for HTML templates and the build, with static output (plain HTML pages). It replaces Pug + Gulp (user decision, 12 Nov 2026; reasons in `docs/implementation/41-cms-migration.md`). Until the migration on `astro/migration` is finished, `src/pug/` and `gulpfile.js` stay only as a reference for comparison; do not add to them.
+- Astro for HTML templates and the build, with static output (plain HTML pages). It replaced Pug + Gulp (user decision, 12 Nov 2026; reasons and the migration in `docs/implementation/41-cms-migration.md`).
 - Sanity as the headless CMS. Its content is fetched at build time only; no CMS code runs in the visitor's browser. Sanity Studio is hosted separately, not inside the website.
 - Sass (SCSS) for styling.
 - Vanilla JavaScript for DOM interactions.

@@ -34,7 +34,7 @@ $button-sweep: 0.5s cubic-bezier(0.33, 1, 0.68, 1);
 // with dark text, its dark fill swept off to the right and the text changing
 // colour just where the sweep passes (user's pick of the hover trials). The
 // fill (a layer of its own) and the light and dark copies of the text
-// (src/pug/mixins/cta-button.pug) are all cut by one moving edge, a clip
+// (src/components/CtaButton.astro) are all cut by one moving edge, a clip
 // with the same timing, so the colour changes exactly at the fill's edge, and
 // the fill stays within the button's round corners (scaled, they were
 // squeezed and its edge fell out of step with the text; user). The outline

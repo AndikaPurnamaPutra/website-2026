@@ -308,7 +308,19 @@ scripts/
   - [x] Transisi halaman (Barba) di build Astro: Home → About → Contact →
     Privacy tanpa muat ulang, `<main>` berganti, tanpa error — sama dengan
     build Pug.
-- [ ] Langkah 4 — cek, hapus Pug + Gulp.
+- [ ] Langkah 4 — cek, hapus Pug + Gulp:
+  - [x] `src/pug/`, `gulpfile.js`, `src/static/` dihapus; paket `gulp`,
+    `gulp-pug`, `gulp-sass`, `esbuild` dilepas (Vite punya esbuild
+    sendiri); 7 komentar kode yang merujuk file Pug diarahkan ke komponen
+    Astro; AGENTS.md diperbarui; `engines.node >= 22` (skrip gambar memakai
+    `glob` dari `node:fs/promises`).
+  - [x] Build dari nol: 6 halaman, 195 gambar; aset 26,94 MB identik byte
+    demi byte dengan hasil Gulp.
+  - [x] Cek otomatis 5 halaman × 19 ukuran: tanpa error JS, 404, scroll
+    samping, elemen keluar layar, teks < 12px; tinggi halaman sama dengan
+    build Pug di 95 kombinasi.
+  - [ ] Preview Vercel `astro/migration` + Lighthouse dibanding `dev`.
+  - [ ] Animasi dicek pengguna di preview.
 
 ### Belum pasti
 - ~~Apakah dev server Astro 7 membuka `about.html`.~~ Ya (langkah 1).

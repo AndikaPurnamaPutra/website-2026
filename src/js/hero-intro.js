@@ -23,7 +23,7 @@ export function initHeroIntro() {
   const transition = movedWithinSite() && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!hero || !(document.documentElement.classList.contains("is-preloading") || transition)) return () => {};
 
-  // The lines of the headline and the description (set in hero.pug, as
+  // The lines of the headline and the description (set in src/components/home/Hero.astro, as
   // in Figma) rise in their own masks.
   const lines = [...hero.querySelectorAll(".hero__line")];
   const [titleTexts, descriptionTexts] = [".hero__title", ".hero__description"].map((selector) => [
