@@ -24,8 +24,15 @@ export function initSmoothScroll() {
   const tick = (time) => lenis.raf(time * 1000);
   gsap.ticker.add(tick);
   gsap.ticker.lagSmoothing(0);
+  // The page's length as ScrollTrigger leaves it (pins add their scroll
+  // length on every refresh): measured again at once, not 250 ms later as
+  // Lenis would, so it never stops short of the end of the page (user: on a
+  // first load the footer's dark layer hung and its content did not show).
+  const resize = () => lenis?.resize();
+  ScrollTrigger.addEventListener("refresh", resize);
 
   return () => {
+    ScrollTrigger.removeEventListener("refresh", resize);
     gsap.ticker.remove(tick);
     lenis.destroy();
     lenis = null;

@@ -1,4 +1,5 @@
 import gsap from "gsap";
+import { getSmoothScroll } from "./smooth-scroll.js";
 
 // The footer is uncovered from behind the section above it, like a curtain
 // going up (user decision, reference sstr.tech): tucked behind that section
@@ -75,18 +76,44 @@ export function initFooterReveal() {
   const update = () => {
     if (!above || !height) return;
     const passed = window.innerHeight - above.getBoundingClientRect().bottom;
-    const progress = Math.min(Math.max(passed / height, 0), 1);
+    // A pixel short of the end counts as the end: the smooth scroll eases
+    // out and may stop a fraction of a pixel early, which left a trace of
+    // the dark layer.
+    const raw = Math.min(Math.max(passed / height, 0), 1);
+    const progress = raw > 1 - 1 / height ? 1 : raw;
     if (progress === last) return;
     last = progress;
     setY(-LAG * height * (1 - progress));
     footer.style.setProperty("--footer-shade", String(SHADE * (1 - progress)));
   };
+  // Updated with every move of the page, from more than one source, so it
+  // never depends on one alone (user, desktop Chrome: on a first load the
+  // dark layer hung and the footer's content did not show): GSAP's ticker
+  // (after ScrollTrigger and the smooth scroll have moved the page) runs its
+  // listeners one after the other with no guard, so an error in one added
+  // earlier stops the later ones for that frame; the smooth scroll's own
+  // scroll event and the browser's scroll event come on their own.
+  const safeUpdate = () => {
+    try {
+      update();
+    } catch {
+      // Measured again on the next move.
+    }
+  };
   update();
-  // After ScrollTrigger and the smooth scroll have moved the page this frame.
-  gsap.ticker.add(update);
+  gsap.ticker.add(safeUpdate);
+  const lenis = getSmoothScroll();
+  lenis?.on("scroll", safeUpdate);
+  window.addEventListener("scroll", safeUpdate, { passive: true });
+  // The section above changing length (pictures, pins) without a scroll.
+  const aboveResize = above ? new ResizeObserver(safeUpdate) : null;
+  aboveResize?.observe(above);
 
   return () => {
-    gsap.ticker.remove(update);
+    gsap.ticker.remove(safeUpdate);
+    lenis?.off("scroll", safeUpdate);
+    window.removeEventListener("scroll", safeUpdate);
+    aboveResize?.disconnect();
     resize.disconnect();
     window.removeEventListener("resize", measure);
     gsap.set(footer, { clearProps: "transform" });
