@@ -27,7 +27,7 @@ gsap.registerPlugin(DrawSVGPlugin);
 //    curtain lifts.
 // The scroll is held meanwhile. Only while <html> has is-preloading (set in
 // <head>, not with reduced motion).
-const MIN_DRAW = 0.9; // s
+const MIN_DRAW = 0.8; // s
 // The outline is drawn at a pace that changes smoothly (user: following the
 // loading progress, it rushed, stopped, jumped and stopped again as assets
 // came in one by one): while loading it follows a curve of time that slows
@@ -38,6 +38,12 @@ const DRAW_HOLD = 0.9;
 const CREEP = 2; // s, the curve's time constant (57% in 2s, 78% in 4s)
 const DRAW_PULL = 2.5; // per second, how strongly it heads for its goal
 const DRAW_EASE = 4; // per second, how quickly its speed follows
+// The fill and the line below start as the outline is nearly drawn, not once
+// it is done, and the line rises with the fill, so logo and text read as one
+// move (user: from the logo to the text it was not seamless; the line came a
+// beat after the fill and the curtain went up as soon as it had risen).
+const INTRO_AT = 0.9; // share of the outline drawn
+const YEAR_AT = 0.1; // s into the intro, the line below starts to rise (was 0.35)
 // One rhythm for the whole entrance (user: smooth, seamless, enjoyable):
 // the big movements (curtain, showreel) start and settle gently (MOVE),
 // what appears (logo, year, navbar, and the hero text in
@@ -45,15 +51,19 @@ const DRAW_EASE = 4; // per second, how quickly its speed follows
 // last one ends.
 const MOVE = "power3.inOut";
 const SHOW = "power3.out";
-const LIFT = 1.5; // s, the curtain off the screen
-const PUSH = 1.6; // s, the showreel up to its place
-const PUSH_AT = 0.35; // s into the lift, the showreel right behind the curtain (user: no delay)
+// About a fifth shorter than before (user, 12 Nov 2026: the entrance felt too
+// long, but should not turn quick): mostly the pause before the curtain lifts,
+// the movements a little quicker, the eases unchanged.
+const LIFT_AT = 1.4; // s into the intro, the curtain starts up (was 1.8)
+const LIFT = 1.3; // s, the curtain off the screen (was 1.5)
+const PUSH = 1.35; // s, the showreel up to its place (was 1.6)
+const PUSH_AT = 0.3; // s into the lift, the showreel right behind the curtain (user: no delay)
 // What appears takes REVEAL seconds (the line below the logo, the hero text
 // in src/js/hero-intro.js), so all of it moves alike.
 const REVEAL = 1;
 const RISE = 200; // % of its height the line below the logo rises from, as the hero text
-const HEADER_AT = 1.1; // s into the lift, as the curtain leaves the top
-const HEADER = 1.2; // s, the navbar down to its place
+const HEADER_AT = 0.95; // s into the lift, as the curtain leaves the top
+const HEADER = 1; // s, the navbar down to its place (was 1.2)
 // The logo and the year blur away as the curtain starts up: motto 1's blur in
 // (src/js/motto-scroll.js: autoAlpha, 12 Figma px, blur 6px), reversed.
 const BLUR_OUT = { autoAlpha: 0, filter: "blur(6px)", duration: 0.6, ease: "power2.in" };
@@ -167,6 +177,7 @@ export function initPreloader() {
   const start = performance.now();
   let shown = 0;
   let speed = 0; // share of the logo per second
+  let started = false;
   const follow = (time, deltaMs) => {
     const dt = Math.min(deltaMs / 1000, 0.1);
     const elapsed = (performance.now() - start) / 1000;
@@ -175,11 +186,14 @@ export function initPreloader() {
     speed += (wanted - speed) * Math.min(1, dt * DRAW_EASE);
     // Not held at the goal (a stop at once); a little past it, it slows down.
     shown = Math.min(1, shown + speed * dt);
+    if (loaded >= total && !started && shown >= INTRO_AT) {
+      started = true;
+      placeForPush();
+      intro.play();
+    }
     if (loaded >= total && shown > 0.995) {
       shown = 1;
       gsap.ticker.remove(follow);
-      placeForPush();
-      intro.play();
     }
     draw.progress(shown);
   };
@@ -226,9 +240,9 @@ export function initPreloader() {
     // Outline → solid, then the year, and a breath with both.
     .to(solid, { opacity: 1, duration: 0.6, ease: "power2.out" })
     .to(preloader.querySelector(".preloader__outline"), { opacity: 0, duration: 0.6, ease: "power2.out" }, "<")
-    .to(year, { yPercent: 0, duration: REVEAL, ease: SHOW }, 0.35)
+    .to(year, { yPercent: 0, duration: REVEAL, ease: SHOW }, YEAR_AT)
     // The curtain lifts off the screen.
-    .addLabel("lift", 1.8)
+    .addLabel("lift", LIFT_AT)
     .add(() => document.dispatchEvent(new CustomEvent("preloader:reveal")), "lift")
     // On the year's box: its window would cut the blur.
     .to([logo, year.parentElement], { ...BLUR_OUT, y: () => -BLUR_SHIFT * designPx() }, "lift")

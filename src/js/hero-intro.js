@@ -10,7 +10,7 @@ import { movedWithinSite } from "./page-transition.js";
 // the page, so each part rises as it is uncovered; sends
 // "hero:introduced" once the headline is up, for its gradient wave. The masks
 // clip only while the text rises. Only on a page load with the preloader.
-const DELAY = 0.6; // s after the curtain starts up, as it uncovers the headline
+const DELAY = 0.5; // s after the curtain starts up (0.6 before the curtain was made quicker), as it uncovers the headline
 const TRANSITION_DELAY = 0.1; // s after a page transition starts showing the page
 // The same soft ease-out as what appears in the preloader (src/js/preloader.js).
 const RISE = { yPercent: 200, duration: 1, ease: "power3.out" }; // as REVEAL there
