@@ -1021,6 +1021,21 @@ Preview Vercel (`responsive/plan`, sebelum perbaikan di bawah):
 - Performance Home dibatasi oleh preloader (menunggu layar pertama, termasuk
   video showreel 1,5 MB yang jadi LCP) dan logo/teks preloader yang baru
   tampil setelah JS jalan (FCP). Belum diubah: keputusan desain.
+
+Preview Vercel sesudah perbaikan (`8a9107b`):
+
+| Halaman | Perf | A11y | BP | SEO |
+|---|---|---|---|---|
+| Home | 89 | 96 | 100 | 66* |
+| About | 84 | 100 | 96 | 66* |
+| Contact | 83 | 100 | 100 | 66* |
+| Privacy | 98 | 100 | 100 | 66* |
+| Terms | 97 | 100 | 100 | 66* |
+
+\* `noindex` preview Vercel; produksi 100. LCP Home 3,2 s, About 4,3 s.
+Performance naik-turun antar pengukuran (pengukuran pertama kemungkinan
+cache CDN masih dingin), jadi tidak semua kenaikan dari perbaikan.
+Target (A11y, BP, SEO ≥ 90 di produksi) tercapai.
 - [ ] Safari iOS (iPhone pengguna).
 
 ## Kriteria selesai
