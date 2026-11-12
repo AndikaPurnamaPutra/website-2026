@@ -38,6 +38,12 @@ const DRAW_HOLD = 0.9;
 const CREEP = 2; // s, the curve's time constant (57% in 2s, 78% in 4s)
 const DRAW_PULL = 2.5; // per second, how strongly it heads for its goal
 const DRAW_EASE = 4; // per second, how quickly its speed follows
+// The fill and the line below start as the outline is nearly drawn, not once
+// it is done, and the line rises with the fill, so logo and text read as one
+// move (user: from the logo to the text it was not seamless; the line came a
+// beat after the fill and the curtain went up as soon as it had risen).
+const INTRO_AT = 0.9; // share of the outline drawn
+const YEAR_AT = 0.1; // s into the intro, the line below starts to rise (was 0.35)
 // One rhythm for the whole entrance (user: smooth, seamless, enjoyable):
 // the big movements (curtain, showreel) start and settle gently (MOVE),
 // what appears (logo, year, navbar, and the hero text in
@@ -171,6 +177,7 @@ export function initPreloader() {
   const start = performance.now();
   let shown = 0;
   let speed = 0; // share of the logo per second
+  let started = false;
   const follow = (time, deltaMs) => {
     const dt = Math.min(deltaMs / 1000, 0.1);
     const elapsed = (performance.now() - start) / 1000;
@@ -179,11 +186,14 @@ export function initPreloader() {
     speed += (wanted - speed) * Math.min(1, dt * DRAW_EASE);
     // Not held at the goal (a stop at once); a little past it, it slows down.
     shown = Math.min(1, shown + speed * dt);
+    if (loaded >= total && !started && shown >= INTRO_AT) {
+      started = true;
+      placeForPush();
+      intro.play();
+    }
     if (loaded >= total && shown > 0.995) {
       shown = 1;
       gsap.ticker.remove(follow);
-      placeForPush();
-      intro.play();
     }
     draw.progress(shown);
   };
@@ -230,7 +240,7 @@ export function initPreloader() {
     // Outline → solid, then the year, and a breath with both.
     .to(solid, { opacity: 1, duration: 0.6, ease: "power2.out" })
     .to(preloader.querySelector(".preloader__outline"), { opacity: 0, duration: 0.6, ease: "power2.out" }, "<")
-    .to(year, { yPercent: 0, duration: REVEAL, ease: SHOW }, 0.35)
+    .to(year, { yPercent: 0, duration: REVEAL, ease: SHOW }, YEAR_AT)
     // The curtain lifts off the screen.
     .addLabel("lift", LIFT_AT)
     .add(() => document.dispatchEvent(new CustomEvent("preloader:reveal")), "lift")
