@@ -1,8 +1,9 @@
 # 41 — Migrasi ke Astro + Sanity (rancangan, belum dikerjakan)
 
-Status: **rancangan disimpan (12 Nov 2026)**. Dikerjakan **setelah pekerjaan
-responsive benar-benar selesai** (keputusan pengguna). Branch nanti:
-`astro/migration` (dari `dev`).
+Status: **rancangan lengkap, siap dikerjakan (12 Nov 2026)**. Responsive
+selesai dan digabung ke `dev` (12 Nov 2026); keputusan desain konten sudah
+dijawab (di bawah). Migrasi belum dimulai. Branch nanti: `astro/migration`
+(dari `dev`).
 
 ## Tujuan
 Konten tiga section homepage bisa diubah lewat headless CMS tanpa menyentuh
@@ -116,7 +117,7 @@ Singleton `ourWorkSection`:
 | Eyebrow | string | "( Our Work )" |
 | Heading | 2 baris | maks. 40 per baris |
 | Recently Added: judul | string | |
-| Recently Added: isi | Otomatis (N terbaru) atau Manual (pilih + urutkan) | 4–10 |
+| Recently Added: jumlah | number | 5–8 project terbaru (otomatis) |
 | Selected Work: judul | string | |
 | Selected Work: isi | reference[] → project, urutan drag | 4–10 |
 | More Work link | link | sekarang `#` |
@@ -143,7 +144,7 @@ Dokumen `testimonial`:
 | Card style | Polos / Noise | default Polos | `testimonial-card--noise` |
 
 Singleton `trustedSection`: Eyebrow, Heading (maks. 110), teks "and hundred
-more...", Clients (reference[], urutan drag), Testimonials (reference[], 3–8).
+more...", Clients (reference[], urutan drag, 4–20), Testimonials (reference[], 3–8).
 
 ### Alur publish
 ```
@@ -152,17 +153,22 @@ Publish di Studio → webhook Sanity → Deploy Hook Vercel
 ```
 Pratinjau draf (Sanity Presentation) bisa ditambahkan nanti.
 
-## Keputusan yang masih terbuka (tanya pengguna sebelum mulai)
-1. Kartu Our Work: **bingkai 4:3 (325 × 244) penuh + hotspot** menggantikan
-   crop manual Figma (`crop`, `inner`), varian bulat tetap ada: setuju?
-2. Recently Added: otomatis, manual, atau bisa dipilih keduanya?
-3. Jumlah logo klien: tetap 12, atau boleh berubah (grid perlu diatur)?
-4. Logo khusus: SVG tunggal untuk **Good at Numbers** (sekarang mark CSS +
-   teks SVG) dan SVG **Kaam Care** yang sudah menghadap benar (sekarang
-   dibalik CSS, `flip`)?
+## Keputusan desain konten (pengguna, 12 Nov 2026)
+1. **Kartu Our Work:** satu bingkai 4:3 (325 × 244) terisi penuh, bagian yang
+   tampil diatur hotspot di Studio; crop manual Figma (`crop`, `inner`)
+   dihapus; varian bulat tetap pilihan (Cover style).
+2. **Recently Added: otomatis**, 5–8 project terbaru menurut *Published at*
+   (urutan diubah lewat tanggalnya); tanpa mode manual dulu (saran Claude,
+   disetujui). Selected Work tetap dipilih dan diurutkan manual.
+3. **Jumlah logo klien boleh berubah** (batas 4–20): grid Trusted diatur
+   ulang supaya baris terakhir yang tidak penuh tetap rapi (mis. di tengah).
+4. **Satu file SVG per logo** di CMS: Good at Numbers (sekarang mark CSS +
+   teks SVG) dan Kaam Care (sekarang dibalik CSS, `flip`) diekspor Claude
+   sebagai SVG tunggal dari tampilan sekarang saat migrasi, sampai desainer
+   memberi versi resminya; field "flip" dan kasus khusus GAN tidak ada.
 
 ## Tahapan
-1. Selesaikan responsive (Pug).
+1. ~~Selesaikan responsive (Pug).~~ Selesai 12 Nov 2026.
 2. Pindah ke Astro **tanpa CMS**, hasil sama persis (lihat ukuran
    keberhasilan). Hapus Gulp setelah lolos.
 3. Buat Sanity Studio + skema di atas; isi dengan konten yang ada sekarang.
