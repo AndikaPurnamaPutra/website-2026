@@ -252,9 +252,25 @@ scripts/
 6. `npm run dev` dan `npm run build` berjalan; Vercel preview branch ini
    tampil sama dengan preview `dev`.
 
+### Progres
+- [x] **Langkah 1 — kerangka** (12 Nov 2026): Astro 7.4.11 (dikunci),
+  `astro.config.mjs` (static, `build.format: "file"`, `outDir: dist`, CSS
+  tidak di-inline, tanpa source map); `scripts/images.mjs` (pengganti gulp
+  `images` + `assets` untuk gambar; lewati file yang sudah terbaru);
+  `npm run dev` / `build` = images → astro. `fonts/`, `icons/`, `models/`,
+  `favicon.svg`, `robots.txt` dipindah ke `public/`; `src/assets/images/`
+  tetap sumber, hasilnya di `public/assets/images/` (diabaikan git).
+  BrowserSync dilepas (membawa `cookie@0.7` yang bentrok dengan Astro).
+  Pembanding: hasil build Pug terakhir disimpan di luar repo (Gulp tidak
+  lagi bisa build setelah aset dipindah). Dicek: 226 file aset hasil skrip
+  identik byte demi byte dengan hasil Gulp; dev server membuka
+  `nama.html` (200).
+- [ ] Langkah 2 — layout + komponen bersama.
+- [ ] Langkah 3 — halaman per halaman.
+- [ ] Langkah 4 — cek, hapus Pug + Gulp.
+
 ### Belum pasti
-- Apakah dev server Astro 7 membuka `about.html` (bukan hanya `/about`).
-  Bila tidak: dicari jalan lain sebelum langkah 3, dilaporkan dulu.
+- ~~Apakah dev server Astro 7 membuka `about.html`.~~ Ya (langkah 1).
 - Celah spasi inline: bila ada beda piksel yang tidak bisa dihindari,
   dilaporkan per kasus.
 

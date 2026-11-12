@@ -4,11 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "gulp",
-    "build": "gulp build"
+    "images": "node scripts/images.mjs",
+    "dev": "node scripts/images.mjs && astro dev",
+    "build": "node scripts/images.mjs && astro build",
+    "preview": "astro preview"
   },
   "devDependencies": {
-    "browser-sync": "^3.0.3",
+    "astro": "7.4.11",
     "esbuild": "^0.28.2",
     "gulp": "^5.0.0",
     "gulp-pug": "^5.0.0",
