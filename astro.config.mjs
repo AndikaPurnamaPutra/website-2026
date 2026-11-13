@@ -10,6 +10,10 @@ export default defineConfig({
   // spaces (the "©2026  /  One Week Wonders Studio" lines are white-space:
   // pre) and the gaps between inline elements, which Pug kept.
   compressHTML: false,
+  // The dev server on every address of this machine, as BrowserSync was:
+  // localhost, 127.0.0.1, and the network address for checking on a phone
+  // (shown as "Network" when it starts).
+  server: { host: true },
   build: {
     // about.html, not about/index.html: links and Barba use .html.
     format: "file",
