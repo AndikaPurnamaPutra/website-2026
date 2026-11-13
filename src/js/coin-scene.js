@@ -265,7 +265,10 @@ export function mountCoin(anchors, fallback) {
     if (anchors.footer) {
       const pageEnd = document.documentElement.scrollHeight - screen;
       const at = rest(anchors.footer);
-      const shift = footer ? gsap.getProperty(footer, "y") : 0;
+      // Read from the browser, not from GSAP: asked through GSAP, a footer
+      // shifted exactly half its height was taken for "yPercent: -50" and
+      // kept so (src/js/footer-reveal.js).
+      const shift = footer ? new DOMMatrixReadOnly(getComputedStyle(footer).transform).m42 : 0;
       // Its place on the screen at the end of the page (document place - the
       // footer's current reveal shift - the last scroll position).
       const atEnd = at.y + window.scrollY - shift - pageEnd;
