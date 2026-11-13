@@ -71,7 +71,16 @@ export function initFooterReveal() {
   resize.observe(footer);
   window.addEventListener("resize", measure);
 
-  const setY = gsap.quickSetter(footer, "y", "px");
+  // Written straight to the style, not through GSAP: at its start the
+  // footer sits exactly half its height up, and GSAP, reading a transform
+  // back (src/js/coin-scene.js asked it for the footer's y), takes a shift of
+  // half the height for "yPercent: -50" and kept it under every later y:
+  // the footer stayed half its height behind the section above, its content
+  // hidden and the dark layer over it (user found translate(0%, -50%) on it,
+  // desktop Chrome, first load).
+  const setY = (y) => {
+    footer.style.transform = y ? `translate3d(0, ${y}px, 0)` : "";
+  };
   let last = -1;
   const update = () => {
     if (!above || !height) return;
@@ -116,7 +125,7 @@ export function initFooterReveal() {
     aboveResize?.disconnect();
     resize.disconnect();
     window.removeEventListener("resize", measure);
-    gsap.set(footer, { clearProps: "transform" });
+    footer.style.removeProperty("transform");
     footer.style.removeProperty("--footer-shade");
   };
 }
