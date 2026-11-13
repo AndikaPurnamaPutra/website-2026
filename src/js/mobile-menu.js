@@ -27,7 +27,9 @@ export function initMobileMenu() {
 
   // The page you are on (set for each page shown; the menu stays between
   // page transitions).
-  const here = location.pathname.split("/").pop() || "index.html";
+  // Clean URLs (/about; vercel.json cleanUrls): /about.html and /index
+  // read as /about and /.
+  const here = location.pathname.replace(/\.html$/, "").replace(/\/index$/, "/") || "/";
   menu.querySelectorAll(".mobile-menu__link").forEach((link) => {
     if (link.getAttribute("href") === here) link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");

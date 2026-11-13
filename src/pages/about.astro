@@ -7,7 +7,7 @@ import Principles from "../components/about/Principles.astro";
 import { photos, team } from "../data/about.js";
 ---
 <Default>
-  <PageMeta slot="meta" title="About — OWW" description="Meet One Week Wonders Studio™: the team behind brand identities, websites and apps for digital leaders. See how we work and the principles we work by." path="about.html" />
+  <PageMeta slot="meta" title="About — OWW" description="Meet One Week Wonders Studio™: the team behind brand identities, websites and apps for digital leaders. See how we work and the principles we work by." path="about" />
   <div class="about">
     <section class="about-intro">
       <div class="container">
@@ -23,7 +23,7 @@ import { photos, team } from "../data/about.js";
             <p class="about-intro__note">We work right alongside you, turning months of traditional planning into focused, one-week design sprints that deliver high-end websites, sharp visuals, and digital products ready for the real world.</p>
           </div>
           {/* Calendly comes later (as on Contact); Contact for now. */}
-          <div class="about-intro__cta"><a class="button text-18" href="contact.html"><ButtonText text="Schedule a call" /></a>
+          <div class="about-intro__cta"><a class="button text-18" href="/contact"><ButtonText text="Schedule a call" /></a>
             <p class="about-intro__cta-caption">Free 15min call</p>
           </div>
         </div>

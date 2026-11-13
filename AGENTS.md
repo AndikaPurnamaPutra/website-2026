@@ -29,7 +29,7 @@ Do not introduce React, Vue, Tailwind CSS, TypeScript, or other frameworks unles
 ### Astro rules
 
 - Do not use Astro's View Transitions / `ClientRouter`: page transitions stay with Barba.js (`src/js/page-transition.js`).
-- Keep `build.format: "file"`, so pages stay at `about.html` (links and Barba use `.html`).
+- Clean URLs (user decision, 13 Nov 2026): pages are reached at `/about`, not `/about.html`. Keep `build.format: "file"` (the build writes `about.html`; Vercel serves it at `/about` through `cleanUrls` in `vercel.json` and redirects `/about.html` there) and no trailing slash (the pages' asset paths are relative). Internal links are root-relative without `.html`: `/`, `/about`, `/contact`.
 - No scoped `<style>` in components: all styles stay in `src/scss/`.
 - Load `src/js/main.js` once, in the layout. Inline scripts that must run before the first paint use `is:inline`.
 - Content arrays live in `src/data/`, not inside components; for sections managed in Sanity, the same place takes the Sanity data.

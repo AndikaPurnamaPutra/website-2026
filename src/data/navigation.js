@@ -2,10 +2,10 @@ import { socialLinks, contactLinks } from "./site-links.js";
 
 // "Career" replaced by "Contact" (user decision).
 export const navLinks = [
-  ["About", "about.html"],
+  ["About", "/about"],
   ["Team", "#"],
   ["Services", "#"],
-  ["Contact", "contact.html"],
+  ["Contact", "/contact"],
 ];
 
 // Work mega menu (Figma "Dropdown - Expand" 1596:442; src/js/work-menu.js).
@@ -31,10 +31,10 @@ export const footerColumns = [
     title: "Navigation",
     links: [
       ["Works", "#"],
-      ["About", "about.html"],
+      ["About", "/about"],
       ["Team", "#"],
       ["Services", "#"],
-      ["Contact", "contact.html"],
+      ["Contact", "/contact"],
       ["Blog", "#"],
     ],
   },
@@ -43,6 +43,6 @@ export const footerColumns = [
 
 // "Terms & Conditions" renamed and "Legal" removed (user decision).
 export const legalLinks = [
-  ["Privacy Policy", "privacy-policy.html"],
-  ["Terms of Service", "terms-of-service.html"],
+  ["Privacy Policy", "/privacy-policy"],
+  ["Terms of Service", "/terms-of-service"],
 ];

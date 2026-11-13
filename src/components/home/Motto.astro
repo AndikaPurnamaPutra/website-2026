@@ -21,7 +21,7 @@ import { mottos } from "../../data/milestone-motto.js";
         <p class="motto__line" style={`--motto-gradient: linear-gradient(${motto.gradient});`}>{motto.segments.map((segment) => segment.accent ? <span class="motto__accent">{segment.text}</span> : segment.text)}</p>
       ))}
     </div>
-    <CtaButton label="Get a Quote" href="contact.html" caption="Free 15min call" variant="light" />
+    <CtaButton label="Get a Quote" href="/contact" caption="Free 15min call" variant="light" />
   </div>
   <div class="motto__ellipse"></div>
 </section>

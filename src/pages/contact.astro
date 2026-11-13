@@ -10,7 +10,7 @@ import Chips from "../components/contact/Chips.astro";
 import { scopes, budgets, types, gallery, mapsUrl } from "../data/contact.js";
 ---
 <Default>
-  <PageMeta slot="meta" title="Contact — OWW" description="Tell us about your project: your goals, timeline and budget. Or schedule a free 15-minute call with One Week Wonders Studio™ in Yogyakarta, Indonesia." path="contact.html" />
+  <PageMeta slot="meta" title="Contact — OWW" description="Tell us about your project: your goals, timeline and budget. Or schedule a free 15-minute call with One Week Wonders Studio™ in Yogyakarta, Indonesia." path="contact" />
   <section class="contact">
     <div class="container contact__inner">
       <div class="contact__aside">
@@ -77,7 +77,7 @@ import { scopes, budgets, types, gallery, mapsUrl } from "../data/contact.js";
         <div class="contact-form__submit-row">
           {/* data-label: the light copy its hover sweeps in (_contact.scss). */}
           <button class="contact-form__submit" type="submit" data-label="Submit"><span data-submit-label>Submit</span><img class="contact-form__submit-check" src="assets/icons/check.svg" width="20" height="20" alt="" hidden></button>
-          <p class="contact-form__privacy">Your details are safe with us. By sending this, you agree to our <a href="privacy-policy.html">Privacy Policy</a>.</p>
+          <p class="contact-form__privacy">Your details are safe with us. By sending this, you agree to our <a href="/privacy-policy">Privacy Policy</a>.</p>
         </div>
         <p class="contact-form__error" role="alert" hidden></p>
         <button class="contact-form__again" type="button" data-again hidden>Submit another form</button>

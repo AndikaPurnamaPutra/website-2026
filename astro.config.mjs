@@ -15,7 +15,10 @@ export default defineConfig({
   // (shown as "Network" when it starts).
   server: { host: true },
   build: {
-    // about.html, not about/index.html: links and Barba use .html.
+    // dist/about.html, not about/index.html: Vercel serves it at /about
+    // (vercel.json cleanUrls; /about.html redirects there), and links use
+    // /about. No trailing slash: at /about/ the pages' relative asset paths
+    // (assets/…) would point into /about/assets/.
     format: "file",
     // One stylesheet, not inlined into the page.
     inlineStylesheets: "never",
