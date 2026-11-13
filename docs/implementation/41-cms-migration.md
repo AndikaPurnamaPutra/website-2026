@@ -1,9 +1,11 @@
-# 41 — Migrasi ke Astro + Sanity (rancangan, belum dikerjakan)
+# 41 — Migrasi ke Astro + Sanity
 
 Versi terakhir sebelum migrasi (Pug + Gulp) disimpan di branch
 **`archive/pug-final`** (= `dev` di `b0c059a`, 12 Nov 2026).
 
-Status: **rancangan lengkap, siap dikerjakan (12 Nov 2026)**. Responsive
+Status: **tahap 2 (Pug + Gulp → Astro) selesai dan ada di `dev` (13 Nov
+2026)**; tahap 3 (CMS) belum dimulai — pilihan CMS dibuka lagi (Sanity Free,
+Keystatic, atau Content Collections; tergantung siapa yang mengisi). Responsive
 selesai dan digabung ke `dev` (12 Nov 2026); keputusan desain konten sudah
 dijawab (di bawah). Migrasi belum dimulai. Branch nanti: `astro/migration`
 (dari `dev`).
@@ -311,7 +313,7 @@ scripts/
   - [x] Transisi halaman (Barba) di build Astro: Home → About → Contact →
     Privacy tanpa muat ulang, `<main>` berganti, tanpa error — sama dengan
     build Pug.
-- [ ] Langkah 4 — cek, hapus Pug + Gulp:
+- [x] Langkah 4 — cek, hapus Pug + Gulp:
   - [x] `src/pug/`, `gulpfile.js`, `src/static/` dihapus; paket `gulp`,
     `gulp-pug`, `gulp-sass`, `esbuild` dilepas (Vite punya esbuild
     sendiri); 7 komentar kode yang merujuk file Pug diarahkan ke komponen
@@ -329,7 +331,14 @@ scripts/
     sesudahnya setara, sisa angka rendah dari jaringan (fase TTFB LCP 3,4 s
     di keduanya). About 77 / 81, Contact 83 / 75, Privacy 98 / 99. A11y
     96–100, BP 96–100 di keduanya; SEO 66 = `noindex` preview.
-  - [ ] Animasi dicek pengguna di preview.
+  - [x] Animasi dan footer dicek pengguna di preview ("sudah aman", 13 Nov
+    2026). Di sela itu ditemukan dan diperbaiki bug footer lama (load
+    pertama, desktop: GSAP membaca `y` footer = −½ tingginya sebagai
+    `yPercent: -50`; kini transform footer ditulis langsung, koin membaca
+    lewat `DOMMatrix`).
+- [x] **Digabung ke `dev`** (13 Nov 2026, fast-forward; preview `dev` kini
+  Astro, 5 halaman 200). Versi Pug terakhir: branch `archive/pug-final` dan
+  tag `pug-final` (`cc37519`). `main` belum disentuh.
 
 ### Belum pasti
 - ~~Apakah dev server Astro 7 membuka `about.html`.~~ Ya (langkah 1).
