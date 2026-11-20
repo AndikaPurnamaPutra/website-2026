@@ -1,0 +1,20 @@
+{
+  "name": "oww-studio",
+  "private": true,
+  "type": "module",
+  "description": "Sanity Studio for the One Week Wonders website (docs/implementation/41-cms-migration.md). Not part of the website build.",
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build",
+    "deploy": "sanity deploy"
+  },
+  "engines": {
+    "node": ">=22.12"
+  },
+  "dependencies": {
+    "react": "^19.2.2",
+    "react-dom": "^19.2.2",
+    "sanity": "^6.23.0",
+    "styled-components": "^6.1.15"
+  }
+}

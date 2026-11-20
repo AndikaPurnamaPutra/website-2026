@@ -345,6 +345,87 @@ scripts/
 - Celah spasi inline: bila ada beda piksel yang tidak bisa dihindari,
   dilaporkan per kasus.
 
+## Tahap 3 — Sanity (rencana implementasi)
+
+Status: **disetujui pengguna (13 Nov 2026), dikerjakan di branch
+`cms/sanity`** (dari `dev`). Pilihan: **Sanity
+Free** — pengguna ingin CMS yang mudah dan gratis; pengisinya pengguna + 1–2
+orang; titik fokus gambar penting (hanya Sanity yang punya). Keystatic dan
+Content Collections ditimbang dan tidak dipilih (tanpa hotspot; gambar dan
+video masuk repo; Keystatic butuh login GitHub per pengisi).
+
+### Cara kerja
+```
+Studio (oww.sanity.studio)  →  Publish
+  → webhook Sanity → Deploy Hook Vercel → npm run build:
+      scripts/cms.mjs   ambil data (GROQ lewat HTTP, tanpa paket Sanity di
+                        website) → src/data/cms/*.json; unduh gambar (sudah
+                        dipotong menurut hotspot, WebP, beberapa lebar) dan
+                        video → public/assets/cms/
+      scripts/images.mjs  (seperti sekarang)
+      astro build         komponen membaca src/data/ seperti sekarang
+```
+- **Website tidak memuat apa pun dari Sanity saat dikunjungi**: gambar dan
+  video disajikan dari website sendiri. Kuota Sanity (bandwidth 100 GB)
+  hampir tidak terpakai; website tetap jalan walau Sanity bermasalah.
+- **Tanpa paket baru di website**: data diambil dengan `fetch` biasa
+  (dataset publik, tanpa token baca).
+- **Cadangan**: bila Sanity tidak terjangkau atau belum diatur (mis. dev
+  lokal tanpa internet), build memakai data terakhir yang tersimpan, lalu
+  data di `src/data/` sekarang — build tidak pernah gagal karena CMS.
+
+### Studio
+- Folder `studio/` di repo yang sama, dengan `package.json` sendiri (tidak
+  ikut build website). Sanity 6 (6.23.x), Node ≥ 22.12 (sudah).
+- Di-host gratis oleh Sanity (`sanity deploy` → mis. `oww.sanity.studio`).
+- ⚠️ Studio adalah aplikasi React. AGENTS.md §3 melarang React **di
+  website**; Studio adalah alat admin terpisah yang tidak dikirim ke
+  pengunjung. Disetujui pengguna sebagai pengecualian, tertulis di
+  AGENTS.md §3.
+- Skema: sesuai "Rancangan Sanity" di atas (Services, Projects, Categories,
+  Clients, Testimonials + 3 singleton section), dengan batas setiap field
+  (AGENTS.md §16) dan keputusan desain konten 1–4.
+
+### Langkah (satu commit per langkah, dicek, dikonfirmasi)
+1. **Akun dan proyek** (pengguna, dipandu): akun gratis sanity.io, proyek
+   baru, dataset `production` (publik). Yang dibutuhkan: **Project ID**
+   (tidak rahasia). Token tulis hanya untuk impor konten awal, disimpan di
+   `.env` lokal (tidak di-commit, tidak dikirim lewat chat).
+2. **Studio + skema Services**, deploy Studio.
+3. **Impor konten Services yang ada sekarang** (teks, gambar, video, poster)
+   lewat skrip, supaya Studio langsung berisi.
+4. **Website membaca Services dari Sanity** (`scripts/cms.mjs`, cadangan
+   data lama). Cek: HTML / piksel sama dengan sekarang, pin Services dan
+   stack HP jalan.
+5. **Webhook → Vercel Deploy Hook**; pengguna mencoba mengubah satu layanan
+   dan melihatnya di preview. **Titik keputusan: lanjut atau ganti CMS.**
+6. **Our Work**: skema Project / Category / section; kartu menjadi bingkai
+   4:3 + hotspot (crop manual Figma dihapus; tampilan sedikit berubah,
+   disetujui); Recently Added otomatis (5–8 terbaru); impor 10 project.
+7. **Trusted**: Client / Testimonial / section; grid logo 4–20 dengan
+   baris terakhir yang rapi; SVG tunggal Good at Numbers dan Kaam Care
+   (diekspor dari tampilan sekarang); impor.
+8. Dokumentasi: cara mengisi CMS (singkat, Bahasa Indonesia) untuk tim.
+
+### Verifikasi
+- Tiap section: HTML dan piksel dibandingkan dengan sebelum CMS (kecuali
+  perubahan yang disetujui: kartu Our Work, grid Trusted), animasi (pin,
+  carousel, marquee) jalan, cek otomatis 5 halaman × 19 ukuran.
+- Isian ekstrem: teks terpanjang, jumlah item terkecil dan terbesar yang
+  diizinkan — tata letak tetap rapi (AGENTS.md §16).
+- Publish → website berubah dalam ±2 menit; Sanity mati → build tetap
+  berhasil dengan data terakhir.
+
+### Yang dibutuhkan dari pengguna
+- Membuat akun sanity.io (gratis) dan memberikan Project ID.
+- Menyetujui pengecualian React untuk Studio (alat admin, bukan website).
+- Menambahkan 1–2 nilai di pengaturan Vercel (Project ID, Deploy Hook) —
+  dipandu.
+
+### Di luar lingkup
+Halaman detail project, "More Work", Blog, pratinjau draf (Presentation),
+form Contact.
+
 ## Tahapan
 1. ~~Selesaikan responsive (Pug).~~ Selesai 12 Nov 2026.
 2. Pindah ke Astro **tanpa CMS**, hasil sama persis (lihat ukuran

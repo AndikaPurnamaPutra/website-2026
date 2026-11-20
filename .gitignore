@@ -7,3 +7,10 @@ graphify-out/
 public/assets/images/
 # Astro
 .astro/
+
+# Sanity Studio (studio/) and local secrets
+studio/node_modules/
+studio/dist/
+studio/.sanity/
+.env
+.env.*

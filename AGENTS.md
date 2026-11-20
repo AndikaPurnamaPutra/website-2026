@@ -25,6 +25,7 @@ Treat Figma as the source of truth for layout, typography, colors, spacing, asse
 - Barba.js for page transitions when required by the design.
 
 Do not introduce React, Vue, Tailwind CSS, TypeScript, or other frameworks unless explicitly requested. This includes Astro's UI integrations (`@astrojs/react`, `@astrojs/vue` and the like).
+One exception (user decision, 13 Nov 2026): Sanity Studio, the CMS's admin app, is built with React. It lives in `studio/` with its own `package.json`, is hosted by Sanity, and is never part of the website or sent to visitors; the website itself stays free of React.
 
 ### Astro rules
 
