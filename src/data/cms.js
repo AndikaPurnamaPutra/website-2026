@@ -3,6 +3,7 @@
 // folder (docs/implementation/41-cms-migration.md, stage 3).
 import { services, servicesEyebrow, servicesNote } from "./services.js";
 import { ourWork } from "./work.js";
+import { trusted } from "./clients.js";
 
 const cms = import.meta.glob("./cms/*.json", { eager: true, import: "default" });
 
@@ -18,3 +19,4 @@ export const servicesSection = cms["./cms/services.json"] ?? {
 };
 
 export const ourWorkSection = cms["./cms/work.json"] ?? ourWork;
+export const trustedSection = cms["./cms/trusted.json"] ?? trusted;

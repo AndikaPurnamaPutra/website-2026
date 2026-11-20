@@ -26,6 +26,8 @@ const MEDIA = "src/assets/images/cms";
 // the projects switched on, in drag order, at most 10. Drafts are not
 // published content, so the public API never returns them.
 const PROJECT_FIELDS = `title, "slug": slug.current, "cover": cover{ hotspot, "url": asset->url, "id": asset->_id }`;
+// Trusted: logos (first 20) and testimonials (first 8), each published and
+// not switched off, in drag order.
 const QUERY = `{
   "services": *[_id == "servicesSection"][0]{
     eyebrow, note,
@@ -41,6 +43,17 @@ const QUERY = `{
     "categories": *[_type == "category"] | order(orderRank) [0...6].title,
     "recent": *[_type == "project" && defined(cover.asset)] | order(publishedAt desc, _createdAt desc) [0...8] { ${PROJECT_FIELDS} },
     "selected": *[_type == "project" && selected == true && defined(cover.asset)] | order(orderRank) [0...10] { ${PROJECT_FIELDS} }
+  },
+  "trusted": *[_id == "trustedSection"][0]{
+    eyebrow, heading, more,
+    "clients": *[_type == "client" && show != false && defined(logo.asset)] | order(orderRank) [0...20] {
+      name, logoHeight, href, "logo": logo{ "url": asset->url, "id": asset->_id }
+    },
+    "testimonials": *[_type == "testimonial" && show != false && defined(logo.asset) && defined(avatar.asset)] | order(orderRank) [0...8] {
+      company, logoHeight, quote, name, role, noise,
+      "logo": logo{ "url": asset->url, "id": asset->_id },
+      "avatar": avatar{ hotspot, "url": asset->url, "id": asset->_id }
+    }
   }
 }`;
 
@@ -135,6 +148,59 @@ const work = async (section) => ({
   moreWorkHref: section.moreWorkHref || "#",
 });
 
+// A logo's width at the height set in the Studio, from the SVG's own
+// proportions (viewBox, else width/height).
+const logoWidth = async (file, height) => {
+  const svg = await readFile(`${MEDIA}/${file}`, "utf8");
+  const tag = svg.match(/<svg\b[^>]*>/)?.[0] ?? "";
+  const box = tag.match(/viewBox="\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)[\s,]+([\d.]+)/);
+  const [w, h] = box ? [box[1], box[2]] : [tag.match(/width="([\d.]+)/)?.[1], tag.match(/height="([\d.]+)/)?.[1]];
+  return w && h ? Math.round((height * w * 1000) / h) / 1000 : height;
+};
+
+// A quote's portable text as HTML: one paragraph, links only.
+const escape = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const quoteHtml = (blocks) =>
+  (blocks ?? [])
+    .map((block) =>
+      (block.children ?? [])
+        .map((span) => {
+          const link = (block.markDefs ?? []).find((def) => def._type === "link" && span.marks?.includes(def._key));
+          const text = escape(span.text ?? "");
+          return link?.href ? `<a class="testimonial-card__link" href="${escape(link.href)}" target="_blank" rel="noopener">${text}</a>` : text;
+        })
+        .join(""),
+    )
+    .join(" ");
+
+const trusted = async (section) => {
+  const clients = [];
+  for (const client of section.clients ?? []) {
+    const name = `clients/${slugify(client.name)}`;
+    await download(client.logo, `${name}.svg`);
+    clients.push({ name: client.name, logo: `cms/${name}`, w: await logoWidth(`${name}.svg`, client.logoHeight), h: client.logoHeight, href: client.href || "#" });
+  }
+  const testimonials = [];
+  for (const item of section.testimonials ?? []) {
+    const name = `testimonials/${slugify(item.company)}`;
+    await download(item.logo, `${name}.svg`);
+    await download(item.avatar, `${name}-avatar.png`);
+    testimonials.push({
+      company: item.company,
+      logo: `cms/${name}`,
+      w: await logoWidth(`${name}.svg`, item.logoHeight),
+      h: item.logoHeight,
+      quote: quoteHtml(item.quote),
+      name: item.name,
+      role: item.role,
+      avatar: `cms/${name}-avatar`,
+      avatarFocus: focus(item.avatar.hotspot),
+      noise: Boolean(item.noise),
+    });
+  }
+  return { eyebrow: section.eyebrow, heading: section.heading, more: section.more, clients, testimonials };
+};
+
 // Each section's file, or none (src/data/cms.js then uses src/data/*.js).
 const write = async (name, section, build) => {
   if (section) {
@@ -167,6 +233,7 @@ try {
   await mkdir(DATA, { recursive: true });
   await write("services", result.services, services);
   await write("work", result.work, work);
+  await write("trusted", result.trusted, trusted);
   await prune();
   await writeFile(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`);
 } catch (error) {

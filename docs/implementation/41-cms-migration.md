@@ -495,6 +495,36 @@ Studio (oww.sanity.studio)  →  Publish
     Studio di-deploy.
   - Di luar lingkup: mega menu Work (gambar dan category-nya) masih dari
     `src/data/navigation.js`.
+- **Langkah 7 — Trusted (20 Nov 2026).**
+  - Studio: Clients (drag, tombol "Tampilkan di homepage", logo SVG, tinggi
+    16–40, link See More; website ambil 20 pertama), Testimonials (drag,
+    tombol tampil, logo SVG, tinggi 14–28, kutipan portable text satu
+    paragraf + link maks. 220 karakter, nama/jabatan maks. 30, foto bulat +
+    titik fokus, kartu noise; website ambil 8 pertama), Section Trusted
+    (label, judul maks. 110, teks "and hundred more...").
+  - Lebar logo dihitung dari proporsi SVG (viewBox) × tinggi; beda
+    sepersekian piksel dari angka Figma lama (mis. BenQ 113.688 vs
+    113.574).
+  - Keputusan 4: **Good at Numbers dan Kaam Care kini satu SVG**
+    (`src/assets/images/testimonials/good-at-numbers.svg`, `kaam-care.svg`),
+    dibuat dari tampilan lama (mark raster sebagai mask #111 + teks; g8
+    dibalik). Mark PNG, teks GAN dan g8.svg lama dihapus, juga CSS
+    khususnya (`--gan`, `--flip`). Dicek: Kaam Care sama per piksel, GAN
+    sama secara visual (selisih sub-piksel).
+  - Grid logo: flex-wrap dengan `--cols` (4/3/2), baris terakhir yang tidak
+    penuh di tengah. Baris testimonial: `--count` menengahkan berapa pun
+    jumlahnya; baris yang lebih sempit dari layar mulai dari kiri.
+  - **Ditemukan dan diperbaiki: dengan 3 testimonial marquee punya celah**
+    (rangkaian lebih pendek dari layar). `marquee.js` kini menambah salinan
+    sampai layar + satu putaran tertutup (3 kartu: 3 salinan); dengan data
+    sekarang tetap 2 salinan, marquee Contact tidak berubah.
+  - Dicek: HTML Trusted dari CMS = cadangan kecuali path dan lebar logo;
+    screenshot 1440 dan 390 sama dengan sebelum CMS (selisih 0,06–0,12%
+    piksel: lebar logo); isian ekstrem (6 logo, 20 logo, 3 dan 8
+    testimonial, kutipan 220 karakter dengan link, nama/jabatan 30) rapi
+    di desktop dan HP; halaman lain hanya beda nama file CSS/JS.
+  - Filter webhook ditambah `client`, `testimonial`, `trustedSection`.
+    Studio di-deploy.
 
 ### Verifikasi
 - Tiap section: HTML dan piksel dibandingkan dengan sebelum CMS (kecuali

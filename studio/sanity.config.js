@@ -22,13 +22,15 @@ export default defineConfig({
           .items([
             S.listItem()
               .title("Homepage")
-              .child(S.list().title("Homepage").items([singleton(S, "servicesSection", "Section Services"), singleton(S, "ourWorkSection", "Section Our Work")])),
+              .child(S.list().title("Homepage").items([singleton(S, "servicesSection", "Section Services"), singleton(S, "ourWorkSection", "Section Our Work"), singleton(S, "trustedSection", "Section Trusted")])),
             S.divider(),
             // Every published service shows on the homepage, in this order (drag).
             orderableDocumentListDeskItem({ type: "service", title: "Services", S, context }),
             // Selected Work follows this order (drag); Recently Added goes by date.
             orderableDocumentListDeskItem({ type: "project", title: "Projects", S, context }),
             orderableDocumentListDeskItem({ type: "category", title: "Categories", S, context }),
+            orderableDocumentListDeskItem({ type: "client", title: "Clients", S, context }),
+            orderableDocumentListDeskItem({ type: "testimonial", title: "Testimonials", S, context }),
           ]),
     }),
   ],

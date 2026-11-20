@@ -44,17 +44,24 @@ function initMarquee(marquee) {
   const track = marquee.querySelector("[data-marquee-track]");
   const originals = [...track.children];
 
-  // A second copy of the items makes the loop seamless.
-  originals.forEach((item) => {
-    const clone = item.cloneNode(true);
-    clone.setAttribute("aria-hidden", "true");
-    clone.querySelectorAll("a").forEach((link) => link.setAttribute("tabindex", "-1"));
-    if (clone.matches("a")) clone.setAttribute("tabindex", "-1");
-    track.append(clone);
-  });
+  // A second copy of the items makes the loop seamless; with few items (the
+  // CMS allows 3 testimonials) more copies, until the row covers the screen
+  // plus one loop, so no gap ever shows (sized for the widest screen it could
+  // be resized to).
+  const addCopy = () =>
+    originals.forEach((item) => {
+      const clone = item.cloneNode(true);
+      clone.setAttribute("aria-hidden", "true");
+      clone.querySelectorAll("a").forEach((link) => link.setAttribute("tabindex", "-1"));
+      if (clone.matches("a")) clone.setAttribute("tabindex", "-1");
+      track.append(clone);
+    });
+  addCopy();
 
   // Distance from the first item to its copy (one set including the gap).
   const loopWidth = () => track.children[originals.length].offsetLeft - track.children[0].offsetLeft;
+  const screenWidth = Math.max(window.innerWidth, window.screen?.width || 0);
+  for (let copies = 2; copies < 8 && track.offsetLeft + track.scrollWidth < screenWidth + loopWidth(); copies++) addCopy();
 
   let loop = loopWidth();
   let x = 0;

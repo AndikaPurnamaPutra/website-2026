@@ -35,13 +35,19 @@
   width: 100%;
 }
 
+// 4–20 logos from the CMS, --cols to a row (4 on desktop, 3 on tablets, 2
+// on phones); a last row that is not full is centered.
 .trusted__logos {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  --cols: 4;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: var(--space-20);
 }
 
 .trusted__logo {
+  flex: 0 0 calc((100% - (var(--cols) - 1) * var(--space-20)) / var(--cols));
   height: fluid(124);
 }
 
@@ -179,12 +185,15 @@
   }
 }
 
-// Five cards (2128px) centered on the page, as in Figma.
+// The cards centered on the page, as Figma's five (2128px): --count cards of
+// 400 and the gaps between them (3–8 from the CMS). A row narrower than the
+// page starts at its left edge instead (min 0), so the moving row has no gap
+// on the left (src/js/marquee.js adds copies for the right).
 .trusted__track {
   display: flex;
   gap: var(--space-32);
   width: max-content;
-  margin-left: calc(50% - #{fluid(1064)});
+  margin-left: min(0px, calc(50% - (var(--count, 5) * 400 + (var(--count, 5) - 1) * 32) / 2 * var(--px)));
 }
 
 .testimonial-card {
@@ -213,33 +222,6 @@
   max-width: none;
 }
 
-.testimonial-card__logo--flip {
-  transform: scaleY(-1);
-}
-
-// Good at Numbers: raster mark used as a mask over #111 (as in Figma) + vector text.
-.testimonial-card__logo--gan {
-  display: flex;
-  align-items: flex-start;
-  gap: fluid(5.87);
-  width: auto;
-  height: fluid(24);
-
-  img {
-    width: fluid(112.365);
-    height: fluid(11.272);
-    margin-top: fluid(5.91);
-  }
-}
-
-.testimonial-card__gan-mark {
-  width: fluid(24.723);
-  height: fluid(24);
-  background: var(--color-ink);
-  -webkit-mask: url("/assets/images/testimonials/good-at-numbers-mark.png") center / 100% 100% no-repeat;
-  mask: url("/assets/images/testimonials/good-at-numbers-mark.png") center / 100% 100% no-repeat;
-}
-
 // Fills the space between logo and author, text vertically centered (Figma).
 // Block + align-content (not flex) keeps the inline link in the text flow.
 .testimonial-card__quote {
@@ -264,6 +246,7 @@
 .testimonial-card__avatar {
   width: fluid(34);
   height: fluid(34);
+  object-fit: cover; // a photo from the CMS that is not square
   border-radius: 50%;
 }
 
@@ -304,7 +287,7 @@
   }
 
   .trusted__logos {
-    grid-template-columns: repeat(3, 1fr);
+    --cols: 3;
   }
 
   .trusted__logo {
@@ -332,7 +315,7 @@
   }
 
   .trusted__logos {
-    grid-template-columns: repeat(2, 1fr);
+    --cols: 2;
   }
 
   .trusted__logo {
@@ -345,9 +328,9 @@
     margin-top: fluid(48);
   }
 
-  // Five cards of 300 (1628 with the gaps) centred, as the desktop's five.
+  // Cards of 300 centred, as on the desktop (five: 1628 with the gaps).
   .trusted__track {
-    margin-left: calc(50% - #{fluid(814)});
+    margin-left: min(0px, calc(50% - (var(--count, 5) * 300 + (var(--count, 5) - 1) * 32) / 2 * var(--px)));
   }
 
   .testimonial-card {
