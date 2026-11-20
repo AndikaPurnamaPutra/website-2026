@@ -68,6 +68,9 @@
 
 .work-card {
   flex: 0 0 fluid(325);
+  // Every card the same width: a title longer than the card used to widen
+  // it (min-width: auto; at 1024 three cards were 231, 260 and 276 px).
+  min-width: 0;
   scroll-snap-align: start;
 }
 
@@ -85,24 +88,11 @@
   background: var(--color-white);
 }
 
-// Image box size and offset come from Figma per card (inline --w/--h/--x/--y),
-// scaled with the card where it is narrower than Figma's (--card-scale,
-// phones).
-.work-card__crop {
-  position: absolute;
-  top: calc(50% + var(--y) * var(--px) * var(--card-scale, 1));
-  left: calc(50% + var(--x) * var(--px) * var(--card-scale, 1));
-  width: calc(var(--w) * var(--px) * var(--card-scale, 1));
-  height: calc(var(--h) * var(--px) * var(--card-scale, 1));
-  overflow: hidden;
-  transform: translate(-50%, -50%);
-}
-
-.work-card__crop--round {
-  border-radius: var(--radius-sm);
-}
-
+// One 4:3 frame filled by the picture (plan 41, decision 1; the per-card
+// Figma crops are gone); the Studio's focus point is an inline
+// object-position.
 .work-card__image {
+  display: block;
   width: 100%;
   height: 100%;
   max-width: none;
@@ -117,14 +107,12 @@
   transform: scale(1.06);
 }
 
-// Extra crop inside the box (inline width/height/left/top from Figma).
-.work-card__image--inner {
-  position: absolute;
-  object-fit: fill;
-}
-
+// One line; a title longer than the card (the CMS allows 60 characters)
+// ends in an ellipsis instead of running under the next card.
 .work-card__title {
+  overflow: hidden;
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -156,11 +144,9 @@
 }
 
 // Phones (plan 32, step 3d): narrower cards, so the next one peeks in (325
-// was nearly the whole screen); the pictures cropped as on the desktop.
+// was nearly the whole screen); still 4:3 (280 × 210).
 @include mobile {
   .work-card {
-    --card-scale: calc(280 / 325);
-
     flex-basis: fluid(280);
   }
 

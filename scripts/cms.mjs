@@ -20,15 +20,27 @@ const MEDIA = "src/assets/images/cms";
 
 // Services: every published one not hidden ("Tampilkan di homepage" off),
 // in the order dragged in the Studio (orderRank), at most 7 (the section's
-// layout is checked up to 7, plan 41). Drafts are not published content, so
-// the public API never returns them.
-const QUERY = `*[_id == "servicesSection"][0]{
-  eyebrow, note,
-  "services": *[_type == "service" && show != false] | order(orderRank) [0...7] {
-    title, text, tags, alt, href, mediaType,
-    "image": image{ hotspot, "url": asset->url, "id": asset->_id },
-    "video": video{ "url": asset->url, "id": asset->_id },
-    "poster": poster{ "url": asset->url, "id": asset->_id }
+// layout is checked up to 7, plan 41). Our Work: the first 6 categories
+// (drag order; more do not fit beside the heading); Recently Added the
+// newest projects by date (the section says how many, 5–8); Selected Work
+// the projects switched on, in drag order, at most 10. Drafts are not
+// published content, so the public API never returns them.
+const PROJECT_FIELDS = `title, "slug": slug.current, "cover": cover{ hotspot, "url": asset->url, "id": asset->_id }`;
+const QUERY = `{
+  "services": *[_id == "servicesSection"][0]{
+    eyebrow, note,
+    "services": *[_type == "service" && show != false] | order(orderRank) [0...7] {
+      title, text, tags, alt, href, mediaType,
+      "image": image{ hotspot, "url": asset->url, "id": asset->_id },
+      "video": video{ "url": asset->url, "id": asset->_id },
+      "poster": poster{ "url": asset->url, "id": asset->_id }
+    }
+  },
+  "work": *[_id == "ourWorkSection"][0]{
+    eyebrow, headingLine1, headingLine2, recentTitle, recentCount, selectedTitle, moreWorkHref,
+    "categories": *[_type == "category"] | order(orderRank) [0...6].title,
+    "recent": *[_type == "project" && defined(cover.asset)] | order(publishedAt desc, _createdAt desc) [0...8] { ${PROJECT_FIELDS} },
+    "selected": *[_type == "project" && selected == true && defined(cover.asset)] | order(orderRank) [0...10] { ${PROJECT_FIELDS} }
   }
 }`;
 
@@ -102,8 +114,40 @@ const services = async (section) => {
   return { eyebrow: section.eyebrow, note: section.note, services: items };
 };
 
-// Files of services removed (or changed to another media type) in the
-// Studio: deleted here and their copies made by scripts/images.mjs in
+const projects = async (items) => {
+  const cards = [];
+  for (const project of items ?? []) {
+    const name = `work/${project.slug || slugify(project.title)}`;
+    await download(project.cover, `${name}.png`);
+    cards.push({ title: project.title, image: `cms/${name}`, focus: focus(project.cover.hotspot) });
+  }
+  return cards;
+};
+
+const work = async (section) => ({
+  eyebrow: section.eyebrow,
+  heading: [section.headingLine1, section.headingLine2],
+  categories: section.categories ?? [],
+  recentTitle: section.recentTitle,
+  recent: await projects((section.recent ?? []).slice(0, Math.min(8, Math.max(5, section.recentCount ?? 5)))),
+  selectedTitle: section.selectedTitle,
+  selected: await projects(section.selected),
+  moreWorkHref: section.moreWorkHref || "#",
+});
+
+// Each section's file, or none (src/data/cms.js then uses src/data/*.js).
+const write = async (name, section, build) => {
+  if (section) {
+    await writeFile(`${DATA}/${name}.json`, `${JSON.stringify(await build(section), null, 2)}\n`);
+    console.log(`cms: ${name} written`);
+  } else {
+    await rm(`${DATA}/${name}.json`, { force: true });
+    console.log(`cms: no ${name} section in Sanity, using the content in src/data/`);
+  }
+};
+
+// Files of services or projects removed (or changed to another media type)
+// in the Studio: deleted here and their copies made by scripts/images.mjs in
 // public/, so they are not deployed.
 const prune = async () => {
   for (const file of Object.keys(manifest)) {
@@ -121,14 +165,9 @@ try {
   if (!response.ok) throw new Error(`${response.status} ${await response.text()}`);
   const { result } = await response.json();
   await mkdir(DATA, { recursive: true });
-  if (result) {
-    await writeFile(`${DATA}/services.json`, `${JSON.stringify(await services(result), null, 2)}\n`);
-    console.log("cms: services written");
-  } else {
-    await rm(`${DATA}/services.json`, { force: true });
-    console.log("cms: no Services section in Sanity, using src/data/services.js");
-  }
-  if (result) await prune();
+  await write("services", result.services, services);
+  await write("work", result.work, work);
+  await prune();
   await writeFile(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`);
 } catch (error) {
   console.warn(`cms: Sanity not reached (${error.message}); keeping the last content`);

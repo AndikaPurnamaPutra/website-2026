@@ -2,8 +2,9 @@
 // it (src/data/cms/*.json, not in git), otherwise the content kept in this
 // folder (docs/implementation/41-cms-migration.md, stage 3).
 import { services, servicesEyebrow, servicesNote } from "./services.js";
+import { ourWork } from "./work.js";
 
-const cms = import.meta.glob("./cms/services.json", { eager: true, import: "default" });
+const cms = import.meta.glob("./cms/*.json", { eager: true, import: "default" });
 
 // Picture and video names are paths under assets/images/ (without extension).
 export const servicesSection = cms["./cms/services.json"] ?? {
@@ -15,3 +16,5 @@ export const servicesSection = cms["./cms/services.json"] ?? {
     video: video && `services/${video}`,
   })),
 };
+
+export const ourWorkSection = cms["./cms/work.json"] ?? ourWork;

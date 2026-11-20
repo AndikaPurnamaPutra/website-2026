@@ -455,6 +455,46 @@ Studio (oww.sanity.studio)  →  Publish
   kembali normal. **Saat merge ke `main`: ganti branch Deploy Hook ke
   `main`** (buat hook baru, perbarui URL webhook). Filter perlu ditambah
   tipe Our Work dan Trusted di langkah 6–7.
+- **Langkah 6 — Our Work (20 Nov 2026).** Keputusan pengguna hari ini:
+  **Selected Work lewat tombol "Tampilkan di Selected Work" di tiap
+  project**, urutan = drag di daftar Projects (bukan daftar di section,
+  sama seperti Services); **varian kartu bulat dihapus** (semua kartu
+  bingkai 4:3 penuh). Field alt project dihapus: gambar ada di link yang
+  sama dengan judulnya, jadi tetap `alt=""`.
+  - Studio: Projects (drag), Categories (drag, maks. 16 karakter; website
+    ambil 6 pertama), Section Our Work (label, judul 2 baris maks. 24
+    karakter, judul carousel, jumlah terbaru 5–8, link More Work).
+  - Impor `studio/scripts/seed-work.mjs`: 5 category, 10 project (WELLMO
+    dua kali: dua gambar berbeda), teks section. Recently Added kini
+    otomatis menurut tanggal publish: 5 project di sana diberi tanggal
+    terbaru dalam urutan sekarang; Selected Work diberi tanggal lebih
+    lama, tombol menyala dan urutan drag sama dengan sekarang. **Category
+    tiap project ditebak dari judulnya** (website belum punya data itu) —
+    perlu dicek pengguna di Studio.
+  - Website: `scripts/cms.mjs` menulis `work.json` (gambar PNG di
+    `cms/work/`); `src/data/work.js` jadi cadangan bentuk baru;
+    `WorkCarousel` satu `<img>` memenuhi bingkai, titik fokus jadi
+    `object-position`; crop Figma (`crop`, `inner`, `--card-scale`, varian
+    bulat) dihapus dari kode dan CSS.
+  - Ditemukan dan diperbaiki: **di 1024 kartu tidak sama lebar** (231/260/
+    276 px) karena judul yang lebih panjang dari kartu melebarkannya (sudah
+    ada sebelum CMS, dulu tersamar oleh crop). Kini `min-width: 0`, judul
+    yang terlalu panjang diakhiri "…" (di 1024 a.l. Papersky dan
+    Chainlytics).
+  - Isian ekstrem (6 category × 16 karakter, judul 2 × 24, judul project
+    60, 8 + 10 project) di 1024, 1440, HP 390: rapi, tanpa geser ke
+    samping. Judul section tidak pernah terlipat di desktop; category yang
+    tidak muat turun baris, rata kanan (HP/tablet tetap rata kiri). Di HP
+    judul 24 huruf lebar bisa jadi 2 baris per baris judul (terlipat
+    rapi).
+  - Dicek: HTML Our Work dari CMS = dari cadangan; header Our Work dengan
+    data asli sama per piksel dengan sebelum CMS (1024, 1440, 390);
+    halaman lain sama. Kartu berubah sesuai keputusan 1 (gambar memenuhi
+    bingkai; Train Ticket tidak lagi bulat).
+  - Filter webhook ditambah `project`, `category`, `ourWorkSection`.
+    Studio di-deploy.
+  - Di luar lingkup: mega menu Work (gambar dan category-nya) masih dari
+    `src/data/navigation.js`.
 
 ### Verifikasi
 - Tiap section: HTML dan piksel dibandingkan dengan sebelum CMS (kecuali

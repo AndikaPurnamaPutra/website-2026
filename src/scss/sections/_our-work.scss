@@ -13,11 +13,13 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+  gap: fs(40);
 }
 
 .our-work__heading {
   display: flex;
   flex-direction: column;
+  flex-shrink: 0; // the heading keeps its two lines; the categories give way
   gap: var(--space-16);
 }
 
@@ -25,9 +27,15 @@
   line-height: 1;
 }
 
+// Categories come from the CMS (up to 6, 16 characters each): when they do
+// not fit in one line beside the heading they wrap, aligned right, a name
+// never broken.
 .our-work__categories {
   display: flex;
-  gap: fs(22);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: fs(8) fs(22);
+  white-space: nowrap;
 }
 
 .our-work__category {
@@ -68,6 +76,7 @@
 
   .our-work__categories {
     flex-wrap: wrap;
+    justify-content: flex-start;
     gap: fs(12) fs(20);
   }
 }

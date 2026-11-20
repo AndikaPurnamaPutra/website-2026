@@ -1,13 +1,16 @@
 ---
+// Content from the CMS (src/data/cms.js).
 import WorkCarousel from "../WorkCarousel.astro";
 import ButtonText from "../ButtonText.astro";
-import { categories, recentlyAdded, selectedWork } from "../../data/work.js";
+import { ourWorkSection } from "../../data/cms.js";
+
+const { eyebrow, heading, categories, recentTitle, recent, selectedTitle, selected, moreWorkHref } = ourWorkSection;
 ---
 <section class="our-work">
   <div class="container our-work__header">
     <div class="our-work__heading">
-      <p class="our-work__eyebrow text-16 text-muted">( Our Work )</p>
-      <h2 class="text-heading-42">Thoughtful Design,<br>Real Impact</h2>
+      <p class="our-work__eyebrow text-16 text-muted">{eyebrow}</p>
+      <h2 class="text-heading-42">{heading[0]}<br>{heading[1]}</h2>
     </div>
     <ul class="our-work__categories">
       {categories.map((category) => <li><a class="our-work__category text-16" href="#">{category}</a></li>)}
@@ -17,11 +20,11 @@ import { categories, recentlyAdded, selectedWork } from "../../data/work.js";
     <hr class="divider">
   </div>
   <div class="our-work__carousels">
-    <WorkCarousel title="Recently Added" items={recentlyAdded} />
-    <WorkCarousel title="Selected Work" items={selectedWork} />
+    <WorkCarousel title={recentTitle} items={recent} />
+    {selected.length > 0 && <WorkCarousel title={selectedTitle} items={selected} />}
   </div>
   <div class="container">
     <hr class="divider">
   </div>
-  <div class="container"><a class="button text-18" href="#"><ButtonText text="More Work" /></a></div>
+  <div class="container"><a class="button text-18" href={moreWorkHref}><ButtonText text="More Work" /></a></div>
 </section>
