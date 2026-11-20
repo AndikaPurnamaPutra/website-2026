@@ -446,6 +446,15 @@ Studio (oww.sanity.studio)  →  Publish
   - Dicek dengan data uji 6 dan 7 layanan (termasuk isian terpanjang yang
     diizinkan) di 1440, 1024×768 dan HP 390: rapi, tanpa error, tanpa
     geser ke samping. Scroll desktop bertambah ±1 layar per layanan.
+- **Langkah 5 (20 Nov 2026).** Vercel Deploy Hook `sanity` (dibuat
+  pengguna, branch `cms/sanity`; URL-nya hanya di `.env` sebagai
+  `VERCEL_DEPLOY_HOOK`, tidak di git). Webhook Sanity "Vercel deploy"
+  (dibuat lewat API): dataset `production`, create/update/delete, filter
+  `_type in ["service", "servicesSection"]`, tanpa draf. Dicek: Publish →
+  teks baru di preview `cms/sanity` dalam ±40 detik; dikembalikan dan
+  kembali normal. **Saat merge ke `main`: ganti branch Deploy Hook ke
+  `main`** (buat hook baru, perbarui URL webhook). Filter perlu ditambah
+  tipe Our Work dan Trusted di langkah 6–7.
 
 ### Verifikasi
 - Tiap section: HTML dan piksel dibandingkan dengan sebelum CMS (kecuali
