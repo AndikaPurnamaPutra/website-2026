@@ -5,11 +5,15 @@
 // plays them only while on screen. One link over the pictures (each wrapped,
 // the top one would take every click); services-scroll.js points it at the
 // service in view. Placeholder pages until the service pages exist.
-import { services } from "../../data/services.js";
+// Content from the CMS (src/data/cms.js); a picture's focus point from the
+// Studio becomes its object-position.
+import { servicesSection } from "../../data/cms.js";
+
+const { eyebrow, note, services } = servicesSection;
 ---
 <section class="services" data-services data-header-theme="dark" data-header-hide>
   <div class="services__inner">
-    <h2 class="services__label text-16 text-muted">(What we do)</h2>
+    <h2 class="services__label text-16 text-muted">{eyebrow}</h2>
     <div class="services__cards">
       {services.map((service) => (
         <article class="services__card">
@@ -24,13 +28,13 @@ import { services } from "../../data/services.js";
     <div class="services__fade"></div>
     <div class="services__media">
       {services.map((service) => service.video ? (
-        <video class="services__image" poster={`assets/images/services/${service.video}-poster.webp`} muted loop playsinline preload="metadata" aria-label={service.alt} data-inview-video>
-          <source src={`assets/images/services/${service.video}.mp4`} type="video/mp4">
+        <video class="services__image" poster={`assets/images/${service.video}-poster.webp`} muted loop playsinline preload="metadata" aria-label={service.alt} data-inview-video>
+          <source src={`assets/images/${service.video}.mp4`} type="video/mp4">
         </video>
       ) : (
-        <img class="services__image" src={`assets/images/services/${service.image}.webp`} srcset={`assets/images/services/${service.image}-800.webp 800w, assets/images/services/${service.image}.webp 2000w`} sizes="(max-width: 1023.98px) 100vw, 65vw" alt={service.alt} loading="lazy" decoding="async">
+        <img class="services__image" src={`assets/images/${service.image}.webp`} srcset={`assets/images/${service.image}-800.webp 800w, assets/images/${service.image}.webp 2000w`} sizes="(max-width: 1023.98px) 100vw, 65vw" alt={service.alt} style={service.focus && `object-position: ${service.focus}`} loading="lazy" decoding="async">
       ))}<a class="services__link" href={services[0].href} aria-label={`View ${services[0].title}`} data-services-link={JSON.stringify(services.map((service) => [service.href, service.title]))}></a>
     </div>
-    <p class="services__note text-14 text-muted">Visual trends evolve, but solid systems don’t age. We build clean digital products designed to scale with your business for years, not just seasons.</p>
+    <p class="services__note text-14 text-muted">{note}</p>
   </div>
 </section>

@@ -9,6 +9,7 @@
 // .env file at the repo root:  SANITY_WRITE_TOKEN=sk...
 // Run from the repo root:  node --env-file=.env studio/scripts/seed-services.mjs
 import { readFile } from "node:fs/promises";
+import { LexoRank } from "lexorank";
 import { services } from "../../src/data/services.js";
 
 const PROJECT = "ao8vrenr";
@@ -38,12 +39,14 @@ const upload = async (kind, file, type) => {
 
 const slug = (title) => title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 const mutations = [];
-const refs = [];
+let rank = LexoRank.min(); // the drag order in the Studio (orderRank)
 for (const service of services) {
   const id = `service-${slug(service.title)}`;
   const doc = {
     _id: id,
     _type: "service",
+    orderRank: (rank = rank.genNext().genNext()).toString(),
+    show: true,
     title: service.title,
     text: service.text,
     tags: service.tags,
@@ -59,10 +62,9 @@ for (const service of services) {
     doc.image = await upload("images", `${service.image}.jpg`, "image/jpeg");
   }
   mutations.push({ createOrReplace: doc });
-  refs.push({ _type: "reference", _ref: id, _key: id });
 }
 mutations.push({
-  createOrReplace: { _id: "servicesSection", _type: "servicesSection", eyebrow: "(What we do)", services: refs, note: NOTE },
+  createOrReplace: { _id: "servicesSection", _type: "servicesSection", eyebrow: "(What we do)", note: NOTE },
 });
 
 const response = await fetch(`${API}/data/mutate/${DATASET}`, {

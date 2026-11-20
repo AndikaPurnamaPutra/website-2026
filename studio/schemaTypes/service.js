@@ -1,14 +1,27 @@
 // A service (Homepage → Services; src/components/home/Services.astro).
-// Limits keep the card and its stack panel on phones tidy (AGENTS.md §16).
+// Every published one shows, in the order dragged in the Studio's list
+// (orderRank), unless "Tampilkan di homepage" is off; the website takes the
+// first 7. Limits keep the card and its stack panel on phones tidy
+// (AGENTS.md §16).
 import { defineField, defineType } from "sanity";
+import { orderRankField, orderRankOrdering } from "@sanity/orderable-document-list";
 
 const isVideo = (parent) => parent?.mediaType === "video";
 
 export const service = defineType({
   name: "service",
-  title: "Layanan",
+  title: "Service",
   type: "document",
+  orderings: [orderRankOrdering],
   fields: [
+    orderRankField({ type: "service", newItemPosition: "after" }),
+    defineField({
+      name: "show",
+      title: "Tampilkan di homepage",
+      type: "boolean",
+      description: "Matikan untuk menyembunyikan service tanpa menghapusnya. Homepage menampilkan 3–7 service (yang ke-8 dan seterusnya tidak tampil).",
+      initialValue: true,
+    }),
     defineField({
       name: "title",
       title: "Judul",
@@ -77,12 +90,12 @@ export const service = defineType({
       name: "href",
       title: "Link",
       type: "string",
-      description: "Halaman layanan, mis. /services/branding. Kosongkan bila belum ada.",
+      description: "Halaman service, mis. /services/branding. Kosongkan bila belum ada.",
       validation: (rule) => rule.custom((value) => (!value || /^(\/|#|https?:\/\/)/.test(value) ? true : "Mulai dengan /, # atau https://")),
     }),
   ],
   preview: {
-    select: { title: "title", media: "image", poster: "poster" },
-    prepare: ({ title, media, poster }) => ({ title, media: media || poster }),
+    select: { title: "title", media: "image", poster: "poster", show: "show" },
+    prepare: ({ title, media, poster, show }) => ({ title, subtitle: show === false ? "Disembunyikan" : undefined, media: media || poster }),
   },
 });

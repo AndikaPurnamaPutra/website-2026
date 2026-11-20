@@ -14,3 +14,7 @@ studio/dist/
 studio/.sanity/
 .env
 .env.*
+
+# CMS content and media fetched at build time (scripts/cms.mjs)
+src/data/cms/
+src/assets/images/cms/

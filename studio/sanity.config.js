@@ -4,6 +4,7 @@
 // document each, edited in place; the collections hold the items they pick.
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
+import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
 import { schemaTypes, singletonTypes } from "./schemaTypes/index.js";
 
 const singleton = (S, type, title) => S.listItem().title(title).id(type).child(S.document().schemaType(type).documentId(type).title(title));
@@ -15,7 +16,7 @@ export default defineConfig({
   dataset: "production",
   plugins: [
     structureTool({
-      structure: (S) =>
+      structure: (S, context) =>
         S.list()
           .title("Konten")
           .items([
@@ -23,7 +24,8 @@ export default defineConfig({
               .title("Homepage")
               .child(S.list().title("Homepage").items([singleton(S, "servicesSection", "Section Services")])),
             S.divider(),
-            S.documentTypeListItem("service").title("Layanan (Services)"),
+            // Every published service shows on the homepage, in this order (drag).
+            orderableDocumentListDeskItem({ type: "service", title: "Services", S, context }),
           ]),
     }),
   ],

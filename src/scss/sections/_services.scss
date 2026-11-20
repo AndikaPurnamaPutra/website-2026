@@ -199,8 +199,8 @@
     display: contents;
   }
 
-  // Card n before picture n.
-  @for $i from 1 through 5 {
+  // Card n before picture n (up to 7: the most the CMS allows).
+  @for $i from 1 through 7 {
     .services__card:nth-child(#{$i}) {
       order: $i * 2 - 1;
     }

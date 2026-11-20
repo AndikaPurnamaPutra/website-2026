@@ -7,9 +7,10 @@
     "node": ">=22"
   },
   "scripts": {
+    "cms": "node scripts/cms.mjs",
     "images": "node scripts/images.mjs",
-    "dev": "node scripts/images.mjs && astro dev",
-    "build": "node scripts/images.mjs && astro build",
+    "dev": "node scripts/cms.mjs && node scripts/images.mjs && astro dev",
+    "build": "node scripts/cms.mjs && node scripts/images.mjs && astro build",
     "preview": "astro preview"
   },
   "devDependencies": {

@@ -407,6 +407,46 @@ Studio (oww.sanity.studio)  →  Publish
    (diekspor dari tampilan sekarang); impor.
 8. Dokumentasi: cara mengisi CMS (singkat, Bahasa Indonesia) untuk tim.
 
+### Catatan pengerjaan
+- **Langkah 1–3 selesai (20 Nov 2026).** Proyek `ao8vrenr` (dataset
+  `production`, publik). Studio di https://oww.sanity.studio (deploy dengan
+  token *Deploy Studio* dari `.env`, tanpa login CLI). 5 layanan + teks
+  section diimpor dengan `studio/scripts/seed-services.mjs`; dicek pengguna
+  di Studio.
+- **Langkah 4 (20 Nov 2026).** `scripts/cms.mjs` (jalan sebelum
+  `images.mjs` di `npm run dev` / `build`) → `src/data/cms/services.json`
+  dan media di `src/assets/images/cms/services/` (keduanya tidak di git).
+  `src/data/cms.js` memilih data CMS, atau `src/data/services.js` bila
+  tidak ada. Titik fokus (hotspot) menjadi `object-position` pada gambar
+  (tidak ditulis bila di tengah), bukan pemotongan file.
+  - Gambar diunduh sebagai PNG (`?fm=png`): CDN Sanity menyajikan JPG yang
+    disimpan ulang (kualitas lebih rendah, tanpa profil warna); PNG memberi
+    piksel yang persis sama dengan aslinya.
+  - Dicek: tanpa data CMS, HTML 5 halaman sama persis dengan sebelumnya;
+    dengan data CMS, HTML sama kecuali path `cms/services/…`; WebP ukuran
+    penuh dan poster sama per piksel; video sama per byte. Salinan 800px
+    untuk HP beda sangat kecil (rata-rata < 2/255; satu gambar 800×450
+    bukan 800×449) karena sharp memperkecil JPG lewat jalan pintas yang
+    tidak ada untuk PNG — tidak terlihat (object-fit: cover).
+  - CSS: urutan kartu/gambar di HP kini sampai 7 layanan (batas CMS), dulu 5.
+  - Sanity tidak terjangkau → build tetap jalan dengan data terakhir.
+  - Data dibaca dari API langsung (`api.sanity.io`), bukan CDN (`apicdn`):
+    CDN sempat menyajikan data dari sebelum Publish terakhir.
+  - File media layanan yang dihapus di Studio ikut dihapus saat build
+    (juga salinannya di `public/`), jadi tidak ikut ter-deploy.
+- **Urutan layanan (pengguna, 20 Nov 2026), kembali ke rancangan awal di
+  atas:** daftar "Layanan yang tampil" di Section Services dihapus (terasa
+  dobel: layanan baru harus dibuat lalu ditambahkan ke daftar). Kini **semua
+  layanan yang di-Publish tampil**, urutannya **digeser (drag)** di daftar
+  Services (plugin `@sanity/orderable-document-list` 2.0.28, hanya di
+  Studio, field `orderRank`), dan tiap layanan punya tombol **"Tampilkan di
+  homepage"** (default menyala) untuk menyembunyikan tanpa menghapus.
+  Website mengambil maksimal 7 (yang ke-8 dst. tidak tampil). Section
+  Services kini hanya label kecil dan catatan.
+  - Dicek dengan data uji 6 dan 7 layanan (termasuk isian terpanjang yang
+    diizinkan) di 1440, 1024×768 dan HP 390: rapi, tanpa error, tanpa
+    geser ke samping. Scroll desktop bertambah ±1 layar per layanan.
+
 ### Verifikasi
 - Tiap section: HTML dan piksel dibandingkan dengan sebelum CMS (kecuali
   perubahan yang disetujui: kartu Our Work, grid Trusted), animasi (pin,

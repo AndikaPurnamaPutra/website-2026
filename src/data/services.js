@@ -1,5 +1,9 @@
 // Services (Figma 1523:3292; src/components/home/Services.astro). image or
-// video: a file name under assets/images/services/.
+// video: a file name under assets/images/services/. Used when the CMS has
+// no content (src/data/cms.js); the CMS import (studio/scripts/
+// seed-services.mjs) started from it.
+export const servicesEyebrow = "(What we do)";
+export const servicesNote = "Visual trends evolve, but solid systems don’t age. We build clean digital products designed to scale with your business for years, not just seasons.";
 export const services = [
   { title: "Branding", href: "#", video: "branding", alt: "FURSYS Manta campaign on a wall display", tags: ["Logo", "Brand Identity", "Motion Design", "Packaging"], text: "We delve into your brand's core values, mission, and vision to create a cohesive identity that resonates with your target audience." },
   { title: "Brand Strategy", href: "#", video: "brand-strategy", alt: "Spotify campaign motion design", tags: ["Social Media", "Strategic Design", "Market Research", "Brand Development"], text: "We turn your vision into a focused brand strategy that gives your business clarity, direction, and room to grow." },

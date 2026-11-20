@@ -1,4 +1,5 @@
-// Homepage → Services section: its texts and which services show, in order.
+// Homepage → Services section: its texts. The services themselves are the
+// published "service" documents, in the order dragged in their list.
 import { defineField, defineType } from "sanity";
 
 export const servicesSection = defineType({
@@ -12,14 +13,6 @@ export const servicesSection = defineType({
       type: "string",
       initialValue: "(What we do)",
       validation: (rule) => rule.required().max(40),
-    }),
-    defineField({
-      name: "services",
-      title: "Layanan yang tampil",
-      type: "array",
-      of: [{ type: "reference", to: [{ type: "service" }] }],
-      description: "Urutan bisa digeser. 3–7 layanan (setiap layanan menambah panjang scroll di desktop).",
-      validation: (rule) => rule.required().min(3).max(7).unique(),
     }),
     defineField({
       name: "note",

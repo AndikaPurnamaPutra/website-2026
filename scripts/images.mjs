@@ -25,6 +25,8 @@ const IMAGE_WIDTHS = {
 // Pictures that Figma stretches into a box of another shape (no
 // object-fit): written in that shape, so the browser has nothing to stretch
 // (the same look). The coin: 1024 × 576 into 448 × 420.
+// CMS pictures (scripts/cms.mjs): the same as the Services pictures above.
+const imageWidths = (name) => IMAGE_WIDTHS[name] ?? (/^cms\/services\/[^/]+(?<!-poster)\.(jpe?g|png)$/i.test(name) ? [800] : []);
 const IMAGE_STRETCH = { "hero/coin.png": [1024, 960] };
 
 const newer = async (from, to) => {
@@ -56,7 +58,7 @@ for await (const file of glob(`${SRC}/**/*.*`)) {
     )
     .webp({ quality: 80 })
     .toFile(webp);
-  for (const width of IMAGE_WIDTHS[name] ?? []) {
+  for (const width of imageWidths(name)) {
     await sharp(file)
       .resize({ width, withoutEnlargement: true })
       .webp({ quality: 80 })
