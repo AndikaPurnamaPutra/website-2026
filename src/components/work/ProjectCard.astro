@@ -1,0 +1,29 @@
+---
+// A project card on the Work page (Figma: Selected Work 2343:1186, Case
+// Study 2351:190, Live Sites, Design Showcase): the cover in a frame of the
+// size the layout gives it (--w / --h, design px; the focus point is the
+// Studio's hotspot), the title and its line (first category · format ·
+// year). Live projects carry a "Live" badge and open their site in a new
+// tab; the others are not links yet (no project pages; plan 42, decision 6).
+// Props: project (scripts/cms.mjs → workProject), width / height (design
+// px, for the frame and the image's aspect), sizes (for srcset), badge
+// ("dark" in Selected Work, as Figma; "light" in Live Sites), extra (slot
+// under the line, e.g. "Read the case study").
+const { project, width, height, sizes, badge = null } = Astro.props;
+const { title, href, meta, image, focus, kind } = project;
+const Tag = href ? "a" : "div";
+const link = href ? { href, target: "_blank", rel: "noopener" } : {};
+---
+<article class="project-card">
+  <Tag class="project-card__body" {...link}>
+    <span class="project-card__media">
+      <img class="project-card__image" src={`assets/images/${image}-800.webp`} srcset={`assets/images/${image}-800.webp 800w, assets/images/${image}.webp 2000w`} sizes={sizes} width={width} height={height} alt="" loading="lazy" decoding="async" draggable="false" style={focus && `object-position: ${focus}`}>
+      {badge && kind === "live" && <span class={`project-card__badge project-card__badge--${badge}`}>Live</span>}
+    </span>
+    <span class="project-card__text">
+      <span class="project-card__title">{title}</span>
+      {meta.length > 0 && <span class="project-card__meta text-muted">{meta.map((word) => <span>{word}</span>)}</span>}
+    </span>
+  </Tag>
+  <slot />
+</article>

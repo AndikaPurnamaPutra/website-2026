@@ -13,6 +13,7 @@ import { initInviewVideos } from "./inview-videos.js";
 import { initWorkCarousels } from "./work-carousel.js";
 import { initOurWorkIntro } from "./our-work-intro.js";
 import { initWorkCursor } from "./work-cursor.js";
+import { initWorkDrag } from "./work-drag.js";
 import { initMarquees } from "./marquee.js";
 import { initTrustedIntro } from "./trusted-intro.js";
 import { initMilestoneCounter } from "./milestone-counter.js";
@@ -59,6 +60,7 @@ function initPage(first) {
   cleanups.push(initServicesScroll());
   cleanups.push(initWorkCarousels());
   cleanups.push(initOurWorkIntro());
+  cleanups.push(initWorkDrag());
   cleanups.push(initWorkCursor());
   cleanups.push(initMarquees());
   cleanups.push(initTrustedIntro());

@@ -97,7 +97,7 @@ apa adanya.
 ## Progres
 - [x] 1. Skema + isi (23 Nov 2026)
 - [x] 2. Halaman + hero (23 Nov 2026)
-- [ ] 3. Selected Work
+- [x] 3. Selected Work (23 Nov 2026)
 - [ ] 4. Tab menempel
 - [ ] 5. Tiga section
 - [ ] 6. Pencarian
@@ -153,3 +153,26 @@ apa adanya.
   0 masalah.
 - Belum: animasi masuk (judul naik seperti About/Contact) — tidak diminta;
   bisa ditambah nanti bila diinginkan.
+
+### Catatan langkah 3 (23 Nov 2026)
+- `SelectedWork.astro`, kartu bersama `ProjectCard.astro` (dipakai lagi di
+  langkah 5), `src/js/work-drag.js`; `work-cursor.js` kini juga menampilkan
+  **"Drag"** di atas baris yang bisa di-drag (homepage tetap "View
+  Project"). Data: `scripts/cms.mjs` menulis semua project berjenis ke
+  `work-page.json` (cover = file yang sama dengan homepage); `images.mjs`
+  membuat salinan 800px untuk cover (srcset) — kini tiap salinan dicek
+  sendiri, jadi salinan baru untuk gambar lama tetap dibuat.
+- Ukuran kartu: pola Figma **kecil 325×244, besar 555×424, kecil, lebar
+  440×244**, berulang (rencana menyebut "ke-2, 5, 8 besar"; Figma ternyata
+  pola 4, jadi besar di kartu ke-2, 6, 10). Tablet/HP: pola sama, lebih kecil.
+- Drag mouse: baris mengikuti kursor, dilepas meluncur lalu melambat; drag
+  bukan klik. Sentuh/trackpad/panah keyboard: scroll bawaan.
+- Teks kartu satu gaya untuk semua section: judul Inter Medium 16 (Figma
+  di kartu kecil Selected 14 — dibuat sama), maks. 2 baris + "…";
+  keterangan 14, opacity 0.6 (aturan kontras situs), satu baris + "…".
+  Label "Live" gelap di kartu Live (Figma: "Live Development").
+- Baris dimulai sejajar container (Figma: kartu pertama terpotong di kiri —
+  posisi setelah digeser).
+- Dicek: 1440 sama dengan Figma (y 759, kartu di +118, ukuran); drag
+  (Playwright: ikut 300px, meluncur ke 594, tanpa klik, label "Drag");
+  390, 834; 10 project berjudul 60 huruf; cek otomatis 6 × 19: 0 masalah.

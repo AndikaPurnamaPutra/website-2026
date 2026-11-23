@@ -27,9 +27,11 @@ const IMAGE_WIDTHS = {
 // (the same look). The coin: 1024 × 576 into 448 × 420.
 // CMS pictures (scripts/cms.mjs): the same as the Services pictures above;
 // the Work page collage cards are at most ~630px wide (2560 screens), so
-// they use the 800 copy only.
+// they use the 800 copy only; project covers get one too for the Work page's
+// smaller cards (srcset).
 const imageWidths = (name) =>
-  IMAGE_WIDTHS[name] ?? (/^cms\/(services\/[^/]+(?<!-poster)|work-page\/collage-\d+)\.(jpe?g|png)$/i.test(name) ? [800] : []);
+  IMAGE_WIDTHS[name] ??
+  (/^cms\/(services\/[^/]+(?<!-poster)|work-page\/collage-\d+|work\/[^/]+)\.(jpe?g|png)$/i.test(name) ? [800] : []);
 const IMAGE_STRETCH = { "hero/coin.png": [1024, 960] };
 
 const newer = async (from, to) => {
@@ -51,22 +53,25 @@ for await (const file of glob(`${SRC}/**/*.*`)) {
   }
   if (!/\.(jpe?g|png)$/i.test(name) || name.startsWith("meta/")) continue;
   const webp = out.replace(/\.(jpe?g|png)$/i, ".webp");
-  if (!(await newer(file, webp))) continue;
-  const stretch = IMAGE_STRETCH[name];
-  await sharp(file)
-    .resize(
-      stretch
-        ? { width: stretch[0], height: stretch[1], fit: "fill" }
-        : { width: IMAGE_MAX, height: IMAGE_MAX, fit: "inside", withoutEnlargement: true },
-    )
-    .webp({ quality: 80 })
-    .toFile(webp);
-  for (const width of imageWidths(name)) {
+  if (await newer(file, webp)) {
+    const stretch = IMAGE_STRETCH[name];
     await sharp(file)
-      .resize({ width, withoutEnlargement: true })
+      .resize(
+        stretch
+          ? { width: stretch[0], height: stretch[1], fit: "fill" }
+          : { width: IMAGE_MAX, height: IMAGE_MAX, fit: "inside", withoutEnlargement: true },
+      )
       .webp({ quality: 80 })
-      .toFile(webp.replace(/\.webp$/, `-${width}.webp`));
+      .toFile(webp);
+    written++;
   }
-  written++;
+  // Each smaller copy on its own, so one added later for a picture already
+  // converted is still made.
+  for (const width of imageWidths(name)) {
+    const copy = webp.replace(/\.webp$/, `-${width}.webp`);
+    if (!(await newer(file, copy))) continue;
+    await sharp(file).resize({ width, withoutEnlargement: true }).webp({ quality: 80 }).toFile(copy);
+    written++;
+  }
 }
 console.log(`images: ${written} written`);

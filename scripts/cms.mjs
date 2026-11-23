@@ -46,7 +46,12 @@ const QUERY = `{
   },
   "workPage": *[_id == "workPage"][0]{
     headingLine1, headingLine2, intro, searchTitle, searchPlaceholder, suggestions,
-    "collage": collage[defined(asset)]{ hotspot, "url": asset->url, "id": asset->_id }
+    selectedTitle, selectedText,
+    "collage": collage[defined(asset)]{ hotspot, "url": asset->url, "id": asset->_id },
+    "projects": *[_type == "project" && defined(kind) && defined(cover.asset)] | order(orderRank) {
+      ${PROJECT_FIELDS}, kind, liveUrl, keywords, selected, publishedAt,
+      "categories": categories[]->title, "format": format->title
+    }
   },
   "trusted": *[_id == "trustedSection"][0]{
     eyebrow, heading, more,
@@ -205,8 +210,28 @@ const trusted = async (section) => {
   return { eyebrow: section.eyebrow, heading: section.heading, more: section.more, clients, testimonials };
 };
 
-// Work page (/work, docs/implementation/42-work-page.md): its texts and the
-// hero's collage pictures.
+// Work page (/work, docs/implementation/42-work-page.md): its texts, the
+// hero's collage pictures and every project with a kind, in drag order (the
+// sections and the search take theirs from it). A card's line: first
+// category · format · year. Covers share the homepage's files (work/<slug>).
+const workProject = async (project) => {
+  const name = `work/${project.slug || slugify(project.title)}`;
+  await download(project.cover, `${name}.png`);
+  return {
+    title: project.title,
+    slug: project.slug,
+    kind: project.kind,
+    href: project.kind === "live" && project.liveUrl ? project.liveUrl : null,
+    meta: [project.categories?.[0], project.format, project.publishedAt?.slice(0, 4)].filter(Boolean),
+    categories: project.categories ?? [],
+    format: project.format ?? null,
+    keywords: project.keywords ?? [],
+    selected: Boolean(project.selected),
+    image: `cms/${name}`,
+    focus: focus(project.cover.hotspot),
+  };
+};
+
 const workPage = async (page) => {
   const collage = [];
   for (const [k, picture] of (page.collage ?? []).entries()) {
@@ -221,6 +246,9 @@ const workPage = async (page) => {
     searchPlaceholder: page.searchPlaceholder,
     suggestions: page.suggestions ?? [],
     collage,
+    selectedTitle: page.selectedTitle,
+    selectedText: page.selectedText,
+    projects: await Promise.all((page.projects ?? []).map(workProject)),
   };
 };
 

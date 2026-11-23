@@ -3,10 +3,12 @@
 import Default from "../layouts/Default.astro";
 import PageMeta from "../components/PageMeta.astro";
 import WorkHero from "../components/work/WorkHero.astro";
+import SelectedWork from "../components/work/SelectedWork.astro";
 ---
 <Default namespace="work">
   <PageMeta slot="meta" title="Work — OWW" description="Case studies, live sites and design showcases by One Week Wonders Studio™: brand identities, websites, apps and dashboards, most of them built in a week." path="work" />
   <div class="work">
     <WorkHero />
+    <SelectedWork />
   </div>
 </Default>

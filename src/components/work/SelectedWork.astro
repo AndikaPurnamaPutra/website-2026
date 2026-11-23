@@ -1,0 +1,41 @@
+---
+// Selected Work (Figma 2343:1167; plan 42, step 3): the projects switched on
+// in the Studio, in drag order (the homepage's Selected Work), at most 10.
+// A row dragged with the mouse ("Drag" label at the pointer,
+// src/js/work-drag.js, src/js/work-cursor.js), swiped on touch, scrolled
+// with a trackpad or the arrow keys. Card sizes repeat Figma's four: small,
+// large, small, wide (_work.scss); editors set no sizes.
+import ProjectCard from "./ProjectCard.astro";
+import { workPage } from "../../data/cms.js";
+
+const { selectedTitle, selectedText, projects } = workPage;
+const selected = projects.filter((project) => project.selected).slice(0, 10);
+// [name, width, height in Figma px, sizes: phone (390 frame), tablet (834
+// frame) and desktop widths as in _work.scss].
+const SIZES = [
+  ["small", 325, 244, "(max-width: 743px) 62vw, (max-width: 1023px) 36vw, 23vw"],
+  ["large", 555, 424, "(max-width: 743px) 80vw, (max-width: 1023px) 55vw, 39vw"],
+  ["small", 325, 244, "(max-width: 743px) 62vw, (max-width: 1023px) 36vw, 23vw"],
+  ["wide", 440, 244, "(max-width: 743px) 77vw, (max-width: 1023px) 48vw, 31vw"],
+];
+---
+{selected.length > 0 && (
+  <section class="work-selected" aria-labelledby="work-selected-title">
+    <div class="container work-section-header">
+      <h2 class="work-section-title" id="work-selected-title">{selectedTitle}</h2>
+      {selectedText && <p class="work-section-text">{selectedText}</p>}
+    </div>
+    <div class="work-selected__viewport" data-drag tabindex="0" role="region" aria-labelledby="work-selected-title">
+      <div class="work-selected__track">
+        {selected.map((project, i) => {
+          const [size, width, height, sizes] = SIZES[i % SIZES.length];
+          return (
+            <div class={`work-selected__item work-selected__item--${size}`}>
+              <ProjectCard project={project} width={width} height={height} sizes={sizes} badge="dark" />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+)}
