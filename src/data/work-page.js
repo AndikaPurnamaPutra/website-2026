@@ -11,5 +11,6 @@ export const workPage = {
   collage: [],
   selectedTitle: "Selected Work",
   selectedText: "The work we’d hang on the wall first.",
+  kinds: { caseStudy: "Case Study", live: "Live Sites", showcase: "Design Showcase" },
   projects: [],
 };

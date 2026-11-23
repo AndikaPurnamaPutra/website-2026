@@ -1,0 +1,31 @@
+---
+// The Work page's bar (Figma 2351:1279; scrolled 2351:744; plan 42, step
+// 4): a tab per section with its number of projects (all of that kind, not
+// only those shown), and the search box. It sticks under the header once
+// it reaches it; the tab of the section under it is lit (src/js/work-
+// tabs.js), a tab scrolls to its section. Phones: the tabs alone (the
+// hero's search box is the one there).
+import { workPage } from "../../data/cms.js";
+import { KINDS } from "../../data/work-kinds.js";
+
+const { kinds, projects, searchPlaceholder } = workPage;
+// Only the sections there are (a kind with no project has none).
+const tabs = KINDS.map(({ kind, id }) => ({ id, title: kinds[kind], count: projects.filter((project) => project.kind === kind).length })).filter(({ count }) => count > 0);
+---
+<div class="work-tabs" data-work-tabs>
+  <div class="container work-tabs__inner">
+    <nav class="work-tabs__nav" aria-label="Work sections">
+      {tabs.map(({ id, title, count }, i) => (
+        <a class:list={["work-tabs__tab", { "is-active": i === 0 }]} href={`#${id}`} data-barba-prevent aria-current={i === 0 ? "true" : undefined}>
+          <span>{title}</span>
+          <span class="work-tabs__count">{count}</span>
+        </a>
+      ))}
+    </nav>
+    <form class="work-search__field work-tabs__search" action="/work" method="get" role="search">
+      <label class="visually-hidden" for="work-tabs-search">Search the work</label>
+      <input class="work-search__input" id="work-tabs-search" type="search" name="q" placeholder={searchPlaceholder} autocomplete="off" enterkeyhint="search">
+      <button class="work-search__submit" type="submit" aria-label="Search"><img src="assets/icons/search.svg" width="24" height="24" alt=""></button>
+    </form>
+  </div>
+</div>

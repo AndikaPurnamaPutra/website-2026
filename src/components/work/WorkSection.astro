@@ -1,0 +1,15 @@
+---
+// A Work page section (Figma: Case Study 2351:1745, Live Sites 2351:1746,
+// Design Showcase 2351:1747): its title, "See all" (/work?type=…, plan 42
+// decision 3) and its cards (slot; step 5). The tabs link to its id.
+const { id, title } = Astro.props;
+---
+<section class="work-section" id={id} aria-labelledby={`${id}-title`} data-work-section>
+  <div class="container">
+    <div class="work-section__header">
+      <h2 class="work-section-title" id={`${id}-title`}>{title}</h2>
+      <a class="work-see-all" href={`/work?type=${id}`}><span>See all</span><img src="assets/icons/arrow-right.svg" width="18" height="18" alt=""></a>
+    </div>
+    <slot />
+  </div>
+</section>

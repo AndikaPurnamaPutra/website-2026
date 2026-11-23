@@ -98,7 +98,7 @@ apa adanya.
 - [x] 1. Skema + isi (23 Nov 2026)
 - [x] 2. Halaman + hero (23 Nov 2026)
 - [x] 3. Selected Work (23 Nov 2026)
-- [ ] 4. Tab menempel
+- [x] 4. Tab menempel (23 Nov 2026)
 - [ ] 5. Tiga section
 - [ ] 6. Pencarian
 - [ ] 7. Link
@@ -176,3 +176,24 @@ apa adanya.
 - Dicek: 1440 sama dengan Figma (y 759, kartu di +118, ukuran); drag
   (Playwright: ikut 300px, meluncur ke 594, tanpa klik, label "Drag");
   390, 834; 10 project berjudul 60 huruf; cek otomatis 6 × 19: 0 masalah.
+
+### Catatan langkah 4 (23 Nov 2026)
+- `WorkTabs.astro`, `WorkSection.astro` (kerangka section: judul + "See all"
+  → `/work?type=…`; kartunya langkah 5), `src/data/work-kinds.js`,
+  `src/js/work-tabs.js`; ikon `arrow-right.svg` (Figma).
+- Bar menempel di bawah header (4rem = tinggi header situs; Figma 104):
+  putih di atasnya mengisi tempat header, jadi header transparan terbaca di
+  atas putih seperti frame Figma saat di-scroll (2351:744). Tab section
+  yang ada di bawah bar menyala (tab pertama sebelum itu, seperti Figma);
+  klik tab → scroll halus (Lenis) sampai section tepat di bawah bar, alamat
+  jadi `#live-sites` dst. (link tab dilewati Barba).
+- Angka tab = semua project jenis itu (Case Study 10, Live 9, Showcase 18),
+  bukan yang tampil saja. Figma 10px → 12px (batas teks terkecil situs).
+  Tab tanpa project tidak tampil.
+- HP: tab saja (kolom cari ada di hero), baris bisa digeser, tab aktif
+  digulir ke tengah. Tablet: kolom cari mengecil. Judul tab terpanjang
+  (24 huruf): kolom cari min. 200, tab bisa digeser; judul section boleh
+  turun baris di HP 320.
+- Dicek: bar di y 1470 (Figma 1468; garis 1px), menempel di 64, klik Live
+  Sites → section di bawah bar, tab menyala, hash; 390, 834, 1024; isian
+  ekstrem; cek otomatis 6 × 19: 0 masalah.

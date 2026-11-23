@@ -504,3 +504,192 @@ a.project-card__body:hover .project-card__image {
     --h: 166;
   }
 }
+
+// The bar (Figma 2351:1279): a line above and below, the tabs and the search
+// box 16 from them. It sticks under the header (4rem: 1.25rem padding
+// around the 1.5rem logo, _header.scss); the white above it then fills the
+// header's place, so the transparent header reads on white as in Figma's
+// scrolled frame (2351:744). That white sits in Selected Work's bottom space
+// while the bar is not stuck.
+.work-tabs {
+  --header-height: 4rem;
+
+  position: sticky;
+  top: var(--header-height);
+  z-index: 50;
+  border-block: 1px solid var(--color-divider);
+  background: var(--color-white);
+
+  &::before {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 1px);
+    left: 0;
+    height: var(--header-height);
+    background: var(--color-white);
+  }
+}
+
+.work-tabs__inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: fluid(40);
+  padding-block: fs(16);
+}
+
+// The tabs keep their width and the search box gives way (tablet), down to
+// 200; past that (the longest titles) the tabs scroll sideways.
+.work-tabs__nav {
+  display: flex;
+  flex-shrink: 0;
+  gap: fs(16);
+  max-width: calc(100% - #{fs(200)} - #{fluid(40)});
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.work-tabs__tab {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: fs(8);
+  padding: fs(8) fs(12);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: fs(14);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  transition: background-color 0.25s;
+
+  &.is-active {
+    background: var(--color-field);
+
+    .work-tabs__count {
+      background: var(--color-white);
+      box-shadow: 0 fs(4) fs(2) rgba(0, 0, 0, 0.02);
+    }
+  }
+
+  @media (hover: hover) {
+    &:not(.is-active):hover {
+      background: var(--color-surface-muted);
+    }
+  }
+}
+
+// Figma 10px; at least 12 (fs-text), the smallest read without zoom.
+.work-tabs__count {
+  padding: fs(4) fs(10);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-muted);
+  font-size: fs-text(10);
+  line-height: 1;
+  transition: background-color 0.25s;
+}
+
+// Smaller than the hero's (Figma 2351:1296): 460 × 50, button 40.
+.work-tabs__search {
+  flex: 0 1 fluid(460);
+  width: auto;
+  min-width: 0;
+  min-height: fs(50);
+
+  .work-search__submit {
+    width: fs(40);
+    padding: fs(7.27);
+    border-radius: fs(5.8);
+
+    img {
+      width: fs(17.45);
+      height: fs(17.45);
+    }
+  }
+}
+
+// Sections (Figma 2351:1745 …): title and "See all" in a row, cards 40
+// below. Case Study follows the bar by 60; the next ones start at a line,
+// 120 below it. They stop under the bar when a tab scrolls to them.
+.work-section {
+  padding-block: fluid(60) fluid(120);
+  scroll-margin-top: calc(4rem + #{fs(82)});
+
+  & + & {
+    padding-top: fluid(120);
+    border-top: 1px solid var(--color-divider);
+  }
+}
+
+.work-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: fluid(20);
+
+  // The longest allowed title beside "See all" on a 320px phone.
+  .work-section-title {
+    min-width: 0;
+    overflow-wrap: break-word;
+  }
+}
+
+.work-see-all {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: fs(8);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: fs(20);
+  line-height: 1.7;
+  letter-spacing: -0.02em;
+
+  span {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  img {
+    width: fs(18);
+    height: fs(18);
+    transition: transform 0.3s cubic-bezier(0.33, 1, 0.68, 1);
+  }
+
+  @media (hover: hover) {
+    &:hover img {
+      transform: translateX(fs(4));
+    }
+  }
+}
+
+// Phones: the tabs alone, in a row that scrolls sideways if it must.
+@include mobile {
+  .work-tabs__search {
+    display: none;
+  }
+
+  .work-tabs__inner {
+    padding-inline: 0;
+  }
+
+  .work-tabs__nav {
+    gap: fs(8);
+    max-width: 100%;
+    padding-inline: var(--page-gutter);
+  }
+
+  .work-section {
+    scroll-margin-top: calc(4rem + #{fs(68)});
+  }
+
+  .work-see-all {
+    font-size: fs(16);
+  }
+}

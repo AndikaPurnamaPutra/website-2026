@@ -4,11 +4,19 @@ import Default from "../layouts/Default.astro";
 import PageMeta from "../components/PageMeta.astro";
 import WorkHero from "../components/work/WorkHero.astro";
 import SelectedWork from "../components/work/SelectedWork.astro";
+import WorkTabs from "../components/work/WorkTabs.astro";
+import WorkSection from "../components/work/WorkSection.astro";
+import { workPage } from "../data/cms.js";
+import { KINDS } from "../data/work-kinds.js";
+
+const sections = KINDS.filter(({ kind }) => workPage.projects.some((project) => project.kind === kind));
 ---
 <Default namespace="work">
   <PageMeta slot="meta" title="Work — OWW" description="Case studies, live sites and design showcases by One Week Wonders Studio™: brand identities, websites, apps and dashboards, most of them built in a week." path="work" />
   <div class="work">
     <WorkHero />
     <SelectedWork />
+    {sections.length > 0 && <WorkTabs />}
+    {sections.map(({ kind, id }) => <WorkSection id={id} title={workPage.kinds[kind]} />)}
   </div>
 </Default>
