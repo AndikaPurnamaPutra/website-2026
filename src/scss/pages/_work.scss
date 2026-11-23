@@ -342,6 +342,7 @@ a.project-card__body:hover .project-card__image {
 
 .project-card__badge {
   position: absolute;
+  z-index: 1;
   top: fluid(20);
   left: fluid(20);
   padding: fs(6.5) fs(8);
@@ -351,6 +352,35 @@ a.project-card__body:hover .project-card__image {
   font-size: fs-text(12);
   line-height: 1;
   letter-spacing: -0.02em;
+}
+
+// Live Sites (Figma 2351:696): white, a green dot, over a dark fade at the
+// top of the picture (0.2 → 0 over its top third).
+.project-card__badge--light {
+  top: fluid(11);
+  left: fluid(18);
+  display: flex;
+  align-items: center;
+  gap: fs(4);
+  background: var(--color-white);
+  color: var(--color-ink);
+
+  &::before {
+    content: "";
+    width: fs(8);
+    height: fs(8);
+    border-radius: 50%;
+    background: #31e45e;
+  }
+}
+
+.project-card__media:has(.project-card__badge--light)::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: calc(81 / 244 * 100%);
+  background: linear-gradient(rgba(0, 0, 0, 0.2), transparent);
+  pointer-events: none;
 }
 
 // Selected Work (Figma 2343:1211): dark glass.
@@ -629,6 +659,7 @@ a.project-card__body:hover .project-card__image {
 
 .work-section__header {
   display: flex;
+  margin-bottom: fluid(40);
   justify-content: space-between;
   align-items: center;
   gap: fluid(20);
@@ -666,6 +697,70 @@ a.project-card__body:hover .project-card__image {
     &:hover img {
       transform: translateX(fs(4));
     }
+  }
+}
+
+// Section cards (Figma 2351:188, 2351:409, 2351:1747): 20 between columns,
+// 32 between rows; Case Study one grid per row, each with Figma's widths
+// (they add up to the 1320 between the gaps).
+.work-grid {
+  display: flex;
+  flex-direction: column;
+  gap: fluid(32);
+}
+
+.work-grid__row {
+  display: grid;
+  align-items: start;
+  gap: fluid(32) var(--grid-gutter);
+}
+
+.work-grid--caseStudy {
+  .work-grid__row--1 {
+    grid-template-columns: 555fr 325fr 440fr;
+  }
+
+  .work-grid__row--2 {
+    grid-template-columns: 382.5fr 382.5fr 555fr;
+  }
+
+  .work-grid__row--3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.work-grid--live .work-grid__row {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.work-grid--showcase .work-grid__row {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+// Live covers are website screens: their top shows (Figma), unless the
+// Studio's focus point says otherwise (inline object-position).
+.work-grid--live .project-card__image {
+  object-position: 50% 0;
+}
+
+// Tablet: two columns, phone: one, for every section; Case Study's cards
+// keep their shapes.
+@include below-laptop {
+  .work-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: start;
+    gap: fluid(32) var(--grid-gutter);
+  }
+
+  .work-grid__row {
+    display: contents;
+  }
+}
+
+@include mobile {
+  .work-grid {
+    grid-template-columns: 1fr;
   }
 }
 

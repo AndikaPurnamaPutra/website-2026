@@ -1,0 +1,47 @@
+---
+// The cards of a Work page section (plan 42, step 5):
+// - Case Study (Figma 2351:188): Figma's three rows of three, each its own
+//   widths and heights (large / small / medium, two halves / large, three
+//   equal), at most 9 cards.
+// - Live Sites (2351:409): three equal columns, 440 × 244, "Live" badge,
+//   at most 9.
+// - Design Showcase (2351:1747): four columns, 325 × 244, at most 12.
+// In drag order (Studio). Rows not full stay left aligned.
+// "Read the case study" (Figma: the third row) waits for the project pages
+// (plan 42, decision 6): not shown until a project has one.
+import ProjectCard from "./ProjectCard.astro";
+
+const { kind, projects } = Astro.props;
+
+// [width, height] in Figma px, and the sizes attribute (desktop share of
+// 1440; tablet two columns, phone one).
+const size = (w, h) => ({ w, h, sizes: `(max-width: 743px) 90vw, (max-width: 1023px) 45vw, ${Math.round((w / 1440) * 100)}vw` });
+const CASE_STUDY = [
+  [size(555, 424), size(325, 244), size(440, 327)],
+  [size(382.5, 244), size(382.5, 244), size(555, 424)],
+  [size(440, 244), size(440, 244), size(440, 244)],
+];
+const LAYOUTS = {
+  caseStudy: { max: 9, cell: (i) => CASE_STUDY[Math.floor(i / 3)][i % 3] },
+  live: { max: 9, cell: () => size(440, 244) },
+  showcase: { max: 12, cell: () => size(325, 244) },
+};
+const { max, cell } = LAYOUTS[kind];
+const items = projects.slice(0, max);
+// Case Study: one grid per row (each row its own columns).
+const rows = kind === "caseStudy" ? Array.from({ length: Math.ceil(items.length / 3) }, (_, r) => items.slice(r * 3, r * 3 + 3)) : [items];
+---
+<div class={`work-grid work-grid--${kind}`}>
+  {rows.map((row, r) => (
+    <div class={`work-grid__row work-grid__row--${r + 1}`}>
+      {row.map((project, k) => {
+        const { w, h, sizes } = cell(r * 3 + k);
+        return (
+          <div class="work-grid__item" style={`--w: ${w}; --h: ${h}`}>
+            <ProjectCard project={project} width={Math.round(w)} height={h} sizes={sizes} badge={kind === "live" ? "light" : null} />
+          </div>
+        );
+      })}
+    </div>
+  ))}
+</div>

@@ -6,6 +6,7 @@ import WorkHero from "../components/work/WorkHero.astro";
 import SelectedWork from "../components/work/SelectedWork.astro";
 import WorkTabs from "../components/work/WorkTabs.astro";
 import WorkSection from "../components/work/WorkSection.astro";
+import WorkGrid from "../components/work/WorkGrid.astro";
 import { workPage } from "../data/cms.js";
 import { KINDS } from "../data/work-kinds.js";
 
@@ -17,6 +18,10 @@ const sections = KINDS.filter(({ kind }) => workPage.projects.some((project) => 
     <WorkHero />
     <SelectedWork />
     {sections.length > 0 && <WorkTabs />}
-    {sections.map(({ kind, id }) => <WorkSection id={id} title={workPage.kinds[kind]} />)}
+    {sections.map(({ kind, id }) => (
+      <WorkSection id={id} title={workPage.kinds[kind]}>
+        <WorkGrid kind={kind} projects={workPage.projects.filter((project) => project.kind === kind)} />
+      </WorkSection>
+    ))}
   </div>
 </Default>

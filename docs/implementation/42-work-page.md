@@ -99,7 +99,7 @@ apa adanya.
 - [x] 2. Halaman + hero (23 Nov 2026)
 - [x] 3. Selected Work (23 Nov 2026)
 - [x] 4. Tab menempel (23 Nov 2026)
-- [ ] 5. Tiga section
+- [x] 5. Tiga section (23 Nov 2026)
 - [ ] 6. Pencarian
 - [ ] 7. Link
 - [ ] 8. Cek
@@ -197,3 +197,21 @@ apa adanya.
 - Dicek: bar di y 1470 (Figma 1468; garis 1px), menempel di 64, klik Live
   Sites → section di bawah bar, tab menyala, hash; 390, 834, 1024; isian
   ekstrem; cek otomatis 6 × 19: 0 masalah.
+
+### Catatan langkah 5 (23 Nov 2026)
+- `WorkGrid.astro` di tiap `WorkSection`; kartu `ProjectCard` (langkah 3).
+  Case Study: pola Figma 3 baris × 3 (lebar 555/325/440, 382,5/382,5/555,
+  3 × 440; tinggi 424/244/327…), maks. 9. Live Sites: 3 kolom 440 × 244,
+  label putih "Live" bertitik hijau di atas gradasi gelap tipis (Figma
+  2351:696), gambar menampilkan bagian atas situs (bisa diubah dengan titik
+  fokus Studio), maks. 9. Design Showcase: 4 kolom 325 × 244, maks. 12.
+  Urutan = drag Studio. Baris tidak penuh rata kiri.
+- **"Read the case study →" belum ditampilkan**: belum ada halaman project
+  (keputusan 6), jadi tidak ada tujuan. Muncul nanti di baris ketiga
+  (keputusan 5) saat halaman project dibuat. Karena itu Case Study ±26px
+  lebih pendek dari Figma.
+- Tablet 2 kolom, HP 1 kolom (semua section; bentuk kartu Case Study tetap).
+- Dicek: posisi section 1440 (Case Study 1554 / Figma 1550, Live 3177 /
+  3202 — selisih = baris "Read the case study", Showcase 4501 / 4510); 834,
+  390; isian ekstrem (1 Live, 5 Showcase, judul 60 huruf); cek otomatis
+  6 × 19: 0 masalah.
