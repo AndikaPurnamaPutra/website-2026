@@ -1,0 +1,276 @@
+// Work page (Figma "Work" 2337:715; docs/implementation/42-work-page.md).
+@use "../abstracts/functions" as *;
+@use "../abstracts/breakpoints" as *;
+
+.work {
+  position: relative;
+  z-index: 1;
+  background: var(--color-white);
+}
+
+// Hero (Figma 2343:1127): title at y 144 (main reserves 104), the search
+// box's chips end at 639; Selected Work 120 below.
+.work-hero {
+  position: relative;
+  padding-bottom: fluid(120);
+}
+
+.work-hero__inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: fluid(60); // at least, with the longest texts
+  min-height: fluid(535); // 40 above the title + Figma's 495
+  padding-top: fluid(40);
+}
+
+// Where a line wraps (phones), lines of even length, not a lone "week,".
+.work-hero__title {
+  text-wrap: balance;
+}
+
+// The text and the search keep clear of the collage (its window starts at
+// x 846): the longest allowed title and chips wrap before it.
+.work-hero__intro,
+.work-search {
+  max-width: fluid(780);
+}
+
+.work-hero__intro {
+  display: flex;
+  flex-direction: column;
+  gap: fs(16);
+}
+
+.work-hero__text {
+  max-width: fs(439);
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: fs(14);
+  line-height: 1.6;
+  letter-spacing: -0.02em;
+  // Line breaks typed in the Studio (Figma breaks after "a launch,").
+  white-space: pre-line;
+}
+
+// Collage (Figma 2343:1156): a 594 × 639 window at the top right, from the
+// top of the page (behind the header). Its cards (353 × 220) sit on the rim
+// of a wheel 714 from its centre, which is 1090 from the window's left and
+// 346 from its top, i.e. off the page; each card lies along the radius, so
+// above the middle they lean one way and below it the other (Figma: 0°,
+// ±15°, ±31°). The wheel turns slowly: the cards climb the arc. The window
+// fades its top and bottom as Figma's white gradients (149 and 157 high).
+// The wheel turns by one round of the pictures (--loop cards of --count) and
+// starts again, where every card has the next one's picture: a seamless
+// loop, and the higher-over-lower order (WorkHero.astro) holds. 5s a card.
+.work-collage {
+  position: absolute;
+  top: fluid(-104);
+  right: 0;
+  width: fluid(594);
+  height: fluid(639);
+  overflow: hidden;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, transparent 0, transparent fluid(74.5), #000 fluid(149), #000 calc(100% - fluid(157)), transparent 100%);
+}
+
+.work-collage__wheel {
+  position: absolute;
+  top: fluid(346);
+  left: fluid(1090);
+  animation: work-wheel calc(var(--loop) * 5s) linear infinite;
+}
+
+.work-collage__arm {
+  position: absolute;
+  top: 0;
+  left: 0;
+  // Top to bottom in the order of the pictures.
+  transform: rotate(calc(var(--i) * -360deg / var(--count)));
+}
+
+.work-collage__card {
+  position: absolute;
+  top: fluid(-110.2);
+  left: fluid(-890.4); // -(714 + 353 / 2)
+  width: fluid(352.85);
+  max-width: none;
+  height: fluid(220.4);
+  border-radius: fluid(8.686);
+  object-fit: cover;
+}
+
+@keyframes work-wheel {
+  to {
+    transform: rotate(calc(var(--loop) * 360deg / var(--count)));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-collage__wheel {
+    animation: none;
+  }
+}
+
+// Search box (Figma 2343:1131).
+.work-search {
+  display: flex;
+  flex-direction: column;
+  gap: fs(16);
+}
+
+.work-search__form {
+  display: flex;
+  flex-direction: column;
+  gap: fs(20);
+}
+
+.work-search__title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: fs(20);
+  line-height: 1.6;
+  letter-spacing: -0.02em;
+}
+
+.work-search__field {
+  display: flex;
+  align-items: center;
+  gap: fs(10);
+  width: fluid(670);
+  max-width: 100%;
+  padding: fs(8) fs(8) fs(8) fs(14);
+  border-radius: var(--radius-md);
+  background: var(--color-field);
+
+  &:has(.work-search__input:focus-visible) {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+}
+
+.work-search__input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: fs(14);
+  line-height: 1.6;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis; // a long example on phones
+  outline: none;
+
+  &::placeholder {
+    color: var(--color-text-secondary);
+    opacity: 1;
+  }
+
+  // The browser's own clear button; the page has its own (step 6).
+  &::-webkit-search-cancel-button {
+    appearance: none;
+  }
+}
+
+.work-search__submit {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  width: fs(55);
+  padding: fs(10);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  box-shadow: 0 fs(4) fs(5) rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+
+  img {
+    width: fs(24);
+    height: fs(24);
+  }
+}
+
+.work-search__recent {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: fs(8);
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: fs-text(12);
+  letter-spacing: -0.02em;
+}
+
+.work-search__recent-label {
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.work-search__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: fs(8);
+  max-width: 100%;
+
+  li {
+    max-width: 100%;
+  }
+}
+
+// Figma: 8 around the capital letters (text trimmed to them).
+.work-search__chip {
+  display: block;
+  padding: fs(6.5) fs(8);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  line-height: 1;
+  white-space: nowrap;
+  text-overflow: ellipsis; // 30 wide letters on a 320px phone
+  transition: color 0.2s, border-color 0.2s;
+
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--color-ink);
+      color: var(--color-ink);
+    }
+  }
+}
+
+// Tablet and mobile: no room for the collage beside the text; the search
+// box follows the intro.
+@include below-laptop {
+  .work-collage {
+    display: none;
+  }
+
+  .work-hero__intro,
+  .work-search {
+    max-width: none;
+  }
+
+  .work-hero__inner {
+    gap: fluid(80);
+    min-height: 0;
+  }
+}
+
+@include mobile {
+  .work-hero__title {
+    font-size: fs(32);
+  }
+
+  .work-hero__text {
+    white-space: normal;
+  }
+
+  .work-hero__inner {
+    gap: fluid(60);
+  }
+}

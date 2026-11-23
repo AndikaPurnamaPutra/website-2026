@@ -25,8 +25,11 @@ const IMAGE_WIDTHS = {
 // Pictures that Figma stretches into a box of another shape (no
 // object-fit): written in that shape, so the browser has nothing to stretch
 // (the same look). The coin: 1024 × 576 into 448 × 420.
-// CMS pictures (scripts/cms.mjs): the same as the Services pictures above.
-const imageWidths = (name) => IMAGE_WIDTHS[name] ?? (/^cms\/services\/[^/]+(?<!-poster)\.(jpe?g|png)$/i.test(name) ? [800] : []);
+// CMS pictures (scripts/cms.mjs): the same as the Services pictures above;
+// the Work page collage cards are at most ~630px wide (2560 screens), so
+// they use the 800 copy only.
+const imageWidths = (name) =>
+  IMAGE_WIDTHS[name] ?? (/^cms\/(services\/[^/]+(?<!-poster)|work-page\/collage-\d+)\.(jpe?g|png)$/i.test(name) ? [800] : []);
 const IMAGE_STRETCH = { "hero/coin.png": [1024, 960] };
 
 const newer = async (from, to) => {

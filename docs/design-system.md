@@ -40,6 +40,8 @@ All sizes in this document are **Figma pixels** at the 1440px frame. In code the
 | `--color-border-row` | `#f0f0f0` | Milestone row border | [T] |
 | `--color-border-strong` | `#d9d9d9` | Time pill border | [T] |
 | `--color-border-dark` | `#3d3d3d` | Tag border on dark | [T] |
+| `--color-field` | `#f3f3f3` | Work page search box (Figma 2343:1135) | [T] |
+| `--color-line` | `#cacaca` | Work page search chips (Figma 2343:1145); same value as the Contact form lines | [T] |
 | `--color-link` | `#3e78ff` | Inline link in testimonial | [T] |
 | `--color-glass` | `rgba(255,255,255,.04)` | Glass cards (with `--blur-glass`) | [T] |
 | `--color-glass-button` | `rgba(255,255,255,.1)` | Showreel button | [T] |

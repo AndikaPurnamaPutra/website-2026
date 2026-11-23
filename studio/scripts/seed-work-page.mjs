@@ -160,8 +160,9 @@ for (const [id, [kind, format, keywords]] of Object.entries(EXISTING)) {
   });
 }
 
+// Top to bottom on the wheel as in Figma: Obsidia in the middle.
 const collage = [];
-for (const [k, file] of ["collage-common.png", "collage-outcast.png", "collage-obsidia.png"].entries()) {
+for (const [k, file] of ["collage-obsidia.png", "collage-outcast.png", "collage-common.png"].entries()) {
   collage.push({ ...(await upload(file)), _key: `collage-${k}` });
 }
 mutations.push({
@@ -170,7 +171,7 @@ mutations.push({
     _type: "workPage",
     headingLine1: "Most of these took a week,",
     headingLine2: "Ask us about the ones that didn’t.",
-    intro: "Brands come to us with a someday: a rebrand, a launch, a product that’s been waiting its turn.",
+    intro: "Brands come to us with a someday: a rebrand, a launch,\na product that’s been waiting its turn.",
     collage,
     selectedTitle: "Selected Work",
     selectedText: "The work we’d hang on the wall first.",

@@ -44,6 +44,10 @@ const QUERY = `{
     "recent": *[_type == "project" && defined(cover.asset)] | order(publishedAt desc, _createdAt desc) [0...8] { ${PROJECT_FIELDS} },
     "selected": *[_type == "project" && selected == true && defined(cover.asset)] | order(orderRank) [0...10] { ${PROJECT_FIELDS} }
   },
+  "workPage": *[_id == "workPage"][0]{
+    headingLine1, headingLine2, intro, searchTitle, searchPlaceholder, suggestions,
+    "collage": collage[defined(asset)]{ hotspot, "url": asset->url, "id": asset->_id }
+  },
   "trusted": *[_id == "trustedSection"][0]{
     eyebrow, heading, more,
     "clients": *[_type == "client" && show != false && defined(logo.asset)] | order(orderRank) [0...20] {
@@ -201,6 +205,25 @@ const trusted = async (section) => {
   return { eyebrow: section.eyebrow, heading: section.heading, more: section.more, clients, testimonials };
 };
 
+// Work page (/work, docs/implementation/42-work-page.md): its texts and the
+// hero's collage pictures.
+const workPage = async (page) => {
+  const collage = [];
+  for (const [k, picture] of (page.collage ?? []).entries()) {
+    const name = `work-page/collage-${k + 1}`;
+    await download(picture, `${name}.png`);
+    collage.push({ image: `cms/${name}`, focus: focus(picture.hotspot) });
+  }
+  return {
+    heading: [page.headingLine1, page.headingLine2],
+    intro: page.intro,
+    searchTitle: page.searchTitle,
+    searchPlaceholder: page.searchPlaceholder,
+    suggestions: page.suggestions ?? [],
+    collage,
+  };
+};
+
 // Each section's file, or none (src/data/cms.js then uses src/data/*.js).
 const write = async (name, section, build) => {
   if (section) {
@@ -234,6 +257,7 @@ try {
   await write("services", result.services, services);
   await write("work", result.work, work);
   await write("trusted", result.trusted, trusted);
+  await write("work-page", result.workPage, workPage);
   await prune();
   await writeFile(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`);
 } catch (error) {

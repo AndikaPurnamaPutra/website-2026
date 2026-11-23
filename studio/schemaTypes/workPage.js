@@ -26,7 +26,7 @@ export const workPage = defineType({
       type: "text",
       rows: 2,
       group: "hero",
-      description: "Maksimal 120 karakter.",
+      description: "Maksimal 120 karakter. Enter = pindah baris (di desktop; di HP baris mengikuti lebar layar).",
       validation: (rule) => rule.required().max(120),
     }),
     defineField({

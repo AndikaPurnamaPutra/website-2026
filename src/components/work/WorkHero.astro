@@ -1,0 +1,62 @@
+---
+// Work page hero (Figma 2343:1127, collage 2343:1156; plan 42, step 2):
+// title, intro, the search box and its suggestions, and on the right the
+// collage: pictures on the rim of a large wheel (its centre off the page,
+// right), turning slowly so they climb the arc and fade at its ends. CSS
+// only (_work.scss); still with reduced motion. Decorative: hidden from
+// screen readers, and below the desktop layout (no room beside the text).
+// The search runs in step 6; without JS the form loads /work?q=… .
+import { workPage } from "../../data/cms.js";
+
+const { heading, intro, searchTitle, searchPlaceholder, suggestions, collage } = workPage;
+
+// As many cards as fill the rim, a multiple of the pictures so the loop has
+// no seam: about 24 (15° apart, as in Figma).
+const repeat = collage.length ? Math.max(1, Math.round(24 / collage.length)) : 0;
+const cards = Array.from({ length: collage.length * repeat }, (_, i) => collage[i % collage.length]);
+// Higher cards lie over lower ones (Figma). Card i starts at -i steps (down
+// the arc); its height rank is its angle in (-180°, 180°], in steps. The
+// wheel turns only one round of the pictures and starts again (_work.scss),
+// so no card reaches the far side, where this order would break, while it
+// is in view.
+const rank = (i) => {
+  const steps = -i;
+  return steps <= -cards.length / 2 ? steps + cards.length : steps;
+};
+---
+<section class="work-hero">
+  {cards.length > 0 && (
+    <div class="work-collage" aria-hidden="true">
+      <div class="work-collage__wheel" style={`--count: ${cards.length}; --loop: ${collage.length}`}>
+        {cards.map(({ image, focus }, i) => (
+          <div class="work-collage__arm" style={`--i: ${i}; z-index: ${rank(i) + cards.length}`}>
+            <img class="work-collage__card" src={`assets/images/${image}-800.webp`} width="353" height="220" alt="" decoding="async" style={focus && `object-position: ${focus}`}>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+  <div class="container work-hero__inner">
+    <div class="work-hero__intro">
+      <h1 class="work-hero__title text-heading-42">{heading[0]}<br>{heading[1]}</h1>
+      <p class="work-hero__text">{intro}</p>
+    </div>
+    <div class="work-search">
+      <form class="work-search__form" action="/work" method="get" role="search">
+        <label class="work-search__title" for="work-search-input">{searchTitle}</label>
+        <div class="work-search__field">
+          <input class="work-search__input" id="work-search-input" type="search" name="q" placeholder={searchPlaceholder} autocomplete="off" enterkeyhint="search">
+          <button class="work-search__submit" type="submit" aria-label="Search"><img src="assets/icons/search.svg" width="24" height="24" alt=""></button>
+        </div>
+      </form>
+      {suggestions.length > 0 && (
+        <div class="work-search__recent">
+          <span class="work-search__recent-label">Most recent search&nbsp;&nbsp;:</span>
+          <ul class="work-search__chips">
+            {suggestions.map((word) => <li><a class="work-search__chip" href={`/work?q=${encodeURIComponent(word)}`}>{word}</a></li>)}
+          </ul>
+        </div>
+      )}
+    </div>
+  </div>
+</section>

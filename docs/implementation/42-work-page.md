@@ -96,7 +96,7 @@ apa adanya.
 
 ## Progres
 - [x] 1. Skema + isi (23 Nov 2026)
-- [ ] 2. Halaman + hero
+- [x] 2. Halaman + hero (23 Nov 2026)
 - [ ] 3. Selected Work
 - [ ] 4. Tab menempel
 - [ ] 5. Tiga section
@@ -126,3 +126,30 @@ apa adanya.
 - Belum ada: alamat 9 project Live (tidak ada di Figma; validasi Studio
   menandainya merah). Gambar BREX dan REX Panels hanya render Figma ukuran
   kartu (555×424, 325×244): file aslinya tidak ada di Figma.
+
+### Catatan langkah 2 (23 Nov 2026)
+- `src/pages/work.astro`, `src/components/work/WorkHero.astro`,
+  `src/scss/pages/_work.scss`; data `src/data/cms/work-page.json` (cadangan
+  `src/data/work-page.js`: teks saja, tanpa kolase). Token baru
+  `--color-field`, `--color-line` (design-system.md).
+- **Kolase = roda**: di Figma kelima kartu ada di lingkar roda besar (pusat
+  di luar halaman, kanan; jari-jari 714; kartu searah jari-jari: 0°, ±15°,
+  ±31°). Roda berputar pelan (CSS saja, 5 detik per kartu), kartu naik
+  menyusuri lengkungan dan memudar di atas/bawah. Kartu yang lebih tinggi
+  menumpuk di atas yang lebih rendah (Figma); supaya urutan itu tetap
+  benar, roda hanya berputar satu putaran gambar lalu mulai lagi (tanpa
+  sambungan terlihat). Reduced motion: diam di posisi Figma. Jumlah kartu
+  ≈24 (kelipatan jumlah gambar; 10 gambar → 20 kartu, 18°).
+- Tablet dan HP: kolase disembunyikan (tidak ada tempat di samping teks;
+  tidak ada desainnya). Judul HP 32px (seperti About), baris seimbang.
+- Kolom cari: form biasa (`/work?q=…`), chip = link `/work?q=…`; pencarian
+  sungguhan di langkah 6. Teks intro: Enter di Studio = pindah baris
+  (desktop/tablet; HP mengikuti lebar layar).
+- Dicek: 1440 sama dengan Figma (posisi teks, kolom cari, chip, kolase,
+  urutan tumpuk); roda berputar ±3°/detik; 390, 834, 1024, 2560 rapi;
+  isian terpanjang (judul 2 × 40, intro 120, judul cari 40, 4 chip × 30) dan
+  kolase 10 gambar rapi — chip terlalu panjang di HP 320 dipotong "…", teks
+  di desktop berhenti sebelum kolase; cek otomatis 6 halaman × 19 ukuran:
+  0 masalah.
+- Belum: animasi masuk (judul naik seperti About/Contact) — tidak diminta;
+  bisa ditambah nanti bila diinginkan.
