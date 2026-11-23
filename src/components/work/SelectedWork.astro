@@ -1,9 +1,9 @@
 ---
 // Selected Work (Figma 2343:1167; plan 42, step 3): the projects switched on
 // in the Studio, in drag order (the homepage's Selected Work), at most 10.
-// A row dragged with the mouse ("Drag" label at the pointer,
-// src/js/work-drag.js, src/js/work-cursor.js), swiped on touch, scrolled
-// with a trackpad or the arrow keys. Card sizes repeat Figma's four: small,
+// An endless row dragged by hand (mouse or finger), a trackpad's sideways
+// swipe or the arrow keys, with a "← Drag →" circle for the pointer
+// (src/js/work-drag.js). Card sizes repeat Figma's four: small,
 // large, small, wide (_work.scss); editors set no sizes.
 import ProjectCard from "./ProjectCard.astro";
 import { workPage } from "../../data/cms.js";
@@ -26,7 +26,7 @@ const SIZES = [
       {selectedText && <p class="work-section-text">{selectedText}</p>}
     </div>
     <div class="work-selected__viewport" data-drag tabindex="0" role="region" aria-labelledby="work-selected-title">
-      <div class="work-selected__track">
+      <div class="work-selected__track" data-drag-track>
         {selected.map((project, i) => {
           const [size, width, height, sizes] = SIZES[i % SIZES.length];
           return (

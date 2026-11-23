@@ -287,3 +287,30 @@ apa adanya.
   turun lagi saat header kembali; tanpa gerak dengan reduced motion.
 - Dicek: 1440 dan 390, turun ke footer lalu naik lagi; cek otomatis 10
   alamat × 19: 0 masalah.
+
+### Perbaikan (23 Nov 2026): Selected Work — drag halus, infinite, kursor
+- Masukan pengguna: drag terasa kasar; kursor masih panah biasa; minta
+  infinite. Pilihan kursor: lingkaran "← Drag →" (bukan tangan bawaan).
+- `src/js/work-drag.js` ditulis ulang: baris digerakkan dengan transform
+  (bukan scroll bawaan), mengikuti kursor/jari sedikit tertinggal dan halus
+  (lerp), dilepas meluncur lalu melambat; mouse, sentuh (geser ke atas tetap
+  menggulir halaman), trackpad ke samping, panah keyboard.
+- Infinite: kartu disalin di depan dan belakang (salinan `aria-hidden`,
+  `inert`), posisi berputar per lebar satu set; tepi kiri menampakkan ujung
+  kartu sebelumnya (seperti Figma).
+- Kursor: lingkaran **kaca** 84 "← Drag →" (pengguna) menggantikan kursor
+  di atas baris, mengecil saat ditekan: blur + saturasi + tepi terang seperti
+  tombol kaca situs, diberi gelap 45% supaya tulisan putih tetap terbaca di
+  atas putih.
+  Reduced motion / layar sentuh: tanpa lingkaran (tangan "grab"), tanpa
+  luncuran. `work-cursor.js` kembali hanya "View Project" (bukan di baris
+  drag).
+- Dicek: drag mouse 6× berturut (> 6.000 px) tetap berputar; lingkaran di
+  ujung kursor, mengecil saat ditekan; sentuh 390 (samping menggeser, atas
+  menggulir halaman); "View Project" homepage tetap; cek otomatis 10
+  alamat × 19: 0 masalah.
+- **Tanpa loncat (pengguna: "seamless")**: ditangkap saat masih meluncur,
+  baris dulu melompat ke tujuan luncuran (diukur: terus jalan ±800px saat
+  ditahan diam); kini berhenti di tempat yang terlihat (diukur: diam).
+  Gambar baris dimuat langsung (bukan lazy) supaya salinan tidak muncul
+  kosong; salinan dibangun ulang hanya bila lebar baris berubah.

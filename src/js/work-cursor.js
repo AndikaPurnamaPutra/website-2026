@@ -10,21 +10,19 @@ import gsap from "gsap";
 const FOLLOW = 0.6; // s, as the showreel button
 const OFFSET = 18; // px from the pointer, right and down
 const LINGER = 80; // ms off a card before it goes (150 and a slow fade felt late; user)
-// Over a project link it reads "View Project"; over a row dragged with the
-// mouse (Work page, Selected Work; src/js/work-drag.js) "Drag" — a link
-// inside such a row still says "View Project".
+// Project links on the Work page too; not inside a row dragged by hand,
+// where the "Drag" circle takes the pointer's place (src/js/work-drag.js).
 const LINKS = ".work-card__link, a.project-card__body";
 
 export function initWorkCursor() {
   const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (!fine || reduceMotion || !document.querySelector(`${LINKS}, [data-drag]`)) return () => {};
+  if (!fine || reduceMotion || !document.querySelector(LINKS)) return () => {};
 
   const label = document.createElement("span");
   label.className = "work-cursor glass-button";
   label.setAttribute("aria-hidden", "true");
   label.innerHTML = "<span>View Project</span>";
-  const text = label.firstChild;
   document.body.append(label);
 
   gsap.set(label, { autoAlpha: 0, scale: 0.6, transformOrigin: "0% 0%" });
@@ -72,14 +70,8 @@ export function initWorkCursor() {
   // The label takes no pointer, so the card below it is found.
   const check = () => {
     if (pointer.x < 0) return;
-    const under = document.elementFromPoint(pointer.x, pointer.y);
-    const link = under?.closest(LINKS);
-    const drag = !link && under?.closest("[data-drag]");
-    if (link || drag) {
-      const word = link ? "View Project" : "Drag";
-      if (text.textContent !== word) text.textContent = word;
-    }
-    show(Boolean(link || drag));
+    const link = document.elementFromPoint(pointer.x, pointer.y)?.closest(LINKS);
+    show(Boolean(link && !link.closest("[data-drag]")));
   };
 
   const events = new AbortController();
