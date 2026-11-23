@@ -6,7 +6,9 @@ import { ourWorkSection } from "./ourWorkSection.js";
 import { client } from "./client.js";
 import { testimonial } from "./testimonial.js";
 import { trustedSection } from "./trustedSection.js";
+import { format } from "./format.js";
+import { workPage } from "./workPage.js";
 
-export const schemaTypes = [service, servicesSection, project, category, ourWorkSection, client, testimonial, trustedSection];
+export const schemaTypes = [service, servicesSection, project, category, ourWorkSection, client, testimonial, trustedSection, format, workPage];
 // One document each (sanity.config.js).
-export const singletonTypes = ["servicesSection", "ourWorkSection", "trustedSection"];
+export const singletonTypes = ["servicesSection", "ourWorkSection", "trustedSection", "workPage"];
