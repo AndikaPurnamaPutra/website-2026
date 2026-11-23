@@ -525,6 +525,17 @@ Studio (oww.sanity.studio)  →  Publish
     di desktop dan HP; halaman lain hanya beda nama file CSS/JS.
   - Filter webhook ditambah `client`, `testimonial`, `trustedSection`.
     Studio di-deploy.
+- **Langkah 8 — Dokumentasi (23 Nov 2026).** Panduan untuk tim:
+  [`docs/cara-mengisi-cms.md`](../cara-mengisi-cms.md) (Publish, urutan
+  drag, sembunyikan vs hapus, batas tiap isian, titik fokus, bila website
+  tidak berubah).
+  - Dicek ulang: webhook aktif, filter memuat 8 tipe, URL = Deploy Hook di
+    `.env`; data Sanity terbaca (5 service, 10 project, 12 client, 5
+    testimonial).
+  - Cek otomatis build dari Sanity, 5 halaman × 19 ukuran (320–2560,
+    reduced motion): **0 masalah** (error JS, 4xx, scroll samping, elemen
+    keluar layar, teks < 12px). Alat ceknya diuji dulu dengan kesalahan
+    sengaja (keenamnya tertangkap).
 
 ### Verifikasi
 - Tiap section: HTML dan piksel dibandingkan dengan sebelum CMS (kecuali
