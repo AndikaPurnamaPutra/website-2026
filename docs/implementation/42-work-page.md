@@ -1,6 +1,6 @@
 # 42 — Halaman Work (`/work`)
 
-Status: **disetujui 23 Nov 2026, dikerjakan.** Branch nanti: `work/page` (dari
+Status: **selesai 23 Nov 2026 (langkah 1–8), di branch `work/page`; belum digabung.** Branch nanti: `work/page` (dari
 `cms/sanity`, karena halaman ini memakai data Sanity).
 
 ## Acuan Figma (file `plgHei2CRPFohXrt3OLhGk`)
@@ -102,7 +102,7 @@ apa adanya.
 - [x] 5. Tiga section (23 Nov 2026)
 - [x] 6. Pencarian (23 Nov 2026)
 - [x] 7. Link (23 Nov 2026)
-- [ ] 8. Cek
+- [x] 8. Cek (23 Nov 2026)
 
 ### Catatan langkah 1 (23 Nov 2026)
 - Skema: Project + `kind`, `format` (dokumen Format, drag), `liveUrl`
@@ -259,3 +259,22 @@ apa adanya.
 - Dicek (Playwright, lewat Barba): mega menu Live Sites (9), dari halaman
   Work ke Case Study (10), kategori Branding (10), More Work, menu HP;
   cek otomatis 10 alamat × 19: 0 masalah.
+
+### Catatan langkah 8 — cek akhir (23 Nov 2026)
+- Figma vs hasil di 1440: hero, Selected Work, bar (biasa dan menempel),
+  tiga section, hasil Grid, List, List hover, kosong — sama, kecuali yang
+  dicatat di langkah 2–7 (menu/footer versi situs, header 64, "Read the
+  case study" menunggu halaman project, angka tab 12px, "Results").
+- Responsive 320–2560; isian ekstrem per section; cek otomatis 10 alamat
+  (6 halaman + 4 alamat hasil cari) × 19 ukuran: 0 masalah.
+- Transisi Barba: About ↔ Work (biasa dan hasil cari), menu dan link ke
+  `/work?type=…`; tanpa error JS. Reduced motion: kolase diam, drag tanpa
+  luncuran.
+- Lighthouse HP (lokal, 2×, sama): **Work 81 / 100 / 100 / 100**, About
+  76 / 100 / 96 / 100 (pembanding). LCP = judul hero (4,7 s; CSS dan font
+  situs, sama di semua halaman). DOM 1.486 elemen (hasil cari disiapkan di
+  HTML: 37 kartu + 37 baris) — wajar sekarang; bila project jauh lebih
+  banyak (ratusan), baris List bisa dibuat oleh skrip.
+- Sisa / nanti: alamat 9 project Live (Studio), gambar asli BREX dan REX,
+  "Read the case study" + klik kartu saat halaman project ada, Deploy Hook
+  ke `main` saat merge (rencana 41).
