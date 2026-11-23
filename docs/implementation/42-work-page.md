@@ -101,7 +101,7 @@ apa adanya.
 - [x] 4. Tab menempel (23 Nov 2026)
 - [x] 5. Tiga section (23 Nov 2026)
 - [x] 6. Pencarian (23 Nov 2026)
-- [ ] 7. Link
+- [x] 7. Link (23 Nov 2026)
 - [ ] 8. Cek
 
 ### Catatan langkah 1 (23 Nov 2026)
@@ -246,3 +246,16 @@ apa adanya.
   kosong, pindah ke About lewat Barba lalu Back; 390; cek otomatis 10
   alamat (termasuk 3 hasil + kata cari sangat panjang) × 19 ukuran: 0
   masalah.
+
+### Catatan langkah 7 (23 Nov 2026)
+- Mega menu Work: jenis dan angkanya dari CMS (judul section + jumlah
+  project), tiap jenis → `/work?type=…`; jadi "Live Development 20" lama →
+  "Live Sites 9" (Case Study 10, Design Showcase 18). Kartu gambar → `/work`;
+  "Work" di bar `href="/work"` (klik tetap membuka/menutup menu, seperti
+  sebelumnya). Tanpa data CMS menu tidak berisi jenis.
+- Menu HP "Work" dan footer "Works" → `/work`.
+- Homepage: "More Work" → `/work` (diisi di Sanity, Section Our Work);
+  kategori di samping judul Our Work → `/work?q=<kategori>` (dulu `#`).
+- Dicek (Playwright, lewat Barba): mega menu Live Sites (9), dari halaman
+  Work ke Case Study (10), kategori Branding (10), More Work, menu HP;
+  cek otomatis 10 alamat × 19: 0 masalah.

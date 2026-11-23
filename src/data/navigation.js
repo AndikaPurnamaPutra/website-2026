@@ -9,14 +9,9 @@ export const navLinks = [
 ];
 
 // Work mega menu (Figma "Dropdown - Expand" 1596:442; src/js/work-menu.js).
-// Links are placeholders until the work pages exist. Card set 1 uses the
-// Figma pictures, sets 2-4 the Our Work pictures (user decision).
-export const workCategories = [
-  ["Case Study", 28],
-  ["Live Development", 20],
-  ["Design Showcase", 28],
-];
-
+// Its kinds and numbers come from the CMS (src/components/Header.astro).
+// Card set 1 uses the Figma pictures, sets 2-4 the Our Work pictures (user
+// decision); the cards open the Work page.
 export const workSets = [
   ["menu/project-1.webp", "menu/project-2.webp", "menu/project-3.webp"],
   ["work/wellmo.webp", "work/papersky.webp", "work/chainlytics.webp"],
@@ -30,7 +25,7 @@ export const footerColumns = [
   {
     title: "Navigation",
     links: [
-      ["Works", "#"],
+      ["Works", "/work"],
       ["About", "/about"],
       ["Team", "#"],
       ["Services", "#"],

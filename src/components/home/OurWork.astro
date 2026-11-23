@@ -13,7 +13,7 @@ const { eyebrow, heading, categories, recentTitle, recent, selectedTitle, select
       <h2 class="text-heading-42">{heading[0]}<br>{heading[1]}</h2>
     </div>
     <ul class="our-work__categories">
-      {categories.map((category) => <li><a class="our-work__category text-16" href="#">{category}</a></li>)}
+      {categories.map((category) => <li><a class="our-work__category text-16" href={`/work?q=${encodeURIComponent(category)}`}>{category}</a></li>)}
     </ul>
   </div>
   <div class="container">
