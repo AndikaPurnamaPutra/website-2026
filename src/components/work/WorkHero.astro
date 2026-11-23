@@ -52,8 +52,8 @@ const rank = (i) => {
       {suggestions.length > 0 && (
         <div class="work-search__recent">
           <span class="work-search__recent-label">Most recent search&nbsp;&nbsp;:</span>
-          <ul class="work-search__chips">
-            {suggestions.map((word) => <li><a class="work-search__chip" href={`/work?q=${encodeURIComponent(word)}`}>{word}</a></li>)}
+          <ul class="work-search__chips" data-search-chips data-suggestions={JSON.stringify(suggestions)}>
+            {suggestions.map((word) => <li><a class="work-search__chip" href={`/work?q=${encodeURIComponent(word)}`} data-barba-prevent data-search-link>{word}</a></li>)}
           </ul>
         </div>
       )}

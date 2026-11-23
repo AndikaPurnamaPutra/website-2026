@@ -12,5 +12,6 @@ export const workPage = {
   selectedTitle: "Selected Work",
   selectedText: "The work we’d hang on the wall first.",
   kinds: { caseStudy: "Case Study", live: "Live Sites", showcase: "Design Showcase" },
+  empty: { text: "Yours could be the first. Try another word, or tell us about it.", button: "Tell us about it", href: "/contact" },
   projects: [],
 };

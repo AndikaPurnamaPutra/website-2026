@@ -5,14 +5,21 @@ import { getSmoothScroll } from "./smooth-scroll.js";
 // section reaches it, as in Figma); a tab scrolls to its section, which then
 // starts just under the bar (smoothly with Lenis, at once with reduced
 // motion). Phones: the lit tab is kept in view in its sideways row.
+// While search results show (src/js/work-search.js), a tab's data-target
+// names its results group or first list row instead, and a tab with no
+// results (is-empty) does nothing.
 export function initWorkTabs() {
   const bar = document.querySelector("[data-work-tabs]");
   if (!bar) return () => {};
   const tabs = [...bar.querySelectorAll(".work-tabs__tab")];
-  const sections = tabs.map((tab) => document.getElementById(tab.hash.slice(1)));
+  // Looked up each time: the search changes them.
+  const target = (tab) => {
+    const element = document.getElementById(tab.dataset.target || tab.hash.slice(1));
+    return element && element.offsetParent !== null && !tab.classList.contains("is-empty") ? element : null;
+  };
   const nav = bar.querySelector(".work-tabs__nav");
   const events = new AbortController();
-  let current = -1;
+  let current = null; // none set yet (the markup lights the first)
 
   const light = (index) => {
     if (index === current) return;
@@ -24,7 +31,7 @@ export function initWorkTabs() {
     });
     // Only the row itself scrolls, not the page.
     const tab = tabs[index];
-    if (nav.scrollWidth > nav.clientWidth) {
+    if (tab && nav.scrollWidth > nav.clientWidth) {
       nav.scrollTo({ left: tab.offsetLeft - (nav.clientWidth - tab.offsetWidth) / 2, behavior: "smooth" });
     }
   };
@@ -33,20 +40,21 @@ export function initWorkTabs() {
   const line = () => bar.getBoundingClientRect().bottom;
   const update = () => {
     const edge = line() + 1;
-    let index = 0;
-    sections.forEach((section, i) => {
+    let index = tabs.findIndex((tab) => target(tab));
+    tabs.forEach((tab, i) => {
+      const section = target(tab);
       if (section && section.getBoundingClientRect().top <= edge) index = i;
     });
-    light(index);
+    light(index); // -1: no section (a search with no result), none lit
   };
 
   tabs.forEach((tab, i) => {
     tab.addEventListener(
       "click",
       (event) => {
-        const section = sections[i];
-        if (!section) return;
         event.preventDefault();
+        const section = target(tab);
+        if (!section) return;
         // Where the bar will be once stuck: under the header, its own height.
         const offset = parseFloat(getComputedStyle(bar).top) + bar.offsetHeight;
         const top = section.getBoundingClientRect().top + window.scrollY - offset + 1;

@@ -7,6 +7,7 @@ import SelectedWork from "../components/work/SelectedWork.astro";
 import WorkTabs from "../components/work/WorkTabs.astro";
 import WorkSection from "../components/work/WorkSection.astro";
 import WorkGrid from "../components/work/WorkGrid.astro";
+import WorkResults from "../components/work/WorkResults.astro";
 import { workPage } from "../data/cms.js";
 import { KINDS } from "../data/work-kinds.js";
 
@@ -14,14 +15,22 @@ const sections = KINDS.filter(({ kind }) => workPage.projects.some((project) => 
 ---
 <Default namespace="work">
   <PageMeta slot="meta" title="Work — OWW" description="Case studies, live sites and design showcases by One Week Wonders Studio™: brand identities, websites, apps and dashboards, most of them built in a week." path="work" />
+  {/* A search or "See all" address shows the results instead of the page
+      from the first paint (src/js/work-search.js does the rest). */}
+  <script is:inline>if (/[?&](q|type)=/.test(location.search)) document.documentElement.classList.add("is-work-results");</script>
   <div class="work">
-    <WorkHero />
-    <SelectedWork />
+    <div data-work-browse>
+      <WorkHero />
+      <SelectedWork />
+    </div>
     {sections.length > 0 && <WorkTabs />}
-    {sections.map(({ kind, id }) => (
-      <WorkSection id={id} title={workPage.kinds[kind]}>
-        <WorkGrid kind={kind} projects={workPage.projects.filter((project) => project.kind === kind)} />
-      </WorkSection>
-    ))}
+    <div data-work-browse>
+      {sections.map(({ kind, id }) => (
+        <WorkSection id={id} title={workPage.kinds[kind]}>
+          <WorkGrid kind={kind} projects={workPage.projects.filter((project) => project.kind === kind)} />
+        </WorkSection>
+      ))}
+    </div>
+    {sections.length > 0 && <WorkResults />}
   </div>
 </Default>

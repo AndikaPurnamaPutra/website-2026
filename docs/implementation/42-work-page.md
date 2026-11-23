@@ -100,7 +100,7 @@ apa adanya.
 - [x] 3. Selected Work (23 Nov 2026)
 - [x] 4. Tab menempel (23 Nov 2026)
 - [x] 5. Tiga section (23 Nov 2026)
-- [ ] 6. Pencarian
+- [x] 6. Pencarian (23 Nov 2026)
 - [ ] 7. Link
 - [ ] 8. Cek
 
@@ -215,3 +215,34 @@ apa adanya.
   3202 — selisih = baris "Read the case study", Showcase 4501 / 4510); 834,
   390; isian ekstrem (1 Live, 5 Showcase, judul 60 huruf); cek otomatis
   6 × 19: 0 masalah.
+
+### Catatan langkah 6 (23 Nov 2026)
+- `WorkResults.astro`, `src/js/work-search.js`; `work-tabs.js` membaca
+  tujuan tab saat diklik (hasil: grup / baris pertama List; tab tanpa hasil
+  redup). Teks hasil kosong dari Studio (Halaman Work → Pencarian).
+- Semua project dirender sekali sebagai kartu (grup per jenis) dan sekali
+  sebagai baris List, tersembunyi; skrip menampilkan yang cocok (gambar
+  tersembunyi tidak dimuat). Indeks = JSON di halaman (judul, kategori,
+  format, kata kunci, jenis, tahun).
+- Cocok: tiap kata yang diketik harus mengawali kata project ("bank" →
+  "banking", "banking" → kata kunci "bank"); tidak ada yang cocok semua →
+  yang cocok salah satu kata ("fintech app").
+- `/work?q=…` dan `/work?type=…` ("See all") berganti tanpa memuat ulang;
+  Back/Forward jalan; dibuka langsung, hasil tampil sejak cat pertama
+  (skrip kecil di `work.astro`). Chip, "See all", "Clear search", ✕ dilewati
+  Barba. Chip = 4 pencarian terakhir di browser ini, lalu saran Studio.
+  Grid/List diingat.
+- Grid: Case Study dan Live 3 kolom, Showcase 4 (Figma 2351:1304); grup
+  pertama 60 di bawah "Showing", berikutnya garis + 120. List (2351:2330):
+  baris 98, kolom jenis di 690, keterangan rata kanan; hover abu-abu +
+  gambar 140 × 78 membuka di kiri (2361:2586). Kosong (2361:2740).
+  "5 Result" Figma → "5 Results"/"1 Result"; jenis ditulis seperti judul
+  section ("1 Case Study, …").
+- Tablet: Grid 2 kolom, List tanpa gambar (judul, lalu jenis + keterangan);
+  HP: Grid 1 kolom, titik ringkasan disembunyikan.
+- Dicek (Playwright): q=bank (2), kosong, mengetik di hero (tersimpan jadi
+  chip), Clear, See all Live (9), Back/Forward, cadangan "fintech app",
+  klik tab di Grid dan List (grup tepat di bawah bar), tanpa tab aktif saat
+  kosong, pindah ke About lewat Barba lalu Back; 390; cek otomatis 10
+  alamat (termasuk 3 hasil + kata cari sangat panjang) × 19 ukuran: 0
+  masalah.

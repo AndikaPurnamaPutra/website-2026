@@ -25,7 +25,11 @@ const tabs = KINDS.map(({ kind, id }) => ({ id, title: kinds[kind], count: proje
     <form class="work-search__field work-tabs__search" action="/work" method="get" role="search">
       <label class="visually-hidden" for="work-tabs-search">Search the work</label>
       <input class="work-search__input" id="work-tabs-search" type="search" name="q" placeholder={searchPlaceholder} autocomplete="off" enterkeyhint="search">
-      <button class="work-search__submit" type="submit" aria-label="Search"><img src="assets/icons/search.svg" width="24" height="24" alt=""></button>
+      {/* While results show (Figma 2361:2900): "Clear search" and ✕ in place
+          of the search button; both go back to the whole page. */}
+      <button class="work-search__clear-text" type="button" data-search-clear hidden>Clear search</button>
+      <button class="work-search__submit" type="submit" aria-label="Search" data-search-submit><img src="assets/icons/search.svg" width="24" height="24" alt=""></button>
+      <button class="work-search__submit" type="button" aria-label="Clear search" data-search-clear hidden><img src="assets/icons/close.svg" width="24" height="24" alt=""></button>
     </form>
   </div>
 </div>

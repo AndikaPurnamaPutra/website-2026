@@ -46,7 +46,7 @@ const QUERY = `{
   },
   "workPage": *[_id == "workPage"][0]{
     headingLine1, headingLine2, intro, searchTitle, searchPlaceholder, suggestions,
-    selectedTitle, selectedText, caseStudyTitle, liveTitle, showcaseTitle,
+    selectedTitle, selectedText, caseStudyTitle, liveTitle, showcaseTitle, emptyText, emptyButton, emptyHref,
     "collage": collage[defined(asset)]{ hotspot, "url": asset->url, "id": asset->_id },
     "projects": *[_type == "project" && defined(kind) && defined(cover.asset)] | order(orderRank) {
       ${PROJECT_FIELDS}, kind, liveUrl, keywords, selected, publishedAt,
@@ -250,6 +250,8 @@ const workPage = async (page) => {
     selectedText: page.selectedText,
     // Section titles by kind (also the tabs' and the list's words).
     kinds: { caseStudy: page.caseStudyTitle, live: page.liveTitle, showcase: page.showcaseTitle },
+    // Search with no result.
+    empty: { text: page.emptyText, button: page.emptyButton, href: page.emptyHref || "/contact" },
     projects: await Promise.all((page.projects ?? []).map(workProject)),
   };
 };
