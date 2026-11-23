@@ -278,3 +278,12 @@ apa adanya.
 - Sisa / nanti: alamat 9 project Live (Studio), gambar asli BREX dan REX,
   "Read the case study" + klik kartu saat halaman project ada, Deploy Hook
   ke `main` saat merge (rencana 41).
+
+### Perbaikan (23 Nov 2026): bar tab di dekat footer
+- Masalah (pengguna): menjelang footer header naik dan hilang (perilaku
+  situs, `header.js`), tetapi putih di atas bar tab (tempat header) tetap
+  tinggal — pita kosong 64px di atas layar.
+- Kini bar ikut naik setinggi header dengan gerak yang sama (0,8 s), lalu
+  turun lagi saat header kembali; tanpa gerak dengan reduced motion.
+- Dicek: 1440 dan 390, turun ke footer lalu naik lagi; cek otomatis 10
+  alamat × 19: 0 masalah.
