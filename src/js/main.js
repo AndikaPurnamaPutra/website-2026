@@ -16,6 +16,7 @@ import { initWorkCursor } from "./work-cursor.js";
 import { initWorkDrag } from "./work-drag.js";
 import { initWorkTabs } from "./work-tabs.js";
 import { initWorkSearch } from "./work-search.js";
+import { initWorkIntro } from "./work-intro.js";
 import { initMarquees } from "./marquee.js";
 import { initTrustedIntro } from "./trusted-intro.js";
 import { initMilestoneCounter } from "./milestone-counter.js";
@@ -65,6 +66,8 @@ function initPage(first) {
   cleanups.push(initWorkDrag());
   // Before the tabs: it decides which part of the page shows.
   cleanups.push(initWorkSearch());
+  // After the search: on a search address the hero is not played.
+  cleanups.push(initWorkIntro());
   cleanups.push(initWorkTabs());
   cleanups.push(initWorkCursor());
   cleanups.push(initMarquees());

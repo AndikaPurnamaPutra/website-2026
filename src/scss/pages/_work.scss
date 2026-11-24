@@ -15,6 +15,22 @@
   padding-bottom: fluid(120);
 }
 
+// Its entrance (src/js/work-intro.js): hidden until it is set up, so it does
+// not show in place and then jump to its start; shown anyway after 3s if
+// the script never comes. Not with reduced motion (nothing moves).
+@media (prefers-reduced-motion: no-preference) {
+  .js:not(.is-work-ready) .work-hero :is(.work-hero__intro, .work-search, .work-collage) {
+    visibility: hidden;
+    animation: work-fallback 0s 3s forwards;
+  }
+}
+
+@keyframes work-fallback {
+  to {
+    visibility: visible;
+  }
+}
+
 .work-hero__inner {
   position: relative;
   display: flex;
@@ -80,6 +96,9 @@
   position: absolute;
   top: fluid(346);
   left: fluid(1090);
+  // The entrance's extra turn (src/js/work-intro.js), on its own property so
+  // it adds to the turning below.
+  rotate: var(--work-wheel-in, 0deg);
   animation: work-wheel calc(var(--loop) * 5s) linear infinite;
 }
 

@@ -334,3 +334,29 @@ apa adanya.
   pilihan Grid/List 22px → 44px (tanpa menggeser).
 - Bukan bug: jarak judul di bawah bar setelah klik tab lebih besar untuk
   Live Sites dan Design Showcase (jarak antar section 120, sesuai Figma).
+
+### Animasi antar section — rencana (24 Nov 2026, disetujui pengguna)
+Bahasa gerak situs (About, Contact, Our Work): teks naik di jendelanya,
+garis digambar dari kiri, gambar kartu terbuka dari bawah; sekali saja,
+dibuka di tengah halaman → yang di atas langsung tampil; reduced motion diam.
+1. Hero (saat dibuka). 2. Selected Work. 3. Bar tab + tiga section (kartu
+per baris). 4. Cek akhir. Hasil cari: tanpa animasi masuk.
+
+### Animasi langkah 1 — hero (24 Nov 2026)
+- `src/js/work-intro.js`: baris judul naik (0,15 s antar baris), lalu
+  baris intro, "What are you building?", kolom cari, label + chip satu per
+  satu; kolase (desktop) "berputar masuk" bersamaan (0,15 s): muncul pelan
+  (0,9 s) sementara roda berputar 36° lebih dulu ke arah putaran biasanya,
+  cepat lalu melambat menyatu dengan putaran CSS (1,8 s; properti `rotate`
+  lewat `--work-wheel-in`, terpisah dari `transform` putaran). Versi awal
+  (dibuka garis lurus dari bawah) terasa aneh (pengguna) — pilihan
+  pengguna: berputar masuk. Menunggu font dan 6 gambar
+  kolase pertama (paling lama 1,5 s), seperti About.
+- Disembunyikan CSS sampai siap (`is-work-ready`), muncul sendiri setelah
+  3 s bila skrip gagal. Alamat hasil cari: tidak dimainkan (hero tersembunyi);
+  Clear search → hero langsung tampil.
+- Jendela naik untuk kolom dan chip (naik 100%) ditutup penuh di awal
+  (sebelumnya tepi atasnya sudah terlihat sebelum gilirannya).
+- Dicek: rekaman 1440 dan 390 (150–3200 ms), reduced motion (langsung
+  tampil, tanpa split), About → Work lewat Barba, Back/Forward, tanpa error
+  JS, tanpa sisa clip/transform; cek otomatis 10 alamat × 19: 0 masalah.
