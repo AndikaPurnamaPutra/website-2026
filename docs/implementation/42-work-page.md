@@ -395,3 +395,18 @@ per baris). 4. Cek akhir. Hasil cari: tanpa animasi masuk.
   Design Showcase lalu naik, cari → Clear search → gulir, dibuka di
   `#live-sites`, reduced motion, About → Work lewat Barba; tanpa error JS;
   cek otomatis 10 alamat × 19: 0 masalah.
+
+### Animasi langkah 4 — cek akhir (24 Nov 2026)
+- Lighthouse HP (lokal, 12.8.2, 2×, sama): **Work 86 / 100 / 100 / 100**
+  (sebelum animasi 81), LCP 3,8 s, TBT 0–10 ms, CLS 0 — animasi tidak
+  menambah beban.
+- Gulir seluruh halaman dengan animasi menyala di 19 ukuran (320–2560): tanpa
+  scroll ke samping selama animasi, tanpa kartu tertinggal tersembunyi,
+  tanpa error JS; satu-satunya gaya tersisa = baris SplitText hero di posisi
+  akhir (sama seperti About/Contact, tidak terlihat).
+- Sudah dicek di langkah 1–3: reduced motion, alamat hasil cari, Clear
+  search, lompatan tab/hash, Barba, ubah lebar di tengah animasi; cek
+  otomatis 10 alamat × 19: 0 masalah.
+- Animasi halaman Work selesai. Sisa (bukan animasi): alamat 9 project Live
+  (Studio), gambar asli BREX dan REX, halaman project ("Read the case
+  study" + klik kartu), Deploy Hook ke `main` saat merge.
