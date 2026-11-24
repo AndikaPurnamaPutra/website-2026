@@ -360,3 +360,22 @@ per baris). 4. Cek akhir. Hasil cari: tanpa animasi masuk.
 - Dicek: rekaman 1440 dan 390 (150–3200 ms), reduced motion (langsung
   tampil, tanpa split), About → Work lewat Barba, Back/Forward, tanpa error
   JS, tanpa sisa clip/transform; cek otomatis 10 alamat × 19: 0 masalah.
+
+### Animasi langkah 2 — Selected Work (24 Nov 2026)
+- Di `src/js/work-intro.js` (`setUpSelected`), seperti kartu Our Work di
+  homepage: judul dan teks naik; kartu yang terlihat (termasuk salinan yang
+  mengintip di tepi kiri) terbuka dari bawah satu per satu dari kiri
+  (0,08 s antar kartu, 1,1 s), gambarnya naik 8% di dalam bingkai, lalu
+  judul + keterangan naik. Sekali saja; kartu di luar layar dibiarkan.
+- Judul dan baris kartu punya pemicu masing-masing (top 85%): di 1440 × 900
+  judul sudah di layar pertama, baris belum — dulu kartu beranimasi tanpa
+  terlihat. Di layar pertama: mulai ≥ 0,6 s setelah hero. Dibuka di bawah
+  (sudah dilewati): langsung tampil.
+- Gerak gambar memakai `translate` (hover kartu memakai `transform`); setelah
+  selesai semua kartu dibersihkan, termasuk salinan yang dibangun ulang
+  saat ukuran layar berubah (`work-drag.js`). Disembunyikan CSS sampai siap
+  bersama hero.
+- Dicek: rekaman 1440 (layar pertama dan digulir), 390, 2560; drag tetap
+  jalan setelahnya; dibuka di `#design-showcase` lalu naik (langsung
+  tampil); ubah lebar di tengah animasi (tanpa sisa, 15 salinan); reduced
+  motion; tanpa error JS; cek otomatis 10 alamat × 19: 0 masalah.

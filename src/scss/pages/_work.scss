@@ -15,11 +15,11 @@
   padding-bottom: fluid(120);
 }
 
-// Its entrance (src/js/work-intro.js): hidden until it is set up, so it does
+// Its entrance and Selected Work's (src/js/work-intro.js): hidden until set up, so it does
 // not show in place and then jump to its start; shown anyway after 3s if
 // the script never comes. Not with reduced motion (nothing moves).
 @media (prefers-reduced-motion: no-preference) {
-  .js:not(.is-work-ready) .work-hero :is(.work-hero__intro, .work-search, .work-collage) {
+  .js:not(.is-work-ready) :is(.work-hero__intro, .work-search, .work-collage, .work-selected) {
     visibility: hidden;
     animation: work-fallback 0s 3s forwards;
   }
