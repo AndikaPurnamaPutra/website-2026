@@ -379,3 +379,19 @@ per baris). 4. Cek akhir. Hasil cari: tanpa animasi masuk.
   jalan setelahnya; dibuka di `#design-showcase` lalu naik (langsung
   tampil); ubah lebar di tengah animasi (tanpa sisa, 15 salinan); reduced
   motion; tanpa error JS; cek otomatis 10 alamat × 19: 0 masalah.
+
+### Animasi langkah 3 — bar tab + tiga section (24 Nov 2026)
+- `src/js/work-intro.js` (`setUpBrowse`): bar — garis atas/bawah digambar
+  dari kiri (1,2 s; garis kini `::after` dengan `--work-tabs-line`, border
+  transparan menjaga ruangnya, tampilan akhir sama), lalu tab dan kolom
+  cari naik. Tiap section: judul dan "See all" naik; kartu dibuka **per
+  baris** (kartu dengan posisi atas sama: 3–4 kolom desktop, 2 tablet, 1 HP)
+  saat baris itu masuk layar, dari kiri, gerak sama dengan Selected Work.
+- Pemicu sampai ujung halaman (`end: "max"`): lompatan tab/hash melewati
+  baris tetap menampilkannya. Mencari sebelum semuanya main: semua yang
+  belum main langsung ditampilkan (Clear search tidak meninggalkan kartu
+  tersembunyi). Disembunyikan CSS sampai siap bersama hero.
+- Dicek: gulir seluruh halaman 390/834/1440/2560 (tanpa sisa), klik tab ke
+  Design Showcase lalu naik, cari → Clear search → gulir, dibuka di
+  `#live-sites`, reduced motion, About → Work lewat Barba; tanpa error JS;
+  cek otomatis 10 alamat × 19: 0 masalah.
