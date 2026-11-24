@@ -314,3 +314,23 @@ apa adanya.
   ditahan diam); kini berhenti di tempat yang terlihat (diukur: diam).
   Gambar baris dimuat langsung (bukan lazy) supaya salinan tidak muncul
   kosong; salinan dibangun ulang hanya bila lebar baris berubah.
+
+### Cek responsive menyeluruh (24 Nov 2026)
+- Permintaan pengguna: pastikan semua komponen halaman Work bebas bug
+  responsive.
+- Dicek: cek otomatis 10 alamat × 19 ukuran; cek tambahan per komponen
+  (5 alamat Work × 19 ukuran, animasi menyala dan reduced motion): teks
+  tumpang tindih atau meluber, gambar rusak/gepeng, area sentuh < 24px,
+  bar tab menempel; foto tiap komponen di 320–1920; alur klik tab, hasil
+  cari Grid/List, kosong, cari ulang dan Clear search di 320–1440.
+- **Bug (HP): di hasil cari tidak ada kolom cari.** Di HP bar hanya berisi
+  tab (kolom cari ada di hero, langkah 4), tetapi hasil cari menyembunyikan
+  hero, jadi kata yang dicari tidak terlihat dan tidak bisa diubah atau
+  dihapus. Kini di HP, hanya saat hasil cari, kolom muncul selebar layar di
+  baris kedua bar (di bawah tab); jarak lompat section disesuaikan.
+- **Area sentuh kecil (layar sentuh):** kotak ketik hanya 22px di dalam
+  kolom 50px (ketuk tepi kolom tidak membuka keyboard) → setinggi kolom;
+  "Clear search" 19px → area ketuk ±43px (tanpa menggeser tata letak);
+  pilihan Grid/List 22px → 44px (tanpa menggeser).
+- Bukan bug: jarak judul di bawah bar setelah klik tab lebih besar untuk
+  Live Sites dan Design Showcase (jarak antar section 120, sesuai Figma).

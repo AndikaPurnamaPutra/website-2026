@@ -153,6 +153,8 @@
 
 .work-search__input {
   flex: 1;
+  // The field's full height takes the tap, not only the 22px line.
+  align-self: stretch;
   min-width: 0;
   padding: 0;
   border: 0;
@@ -844,6 +846,27 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
     scroll-margin-top: calc(4rem + #{fs(68)});
   }
 
+  // Search results hide the hero, the only other field: without this a
+  // phone could not see, change or clear its search. The field comes back
+  // as a second row under the tabs.
+  .is-work-results {
+    .work-tabs__inner {
+      flex-wrap: wrap;
+      row-gap: fs(12);
+    }
+
+    .work-tabs__search {
+      display: flex;
+      flex: none;
+      width: calc(100% - 2 * var(--page-gutter));
+      margin-inline: var(--page-gutter);
+    }
+
+    .work-section {
+      scroll-margin-top: calc(4rem + #{fs(130)});
+    }
+  }
+
   .work-see-all {
     font-size: fs(16);
   }
@@ -871,6 +894,7 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
 }
 
 .work-search__clear-text {
+  position: relative;
   flex-shrink: 0;
   color: var(--color-text-secondary);
   font-family: var(--font-body);
@@ -881,6 +905,13 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
   text-decoration: underline;
   text-underline-offset: 0.15em;
   cursor: pointer;
+
+  // A finger-sized hit area around the 19px text; the layout keeps the text's size.
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -12px 0;
+  }
 
   @media (hover: hover) {
     &:hover {
@@ -944,7 +975,9 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
 // A plain select with Figma's chevron.
 .work-results__select {
   appearance: none;
-  padding: 0 fs(20) 0 0;
+  // Taller to tap (44px), the same place in the line (negative margin).
+  margin-block: -11px;
+  padding: 11px fs(20) 11px 0;
   border: 0;
   background: url("/assets/icons/chevron-down.svg") no-repeat right center / fs(16) fs(16);
   color: var(--color-ink);
