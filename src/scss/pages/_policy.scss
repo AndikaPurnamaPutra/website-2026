@@ -31,7 +31,7 @@
   margin: 0;
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fs-text(14);
+  font-size: fs(14);
   // Figma's 160% renders as 22px lines.
   line-height: calc(22 / 14);
   letter-spacing: -0.02em;
@@ -73,7 +73,7 @@
 .policy__heading {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: fs-text(28);
+  font-size: fs(28);
   // Figma "normal": 38px per line.
   line-height: calc(38 / 28);
   letter-spacing: -0.03em;
@@ -91,7 +91,7 @@
   min-width: 0;
   font-family: var(--font-body);
   font-weight: 400;
-  font-size: fs-text(16);
+  font-size: fs(16);
   // Figma's 160% renders as 26px lines (6 lines = 156px).
   line-height: calc(26 / 16);
   letter-spacing: -0.03em;
@@ -149,7 +149,7 @@
   }
 
   .policy__title.text-heading-42 {
-    font-size: fs-text(32);
+    font-size: fs(32);
   }
 
   .policy__meta .policy__meta-row {
@@ -167,7 +167,7 @@
 
   .policy__number,
   .policy__heading {
-    font-size: fs-text(24);
+    font-size: fs(24);
   }
 
   .policy__number {
@@ -175,6 +175,6 @@
   }
 
   .policy__body {
-    font-size: fs-text(15);
+    font-size: fs(15);
   }
 }

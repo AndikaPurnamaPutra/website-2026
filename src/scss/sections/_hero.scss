@@ -181,7 +181,7 @@
   border-radius: var(--radius-sm);
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: fs-text(14);
+  font-size: fs(14);
   line-height: 1;
   letter-spacing: -0.02em;
 }
@@ -294,7 +294,7 @@
   }
 
   .hero__title {
-    font-size: fs-text(64);
+    font-size: fs(64);
   }
 
   .hero__info {
@@ -324,7 +324,7 @@
 
   .hero__title {
     order: -2;
-    font-size: fs-text(48);
+    font-size: fs(48);
   }
 
   .hero__info {
@@ -385,7 +385,7 @@
   }
 
   .hero__title {
-    font-size: fs-text(32);
+    font-size: fs(32);
   }
 
   .hero__content {

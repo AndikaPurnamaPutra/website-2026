@@ -64,7 +64,7 @@
   color: var(--color-text-secondary);
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fs-text(14);
+  font-size: fs(14);
   line-height: 1.6;
   letter-spacing: -0.02em;
   // Line breaks typed in the Studio (Figma breaks after "a launch,").
@@ -139,7 +139,7 @@
 .work-search__title {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: fs-text(20);
+  font-size: fs(20);
   line-height: 1.6;
   letter-spacing: -0.02em;
 }
@@ -171,7 +171,7 @@
   color: var(--color-ink);
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fs-text(14);
+  font-size: fs(14);
   line-height: 1.6;
   letter-spacing: -0.02em;
   text-overflow: ellipsis; // a long example on phones
@@ -274,7 +274,7 @@
 
 @include mobile {
   .work-hero__title {
-    font-size: fs-text(32);
+    font-size: fs(32);
   }
 
   .work-hero__text {
@@ -297,7 +297,7 @@
 .work-section-title {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: fs-text(40);
+  font-size: fs(40);
   line-height: 1;
   letter-spacing: -0.02em;
 }
@@ -307,7 +307,7 @@
   color: var(--color-text-secondary);
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fs-text(14);
+  font-size: fs(14);
   line-height: 1.6;
   letter-spacing: -0.02em;
 }
@@ -414,7 +414,7 @@ a.project-card__body:hover .project-card__image {
   display: -webkit-box;
   overflow: hidden;
   font-weight: 500;
-  font-size: fs-text(16);
+  font-size: fs(16);
   line-height: 1.7;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -424,7 +424,7 @@ a.project-card__body:hover .project-card__image {
 // than wrapping with a dot at the start of the next line.
 .project-card__meta {
   overflow: hidden;
-  font-size: fs-text(14);
+  font-size: fs(14);
   line-height: 1.7;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -571,7 +571,7 @@ a.project-card__body:hover .project-card__image {
 
 @include mobile {
   .work-section-title {
-    font-size: fs-text(32);
+    font-size: fs(32);
   }
 
   .work-selected__item--small {
@@ -677,7 +677,7 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
   border-radius: var(--radius-md);
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fs-text(14);
+  font-size: fs(14);
   line-height: 1.2;
   letter-spacing: -0.02em;
   white-space: nowrap;
@@ -762,7 +762,7 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
   gap: fs(8);
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fs-text(20);
+  font-size: fs(20);
   line-height: 1.7;
   letter-spacing: -0.02em;
 
@@ -890,7 +890,7 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
   }
 
   .work-see-all {
-    font-size: fs-text(16);
+    font-size: fs(16);
   }
 }
 
@@ -964,7 +964,7 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
   padding-top: fluid(32);
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fs-text(14);
+  font-size: fs(14);
   line-height: 1.6;
   letter-spacing: -0.02em;
 }
@@ -1084,7 +1084,7 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
   overflow: hidden;
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fs-text(20);
+  font-size: fs(20);
   line-height: 1.7;
   letter-spacing: -0.02em;
   white-space: nowrap;
@@ -1094,7 +1094,7 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
 .work-list__kind,
 .work-list__meta {
   font-family: var(--font-body);
-  font-size: fs-text(14);
+  font-size: fs(14);
   line-height: 1.7;
   letter-spacing: -0.02em;
 }
@@ -1131,7 +1131,7 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
 .work-results__empty-title {
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fs-text(32);
+  font-size: fs(32);
   line-height: 1.7;
   letter-spacing: -0.02em;
   overflow-wrap: anywhere;
@@ -1142,7 +1142,7 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
   color: var(--color-text-secondary);
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fs-text(14);
+  font-size: fs(14);
   line-height: 1.6;
   letter-spacing: -0.02em;
 }
@@ -1192,10 +1192,10 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
   }
 
   .work-list__title {
-    font-size: fs-text(18);
+    font-size: fs(18);
   }
 
   .work-results__empty-title {
-    font-size: fs-text(24);
+    font-size: fs(24);
   }
 }

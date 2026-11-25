@@ -4,16 +4,16 @@
   @return calc(#{$value} * var(--px));
 }
 
-// fs = "font scale": same as fluid(), for type and for sizes that wrap text
-// (buttons, text boxes), rem-based; see --type-px in base/_tokens.scss.
+// fs = "font scale": same as fluid(), for type and for sizes that wrap text (buttons, text boxes). Grows
+// slower than the layout on wide screens; see --type-px in base/_tokens.scss.
 @function fs($value) {
   @return calc(#{$value} * var(--type-px));
 }
 
-// fs() for a font size: never under 12px (0.75rem), the smallest size read
-// without zoom. Type scales with the layout on every screen (25 Nov 2026),
-// so at 1024 or 320 wide a 14 or 16 would go under it. Used for every
-// font-size but the badges set smaller on purpose (8–10 in Figma).
+// fs() for small text (12 and 13 in Figma): never under 12px (0.75rem), the
+// smallest size read without zoom (plan 32, final check, 12 Nov 2026: on the
+// desktop layout at 1024–1366 the type scale's floor took them to 10.7–11.6).
+// Not for sizes other than text, nor the badges set smaller on purpose.
 @function fs-text($value) {
   @return max(0.75rem, #{fs($value)});
 }
