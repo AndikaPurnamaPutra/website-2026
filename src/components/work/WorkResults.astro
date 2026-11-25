@@ -31,13 +31,27 @@ const SIZES = { caseStudy: "(max-width: 743px) 90vw, (max-width: 1023px) 45vw, 3
       <span class="work-results__dot" aria-hidden="true"></span>
       <span class="work-results__label" data-results-summary></span>
     </p>
-    <label class="work-results__view">
-      <span class="work-results__label">View mode</span>
-      <select class="work-results__select" data-results-view>
-        <option value="grid">Grid</option>
-        <option value="list">List</option>
-      </select>
-    </label>
+    {/* View mode: a dropdown of our own (user, 25 Nov 2026), as Contact's
+        Turnaround: a button and a list that drops below it; work-search.js. */}
+    <div class="work-results__view">
+      <span class="work-results__label" id="results-view-label">View mode</span>
+      <div class="work-view" data-results-view>
+        <button class="work-view__button" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="results-view-label results-view-value">
+          <span id="results-view-value" data-view-value>Grid</span>
+          <img src="/assets/icons/chevron-down.svg" width="16" height="16" alt="">
+        </button>
+        <ul class="work-view__options" role="listbox" aria-labelledby="results-view-label" tabindex="-1" hidden>
+          <li class="work-view__option" id="results-view-grid" role="option" data-value="grid" aria-selected="true">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2" width="5" height="5" rx="1" /><rect x="9" y="2" width="5" height="5" rx="1" /><rect x="2" y="9" width="5" height="5" rx="1" /><rect x="9" y="9" width="5" height="5" rx="1" /></svg>
+            <span>Grid</span>
+          </li>
+          <li class="work-view__option" id="results-view-list" role="option" data-value="list" aria-selected="false">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="2" rx="1" /><rect x="2" y="7" width="12" height="2" rx="1" /><rect x="2" y="11" width="12" height="2" rx="1" /></svg>
+            <span>List</span>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
   <div data-results-grid>
     {KINDS.map(({ kind, id }) => (

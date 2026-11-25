@@ -71,7 +71,11 @@ export function initWorkSearch() {
   const gridView = results.querySelector("[data-results-grid]");
   const listView = results.querySelector("[data-results-list]");
   const empty = results.querySelector("[data-results-empty]");
-  const select = results.querySelector("[data-results-view]");
+  const viewBox = results.querySelector("[data-results-view]");
+  const viewButton = viewBox.querySelector(".work-view__button");
+  const viewValue = viewBox.querySelector("[data-view-value]");
+  const viewList = viewBox.querySelector('[role="listbox"]');
+  const viewOptions = [...viewList.children];
   const tabs = [...document.querySelectorAll(".work-tabs__tab")];
   const tabsInput = document.querySelector(".work-tabs__search .work-search__input");
   const submit = document.querySelector("[data-search-submit]");
@@ -92,7 +96,36 @@ export function initWorkSearch() {
     return all.length ? all : hits.map((n, i) => (n > 0 ? i : -1)).filter((i) => i >= 0);
   };
 
-  const view = () => (select.value === "list" ? "list" : "grid");
+  // View mode: a dropdown of our own (as Contact's Turnaround).
+  let current = "grid";
+  let pointed = 0;
+  const view = () => current;
+  const setView = (value) => {
+    current = value === "list" ? "list" : "grid";
+    viewOptions.forEach((option) => {
+      const on = option.dataset.value === current;
+      option.setAttribute("aria-selected", String(on));
+      if (on) viewValue.textContent = option.textContent.trim();
+    });
+  };
+  const point = (index) => {
+    pointed = (index + viewOptions.length) % viewOptions.length;
+    viewOptions.forEach((option, i) => option.classList.toggle("is-active", i === pointed));
+    viewList.setAttribute("aria-activedescendant", viewOptions[pointed].id);
+  };
+  const openView = () => {
+    viewList.hidden = false;
+    viewButton.setAttribute("aria-expanded", "true");
+    point(viewOptions.findIndex((option) => option.dataset.value === current));
+    viewList.focus({ preventScroll: true });
+  };
+  const closeView = (focusButton) => {
+    if (viewList.hidden) return;
+    viewList.hidden = true;
+    viewButton.setAttribute("aria-expanded", "false");
+    viewOptions.forEach((option) => option.classList.remove("is-active"));
+    if (focusButton) viewButton.focus({ preventScroll: true });
+  };
 
   const showChips = () => {
     if (!chips) return;
@@ -303,9 +336,44 @@ export function initWorkSearch() {
     go(link.href, { save: link.classList.contains("work-search__chip") });
   });
   clears.forEach((button) => on(button, "click", () => go("/work")));
-  on(select, "change", () => {
-    write(VIEW_KEY, view());
+  const chooseView = (index) => {
+    const value = viewOptions[index].dataset.value;
+    closeView(true);
+    if (value === current) return;
+    setView(value);
+    write(VIEW_KEY, current);
     swap(render, { top: false });
+  };
+  on(viewButton, "click", () => (viewList.hidden ? openView() : closeView(false)));
+  on(viewButton, "keydown", (event) => {
+    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+    event.preventDefault();
+    openView();
+  });
+  on(viewList, "click", (event) => {
+    const option = event.target.closest('[role="option"]');
+    if (option) chooseView(viewOptions.indexOf(option));
+  });
+  on(viewList, "pointermove", (event) => {
+    const option = event.target.closest('[role="option"]');
+    if (option) point(viewOptions.indexOf(option));
+  });
+  on(viewList, "keydown", (event) => {
+    if (event.key === "ArrowDown") point(pointed + 1);
+    else if (event.key === "ArrowUp") point(pointed - 1);
+    else if (event.key === "Home") point(0);
+    else if (event.key === "End") point(viewOptions.length - 1);
+    else if (event.key === "Enter" || event.key === " ") chooseView(pointed);
+    else if (event.key === "Escape") closeView(true);
+    else if (event.key === "Tab") closeView(false);
+    else return;
+    event.preventDefault();
+  });
+  on(document, "pointerdown", (event) => {
+    if (!viewBox.contains(event.target)) closeView(false);
+  });
+  on(viewBox, "focusout", (event) => {
+    if (event.relatedTarget && !viewBox.contains(event.relatedTarget)) closeView(false);
   });
   on(window, "popstate", () =>
     swap(() => {
@@ -315,7 +383,7 @@ export function initWorkSearch() {
   );
 
   const saved = read(VIEW_KEY);
-  if (saved === "list" || saved === "grid") select.value = saved;
+  if (saved === "list" || saved === "grid") setView(saved);
   showChips();
   render();
 

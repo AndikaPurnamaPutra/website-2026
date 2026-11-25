@@ -517,3 +517,22 @@ Diuji di Chrome:
 - Klik ikon di bar tab (1440): skala terkecil 0,86.
 - Enter di bar tab saat hasil tampil: pencarian tetap jalan.
 - Style tombol bersih setelah gerakan selesai, dan tidak ada error JS.
+
+### Search: View mode jadi dropdown sendiri (25 Nov 2026)
+
+Pilihan user: "Dropdown custom". Sebelumnya View mode memakai `<select>` bawaan, jadi menu yang terbuka bergaya sistem. Sekarang dropdown-nya kita gambar sendiri, mengikuti pola Turnaround di Contact:
+
+- Markup (`WorkResults.astro`): tombol "Grid ⌄" (`.work-view__button`, `aria-haspopup="listbox"`) dan daftar `role="listbox"` berisi Grid dan List, masing-masing dengan ikon kecil.
+- Gaya (`_work.scss`, `.work-view__*`):
+  - Panel putih dengan sudut membulat dan bayangan lembut, 12 di bawah tombol.
+  - Panel turun dan memudar saat dibuka/ditutup. Chevron berputar 180°.
+  - Pilihan yang aktif atau ditunjuk berwarna hitam penuh dengan latar abu muda. Yang lain 50%.
+  - Di desktop dan tablet panel rata kanan dengan tombol. Di HP rata kiri, supaya tidak keluar layar di 320.
+  - `.work-results__bar` diberi `z-index: 3` supaya panel di atas kartu.
+- Logika (`work-search.js`): `setView`, `openView`, `closeView`, `chooseView` menggantikan `select.value`.
+  - Mouse: klik untuk membuka, klik pilihan untuk memilih, klik di luar untuk menutup.
+  - Keyboard: ↓/↑ membuka, ↑/↓/Home/End menunjuk, Enter/Spasi memilih, Esc menutup.
+  - Pilihan yang sama hanya menutup panel. Pilihan baru disimpan (`oww-work-view`) dan menjalankan transisi hasil seperti sebelumnya.
+- Reduced motion: tanpa transisi panel.
+
+Diuji di Chrome (1440, 834, 390, 320): panel tampil di atas kartu dan tidak keluar layar. Klik dan keyboard berfungsi, Esc dan klik di luar menutup panel, pilihan bertahan setelah reload. `swap.mjs` (motion on/off) lolos tanpa error JS.
