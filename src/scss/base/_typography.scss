@@ -8,7 +8,7 @@
 .text-display-80 {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: fs(80);
+  font-size: fs-text(80);
   line-height: 1.1;
   letter-spacing: -0.03em;
 }
@@ -16,7 +16,7 @@
 .text-display-48 {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: fs(48);
+  font-size: fs-text(48);
   line-height: 1.1;
   letter-spacing: -0.03em;
 }
@@ -24,7 +24,7 @@
 .text-heading-42 {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: fs(42);
+  font-size: fs-text(42);
   // Figma "normal" renders 57px per line; the browser's normal is 56px.
   line-height: calc(57 / 42);
   letter-spacing: -0.03em;
@@ -33,7 +33,7 @@
 .text-heading-28 {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: fs(28);
+  font-size: fs-text(28);
   line-height: 1;
   letter-spacing: -0.02em;
 }
@@ -41,7 +41,7 @@
 .text-title-22 {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: fs(22);
+  font-size: fs-text(22);
   line-height: 1;
   letter-spacing: -0.02em;
 }
@@ -49,7 +49,7 @@
 .text-title-20 {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: fs(20);
+  font-size: fs-text(20);
   line-height: normal;
   letter-spacing: -0.02em;
 }
@@ -58,7 +58,7 @@
 .text-20 {
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fs(20);
+  font-size: fs-text(20);
   line-height: 1.4;
   letter-spacing: -0.02em;
 }
@@ -66,7 +66,7 @@
 .text-18 {
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fs(18);
+  font-size: fs-text(18);
   line-height: normal;
   letter-spacing: -0.02em;
 }
@@ -74,7 +74,7 @@
 .text-16 {
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fs(16);
+  font-size: fs-text(16);
   line-height: 1;
   letter-spacing: -0.02em;
 }
@@ -82,7 +82,7 @@
 .text-14 {
   font-family: var(--font-body);
   font-weight: 400;
-  font-size: fs(14);
+  font-size: fs-text(14);
   line-height: 1.5;
   letter-spacing: -0.02em;
 }

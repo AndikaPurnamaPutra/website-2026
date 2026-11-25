@@ -182,7 +182,7 @@
   position: relative;
   grid-area: 1 / 1;
   font-family: var(--font-display);
-  font-size: fs(42);
+  font-size: fs-text(42);
   line-height: 1.1;
   letter-spacing: -0.03em;
   white-space: nowrap;
@@ -277,7 +277,7 @@
 
   .motto__line {
     max-width: 100%;
-    font-size: fs(36);
+    font-size: fs-text(36);
     text-align: center;
     white-space: normal;
   }
@@ -289,6 +289,6 @@
   }
 
   .motto__line {
-    font-size: fs(28);
+    font-size: fs-text(28);
   }
 }

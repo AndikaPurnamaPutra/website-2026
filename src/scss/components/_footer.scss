@@ -113,7 +113,7 @@ body {
 
 .site-footer__label,
 .site-footer__title {
-  font-size: fs(14);
+  font-size: fs-text(14);
   line-height: 1;
   opacity: 0.5;
 }
@@ -125,7 +125,7 @@ body {
   margin-top: fs(16);
   padding: 0 0 fs(12);
   font-family: var(--font-display);
-  font-size: fs(16);
+  font-size: fs-text(16);
   line-height: 1;
   letter-spacing: -0.04em;
   color: var(--color-ink);
@@ -172,7 +172,7 @@ body {
   flex-direction: column;
   gap: fs(8);
   font-family: var(--font-display);
-  font-size: fs(20);
+  font-size: fs-text(20);
   // Figma "normal" = 27px for 20px General Sans.
   line-height: calc(27 / 20);
   white-space: nowrap;
@@ -213,7 +213,7 @@ body {
   // before from 1280 up.
   width: max(#{fluid(548)}, #{fs(548)});
   font-family: var(--font-display);
-  font-size: fs(20);
+  font-size: fs-text(20);
   line-height: calc(27 / 20);
 }
 
@@ -227,7 +227,7 @@ body {
   display: flex;
   align-items: center;
   gap: var(--space-16);
-  font-size: fs(14);
+  font-size: fs-text(14);
   line-height: 1;
   white-space: nowrap;
 }
@@ -294,14 +294,14 @@ body {
   }
 
   .site-footer__links {
-    font-size: fs(18);
+    font-size: fs-text(18);
   }
 
   .site-footer__about {
     grid-area: about;
     width: auto;
     max-width: fluid(548);
-    font-size: fs(18);
+    font-size: fs-text(18);
   }
 
   .site-footer__bottom {

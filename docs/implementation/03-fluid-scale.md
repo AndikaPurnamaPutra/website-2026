@@ -107,3 +107,45 @@ Keputusan pengguna (opsi A). Lebar CSS layar besar umumnya 2560px (2K di 100%, 4
 - Tiga salinan `designPx()` di JS disatukan menjadi `src/js/design-px.js`, supaya batas di CSS dan JS tidak bisa berbeda.
 - Gambar diperiksa terhadap ukuran tampil di 2560px. Hanya tekstur Motto yang kurang (1600px), jadi diekspor ulang ke 2560px. Gambar lain sudah cukup (showreel 2400px untuk tampil 2418px, ilustrasi layar penuh 2732px).
 - **Verifikasi:** 16 elemen kunci dari semua section di 2560px = nilai 1440px × 1,778 (selisih ≤ 0,1px; teks nowrap kolom footer 0,8% lebih lebar karena rendering huruf besar, baris motto 1,6px karena pembulatan). Di 3840px identik dengan 2560px, digeser ke tengah. Tidak ada scroll horizontal. Section tertahan What we do dan Motto diuji per langkah di 2560px, posisi kartu = × 1,778. Marquee 71 px/detik (= 40 × 1,778).
+
+---
+
+## Pembaruan 25 Nov 2026: font sebanding dengan layout di setiap layar
+
+Keputusan user: "Sebanding penuh, minimal 12px". Sebelumnya font tidak ikut skala layout:
+
+| Layar | Sebelumnya |
+|---|---|
+| HP dan tablet | Font tetap (1rem = 16px) |
+| 1024–1279 | Font berhenti di 0,889× |
+| Di atas 1440 | Font tumbuh lebih lambat (2560 = 1,2×, layout 1,78×) |
+
+Rasio font terhadap layout sebelumnya 0,68–1,25.
+
+**Sekarang** `--type-px` sama dengan `--px` di setiap lebar layar (`base/_tokens.scss`):
+
+- Tetap berbasis rem (`0.0625rem + (100vw - frame) / frame`), jadi ukuran font browser pengunjung tetap dihormati.
+- Tablet dan HP memakai `--site-type-px-small`. Halaman Contact (di bawah laptop) memakainya juga.
+- **Batas bawah skala 12/14 (0,857).** Teks 14px tepat jatuh di 12px, dan kotak teks (`fs()`) ikut berhenti di skala yang sama, jadi baris tetap patah seperti Figma. Tanpa batas ini, di 1024 teks kanan hero beranda patah jadi 5 baris. Batas ini bekerja di 1024–1234 dan 320–334. Di sana rasio font terhadap layout naik sampai 1,21 dan 1,04.
+- **Semua `font-size` memakai `fs-text()`** (minimal 12px), kecuali badge 8–10 yang sengaja kecil: `.work-menu__count`, badge kartu di menu, dan `.contact-form__file-type`. Teks header yang dulu tetap 14px (`0.875rem`) sekarang `fs-text(14)`.
+- `.button--small`: `line-height` jadi rasio `calc(15 / 12)`, supaya tidak lebih pendek dari font saat font ditahan di 12px.
+- Halaman Contact tetap memakai skalanya sendiri (tidak membesar di atas 1440, keputusan lama).
+
+**Hasil ukur** (teks intro hero Work):
+
+| Lebar | 320 | 390 | 430 | 743 | 834 | 1023 | 1024 | 1280 | 1440 | 1920 | 2560 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| px | 12 | 14 | 15,4 | 17,2 | 14 | 17,2 | 12 | 12,4 | 14 | 18,7 | 24,9 |
+
+Rasio font terhadap layout 1,00 di semua lebar, kecuali di dua rentang batas bawah tadi.
+
+**Cek:**
+
+- `check.mjs`, 190 kombinasi (10 alamat × 19 ukuran): 0 masalah. Tidak ada scroll ke samping, tidak ada elemen keluar layar, tidak ada teks di bawah 12px, tidak ada error.
+- Perbandingan build lama dan baru (teks meluber dan jumlah baris dibanding frame Figma, 5 halaman × 15 ukuran): lebih banyak teks sekarang patah seperti Figma.
+- Temuan baru yang tersisa sudah diperiksa lewat screenshot:
+  - Ikon di sebelah "Work" dan "Back" terbaca sebagai baris kedua. Ini salah baca alat cek, bukan masalah.
+  - Label form Contact berisi pilihan chip.
+  - Judul kartu di carousel terpotong oleh carousel itu sendiri.
+- **Sengaja dibiarkan:** di tablet 1023, panel Services dibatasi 770px (keputusan user sebelumnya: tidak terlalu lebar). Font di dalamnya sekarang membesar, jadi teks kartu bisa jadi 2 baris.
+- **Tidak diubah:** teks di ilustrasi About (papan "Task Manager", "Designing Spaces"). Teks itu bagian dari gambar dan diskalakan bersama ilustrasinya.
