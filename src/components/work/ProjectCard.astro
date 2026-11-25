@@ -8,16 +8,27 @@
 // Props: project (scripts/cms.mjs → workProject), width / height (design
 // px, for the frame and the image's aspect), sizes (for srcset), badge
 // ("dark" in Selected Work, as Figma; "light" in Live Sites), extra (slot
-// under the line, e.g. "Read the case study").
-const { project, width, height, sizes, badge = null } = Astro.props;
-const { title, href, meta, image, focus, kind } = project;
+// under the line, e.g. "Read the case study"), playVideo (the Case Study
+// section and the results: a project's video, when it has one, plays in the
+// frame instead of the cover, muted and looping, while in view
+// (src/js/inview-videos.js); the cover is its poster. Selected Work keeps
+// the cover.)
+const { project, width, height, sizes, badge = null, playVideo = false } = Astro.props;
+const { title, href, meta, image, video, focus, kind } = project;
+const style = focus && `object-position: ${focus}`;
 const Tag = href ? "a" : "div";
 const link = href ? { href, target: "_blank", rel: "noopener" } : {};
 ---
 <article class="project-card">
   <Tag class="project-card__body" {...link}>
     <span class="project-card__media">
-      <img class="project-card__image" src={`assets/images/${image}-800.webp`} srcset={`assets/images/${image}-800.webp 800w, assets/images/${image}.webp 2000w`} sizes={sizes} width={width} height={height} alt="" loading="lazy" decoding="async" draggable="false" style={focus && `object-position: ${focus}`}>
+      {playVideo && video ? (
+        <video class="project-card__image" poster={`assets/images/${image}-800.webp`} width={width} height={height} muted loop playsinline preload="none" aria-hidden="true" style={style} data-card-video>
+          <source src={`assets/images/${video}.mp4`} type="video/mp4">
+        </video>
+      ) : (
+        <img class="project-card__image" src={`assets/images/${image}-800.webp`} srcset={`assets/images/${image}-800.webp 800w, assets/images/${image}.webp 2000w`} sizes={sizes} width={width} height={height} alt="" loading="lazy" decoding="async" draggable="false" style={style}>
+      )}
       {badge && kind === "live" && <span class={`project-card__badge project-card__badge--${badge}`}>Live</span>}
     </span>
     <span class="project-card__text">

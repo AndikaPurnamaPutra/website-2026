@@ -21,5 +21,22 @@ export function initInviewVideos() {
     });
   });
 
-  return () => triggers.forEach((trigger) => trigger.kill());
+  // Project cards' videos (src/components/work/ProjectCard.astro): watched
+  // with an IntersectionObserver, which also follows cards that are shown
+  // later (search results, "Load more") without a refresh. Loaded only when
+  // first in view (preload none).
+  const cards = new IntersectionObserver(
+    (entries) =>
+      entries.forEach(({ target, isIntersecting }) => {
+        if (isIntersecting && !reduceMotion) target.play().catch(() => {});
+        else target.pause();
+      }),
+    { rootMargin: "100px 0px" },
+  );
+  document.querySelectorAll("[data-card-video]").forEach((video) => cards.observe(video));
+
+  return () => {
+    triggers.forEach((trigger) => trigger.kill());
+    cards.disconnect();
+  };
 }

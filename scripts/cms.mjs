@@ -50,6 +50,7 @@ const QUERY = `{
     "collage": collage[defined(asset)]{ hotspot, "url": asset->url, "id": asset->_id },
     "projects": *[_type == "project" && defined(kind) && defined(cover.asset)] | order(orderRank) {
       ${PROJECT_FIELDS}, kind, liveUrl, keywords, selected, publishedAt,
+      "video": video{ "url": asset->url, "id": asset->_id },
       "categories": categories[]->title, "format": format->title
     }
   },
@@ -214,9 +215,13 @@ const trusted = async (section) => {
 // hero's collage pictures and every project with a kind, in drag order (the
 // sections and the search take theirs from it). A card's line: first
 // category · format · year. Covers share the homepage's files (work/<slug>).
+// A Case Study may have a video (work/<slug>.mp4) that its card plays over
+// the cover (the cover stays: the video's poster, the homepage, Selected Work).
 const workProject = async (project) => {
   const name = `work/${project.slug || slugify(project.title)}`;
   await download(project.cover, `${name}.png`);
+  const video = project.kind === "caseStudy" && project.video?.url;
+  if (video) await download(project.video, `${name}.mp4`);
   return {
     title: project.title,
     slug: project.slug,
@@ -228,6 +233,7 @@ const workProject = async (project) => {
     keywords: project.keywords ?? [],
     selected: Boolean(project.selected),
     image: `cms/${name}`,
+    video: video ? `cms/${name}` : null,
     focus: focus(project.cover.hotspot),
   };
 };
@@ -274,7 +280,9 @@ const prune = async () => {
   for (const file of Object.keys(manifest)) {
     if (used.has(file)) continue;
     const base = file.replace(/\.[^.]+$/, "");
-    const copies = [file, `${base}.webp`, `${base}-800.webp`];
+    // Only a picture has WebP copies; a video (work/<slug>.mp4) shares its
+    // name with the cover, whose copies stay.
+    const copies = /\.(png|jpe?g)$/i.test(file) ? [file, `${base}.webp`, `${base}-800.webp`] : [file];
     await Promise.all([rm(`${MEDIA}/${file}`, { force: true }), ...copies.map((copy) => rm(`public/assets/images/cms/${copy}`, { force: true }))]);
     delete manifest[file];
     console.log(`cms: removed ${file}`);

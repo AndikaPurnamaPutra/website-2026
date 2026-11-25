@@ -93,6 +93,15 @@ export const project = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: "video",
+      title: "Video cover (MP4, opsional)",
+      type: "file",
+      options: { accept: "video/mp4" },
+      description:
+        "Kalau diisi, kartu Case Study di halaman Work memutar video ini (tanpa suara, berulang) menggantikan cover. Cover tetap wajib: tampil sebelum video berjalan, di homepage dan di Selected Work. MP4, sebaiknya di bawah 8 MB.",
+      hidden: ({ parent }) => parent?.kind !== "caseStudy",
+    }),
+    defineField({
       name: "publishedAt",
       title: "Tanggal publish",
       type: "date",

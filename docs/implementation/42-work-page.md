@@ -653,3 +653,47 @@ Diuji di Chrome 1440:
 - Klik ✕: skala terkecil 0,86, lalu kembali ke `/work`.
 - Hover search: putih.
 - "Clear search" tetap berfungsi, dan tidak ada error JS.
+
+### Case Study: video di kartu (25 Nov 2026)
+
+User: kartu BREX Banking Branding dan REX Panels Branding memakai video (`brex-banking-branding.mp4`, `rex-panels-branding.mp4`) menggantikan gambar. Dipasang lewat Sanity, dengan pola yang sama seperti Services:
+
+- **Studio** (`studio/schemaTypes/project.js`): field baru "Video cover (MP4, opsional)". Hanya tampil untuk Jenis = Case Study.
+  - Cover tetap wajib, karena dipakai sebagai poster video, di homepage, dan di Selected Work.
+- **Build** (`scripts/cms.mjs`): video Case Study diunduh ke `src/assets/images/cms/work/<slug>.mp4`, lalu `video: "cms/work/<slug>"`.
+  - `prune()` sekarang hanya menghapus file video itu sendiri. Sebelumnya `.webp` cover yang namanya sama ikut terhapus.
+- **Kartu** (`ProjectCard.astro`, prop `playVideo` dari `WorkGrid` dan `WorkResults`): `<video muted loop playsinline preload="none">` dengan cover sebagai poster. Selected Work tetap memakai gambar.
+- **Putar** (`inview-videos.js`): IntersectionObserver.
+  - Video berjalan saat kartu terlihat dan berhenti saat keluar layar.
+  - Kartu yang baru tampil (hasil search, Load more) juga ikut, tanpa refresh.
+  - Dengan reduced motion: video tidak diputar, poster tetap tampil.
+
+Diuji di Chrome (1440 dan 390, video dipasang sementara di data lokal):
+
+- Tidak ada video yang dimuat sebelum section Case Study terlihat.
+- Di Case Study kedua video berjalan. Setelah scroll menjauh, keduanya berhenti.
+- Search "brex": video berjalan di kartu hasil.
+- Reduced motion: video tidak berjalan.
+- Tidak ada error JS.
+
+Catatan ukuran: BREX 1690×1265, 14,8 detik, 7,2 MB. REX 1920×1080, 20 detik, 5,2 MB. Kartunya hanya 325–555 px lebar, jadi video bisa dikecilkan jauh tanpa terlihat berbeda (lihat batas bandwidth Vercel).
+
+#### Video dikecilkan sebelum upload (25 Nov 2026)
+
+Video dikecilkan dengan ffmpeg (dipasang lewat Homebrew, atas persetujuan user):
+
+```
+ffmpeg -i in.mp4 -an -vf "scale=1110:-2:flags=lanczos" -c:v libx264 -profile:v high -pix_fmt yuv420p -preset slow -crf 26 -movflags +faststart out.mp4
+```
+
+- Lebar 1110 = 2× kartu terbesar (555), jadi tetap tajam di layar retina.
+- Tanpa audio, karena kartu memutarnya tanpa suara.
+- `faststart` supaya video bisa mulai diputar sebelum selesai diunduh.
+
+Hasil:
+
+- BREX: 7,2 MB → 2,1 MB.
+- REX: 5,2 MB → 1,5 MB.
+- Perbandingan frame dengan aslinya tidak terlihat berbeda.
+
+File hasilnya ada di folder utama project: `brex-banking-branding-web.mp4` dan `rex-panels-branding-web.mp4`, tidak masuk git. Upload file `-web` ini ke Studio. Untuk video kartu berikutnya, pakai setelan yang sama.

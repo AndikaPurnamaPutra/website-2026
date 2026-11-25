@@ -64,7 +64,7 @@ const SIZES = { caseStudy: "(max-width: 743px) 90vw, (max-width: 1023px) 45vw, 3
           <div class={`work-results__cards work-results__cards--${kind}`}>
             {projects.map((project, i) => project.kind === kind && (
               <div class="work-results__item" data-result={i} style={`--w: ${CELL[kind][0]}; --h: ${CELL[kind][1]}`}>
-                <ProjectCard project={project} width={CELL[kind][0]} height={CELL[kind][1]} sizes={SIZES[kind]} badge={kind === "live" ? "light" : null} />
+                <ProjectCard project={project} width={CELL[kind][0]} height={CELL[kind][1]} sizes={SIZES[kind]} badge={kind === "live" ? "light" : null} playVideo />
               </div>
             ))}
           </div>

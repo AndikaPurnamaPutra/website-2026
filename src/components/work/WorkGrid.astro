@@ -38,7 +38,7 @@ const rows = kind === "caseStudy" ? Array.from({ length: Math.ceil(items.length 
         const { w, h, sizes } = cell(r * 3 + k);
         return (
           <div class="work-grid__item" style={`--w: ${w}; --h: ${h}`}>
-            <ProjectCard project={project} width={Math.round(w)} height={h} sizes={sizes} badge={kind === "live" ? "light" : null} />
+            <ProjectCard project={project} width={Math.round(w)} height={h} sizes={sizes} badge={kind === "live" ? "light" : null} playVideo />
           </div>
         );
       })}
