@@ -63,3 +63,19 @@ terpisah; tanpa JS semuanya tetap tautan biasa).
 
 ## Belum jelas
 - Konten halaman layanan yang sebenarnya (menunggu desain).
+
+## Perbaikan: isi footer kosong setelah pindah halaman (25 Nov 2026)
+
+User: di homepage, isi footer kadang tidak muncul. Bukan masalah transform footer (`footer-reveal.js` tetap benar). Penyebabnya di transisi halaman:
+
+- Footer tidak ikut berganti antar halaman. Saat halaman lama keluar dengan footer terlihat di layar (misalnya link di footer diklik), `.site-footer__inner` ikut dipudarkan: `opacity 0`, `blur(8px)`, naik 16 px.
+- Halaman baru hanya memunculkan bagian yang terlihat di layar. Halaman baru mulai dari atas, jadi footer tidak termasuk. Isinya tetap pudar dan blur, dan saat di-scroll ke bawah footer kosong (hanya latar dan koin).
+
+Perbaikan (`page-transition.js`, `enter`): sebelum bagian yang terlihat dihitung, `gsap.set(".site-footer__inner", { clearProps: "opacity,transform,filter" })`. Kalau footer terlihat di halaman baru, footer tetap ikut masuk dengan animasi seperti bagian lain.
+
+Diuji di Chrome 1440. Langkahnya: scroll ke bawah, klik link footer, lalu scroll ke footer halaman baru.
+
+- About → Home, Work → About, Home → Work, Contact → Home: isi footer bersih (`style` kosong, opacity 1) dan tampil lengkap.
+- Tombol Back (Home → About): tampil lengkap.
+- Sebelum perbaikan, kasus About → Home menunjukkan footer kosong dengan `opacity: 0; filter: blur(8px)` di `.site-footer__inner`.
+- Tidak ada error JS.

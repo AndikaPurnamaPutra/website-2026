@@ -96,6 +96,12 @@ export function initPageTransitions({ setUp, tearDown }) {
           // set-up, the pictures in view decoded): animated while they ran,
           // the fade in stuttered (user).
           await settle(next.container);
+          // The footer stays from page to page; its content, faded with the
+          // old page when it was on screen (a footer link clicked), is put
+          // back first. Only the parts on screen of the new page come in
+          // below, so off screen there it stayed faded and blurred: the
+          // footer showed empty when scrolled to (user, homepage).
+          gsap.set(".site-footer__inner", { clearProps: "opacity,transform,filter" });
           // Only what is on screen moves (the whole page moved, a layer the
           // page's full height was drawn: long frames as it began).
           const parts = inView(next.container);
