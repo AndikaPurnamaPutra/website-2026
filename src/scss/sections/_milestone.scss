@@ -70,7 +70,7 @@
 .milestone__text {
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fs(20);
+  font-size: fs-text(20);
   line-height: 1.4;
   letter-spacing: -0.02em;
   // Milestone follows the page theme (it turns over as Motto comes in).
@@ -118,7 +118,7 @@
   }
 
   .milestone__intro .text-heading-42 {
-    font-size: fs(32);
+    font-size: fs-text(32);
   }
 
   .milestone__stats {
@@ -135,10 +135,10 @@
   }
 
   .milestone__value {
-    font-size: fs(40);
+    font-size: fs-text(40);
   }
 
   .milestone__text {
-    font-size: fs(18);
+    font-size: fs-text(18);
   }
 }

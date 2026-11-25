@@ -70,12 +70,12 @@
 }
 
 .about-intro__lead {
-  font-size: fs(18);
+  font-size: fs-text(18);
   line-height: calc(29 / 18);
 }
 
 .about-intro__note {
-  font-size: fs(14);
+  font-size: fs-text(14);
   line-height: calc(22 / 14);
 }
 
@@ -92,7 +92,7 @@
 
 .about-intro__cta-caption {
   font-weight: 500;
-  font-size: fs(14);
+  font-size: fs-text(14);
   line-height: calc(24 / 14);
   opacity: 0.6; // as .text-muted (contrast)
 }
@@ -129,7 +129,7 @@
 
 .principles__intro {
   font-family: var(--font-display);
-  font-size: fs(28);
+  font-size: fs-text(28);
   line-height: 1.4;
   letter-spacing: -0.02em;
 }
@@ -148,7 +148,7 @@
 }
 
 .principles__number {
-  font-size: fs(18);
+  font-size: fs-text(18);
   line-height: calc(29 / 18);
   opacity: 0.2;
   transition: opacity 0.4s ease-out;
@@ -176,12 +176,12 @@
 }
 
 .principles__title {
-  font-size: fs(18);
+  font-size: fs-text(18);
   line-height: calc(29 / 18);
 }
 
 .principles__description {
-  font-size: fs(14);
+  font-size: fs-text(14);
   line-height: calc(22 / 14);
 }
 
@@ -3896,7 +3896,7 @@
 
 .about-team__lead {
   max-width: fs(900);
-  font-size: fs(18);
+  font-size: fs-text(18);
   line-height: calc(29 / 18);
   color: var(--color-text-secondary);
 }
@@ -3914,7 +3914,7 @@
   display: grid;
   grid-template-columns: fs(462) 1fr;
   padding-bottom: fs(16);
-  font-size: fs(14);
+  font-size: fs-text(14);
   line-height: calc(22 / 14);
   color: var(--color-ink);
 
@@ -3972,7 +3972,7 @@
   }
 
   .about-intro__title {
-    font-size: fs(32);
+    font-size: fs-text(32);
   }
 
   .about-intro__photo {
@@ -4139,7 +4139,7 @@
   }
 
   .principles__intro {
-    font-size: fs(24);
+    font-size: fs-text(24);
   }
 
   .principles__figure {
@@ -4200,7 +4200,7 @@
   }
 
   .about-team__lead {
-    font-size: fs(16);
+    font-size: fs-text(16);
   }
 
   .about-team__list {

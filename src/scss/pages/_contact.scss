@@ -105,7 +105,7 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
 
 .contact__lead {
   font-weight: 500;
-  font-size: fs(14);
+  font-size: fs-text(14);
   line-height: calc(22 / 14);
   color: var(--color-text-secondary);
 }
@@ -123,7 +123,7 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
 
 .contact__cta-caption {
   font-weight: 500;
-  font-size: fs(14);
+  font-size: fs-text(14);
   line-height: calc(24 / 14);
   opacity: 0.6; // as .text-muted (contrast)
 }
@@ -154,7 +154,7 @@ $shadow-card: 0 0 fs(20) rgba(0, 0, 0, 0.05);
   gap: fs(8);
   align-self: flex-start;
   font-weight: 500;
-  font-size: fs(14);
+  font-size: fs-text(14);
   line-height: calc(22 / 14);
 }
 
@@ -247,7 +247,7 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
 }
 
 .contact__address {
-  font-size: fs(14);
+  font-size: fs-text(14);
   line-height: calc(22 / 14);
   opacity: 0.6; // as .text-muted (contrast)
 }
@@ -284,7 +284,7 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
 
 .contact-form__title {
   font-family: var(--font-display);
-  font-size: fs(28);
+  font-size: fs-text(28);
   line-height: 1;
   letter-spacing: -0.04em;
 }
@@ -308,7 +308,7 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
   margin-bottom: fs(16);
   padding: 0;
   font-weight: 500;
-  font-size: fs(14);
+  font-size: fs-text(14);
   line-height: calc(24 / 14);
 }
 
@@ -330,7 +330,7 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
   padding: 0 0 fs(12);
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: fs(20);
+  font-size: fs-text(20);
   line-height: 1;
   letter-spacing: -0.04em;
   color: var(--color-ink);
@@ -403,7 +403,7 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
     display: block;
     padding: fs(10) fs(16);
     text-align: center;
-    font-size: fs(16);
+    font-size: fs-text(16);
     line-height: 1;
     letter-spacing: -0.04em;
     white-space: nowrap;
@@ -532,7 +532,7 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
 .contact-form__select-value {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: fs(20);
+  font-size: fs-text(20);
   line-height: 1;
   letter-spacing: -0.04em;
 
@@ -590,7 +590,7 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
 .contact-form__option {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: fs(16);
+  font-size: fs-text(16);
   line-height: 1;
   letter-spacing: -0.04em;
   opacity: 0.5;
@@ -750,7 +750,7 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
   flex-shrink: 0;
   width: fs(37);
   font-weight: 500;
-  font-size: fs(14);
+  font-size: fs-text(14);
   line-height: calc(20 / 14);
   letter-spacing: 0;
   color: $color-file;
@@ -799,7 +799,7 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
   width: fs(156);
   padding: fs(10) fs(20);
   font-weight: 500;
-  font-size: fs(18);
+  font-size: fs-text(18);
   line-height: fs(22);
   color: var(--color-ink);
   border: 1px solid var(--color-ink);
@@ -863,7 +863,7 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
 .contact-form__error,
 .contact-form__again {
   font-weight: 500;
-  font-size: fs(14);
+  font-size: fs-text(14);
   line-height: calc(24 / 14);
 }
 
@@ -1004,7 +1004,7 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
 @include below-laptop {
   .contact {
     --px: var(--site-px-small);
-    --type-px: 0.0625rem;
+    --type-px: var(--site-type-px-small);
 
     margin-top: 0;
     padding-bottom: fluid(80);
@@ -1069,7 +1069,7 @@ $office-arrow-out: cubic-bezier(0.55, 0, 1, 0.45);
   }
 
   .contact__heading .text-heading-42 {
-    font-size: fs(32);
+    font-size: fs-text(32);
   }
 
   .contact-form {

@@ -228,7 +228,7 @@
   flex: 1 0 0;
   align-content: center;
   font-family: var(--font-body);
-  font-size: fs(14);
+  font-size: fs-text(14);
   line-height: 1.4;
   letter-spacing: -0.02em;
 }
@@ -311,7 +311,7 @@
   }
 
   .trusted__header .text-heading-42 {
-    font-size: fs(32);
+    font-size: fs-text(32);
   }
 
   .trusted__logos {
