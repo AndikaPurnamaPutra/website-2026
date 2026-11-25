@@ -436,3 +436,23 @@ Cara kerjanya (`src/js/work-collage.js`, GSAP):
 - Timeline jeda saat collage tidak terlihat (di bawah layout laptop atau di luar layar). Dengan reduced motion, collage diam.
 - Angka bisa disetel di bagian atas file: `REST`, `GLIDE`, `GAP`, `EASE`, `AFTER_READY`.
 
+### Selected Work: drag berhenti rapi di kartu (25 Nov 2026)
+
+Pilihan user: "Berhenti rapi di kartu". Drag tetap bebas dan meluncur seperti biasa, tapi baris selalu mendarat dengan awal kartu di garis istirahat, yaitu posisi awal baris seperti di Figma. Sebelumnya baris bisa berhenti di tengah kartu.
+
+- **Lepas setelah drag:** mendarat di kartu terdekat dari titik akhir luncuran. Lemparan cepat bisa melewati beberapa kartu.
+- **Drag pelan:** kalau ditarik minimal 20% lebar kartu (`NUDGE`), baris maju paling sedikit satu kartu ke arah tarikan. Tarikan lebih pendek kembali ke kartu semula.
+- **Swipe trackpad:** baris mendarat di kartu 140 ms setelah swipe berhenti (`SWIPE_END`).
+- **Tombol panah:** tepat satu kartu.
+- **Saat ukuran layar berubah:** baris tetap berada di kartu.
+- **Cara kerjanya (`src/js/work-drag.js`):** titik berhenti diambil dari `offsetLeft` setiap kartu asli dalam satu set, lalu diulang per set, jadi tetap berlaku untuk baris yang tidak berujung.
+- **Hasil uji di Chrome:**
+  - 1440 dengan mouse:
+    - drag pelan 60 px → 1 kartu,
+    - drag 25 px → 0 (kembali),
+    - lempar cepat → 2,
+    - drag 300 px ke kanan → −2,
+    - swipe trackpad → 2,
+    - panah kanan → 1.
+  - 390 dengan sentuhan: drag 80 px → 1, flick → 1.
+  - Semuanya mendarat tepat di kartu (selisih 0 px), dan tidak ada error JS.

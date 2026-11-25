@@ -5,8 +5,10 @@ import gsap from "gsap";
 // from screen readers and the keyboard) and the row moves by transform,
 // wrapping by one set's width, so it never ends. It follows the pointer
 // (mouse or finger) a touch behind, eased, and once let go glides on and
-// slows down; a trackpad's sideways swipe and the arrow keys (row
-// focused) move it too; a vertical swipe or wheel still scrolls the page.
+// slows down, landing with a card's start at the row's start (user's
+// choice: card by card, a quick throw passes several); a trackpad's sideways
+// swipe (landing so too once it stops) and the arrow keys (row focused, a
+// card) move it too; a vertical swipe or wheel still scrolls the page.
 // A drag is not a click. With the mouse, the pointer becomes a glass circle
 // "← Drag →" over the row, smaller while pressed (user's choice). Reduced
 // motion: no easing or glide, no circle (a grab hand instead).
@@ -15,6 +17,8 @@ const FOLLOW = 0.2; // share of the way to the target per frame while dragged
 const SETTLE = 0.075; // … while gliding
 const THROW = 320; // ms of the release speed the glide carries on
 const MAX_SPEED = 6; // px per ms
+const NUDGE = 0.2; // share of a card a drag needs to land on the next one
+const SWIPE_END = 140; // ms without sideways wheel events that ends a swipe
 
 const ARROW = (d) => `<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
@@ -34,6 +38,7 @@ function setUpRow(row, still) {
   const events = new AbortController();
   const on = (target, type, handler, options = {}) => target.addEventListener(type, handler, { ...options, signal: events.signal });
   let width = 0; // one set, gap included
+  let stops = []; // where a card's start meets the row's start, in one set
   let before = 0; // sets copied in front of the originals
   let x = 0; // shown position (px the row has moved left)
   let target = 0;
@@ -47,6 +52,7 @@ function setUpRow(row, still) {
     const last = originals[originals.length - 1];
     width = last.offsetLeft + last.offsetWidth + gap - first.offsetLeft;
     if (!width) return;
+    stops = originals.map((card) => card.offsetLeft - first.offsetLeft);
     // One set in front (its end shows at the left edge, as in Figma), and
     // enough after to fill the row twice over.
     before = 1;
@@ -92,6 +98,26 @@ function setUpRow(row, still) {
     ease = how;
     start();
   };
+  // The card stops around a position, in all the sets (it never ends).
+  const stopsNear = (value) => {
+    const set = Math.floor(value / width);
+    return [-1, 0, 1].flatMap((k) => stops.map((stop) => (set + k) * width + stop));
+  };
+  const nearest = (value) => stopsNear(value).reduce((best, stop) => (Math.abs(stop - value) < Math.abs(best - value) ? stop : best));
+  // The next stop past a position, forward (1) or back (-1).
+  const next = (value, way) => {
+    const ahead = stopsNear(value).filter((stop) => (way > 0 ? stop > value + 0.5 : stop < value - 0.5));
+    return way > 0 ? Math.min(...ahead) : Math.max(...ahead);
+  };
+  // Lands on the stop nearest where the glide would end; a drag of a fifth
+  // of a card or more goes on at least to the next one its way.
+  const land = (from, to) => {
+    let stop = nearest(to);
+    const way = Math.sign(to - from);
+    const card = stops[1] ?? width;
+    if (way && Math.abs(to - from) >= card * NUDGE && (stop - from) * way <= 0.5) stop = next(from, way);
+    return stop;
+  };
 
   // Pointer (mouse and touch). Touch: the page keeps its vertical scroll
   // (touch-action: pan-y); a mostly sideways move drags the row.
@@ -125,7 +151,7 @@ function setUpRow(row, still) {
   });
   const end = (event) => {
     if (!press || event.pointerId !== press.id) return;
-    const { moved, samples } = press;
+    const { moved, samples, from: press0 } = press;
     press = null;
     row.classList.remove("is-pressed", "is-dragging");
     if (!moved) return;
@@ -134,7 +160,7 @@ function setUpRow(row, still) {
     const [t0, x0] = samples[0];
     const [t1, x1] = samples[samples.length - 1];
     const speed = t1 > t0 ? Math.max(-MAX_SPEED, Math.min(MAX_SPEED, (x0 - x1) / (t1 - t0))) : 0;
-    moveTo(target + (still ? 0 : speed * THROW), SETTLE);
+    moveTo(land(press0, target + (still ? 0 : speed * THROW)), SETTLE);
   };
   on(row, "pointerup", end);
   on(row, "pointercancel", end);
@@ -147,21 +173,26 @@ function setUpRow(row, still) {
   on(row, "dragstart", (event) => event.preventDefault());
 
   // A trackpad's sideways swipe (or shift + wheel); up and down stays the
-  // page's.
+  // page's. Once it stops, the row lands on a card.
+  let swipe = null;
   on(row, "wheel", (event) => {
     const sideways = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.shiftKey ? event.deltaY : 0;
     if (!sideways) return;
     event.preventDefault();
+    if (!swipe) swipe = { from: target };
     moveTo(target + sideways, FOLLOW);
+    clearTimeout(swipe.timer);
+    swipe.timer = setTimeout(() => {
+      moveTo(land(swipe.from, target), SETTLE);
+      swipe = null;
+    }, SWIPE_END);
   }, { passive: false });
 
   // Arrow keys: one card.
   on(row, "keydown", (event) => {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
     event.preventDefault();
-    const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
-    const card = originals[0].offsetWidth + gap;
-    moveTo(target + (event.key === "ArrowRight" ? card : -card), SETTLE);
+    moveTo(next(target, event.key === "ArrowRight" ? 1 : -1), SETTLE);
   });
 
   // Rebuilt only when the row's width changes (the fluid sizes), keeping
@@ -172,7 +203,7 @@ function setUpRow(row, still) {
     rowWidth = row.clientWidth;
     const share = width ? x / width : 0;
     build();
-    x = target = share * width;
+    x = target = width ? nearest(share * width) : 0;
     draw();
   });
   resize.observe(row);
@@ -184,6 +215,7 @@ function setUpRow(row, still) {
   return () => {
     events.abort();
     resize.disconnect();
+    clearTimeout(swipe?.timer);
     stop();
     track.querySelectorAll("[data-drag-copy]").forEach((copy) => copy.remove());
     track.style.transform = "";
