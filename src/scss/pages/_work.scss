@@ -153,11 +153,8 @@
   padding: fs(8) fs(8) fs(8) fs(14);
   border-radius: var(--radius-md);
   background: var(--color-field);
-
-  &:has(.work-search__input:focus-visible) {
-    outline: 2px solid var(--color-ink);
-    outline-offset: 2px;
-  }
+  // No ring when the field is focused (user, 25 Nov 2026): the blinking
+  // caret shows where typing goes. The buttons beside it keep theirs.
 }
 
 .work-search__input {

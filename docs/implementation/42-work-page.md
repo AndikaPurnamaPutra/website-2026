@@ -464,3 +464,7 @@ Permintaan user, pilihan "Lebih tipis". Berlaku untuk kedua kolom search: hero d
 - Placeholder dan kolom kosong: 500 (Medium) → **400 (Regular)**.
 - Teks yang diketik: 600 (SemiBold) → **500 (Medium)**.
 - Kedua font sudah dimuat situs. Dicek di Chrome: 400 dan 500.
+
+### Kolom search: tanpa garis focus (25 Nov 2026)
+
+Permintaan user. Aturan `.work-search__field:has(.work-search__input:focus-visible)` (outline 2px hitam) dihapus. Kolom di hero dan di bar tab tidak lagi diberi garis saat aktif, baik diklik maupun lewat keyboard. Kursor teks yang berkedip menjadi penanda posisi ketik. Tombol search dan Clear search tetap punya garis focus.
