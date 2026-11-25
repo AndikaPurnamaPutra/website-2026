@@ -1,4 +1,6 @@
+import gsap from "gsap";
 import { getSmoothScroll } from "./smooth-scroll.js";
+import { PART_RISE, rise, openCards, clearCards, rowsOf } from "./work-motion.js";
 
 // Work page search and "See all" (plan 42, step 6;
 // src/components/work/WorkResults.astro). /work?q=… shows the projects
@@ -14,9 +16,23 @@ import { getSmoothScroll } from "./smooth-scroll.js";
 // categories, format, keywords, kind, year) — "bank" finds "banking" and
 // "banking" finds the keyword "bank" — and if no project has them all, the
 // projects with any of them are shown.
+//
+// Changing view (a search, a chip, "See all", Clear search, Back and
+// Forward, Grid or List) is not a cut (user: too abrupt): what shows fades
+// out, the page goes to the top while nothing shows, then the results come
+// in in the page's motion language (work-motion.js), quicker: their bar
+// rises, then the group titles and the cards in view open row by row (the
+// list's rows rise); back to the whole page, it rises into place. With
+// reduced motion, a cut as before. Enter or the search icon first presses
+// the field's search button (user's pick): it goes down and springs back,
+// its magnifier nudging up and to the right and back.
 const RECENT_KEY = "oww-work-recent";
 const VIEW_KEY = "oww-work-view";
 const RECENT_MAX = 4;
+const OUT = 0.25; // s what shows takes to fade out
+const PACE = 1.4; // the entrance, quicker than the page's (one waits on it)
+const ROW_GAP = 0.12; // s between rows of cards (at the page's pace)
+const PRESS = 0.12; // s the search button goes down; what shows fades after it
 
 const words = (text) =>
   text
@@ -46,6 +62,7 @@ export function initWorkSearch() {
   const results = document.querySelector("[data-work-results]");
   if (!results) return () => {};
   const root = document.documentElement;
+  const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const browse = [...document.querySelectorAll("[data-work-browse]")];
   const index = JSON.parse(results.querySelector("[data-search-index]").textContent).map((item) => ({ ...item, words: words(item.words) }));
   const cards = [...results.querySelectorAll("[data-results-grid] [data-result]")];
@@ -168,23 +185,114 @@ export function initWorkSearch() {
     root.classList.add("is-results-ready");
   };
 
-  const go = (url, { save } = {}) => {
-    const next = new URL(url, location.href);
-    const query = (next.searchParams.get("q") ?? "").trim();
-    if (save && query) remember(query);
-    history.pushState(history.state, "", `${next.pathname}${next.search}`);
-    render();
-    showChips();
+  const toTop = () => {
     const lenis = getSmoothScroll();
     if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
     else window.scrollTo(0, 0);
+  };
+
+  // The new view coming in (see the top of this file). Only what is in the
+  // first screen moves; below it, it is in place.
+  const inView = (el) => el.getBoundingClientRect().top < window.innerHeight;
+  const enter = () => {
+    const moved = [];
+    const tl = gsap.timeline({
+      onComplete: () => {
+        clearCards(results);
+        gsap.set(moved, { clearProps: "transform,clipPath,opacity,visibility" });
+        entering = null;
+      },
+    });
+    if (!root.classList.contains("is-work-results")) {
+      const page = browse.filter((part) => !part.hidden);
+      moved.push(...page);
+      tl.fromTo(page, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 1, ease: "power3.out" });
+    } else {
+      const bar = [...results.querySelectorAll(".work-results__summary, .work-results__view")];
+      moved.push(...bar);
+      tl.add(rise(bar, { stagger: 0.07 }, PART_RISE), 0);
+      if (!empty.hidden) {
+        moved.push(empty);
+        tl.fromTo(empty, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.9, ease: "power3.out" }, 0.1);
+      } else if (!listView.hidden) {
+        const shown = rows.filter((row) => !row.hidden && inView(row));
+        moved.push(...shown);
+        tl.add(rise(shown, { stagger: 0.05 }, PART_RISE), 0.15);
+      } else {
+        const titles = groups.filter((group) => !group.hidden).map((group) => group.querySelector(".work-section-title")).filter(inView);
+        moved.push(...titles);
+        if (titles.length) tl.add(rise(titles, { stagger: 0.1 }), 0.1);
+        rowsOf(cards.filter((card) => !card.hidden && inView(card))).forEach(({ items }, i) => {
+          tl.add(openCards(items).paused(false), 0.2 + i * ROW_GAP);
+        });
+      }
+    }
+    tl.timeScale(PACE);
+    entering = tl;
+  };
+
+  // Out, the change (address, results, chips), to the top, in.
+  let leaving = null;
+  let entering = null;
+  const swap = (change, { top = true, after = 0 } = {}) => {
+    entering?.progress(1);
+    const finish = () => {
+      change();
+      if (top) toTop();
+    };
+    if (still) return finish();
+    leaving?.kill();
+    const out = [...browse, results].filter((part) => !part.hidden);
+    leaving = gsap.to(out, {
+      autoAlpha: 0,
+      duration: OUT,
+      delay: after,
+      ease: "power1.in",
+      onComplete: () => {
+        leaving = null;
+        finish();
+        gsap.set(out, { clearProps: "opacity,visibility" });
+        enter();
+      },
+    });
+  };
+
+  const go = (url, { save, after } = {}) => {
+    const next = new URL(url, location.href);
+    const query = (next.searchParams.get("q") ?? "").trim();
+    if (save && query) remember(query);
+    swap(
+      () => {
+        history.pushState(history.state, "", `${next.pathname}${next.search}`);
+        render();
+        showChips();
+      },
+      { after },
+    );
+  };
+
+  // The search button pressed (see the top of this file); false if there is
+  // none to press (the bar's, while results show, gives way to ✕).
+  const press = (form) => {
+    const button = form.querySelector('.work-search__submit[type="submit"]:not([hidden])');
+    if (still || !button) return false;
+    const icon = button.querySelector("img");
+    gsap.killTweensOf([button, icon]);
+    gsap
+      .timeline({ onComplete: () => gsap.set([button, icon], { clearProps: "transform" }) })
+      .to(button, { scale: 0.86, duration: PRESS, ease: "power2.out" }, 0)
+      .to(icon, { x: 3, y: -3, duration: PRESS, ease: "power2.out" }, 0)
+      .to(button, { scale: 1, duration: 0.5, ease: "back.out(3)" }, PRESS)
+      .to(icon, { x: 0, y: 0, duration: 0.5, ease: "back.out(3)" }, PRESS);
+    return true;
   };
 
   document.querySelectorAll(".work-search__form, .work-tabs__search").forEach((form) => {
     on(form, "submit", (event) => {
       event.preventDefault();
       const query = form.querySelector(".work-search__input").value.trim();
-      go(query ? `/work?q=${encodeURIComponent(query)}` : "/work", { save: true });
+      const after = press(form) ? PRESS : 0;
+      go(query ? `/work?q=${encodeURIComponent(query)}` : "/work", { save: true, after });
     });
   });
   // Suggestions and "See all" (also the chips written later).
@@ -197,12 +305,14 @@ export function initWorkSearch() {
   clears.forEach((button) => on(button, "click", () => go("/work")));
   on(select, "change", () => {
     write(VIEW_KEY, view());
-    render();
+    swap(render, { top: false });
   });
-  on(window, "popstate", () => {
-    render();
-    showChips();
-  });
+  on(window, "popstate", () =>
+    swap(() => {
+      render();
+      showChips();
+    }),
+  );
 
   const saved = read(VIEW_KEY);
   if (saved === "list" || saved === "grid") select.value = saved;
@@ -211,6 +321,8 @@ export function initWorkSearch() {
 
   return () => {
     events.abort();
+    leaving?.kill();
+    entering?.kill();
     root.classList.remove("is-work-results", "is-results-ready");
   };
 }

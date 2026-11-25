@@ -468,3 +468,52 @@ Permintaan user, pilihan "Lebih tipis". Berlaku untuk kedua kolom search: hero d
 ### Kolom search: tanpa garis focus (25 Nov 2026)
 
 Permintaan user. Aturan `.work-search__field:has(.work-search__input:focus-visible)` (outline 2px hitam) dihapus. Kolom di hero dan di bar tab tidak lagi diberi garis saat aktif, baik diklik maupun lewat keyboard. Kursor teks yang berkedip menjadi penanda posisi ketik. Tombol search dan Clear search tetap punya garis focus.
+
+### Search: transisi saat menampilkan hasil (25 Nov 2026)
+
+Masukan user: menampilkan hasil pencarian terasa kasar. Penyebabnya, semua terjadi dalam satu frame:
+
+- isi halaman langsung ditukar,
+- halaman langsung melompat ke atas,
+- hasil tidak punya animasi masuk (aturan lama di rencana animasi).
+
+Sekarang (`src/js/work-search.js`, fungsi `swap()` dan `enter()`):
+
+- **Keluar:** isi yang sedang tampil memudar dalam 0,25 detik (`OUT`).
+- **Pindah:** saat tidak ada yang terlihat, alamat dan hasil diperbarui, lalu halaman dipindah ke atas. Lompatannya tidak tampak.
+- **Masuk ke hasil (Grid):** baris "Showing … / View mode" naik, lalu judul grup naik, lalu kartu di layar pertama terbuka dari bawah, baris demi baris (`ROW_GAP` 0,12 detik). Kartu di bawah layar pertama langsung berada di tempatnya.
+- **Masuk ke hasil (List):** baris-baris di layar pertama naik bergantian.
+- **Hasil kosong:** pesan kosong memudar sambil naik.
+- **Kembali ke halaman lengkap** (Clear search, Back): hero dan Selected Work memudar sambil naik 40 px.
+- **Kecepatan:** gerak masuk 1,4× lebih cepat dari animasi halaman (`PACE`), karena pengguna sedang menunggu hasil.
+- **Berlaku untuk:** cari dari hero dan dari bar tab, chip, See all, Clear search dan ✕, Back/Forward, serta pilihan Grid/List. Pilihan Grid/List tidak memindah halaman ke atas.
+- **Pencarian beruntun:** pencarian kedua di tengah transisi menggantikan yang pertama, tanpa bentrok.
+- **Reduced motion:** langsung tanpa animasi, seperti sebelumnya.
+
+Gerak teks naik dan kartu terbuka dipindah ke modul bersama `src/js/work-motion.js` (`rise`, `openCards`, `clearCards`, `rowsOf`). `work-intro.js` sekarang memakainya, dan gerakannya tidak berubah.
+
+**Uji di Chrome**, 1440 dan 390, motion menyala dan reduced motion:
+
+- Diuji: cari dari hero, List dan Grid, dua pencarian cepat, cari dari bar tab saat halaman sudah di-scroll, Back, dan Clear search.
+- Hasilnya:
+  - Hasil selalu tampil, posisi scroll selalu 0, dan tidak ada kartu yang tertinggal tertutup.
+  - Style animasi bersih setelah ±2 detik.
+  - Tidak ada error JS.
+- Cek animasi halaman (`final.mjs`, 19 ukuran): sama seperti sebelumnya. Yang tersisa hanya 4 baris judul hero dari SplitText yang sudah berada di posisi akhir.
+
+### Search: tombol tertekan saat Enter atau klik ikon (25 Nov 2026)
+
+Pilihan user: "Tombol ditekan + ikon bergerak". Saat form search dikirim (Enter atau klik ikon), `press()` di `work-search.js` menjalankan gerak ini:
+
+- Tombol search di kolom itu mengecil ke 0,86 dalam 0,12 detik (`PRESS`), lalu memantul kembali ke 1 (`back.out(3)`, 0,5 detik).
+- Ikon kaca pembesar bergeser 3 px ke kanan atas, lalu kembali bersama tombol.
+- Isi halaman baru mulai memudar setelah tombol tertekan (`swap(…, { after: PRESS })`), supaya tekanannya terlihat. Hasil tampil hanya 0,12 detik lebih lambat.
+- Di bar tab saat hasil tampil, tombol search diganti ✕, jadi tidak ada tombol yang ditekan dan transisi langsung jalan.
+- Dengan reduced motion, tombol tidak bergerak.
+
+Diuji di Chrome:
+
+- Enter di hero (1440 dan 390): skala 0,87–0,88, ikon bergeser (2,7, −2,7), isi mulai memudar setelah ±0,12 detik.
+- Klik ikon di bar tab (1440): skala terkecil 0,86.
+- Enter di bar tab saat hasil tampil: pencarian tetap jalan.
+- Style tombol bersih setelah gerakan selesai, dan tidak ada error JS.

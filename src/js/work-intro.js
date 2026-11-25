@@ -1,6 +1,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
+import { PART_RISE, rise, openCards, clearCards } from "./work-motion.js";
 
 gsap.registerPlugin(SplitText);
 
@@ -20,12 +21,8 @@ gsap.registerPlugin(SplitText);
 // (opened further down), it is in place at once. The bar and the sections
 // as they come up too (setUpBrowse). Nothing is played on a search
 // address, and a search started meanwhile puts all in place.
-const RISE = 200; // % of its height text rises from
-const PART_RISE = 100; // % for the field and the chips (taller than a line)
-const DESCENT = 25; // % of its height its window reaches below it (g, p, y)
 const LINE_GAP = 0.15; // s between the title's lines
 const PART_GAP = 0.07; // s between the other parts
-const TEXT_IN = 1.25; // s text takes to rise (as About)
 const TEXT_AT = 0.3; // s after the title starts, the intro rises
 const SEARCH_AT = 0.5; // s, the search block
 const COLLAGE_AT = 0.15; // s, the collage opens
@@ -33,22 +30,11 @@ const COLLAGE_IN = 1.8; // s the wheel takes to roll in
 const COLLAGE_TURN = 36; // ° it rolls in from (about 2 pictures, 15° apart)
 const COLLAGE_FADE = 0.9; // s the collage takes to fade in
 const WAIT = 1500; // ms at most for the collage's pictures before it plays
-const CARD_GAP = 0.08; // s between the cards, left to right (as Our Work)
-const CARD_IN = 1.1; // s a card picture takes to open (as Our Work)
-const CARD_SETTLE = 8; // % the picture rises from within its frame as it opens
 const SELECTED_AFTER = 0.6; // s after the hero starts, at the earliest
 const LINE_IN = 1.2; // s the bar's lines take to draw (as the Services lines)
 const START = "top 85%";
 
-// Up from below in a window of its own: a clip whose bottom edge comes up
-// as much as the element does, so no wrapper is needed. Fully shut at the
-// start also for a short rise (120% with the window's 20% above).
-const rise = (els, vars, from = RISE) =>
-  gsap.fromTo(
-    els,
-    { yPercent: from, clipPath: `inset(-20% -20% ${Math.max(from - DESCENT, 120)}% -20%)` },
-    { yPercent: 0, clipPath: `inset(-20% -20% ${-DESCENT}% -20%)`, duration: TEXT_IN, ease: "power3.out", ...vars },
-  );
+// rise(), openCards() and clearCards(): src/js/work-motion.js.
 
 export function initWorkIntro() {
   const hero = document.querySelector(".work-hero");
@@ -183,34 +169,6 @@ function createPlays(started) {
     },
   };
 }
-
-// Cards opening one after another, left to right (as Our Work on the
-// homepage): each picture opens from the bottom of its frame while it
-// settles up in it (translate, apart from the hover scale: transform), then
-// its title and line rise.
-function openCards(items) {
-  const pick = (selector) => items.map((item) => item.querySelector(selector)).filter(Boolean);
-  return gsap
-    .timeline({ paused: true })
-    .fromTo(
-      pick(".project-card__media"),
-      { clipPath: "inset(100% 0% 0% 0%)" },
-      { clipPath: "inset(0% 0% 0% 0%)", duration: CARD_IN, ease: "power2.inOut", stagger: CARD_GAP },
-      0,
-    )
-    .fromTo(
-      pick(".project-card__image"),
-      { translate: `0 ${CARD_SETTLE}%` },
-      { translate: "0 0%", duration: CARD_IN, ease: "power2.inOut", stagger: CARD_GAP },
-      0,
-    )
-    .add(rise(pick(".project-card__text"), { stagger: CARD_GAP }, PART_RISE), 0.45);
-}
-
-const clearCards = (scope) =>
-  gsap.set(scope.querySelectorAll(".project-card__media, .project-card__image, .project-card__text"), {
-    clearProps: "transform,clipPath,translate",
-  });
 
 const leftOf = (el) => el.getBoundingClientRect().left;
 
