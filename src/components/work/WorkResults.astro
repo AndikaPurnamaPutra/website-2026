@@ -6,7 +6,8 @@
 // /work?type=…, with the counts, and hides the rest of the page. Hidden
 // pictures are not loaded (lazy). The index the search reads is the JSON
 // below: per project, its words (title, categories, format, keywords, kind,
-// year).
+// year). Each kind shows 24 at a time, with "Load more" below them (in
+// the grid under its group, in the list after its rows).
 import ProjectCard from "./ProjectCard.astro";
 import ButtonText from "../ButtonText.astro";
 import { workPage } from "../../data/cms.js";
@@ -67,16 +68,21 @@ const SIZES = { caseStudy: "(max-width: 743px) 90vw, (max-width: 1023px) 45vw, 3
               </div>
             ))}
           </div>
+          <div class="work-results__more" data-results-more={kind} hidden>
+            <button class="button text-18" type="button"><ButtonText text="Load more" /></button>
+            <p class="work-results__more-count" data-more-count></p>
+          </div>
         </div>
       </section>
     ))}
   </div>
   <div class="container" data-results-list hidden>
     <ul class="work-list">
-      {ordered.map(({ project, i }) => {
+      {ordered.map(({ project, i }, n) => {
         const Tag = project.href ? "a" : "div";
         const link = project.href ? { href: project.href, target: "_blank", rel: "noopener" } : {};
         return (
+          <>
           <li class="work-list__item" data-result={i} data-kind={project.kind}>
             <Tag class="work-list__row" {...link}>
               <span class="work-list__thumb"><img src={`assets/images/${project.image}-800.webp`} width="140" height="78" alt="" loading="lazy" decoding="async" style={project.focus && `object-position: ${project.focus}`}></span>
@@ -85,6 +91,13 @@ const SIZES = { caseStudy: "(max-width: 743px) 90vw, (max-width: 1023px) 45vw, 3
               <span class="work-list__meta project-card__meta text-muted">{project.meta.map((word) => <span>{word}</span>)}</span>
             </Tag>
           </li>
+          {ordered[n + 1]?.project.kind !== project.kind && (
+            <li class="work-list__more work-results__more" data-results-more={project.kind} hidden>
+              <button class="button text-18" type="button"><ButtonText text="Load more" /></button>
+              <p class="work-results__more-count" data-more-count></p>
+            </li>
+          )}
+          </>
         );
       })}
     </ul>

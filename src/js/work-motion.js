@@ -24,30 +24,34 @@ export const rise = (els, vars, from = RISE) =>
 // Cards opening one after another, left to right (as Our Work on the
 // homepage): each picture opens from the bottom of its frame while it
 // settles up in it (translate, apart from the hover scale: transform), then
-// its title and line rise.
-export function openCards(items) {
+// its title and line rise. The ease can be one that starts at once
+// ("Load more": the answer to a click, user: it felt held back).
+export function openCards(items, { ease = "power2.inOut" } = {}) {
   const pick = (selector) => items.map((item) => item.querySelector(selector)).filter(Boolean);
   return gsap
     .timeline({ paused: true })
     .fromTo(
       pick(".project-card__media"),
       { clipPath: "inset(100% 0% 0% 0%)" },
-      { clipPath: "inset(0% 0% 0% 0%)", duration: CARD_IN, ease: "power2.inOut", stagger: CARD_GAP },
+      { clipPath: "inset(0% 0% 0% 0%)", duration: CARD_IN, ease, stagger: CARD_GAP },
       0,
     )
     .fromTo(
       pick(".project-card__image"),
       { translate: `0 ${CARD_SETTLE}%` },
-      { translate: "0 0%", duration: CARD_IN, ease: "power2.inOut", stagger: CARD_GAP },
+      { translate: "0 0%", duration: CARD_IN, ease, stagger: CARD_GAP },
       0,
     )
     .add(rise(pick(".project-card__text"), { stagger: CARD_GAP }, PART_RISE), 0.45);
 }
 
+// Only the cards that moved (an element or a list of them): with hundreds
+// of results, clearing them all held the page up (~0.2s) when it ended.
 export const clearCards = (scope) =>
-  gsap.set(scope.querySelectorAll(".project-card__media, .project-card__image, .project-card__text"), {
-    clearProps: "transform,clipPath,translate",
-  });
+  gsap.set(
+    [scope].flat().flatMap((el) => [...el.querySelectorAll(".project-card__media, .project-card__image, .project-card__text")]),
+    { clearProps: "transform,clipPath,translate" },
+  );
 
 // Items in rows (the same top, give or take), each row left to right.
 export function rowsOf(items) {

@@ -26,6 +26,12 @@ import { PART_RISE, rise, openCards, clearCards, rowsOf } from "./work-motion.js
 // reduced motion, a cut as before. Enter or the search icon first presses
 // the field's search button (user's pick): it goes down and springs back,
 // its magnifier nudging up and to the right and back.
+//
+// Each kind shows PAGE results at first; "Load more" below them (in the
+// grid under the group, in the list after its rows) adds PAGE more, which
+// open as the cards do (the list's rows rise) without the page moving
+// (user, 25 Nov 2026: a catalogue of hundreds). The count is kept while the
+// address stays (Grid ↔ List), and starts again for a new search.
 const RECENT_KEY = "oww-work-recent";
 const VIEW_KEY = "oww-work-view";
 const RECENT_MAX = 4;
@@ -33,6 +39,7 @@ const OUT = 0.25; // s what shows takes to fade out
 const PACE = 1.4; // the entrance, quicker than the page's (one waits on it)
 const ROW_GAP = 0.12; // s between rows of cards (at the page's pace)
 const PRESS = 0.12; // s the search button goes down; what shows fades after it
+const PAGE = 24; // results of a kind shown at first and added by "Load more" (3 and 4 columns)
 
 const words = (text) =>
   text
@@ -68,6 +75,7 @@ export function initWorkSearch() {
   const cards = [...results.querySelectorAll("[data-results-grid] [data-result]")];
   const rows = [...results.querySelectorAll("[data-results-list] [data-result]")];
   const groups = [...results.querySelectorAll("[data-results-group]")];
+  const mores = [...results.querySelectorAll("[data-results-more]")];
   const gridView = results.querySelector("[data-results-grid]");
   const listView = results.querySelector("[data-results-list]");
   const empty = results.querySelector("[data-results-empty]");
@@ -166,6 +174,31 @@ export function initWorkSearch() {
     });
   };
 
+  // The results found, PAGE (or more, after "Load more") of each kind.
+  let shown = { found: new Set(), counts: {} };
+  let limit = {};
+  let limitFor = null;
+  const limitOf = (kind) => limit[kind] ?? PAGE;
+  const showLimited = () => {
+    const { found, counts } = shown;
+    [cards, rows].forEach((items) => {
+      const seen = {};
+      items.forEach((item) => {
+        const i = +item.dataset.result;
+        const kind = index[i].kind;
+        if (!found.has(i)) return (item.hidden = true);
+        seen[kind] = (seen[kind] ?? 0) + 1;
+        item.hidden = seen[kind] > limitOf(kind);
+      });
+    });
+    mores.forEach((more) => {
+      const kind = more.dataset.resultsMore;
+      const all = counts[kind] ?? 0;
+      more.hidden = all <= limitOf(kind);
+      more.querySelector("[data-more-count]").textContent = `${Math.min(limitOf(kind), all)} of ${all}`;
+    });
+  };
+
   const render = () => {
     const params = new URLSearchParams(location.search);
     const query = (params.get("q") ?? "").trim();
@@ -190,14 +223,17 @@ export function initWorkSearch() {
     const counts = Object.fromEntries(Object.keys(kindTitle).map((kind) => [kind, 0]));
     found.forEach((i) => counts[index[i].kind]++);
 
-    cards.forEach((card) => (card.hidden = !found.has(+card.dataset.result)));
+    if (limitFor !== location.search) {
+      limitFor = location.search;
+      limit = {};
+    }
+    shown = { found, counts };
+    showLimited();
     groups.forEach((group) => (group.hidden = counts[group.dataset.resultsGroup] === 0));
     const firstRow = {};
     rows.forEach((row) => {
-      const shown = found.has(+row.dataset.result);
-      row.hidden = !shown;
       row.removeAttribute("id");
-      if (shown && !firstRow[row.dataset.kind]) firstRow[row.dataset.kind] = row;
+      if (!row.hidden && !firstRow[row.dataset.kind]) firstRow[row.dataset.kind] = row;
     });
     Object.entries(firstRow).forEach(([kind, row]) => {
       const id = Object.keys(groupKind).find((key) => groupKind[key] === kind);
@@ -229,9 +265,10 @@ export function initWorkSearch() {
   const inView = (el) => el.getBoundingClientRect().top < window.innerHeight;
   const enter = () => {
     const moved = [];
+    const opened = [];
     const tl = gsap.timeline({
       onComplete: () => {
-        clearCards(results);
+        clearCards(opened);
         gsap.set(moved, { clearProps: "transform,clipPath,opacity,visibility" });
         entering = null;
       },
@@ -256,6 +293,7 @@ export function initWorkSearch() {
         moved.push(...titles);
         if (titles.length) tl.add(rise(titles, { stagger: 0.1 }), 0.1);
         rowsOf(cards.filter((card) => !card.hidden && inView(card))).forEach(({ items }, i) => {
+          opened.push(...items);
           tl.add(openCards(items).paused(false), 0.2 + i * ROW_GAP);
         });
       }
@@ -306,19 +344,22 @@ export function initWorkSearch() {
 
   // The search button pressed (see the top of this file); false if there is
   // none to press (the bar's, while results show, gives way to ✕).
-  const press = (form) => {
-    const button = form.querySelector('.work-search__submit[type="submit"]:not([hidden])');
+  // A white button pressed: down and back with a spring; the magnifier
+  // also nudges up and right (the ✕ only goes down, user: as the search).
+  const pressButton = (button, { nudge = false } = {}) => {
     if (still || !button) return false;
     const icon = button.querySelector("img");
     gsap.killTweensOf([button, icon]);
-    gsap
+    const tl = gsap
       .timeline({ onComplete: () => gsap.set([button, icon], { clearProps: "transform" }) })
       .to(button, { scale: 0.86, duration: PRESS, ease: "power2.out" }, 0)
-      .to(icon, { x: 3, y: -3, duration: PRESS, ease: "power2.out" }, 0)
-      .to(button, { scale: 1, duration: 0.5, ease: "back.out(3)" }, PRESS)
-      .to(icon, { x: 0, y: 0, duration: 0.5, ease: "back.out(3)" }, PRESS);
+      .to(button, { scale: 1, duration: 0.5, ease: "back.out(3)" }, PRESS);
+    if (nudge) {
+      tl.to(icon, { x: 3, y: -3, duration: PRESS, ease: "power2.out" }, 0).to(icon, { x: 0, y: 0, duration: 0.5, ease: "back.out(3)" }, PRESS);
+    }
     return true;
   };
+  const press = (form) => pressButton(form.querySelector('.work-search__submit[type="submit"]:not([hidden])'), { nudge: true });
 
   document.querySelectorAll(".work-search__form, .work-tabs__search").forEach((form) => {
     on(form, "submit", (event) => {
@@ -335,7 +376,35 @@ export function initWorkSearch() {
     event.preventDefault();
     go(link.href, { save: link.classList.contains("work-search__chip") });
   });
-  clears.forEach((button) => on(button, "click", () => go("/work")));
+  clears.forEach((button) =>
+    on(button, "click", () => {
+      // The ✕ (a white button) presses as the search does; "Clear search" (text) does not.
+      const after = button.classList.contains("work-search__submit") && pressButton(button) ? PRESS : 0;
+      go("/work", { after });
+    }),
+  );
+  // "Load more": PAGE more of its kind, in place; the first new one takes
+  // the focus (keyboard: on to them, not back through the old ones).
+  on(results, "click", (event) => {
+    const button = event.target.closest("[data-results-more] button");
+    if (!button) return;
+    const kind = button.closest("[data-results-more]").dataset.resultsMore;
+    const items = listView.hidden ? cards : rows;
+    const before = new Set(items.filter((item) => !item.hidden));
+    limit[kind] = limitOf(kind) + PAGE;
+    showLimited();
+    const fresh = items.filter((item) => !item.hidden && !before.has(item));
+    fresh[0]?.querySelector("a")?.focus({ preventScroll: true });
+    if (still || !fresh.length) return;
+    const near = fresh.filter(inView);
+    if (!listView.hidden) {
+      rise(near, { stagger: 0.05, onComplete: () => gsap.set(near, { clearProps: "transform,clipPath" }) }, PART_RISE).timeScale(PACE);
+      return;
+    }
+    const tl = gsap.timeline({ onComplete: () => clearCards(near) });
+    rowsOf(near).forEach(({ items: row }, i) => tl.add(openCards(row, { ease: "power3.out" }).paused(false), i * ROW_GAP));
+    tl.timeScale(PACE);
+  });
   const chooseView = (index) => {
     const value = viewOptions[index].dataset.value;
     closeView(true);

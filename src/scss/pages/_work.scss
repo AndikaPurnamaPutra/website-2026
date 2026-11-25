@@ -201,6 +201,16 @@
   img {
     width: fs(24);
     height: fs(24);
+    transition: rotate 0.45s cubic-bezier(0.33, 1, 0.68, 1);
+  }
+
+  // Pointed at (user, 25 Nov 2026): both stay white (as the search, user:
+  // the same); only the ✕ turns a quarter. Pressed: both go down and spring
+  // back (src/js/work-search.js).
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    &[data-search-clear]:hover img {
+      rotate: 90deg;
+    }
   }
 }
 
@@ -376,10 +386,39 @@ a.project-card__body:hover .project-card__image {
 
   &::before {
     content: "";
-    width: fs(8);
-    height: fs(8);
+    // 6, not Figma's 8 (user, 25 Nov 2026: smaller, with the pulse round it).
+    width: fs(6);
+    height: fs(6);
     border-radius: 50%;
     background: #31e45e;
+  }
+
+  // A live signal (user, 25 Nov 2026: "bling"): the dot sends out a green
+  // ring that fades as it grows, and dims a little between, every 2s.
+  @media (prefers-reduced-motion: no-preference) {
+    &::before {
+      animation: live-pulse 2s ease-out infinite;
+    }
+  }
+}
+
+@keyframes live-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(49, 228, 94, 0.7);
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+
+  70% {
+    box-shadow: 0 0 0 fs(6) rgba(49, 228, 94, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(49, 228, 94, 0);
+    opacity: 1;
   }
 }
 
@@ -757,10 +796,11 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  gap: fs(8);
+  gap: fs(6);
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: fs-text(20);
+  // 16, not Figma's 20 (user, 25 Nov 2026: too big); 14 on phones.
+  font-size: fs-text(16);
   line-height: 1.7;
   letter-spacing: -0.02em;
 
@@ -770,8 +810,8 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
   }
 
   img {
-    width: fs(18);
-    height: fs(18);
+    width: fs(14);
+    height: fs(14);
     transition: transform 0.3s cubic-bezier(0.33, 1, 0.68, 1);
   }
 
@@ -888,7 +928,7 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
   }
 
   .work-see-all {
-    font-size: fs-text(16);
+    font-size: fs-text(14);
   }
 }
 
@@ -1128,6 +1168,35 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
   grid-template-columns: repeat(4, 1fr);
 }
 
+// "Load more" (user, 25 Nov 2026): the site's button, centred under the
+// group's cards (in the list, after the kind's rows), and how many of all
+// show under it.
+.work-results__more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: fs(12);
+  margin-top: fluid(60);
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.work-list__more {
+  padding-block: fluid(40);
+  margin-top: 0;
+}
+
+.work-results__more-count {
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: fs-text(14);
+  line-height: 1.6;
+  letter-spacing: -0.02em;
+}
+
 .work-results__cards--live .project-card__image {
   object-position: 50% 0;
 }
@@ -1138,6 +1207,9 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
 // pushing the title to 170.
 .work-list {
   margin-top: fluid(60);
+  // 120 under the last row before the footer, as the grid's groups
+  // (.work-section) end (user, 25 Nov 2026: it had none).
+  padding-bottom: fluid(120);
   border-top: 1px solid transparent;
 }
 

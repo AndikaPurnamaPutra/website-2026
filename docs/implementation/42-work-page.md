@@ -536,3 +536,120 @@ Pilihan user: "Dropdown custom". Sebelumnya View mode memakai `<select>` bawaan,
 - Reduced motion: tanpa transisi panel.
 
 Diuji di Chrome (1440, 834, 390, 320): panel tampil di atas kartu dan tidak keluar layar. Klik dan keyboard berfungsi, Esc dan klik di luar menutup panel, pilihan bertahan setelah reload. `swap.mjs` (motion on/off) lolos tanpa error JS.
+
+### Search: hover tombol search dan ✕ (25 Nov 2026)
+
+Sebelumnya tombol search (kaca pembesar) dan ✕ tidak berubah saat diarahkan.
+
+- Percobaan 1: tombol naik 2 px, ikon search miring, ✕ berputar. User: "terlalu aneh".
+- Percobaan 2: tombol jadi hitam dengan ikon putih. User: "terlalu aneh".
+- Akhir (pilihan user: abu-abu tipis, dan ✕ lebih baik seperti sebelumnya):
+  - Latar tombol berubah dari putih ke abu muda (`--color-surface-soft`, #eee) dalam 0,3 detik. Sedikit lebih gelap dari kolom (#f3f3f3), supaya tombol tidak menyatu dengannya.
+  - ✕ berputar 90° (0,45 detik). Kaca pembesar diam.
+  - Lalu (user: abu-abu di ikon search aneh, lebih baik tidak ada): tombol search tidak berubah sama sekali saat diarahkan. Abu-abu dan putaran hanya untuk ✕.
+  - Reduced motion: ✕ tidak berputar, hanya warnanya yang berubah.
+
+Diuji di Chrome 1440 (hero dan bar tab): warna dan putaran benar, klik search tetap jalan, tanpa error JS.
+
+### Search: ruang di bawah mode List (25 Nov 2026)
+
+User: mode List terasa aneh karena tidak ada ruang di bawahnya. Penyebabnya, grup Grid adalah `.work-section` (120 di bawah), sedangkan daftar List tidak punya padding. `.work-list` sekarang punya `padding-bottom: fluid(120)`.
+
+Diuji di Chrome (1440, 834, 390): jarak baris terakhir ke akhir hasil 120, sama dengan Grid.
+
+### Badge "Live": titik hijau berdenyut (25 Nov 2026)
+
+User: badge `project-card__badge--light` lebih baik "bling". Titik hijaunya (`::before`) sekarang berdenyut seperti tanda siaran langsung (`@keyframes live-pulse`, 2 detik, berulang):
+
+- Cincin hijau keluar dari titik, membesar sampai 6, lalu hilang.
+- Titiknya sedikit meredup (0,6) di tengah, lalu terang lagi.
+- Dengan reduced motion: titik diam.
+- Titiknya diperkecil dari 8 (Figma) ke 6 (user: dot solidnya lebih kecil).
+
+Berlaku di semua kartu Live Sites (section halaman dan hasil search). Diuji di Chrome 1440: animasi jalan, tanpa error JS.
+
+### Tes banyak project: `WORK_STRESS` (25 Nov 2026)
+
+User ingin melihat halaman Work dengan 100, 200, atau lebih project. `src/data/cms.js` sekarang membaca `WORK_STRESS`:
+
+- `WORK_STRESS=200 npm run dev` (atau `build`) menyalin project yang ada sampai setiap jenis punya 200.
+- Judul salinan diberi nomor.
+- Project asli tetap di depan dengan urutannya. Salinan tidak masuk Selected Work.
+- Tanpa variabel itu, tidak ada yang berubah. Sanity dan data asli juga tidak tersentuh.
+
+Hasil ukur di Chrome (200 per jenis = 600 project, Mac tanpa CPU throttle):
+
+| | 1440 | 390 |
+|---|---|---|
+| HTML `work.html` | 1 MB | 1 MB |
+| Elemen di halaman | ±13.300 | ±13.300 |
+| Gambar dimuat saat buka | 28 (1,6 MB) | 15 (0,9 MB) |
+| Search "branding" (194 hasil), sampai tampil | 0,43 detik | 0,56 detik |
+| Ganti ke List (194 baris), long task | 0,24 detik | 0,83 detik |
+| Scroll daftar / grid | 60 fps | 60 fps |
+
+Gambar tetap lazy, jadi yang dimuat hanya yang terlihat. Yang terasa berat adalah saat banyak hasil tampil sekaligus (terutama List di HP). Di HP sungguhan bisa 3–4× lebih lama.
+
+### Search: "Load more" di hasil (25 Nov 2026)
+
+Dari tes `WORK_STRESS`, ratusan hasil yang tampil sekaligus terasa berat, terutama mode List di HP. User setuju menambahkan "Load more" di hasil search dan "See all". Section di halaman Work tidak diubah karena sudah dibatasi 9 atau 12 kartu.
+
+- Setiap jenis menampilkan 24 hasil dulu (`PAGE`, habis dibagi 3 dan 4 kolom).
+  - Grid: tombol "Load more" ada di bawah kartu grupnya.
+  - List: tombol ada setelah baris jenis itu.
+  - Tombolnya memakai gaya tombol situs (`button text-18`, seperti "More Work"). Di bawahnya ada teks "24 of 160".
+- Klik menambah 24 lagi di tempat, tanpa halaman bergeser.
+  - Kartu baru terbuka seperti kartu lain (`openCards` per baris). Baris List naik (`rise`).
+  - Kalau kartu punya link, fokus pindah ke kartu baru pertama.
+  - Tombol hilang saat semua sudah tampil.
+- Jumlah yang sudah dibuka tetap saat ganti Grid ↔ List. Search baru mulai lagi dari 24.
+- Dengan data sekarang (maksimal 18 per jenis), tombol tidak pernah muncul. Tombol baru terlihat kalau satu jenis punya lebih dari 24 hasil.
+
+Diuji di Chrome (1440 dan 390, `WORK_STRESS=200`, search "branding" = 194 hasil):
+
+- Mulai: 58 kartu, "24 of 160". Setelah Load more: 82 kartu, "48 of 160", scroll tidak bergeser.
+- List: 82 baris. Setelah Load more: 106 baris.
+- Search baru ("app"): kembali ke 24 per jenis.
+- Style animasi bersih dan tidak ada error JS.
+
+#### Load more terasa tertahan (25 Nov 2026)
+
+User: setiap klik Load more terasa tertahan atau lag. Hasil ukur dengan 600 project:
+
+- **Penyebab 1:** saat animasi selesai, `clearCards(results)` membersihkan style di semua kartu hasil (600 × 3 elemen). Satu frame tertahan ±170–180 ms tepat di akhir. Hal yang sama terjadi setelah setiap search.
+- **Penyebab 2:** kartu baru dibuka dengan `power2.inOut`, yang mulainya pelan. Sesaat setelah klik seolah tidak terjadi apa-apa.
+
+Perbaikan:
+
+- `clearCards` (`work-motion.js`) sekarang menerima satu elemen atau daftar elemen. Search dan Load more hanya membersihkan kartu yang benar-benar bergerak.
+- `openCards(items, { ease })`: Load more memakai `power3.out`, jadi kartu langsung bergerak saat diklik. Masuknya halaman dan search tetap `power2.inOut`.
+
+Hasil (1440, Grid dan List): tidak ada frame di atas 17 ms dan tidak ada long task. Search "branding" dengan 600 project: hanya satu frame 50 ms (sebelumnya ada ±180 ms di akhir). `swap.mjs` dan `more.mjs` lolos tanpa error.
+
+### "See all" satu tingkat lebih kecil (25 Nov 2026)
+
+User: ukuran "See all" terlalu besar. Ukurannya sekarang:
+
+- Desktop dan tablet: 16 (sebelumnya 20, sesuai Figma).
+- HP: 14 (sebelumnya 16).
+- Panah: 14 (sebelumnya 18). Jarak teks ke panah: 6 (sebelumnya 8).
+
+Diuji di Chrome 1440 dan 390.
+
+### Tombol search dan ✕ dibuat seragam (25 Nov 2026)
+
+User bertanya kenapa ✕ tidak seperti tombol search, dan setuju dibuat seragam:
+
+- Hover: kedua tombol tetap putih (abu-abu di ✕ dihapus). Hanya ✕ yang berputar 90°.
+- Klik: ✕ juga tertekan seperti tombol search. `pressButton(button, { nudge })` di `work-search.js` dipakai bersama.
+  - Tombol search: tertekan, dan kaca pembesar bergeser.
+  - ✕: hanya tertekan.
+  - Halaman kembali ke `/work` setelah `PRESS` (0,12 detik).
+- Teks "Clear search" tidak tertekan.
+
+Diuji di Chrome 1440:
+
+- Hover ✕: latar putih dan ikon berputar 90°.
+- Klik ✕: skala terkecil 0,86, lalu kembali ke `/work`.
+- Hover search: putih.
+- "Clear search" tetap berfungsi, dan tidak ada error JS.
