@@ -10,15 +10,20 @@
   // frames (below).
   --px: clamp(calc(1024px / 1440), calc(100vw / 1440), calc(2560px / 1440));
 
-  // One Figma pixel for type (and sizes that wrap text): the same as --px
-  // at every width (user decision, 25 Nov 2026: type in proportion on every
-  // screen, so lines break as in Figma), but rem-based so the visitor's
-  // browser font size is respected: 0.0625rem + (100vw - 1440px) / 1440
-  // (= 100vw / 1440 at 16px). Text never goes under 12px (fs-text()); and
-  // the scale stops at 12/14 (1024–1234 wide), where the body's 14 reaches
-  // 12: further down the text would stop at 12 while its box (fs()) went on
-  // shrinking, and lines would break where Figma's do not.
-  --type-px: clamp(calc(0.0625rem * 12 / 14), calc(0.0625rem + (100vw - 1440px) / 1440), calc(0.0625rem * 2560 / 1440));
+  // One Figma pixel for type (and sizes that wrap text), rem-based so the
+  // visitor's browser font size is respected (0.0625rem = 1px at 16px).
+  // Below the frame (1440) it shrinks with the layout, so lines break as in
+  // Figma (25 Nov 2026); above it, it grows at a quarter of the layout's
+  // rate (1.19x at 2560; user: in step all the way up read too large).
+  // Text never goes under 12px (fs-text()); and the scale stops at 12/14
+  // (1024–1234 wide), where the body's 14 reaches 12: further down the text
+  // would stop at 12 while its box (fs()) went on shrinking, and lines would
+  // break where Figma's do not.
+  --type-px: clamp(
+    calc(0.0625rem * 12 / 14),
+    min(calc(0.0625rem + (100vw - 1440px) / 1440), calc(0.0625rem + (100vw - 1440px) / 5760)),
+    calc(0.0625rem + 1120px / 5760)
+  );
 
   // Colors
   --color-ink: #111111;
@@ -95,7 +100,8 @@
   :root {
     --site-px-small: calc(100vw / 834);
     --px: calc(100vw / 834);
-    --site-type-px-small: calc(0.0625rem + (100vw - 834px) / 834);
+    // In step below the 834 frame, a quarter of the layout's rate above it.
+    --site-type-px-small: min(calc(0.0625rem + (100vw - 834px) / 834), calc(0.0625rem + (100vw - 834px) / 3336));
     --type-px: var(--site-type-px-small);
     --page-gutter: #{fluid(32)};
   }
@@ -108,7 +114,11 @@
     --site-px-small: clamp(calc(320px / 390), calc(100vw / 390), calc(480px / 390));
     --px: clamp(calc(320px / 390), calc(100vw / 390), calc(480px / 390));
     // Stops at 12/14 as on the desktop (320–334 wide).
-    --site-type-px-small: clamp(calc(0.0625rem * 12 / 14), calc(0.0625rem + (100vw - 390px) / 390), calc(0.0625rem * 480 / 390));
+    --site-type-px-small: clamp(
+      calc(0.0625rem * 12 / 14),
+      min(calc(0.0625rem + (100vw - 390px) / 390), calc(0.0625rem + (100vw - 390px) / 1560)),
+      calc(0.0625rem + 90px / 1560)
+    );
     --type-px: var(--site-type-px-small);
     --page-gutter: #{fluid(20)};
   }

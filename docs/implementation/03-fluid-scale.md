@@ -149,3 +149,19 @@ Rasio font terhadap layout 1,00 di semua lebar, kecuali di dua rentang batas baw
   - Judul kartu di carousel terpotong oleh carousel itu sendiri.
 - **Sengaja dibiarkan:** di tablet 1023, panel Services dibatasi 770px (keputusan user sebelumnya: tidak terlalu lebar). Font di dalamnya sekarang membesar, jadi teks kartu bisa jadi 2 baris.
 - **Tidak diubah:** teks di ilustrasi About (papan "Task Manager", "Designing Spaces"). Teks itu bagian dari gambar dan diskalakan bersama ilustrasinya.
+
+### Revisi 25 Nov 2026: membesar lebih lambat di atas frame
+
+Masukan user: versi yang sebanding penuh terasa terlalu besar. Jalan tengah yang dipakai:
+
+- **Di bawah frame** (HP 390, tablet 834, desktop 1440), font tetap mengecil sebanding dengan layout. Batas bawahnya 12/14, seperti sebelumnya.
+- **Di atas frame**, font membesar dengan **seperempat laju layout**: `min(skala sebanding, 0.0625rem + (100vw - frame) / (frame × 4))`.
+
+| Lebar | 430 | 480–743 | 1023 | 1680 | 1920 | 2560 |
+|---|---|---|---|---|---|---|
+| Teks intro (Figma 14), px | 14,4 | 14,8 | 14,8 | 14,6 | 15,2 | 16,7 |
+| Sebanding penuh, px | 15,4 | 17,2 | 17,2 | 16,3 | 18,7 | 24,9 |
+
+Di desktop hasilnya hampir sama dengan skala lama (2560 = 1,19×, lama 1,2×). Bedanya, di bawah 1440 font sekarang ikut mengecil.
+
+Hasil `check.mjs` (190 kombinasi): 0 masalah.
