@@ -170,7 +170,8 @@
   background: none;
   color: var(--color-ink);
   font-family: var(--font-body);
-  font-weight: 500;
+  // One step lighter than Figma's Medium (user, 25 Nov 2026).
+  font-weight: 400;
   font-size: fs-text(14);
   line-height: 1.6;
   letter-spacing: -0.02em;
@@ -910,9 +911,10 @@ body:has(.site-header.is-hidden):not(:has(.site-header :focus-visible, .site-nav
   display: block;
 }
 
-// A typed word reads bold (Figma 2361:2902).
+// A typed word reads heavier (Figma 2361:2902: SemiBold; one step lighter,
+// user, 25 Nov 2026).
 .work-search__input:not(:placeholder-shown) {
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .work-search__clear-text {

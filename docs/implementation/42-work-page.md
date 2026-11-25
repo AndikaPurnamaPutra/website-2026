@@ -456,3 +456,11 @@ Pilihan user: "Berhenti rapi di kartu". Drag tetap bebas dan meluncur seperti bi
     - panah kanan → 1.
   - 390 dengan sentuhan: drag 80 px → 1, flick → 1.
   - Semuanya mendarat tepat di kartu (selisih 0 px), dan tidak ada error JS.
+
+### Kolom search: satu tingkat lebih tipis (25 Nov 2026)
+
+Permintaan user, pilihan "Lebih tipis". Berlaku untuk kedua kolom search: hero dan bar tab (`.work-search__input`).
+
+- Placeholder dan kolom kosong: 500 (Medium) → **400 (Regular)**.
+- Teks yang diketik: 600 (SemiBold) → **500 (Medium)**.
+- Kedua font sudah dimuat situs. Dicek di Chrome: 400 dan 500.
