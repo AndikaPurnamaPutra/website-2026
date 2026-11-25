@@ -76,11 +76,12 @@
 // of a wheel 714 from its centre, which is 1090 from the window's left and
 // 346 from its top, i.e. off the page; each card lies along the radius, so
 // above the middle they lean one way and below it the other (Figma: 0°,
-// ±15°, ±31°). The wheel turns slowly: the cards climb the arc. The window
+// ±15°, ±31°). The cards climb the arc a place at a time. The window
 // fades its top and bottom as Figma's white gradients (149 and 157 high).
-// The wheel turns by one round of the pictures (--loop cards of --count) and
-// starts again, where every card has the next one's picture: a seamless
-// loop, and the higher-over-lower order (WorkHero.astro) holds. 5s a card.
+// Each card moves on its own (src/js/work-collage.js), one round of the
+// pictures (--loop places) and again, where every card shows the picture of
+// the one it reached: a seamless loop, and the higher-over-lower order
+// (WorkHero.astro) holds.
 .work-collage {
   position: absolute;
   top: fluid(-104);
@@ -99,7 +100,6 @@
   // The entrance's extra turn (src/js/work-intro.js), on its own property so
   // it adds to the turning below.
   rotate: var(--work-wheel-in, 0deg);
-  animation: work-wheel calc(var(--loop) * 5s) linear infinite;
 }
 
 .work-collage__arm {
@@ -108,6 +108,8 @@
   left: 0;
   // Top to bottom in the order of the pictures.
   transform: rotate(calc(var(--i) * -360deg / var(--count)));
+  // Its move along the rim (src/js/work-collage.js), adding to its place.
+  rotate: var(--turn, 0deg);
 }
 
 .work-collage__card {
@@ -119,18 +121,6 @@
   height: fluid(220.4);
   border-radius: fluid(8.686);
   object-fit: cover;
-}
-
-@keyframes work-wheel {
-  to {
-    transform: rotate(calc(var(--loop) * 360deg / var(--count)));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .work-collage__wheel {
-    animation: none;
-  }
 }
 
 // Search box (Figma 2343:1131).

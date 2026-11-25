@@ -9,7 +9,7 @@ gsap.registerPlugin(SplitText);
 // about-intro.js): on load the title's lines rise in their windows, then the
 // intro's lines, the search title, the field and the suggestions part by
 // part; alongside, the collage fades in as its wheel rolls in along its
-// arc and slows into its usual turn (CSS). Hidden by the CSS until it is
+// arc and slows to rest (then work-collage.js moves it). Hidden by the CSS until it is
 // set up (_work.scss: is-work-ready). Not on a search address (the hero is
 // hidden there; work-search.js) and nothing moves with reduced motion.
 // Selected Work, as it comes up the screen, once (as Our Work on the
@@ -100,9 +100,9 @@ function setUp(hero, ready) {
   if (collageShown) {
     // Rolls in (user's pick; opened by a straight edge from the bottom it
     // fought the turning, odd): it fades in while the wheel turns ahead,
-    // the way it always turns, quickly, slowing into its own slow turn. On
-    // the wheel's `rotate` (--work-wheel-in, _work.scss), apart from its
-    // turning (transform, CSS).
+    // the way it always turns, quickly, slowing to rest. On the wheel's
+    // `rotate` (--work-wheel-in, _work.scss), apart from the cards' own
+    // moves (work-collage.js).
     const wheel = collage.querySelector(".work-collage__wheel");
     tl.fromTo(collage, { opacity: 0 }, { opacity: 1, duration: COLLAGE_FADE, ease: "power1.out" }, COLLAGE_AT).fromTo(
       wheel,

@@ -410,3 +410,29 @@ per baris). 4. Cek akhir. Hasil cari: tanpa animasi masuk.
 - Animasi halaman Work selesai. Sisa (bukan animasi): alamat 9 project Live
   (Studio), gambar asli BREX dan REX, halaman project ("Read the case
   study" + klik kartu), Deploy Hook ke `main` saat merge.
+
+### Collage: kartu bergerak satu per satu (25 Nov 2026)
+
+Gerakan collage diadaptasi dari video hero outstandingbranding.co. Gambar, posisi, dan animasi masuk tetap sama. Yang berubah hanya cara roda berputar:
+
+- Sebelumnya roda berputar terus dengan kecepatan rata (CSS).
+- Sekarang setiap kartu bergeser satu tempat (15°) dengan kurva `expo.inOut` selama 2,3 detik. Kurva ini sangat pelan di awal dan di akhir, jadi gerakan yang terlihat ±1,8 detik dan sisanya terasa diam. Jeda antar gerakan hanya 0,1 detik.
+- Kurva dan durasi dipilih dengan mencocokkan profil kecepatan ke referensi. Ukurannya adalah lebar profil di 2% dan 10% kecepatan puncak.
+  - Diukur dari screencast Chrome, tiga gerakan: 1,55–1,96 / 1,20–1,22 detik. Referensi 1,80 / 1,20.
+  - Diam antar gerakan ±0,75–0,9 detik. Referensi bergantian 1,2 dan 0,3 detik.
+  - Sebelumnya `power3.inOut` 1,6 detik: 1,46 / 1,17 detik. Mulai dan berhentinya terlalu cepat.
+- Gerakan pertama menunggu 1,5 detik setelah halaman siap (`is-work-ready`), supaya tidak bertabrakan dengan animasi masuk collage.
+- Geserannya bergiliran: kartu paling atas bergerak duluan, lalu kartu di bawahnya menyusul setiap 0,05 detik. Karena itu kartu sempat merapat dan merenggang, seperti di referensi.
+- Angka-angka ini diukur dari video referensi frame demi frame (perubahan piksel per frame):
+  - satu gerakan ±1,8 detik dari kartu pertama sampai terakhir,
+  - kartu depan ±0,25 detik lebih dulu dari kartu terakhir yang terlihat,
+  - diam ±1,2 detik.
+- Referensi bergerak bolak-balik. Di sini arahnya tetap maju, supaya roda terus berputar.
+
+Cara kerjanya (`src/js/work-collage.js`, GSAP):
+
+- Setiap `.work-collage__arm` diputar lewat `rotate: var(--turn)` (`_work.scss`). Ini terpisah dari letaknya dan dari putaran masuk (`--work-wheel-in`).
+- Satu putaran timeline = satu putaran gambar (`--loop` tempat), lalu ulang dari 0 tanpa sambungan.
+- Timeline jeda saat collage tidak terlihat (di bawah layout laptop atau di luar layar). Dengan reduced motion, collage diam.
+- Angka bisa disetel di bagian atas file: `REST`, `GLIDE`, `GAP`, `EASE`, `AFTER_READY`.
+
