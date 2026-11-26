@@ -565,3 +565,10 @@ form Contact.
    Services → Our Work → Trusted.
 5. Webhook Sanity → Deploy Hook Vercel.
 6. Nanti bila perlu: halaman detail project dan halaman "More Work".
+
+### Deploy Hook ke branch dev (26 Nov 2026)
+
+`cms/sanity` sudah digabung ke `dev` (fast-forward, 38 commit). Mulai sekarang pekerjaan dilakukan di `dev`.
+
+- User membuat Deploy Hook Vercel baru, `sanity-dev` (branch `dev`), lalu mengganti URL webhook Sanity "Vercel deploy" ke hook itu. Publish di Studio sekarang membangun ulang preview `dev`, bukan `cms/sanity` lagi.
+- **Saat merge ke `main`:** buat hook untuk `main` dan ganti lagi URL webhook-nya.
