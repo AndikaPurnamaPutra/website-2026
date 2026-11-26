@@ -32,6 +32,10 @@ import dribbble from "../icons/dribbble.svg?raw";
     </div>
     <div class="hero__showreel">
       <video class="hero__showreel-image" poster="assets/images/hero/showreel-poster.webp" muted loop playsinline preload="metadata" aria-label="Showreel preview" data-inview-video>
+        {/* Phones show the middle of the frame (a 4:5 crop, object-fit: cover):
+            their own file is that middle at full size, 1.10 MB instead of
+            1.75 (26 Nov 2026). */}
+        <source src="assets/images/hero/showreel-preview-phone.mp4" type="video/mp4" media="(max-width: 743.98px)">
         <source src="assets/images/hero/showreel-preview.mp4" type="video/mp4">
       </video>
       <button class="hero__showreel-button glass-button" type="button"><span class="text-14 text-medium">Play Showreel</span><img src="assets/icons/play.svg" width="16" height="16" alt=""></button>

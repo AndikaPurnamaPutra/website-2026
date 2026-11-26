@@ -355,3 +355,19 @@ Revisi (permintaan pengguna):
 - `gradient-wave.js`: gelombang baru tidak lagi menghentikan gelombang yang sedang berjalan. Setiap huruf diambil alih oleh gelombang terbaru saat gelombang itu sampai (dari keadaannya sekarang, tanpa lompatan). Ini juga berlaku untuk "$139M+" di Milestone.
 - `hero-highlight.js`: gelombang dipicu saat kursor masuk ke judul **dan setiap kali kursor pindah ke kata lain** di "Elite digital" (`wordAt`, dari posisi huruf yang sudah diukur).
 - Terukur (opasitas gradasi per huruf, 0–9): kursor di "Elite" lalu ke "digital" → huruf menyala berurutan 999985000000 → 999999873000 → 999999999862 → semua menyala, dan huruf awal mulai memudar (888999…) sementara gelombang kedua masih berjalan.
+
+## Showreel preview khusus HP (26 Nov 2026)
+
+User meminta video showreel dikecilkan.
+
+- **Desktop dan tablet:** `showreel-preview.mp4` (1920×1280, 1,75 MB) tetap dipakai. Kompres ulang hanya menghemat ±0,1 MB, dan di 1440 dengan layar 2× videonya tampil selebar 2720 px, jadi resolusinya masih dibutuhkan.
+- **HP (≤ 743 px):** bingkai showreel 4:5 (350×438 di 390) dengan `object-fit: cover`, jadi yang terlihat hanya bagian tengah video, 1024×1280 piksel sumber.
+  - File baru `showreel-preview-phone.mp4` berisi bagian tengah itu pada ukuran penuh: `crop=1024:1280:448:0`, tanpa audio, `crf 24`, `faststart`. Ukurannya 1,10 MB (sebelumnya 1,75 MB), dengan ketajaman yang sama.
+  - Dipilih lewat `<source media="(max-width: 743.98px)">` di `Hero.astro`.
+- Video lengkap di lightbox (`showreel.mp4`, 2,4 MB) tidak diubah. File itu hanya dimuat saat "Play Showreel" diklik.
+
+Diuji di Chrome:
+
+- 390 dan 743 memuat file HP, sedangkan 834 dan 1440 memuat file desktop. Tidak ada yang memuat keduanya.
+- Screenshot 390 dibandingkan dengan bagian tengah video asli di detik yang sama: SSIM 0,925. Selisihnya karena tombol "Play Showreel" yang menutupi video. Di detik yang berbeda, skornya ±0,6.
+- Kemiripan file HP dengan potongan aslinya: SSIM 0,997.
