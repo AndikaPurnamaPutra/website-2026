@@ -19,6 +19,19 @@
   }
 }
 
+// The coin can be dragged round (src/js/coin-scene.js): a hand over it, a
+// closed hand while it is held (over everything, the pointer may leave it).
+.is-coin-grab,
+.is-coin-grab * {
+  cursor: grab !important;
+}
+
+.is-coin-dragging,
+.is-coin-dragging * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
 // With JS (and motion) the 3D coin replaces both coin pictures, hidden from
 // the first paint (.js is set in <head>) so a picture and the 3D coin never
 // show together. They come back if the 3D coin cannot load (is-fallback).

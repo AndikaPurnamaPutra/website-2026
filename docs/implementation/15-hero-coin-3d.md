@@ -65,3 +65,26 @@ User meminta file 3D koin dikecilkan.
   - Coba juga error 0.0001 (0,64 MB) dan 0.001 (0,53 MB). Dipilih 0.0003 sebagai tengahnya.
 - Total koin dan cahaya: 2,59 MB → 0,92 MB per pengunjung desktop. Di HP dan tablet koin 3D memang tidak dimuat (`NO_COIN`, `coin-3d.js`), jadi tidak berubah.
 - Diuji: `coin:ready` terpicu di 1440, koin tampil di hero dan footer, tanpa error.
+
+## Koin bisa di-drag (26 Nov 2026)
+
+User: koin bisa di-drag dan diputar bebas. Pilihan user: diputar, lalu kembali.
+
+- `coin-scene.js`: dengan mouse atau pen, koin berputar ke arah tarikan, mengikuti sumbu layar (`DRAG` 0,008 rad per piksel).
+  - Setelah dilepas, koin tetap berputar karena kecepatan tarikan terakhir, yang memudar (`SPIN_FADE` 3,5/detik). Kalau sudah lambat, koin kembali ke posisi semula (`RETURN`, slerp ke nol).
+  - Kalau mouse ditahan diam lebih dari 80 ms sebelum dilepas, tidak ada putaran lanjutan.
+  - Putaran drag ditumpuk di atas putaran menghadap kursor (`dragTurn × facingTurn`).
+- **Kapan koin bisa diambil:**
+  - Hanya kalau sinar dari kursor benar-benar mengenai model (Raycaster).
+  - Hanya saat koin tampil penuh (opacity > 0,9).
+  - Tidak di atas link, tombol, atau field.
+  - Tidak di tempat yang tertutup gambar, video, atau kotak berlatar, seperti showreel dan Motto.
+- **Kursor:** `.is-coin-grab` (tangan terbuka) di atas koin, dan `.is-coin-dragging` (tangan menggenggam, tanpa seleksi teks) selama drag (`_coin-stage.scss`).
+- Sentuhan jari tidak memutar koin, supaya tetap bisa scroll. Di HP dan tablet koin 3D memang tidak ada.
+
+Diuji di Chrome 1440:
+
+- Kursor tangan muncul di atas koin, dan class drag aktif saat ditekan.
+- Koin berputar saat di-drag, tetap berputar sedikit setelah dilepas, lalu ±4 detik kemudian kembali tegak. Koin juga tetap berputar pelan sendiri seperti biasa.
+- Drag yang dimulai di showreel tidak mengambil koin.
+- Tidak ada teks yang terseleksi, dan tidak ada error JS.

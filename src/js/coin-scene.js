@@ -360,6 +360,103 @@ export function mountCoin(anchors, fallback) {
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     document.addEventListener("pointerout", onPointerOut);
   }
+  // Dragged (user, 26 Nov 2026): with the mouse, the coin turns any way the
+  // pointer pulls it, around the screen's axes; let go, it carries on a
+  // little (its speed fading) and then eases back to where it was. It is
+  // hit where it shows: on the coin itself (a ray into the model), not
+  // under a link, a button or a field, nor where something covers it (a
+  // picture, a video, a filled box: the showreel, Motto). The cursor shows
+  // a hand over it. Mouse and pen only (a finger scrolls the page).
+  const DRAG = 0.008; // radians per pixel of pointer
+  const SPIN_FADE = 3.5; // per second, the speed after letting go
+  const RETURN = 2.2; // per second, the way back once it is slow
+  const dragTurn = new THREE.Quaternion(); // the drag's turn, on top of the rest
+  const dragSpeed = { x: 0, y: 0 }; // radians per second, round the screen's x and y
+  const drag = { on: false, x: 0, y: 0, t: 0 };
+  const turnBy = (ax, ay) => {
+    const q = new THREE.Quaternion();
+    q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), ay);
+    dragTurn.premultiply(q);
+    q.setFromAxisAngle(new THREE.Vector3(1, 0, 0), ax);
+    dragTurn.premultiply(q);
+  };
+  const raycaster = new THREE.Raycaster();
+  const pointerAt = new THREE.Vector2();
+  let coinShown = false;
+  const SKIP = "a, button, input, textarea, select, label, [role='button'], [contenteditable]";
+  const covered = (target) => {
+    for (let el = target; el && el !== document.body && el !== document.documentElement; el = el.parentElement) {
+      if (/^(IMG|VIDEO|CANVAS|IFRAME|SVG)$/i.test(el.tagName)) return true;
+      const style = getComputedStyle(el);
+      if (style.backgroundImage !== "none") return true;
+      const bg = style.backgroundColor.match(/[\d.]+/g);
+      if (bg && (bg.length < 4 || +bg[3] > 0.05)) return true;
+    }
+    return false;
+  };
+  const onCoin = (event) => {
+    if (!coinShown || !model || event.target.closest?.(SKIP) || covered(event.target)) return false;
+    const box = renderer.domElement.getBoundingClientRect();
+    pointerAt.set(((event.clientX - box.left) / box.width) * 2 - 1, -((event.clientY - box.top) / box.height) * 2 + 1);
+    raycaster.setFromCamera(pointerAt, camera);
+    return raycaster.intersectObject(model, true).length > 0;
+  };
+  const root = document.documentElement;
+  let hoverPending = null;
+  const onHover = (event) => {
+    if (drag.on || event.pointerType === "touch") return;
+    if (hoverPending) return;
+    hoverPending = requestAnimationFrame(() => {
+      hoverPending = null;
+      root.classList.toggle("is-coin-grab", onCoin(event));
+    });
+  };
+  const onDown = (event) => {
+    if (event.button !== 0 || event.pointerType === "touch" || !onCoin(event)) return;
+    event.preventDefault(); // no text selection while dragging
+    drag.on = true;
+    drag.x = event.clientX;
+    drag.y = event.clientY;
+    drag.t = performance.now();
+    dragSpeed.x = 0;
+    dragSpeed.y = 0;
+    root.classList.add("is-coin-dragging");
+  };
+  const onDrag = (event) => {
+    if (!drag.on) return;
+    const now = performance.now();
+    const dx = event.clientX - drag.x;
+    const dy = event.clientY - drag.y;
+    const dt = Math.max((now - drag.t) / 1000, 1 / 240);
+    turnBy(dy * DRAG, dx * DRAG);
+    // The speed of the last moves, smoothed, for the carry after letting go.
+    dragSpeed.x += ((dy * DRAG) / dt - dragSpeed.x) * 0.5;
+    dragSpeed.y += ((dx * DRAG) / dt - dragSpeed.y) * 0.5;
+    drag.x = event.clientX;
+    drag.y = event.clientY;
+    drag.t = now;
+  };
+  const onUp = () => {
+    if (!drag.on) return;
+    drag.on = false;
+    // Held still before letting go: no carry.
+    if (performance.now() - drag.t > 80) {
+      dragSpeed.x = 0;
+      dragSpeed.y = 0;
+    }
+    root.classList.remove("is-coin-dragging");
+  };
+  if (finePointer) {
+    window.addEventListener("pointermove", onHover, { passive: true });
+    window.addEventListener("pointerdown", onDown);
+    window.addEventListener("pointermove", onDrag, { passive: true });
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+    window.addEventListener("blur", onUp);
+  }
+  const facingTurn = new THREE.Quaternion();
+  const facingEuler = new THREE.Euler();
+
   let idle = THREE.MathUtils.degToRad(-45);
   let last = performance.now();
 
@@ -381,6 +478,9 @@ export function mountCoin(anchors, fallback) {
     }
     const shown = p && p.opacity > 0.001 && p.y > -window.innerHeight * 0.4 && p.y < window.innerHeight * 1.4;
     stage.style.opacity = shown ? p.opacity : 0;
+    // Only a coin in full view can be taken (not while it comes or goes).
+    coinShown = Boolean(shown && p.opacity > 0.9);
+    if (!coinShown && !drag.on) root.classList.remove("is-coin-grab");
     if (!shown) return;
 
     idle += 0.15 * dt; // very slow turn on its own face
@@ -393,7 +493,18 @@ export function mountCoin(anchors, fallback) {
     const ease = 1 - Math.exp(-dt * 6);
     facingCursor.x += (look.x - facingCursor.x) * ease;
     facingCursor.y += (look.y - facingCursor.y) * ease;
-    model.rotation.set(facingCursor.y * LOOK, facingCursor.x * LOOK, 0);
+    facingTurn.setFromEuler(facingEuler.set(facingCursor.y * LOOK, facingCursor.x * LOOK, 0));
+    // The drag's turn on top: after letting go, carried on by its speed,
+    // fading, then eased back to none.
+    if (!drag.on) {
+      const fade = Math.exp(-dt * SPIN_FADE);
+      dragSpeed.x *= fade;
+      dragSpeed.y *= fade;
+      turnBy(dragSpeed.x * dt, dragSpeed.y * dt);
+      const speed = Math.hypot(dragSpeed.x, dragSpeed.y);
+      if (speed < 1.5) dragTurn.slerp(new THREE.Quaternion(), 1 - Math.exp(-dt * RETURN * (1 - speed / 1.5)));
+    }
+    model.quaternion.multiplyQuaternions(dragTurn, facingTurn);
 
     let px = p.x;
     let py = p.y;
@@ -482,6 +593,14 @@ export function mountCoin(anchors, fallback) {
     window.removeEventListener("resize", onResize);
     window.removeEventListener("pointermove", onPointerMove);
     document.removeEventListener("pointerout", onPointerOut);
+    window.removeEventListener("pointermove", onHover);
+    window.removeEventListener("pointerdown", onDown);
+    window.removeEventListener("pointermove", onDrag);
+    window.removeEventListener("pointerup", onUp);
+    window.removeEventListener("pointercancel", onUp);
+    window.removeEventListener("blur", onUp);
+    if (hoverPending) cancelAnimationFrame(hoverPending);
+    root.classList.remove("is-coin-grab", "is-coin-dragging");
     renderer.dispose();
     stage.remove();
     if (arrived) {
