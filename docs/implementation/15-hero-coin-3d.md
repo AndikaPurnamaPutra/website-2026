@@ -50,3 +50,18 @@ Pengguna memberikan skrip Three.js mandiri (`~/Downloads/web-coin/main.js` denga
 - Dicek 390 × 664: geser −332 → −166 → 0, lapisan gelap 0,5 → 0,25 → 0; logo dan form terlihat.
 - **Halus di layar sentuh** (pengguna: "patah-patah di HP"): scroll bawaan HP berjalan di thread sendiri, dan footer yang digeser JS tertinggal satu frame lalu menyusul. Di layar sentuh yang mendukung `animation-timeline` gerak naik dan lapisan gelapnya kini dijalankan browser (view timeline `--footer-above` pada section di atasnya, `--footer-reach` dari JS); browser lama tetap memakai GSAP. Dicek 390 × 664 dan 834 (sentuh): nilai sama dengan versi GSAP.
 - **Logo dan form tetap terlihat** (pengguna: "scroll ke atas sedikit, cepat tertutup"): footer yang lebih tinggi dari layar kini selesai naik saat tepinya di tengah layar (`TALL_REACH` 0,5), bukan di atas layar. Dicek 390 × 664: dari bawah halaman bisa naik ±480 px sebelum tertutup (sebelumnya ±150).
+
+## Cahaya studio 512 di semua layar (26 Nov 2026)
+
+User meminta file 3D koin dikecilkan.
+
+- `white-studio-1k.hdr` (1,36 MB, khusus desktop) dihapus. Semua layar sekarang memakai `white-studio-512.hdr` (351 KB), yang sebelumnya hanya untuk HP.
+- Dibandingkan berdampingan di 1440 dengan layar 2×: pantulan di tepi, kilau logo, dan bayangannya terbaca sama.
+- Hasilnya, setiap halaman di desktop 1 MB lebih ringan, karena koin muncul di semua halaman (homepage 9,4 → 8,4 MB, Contact 5,3 → 4,3 MB).
+- `oww-pin.glb`: 1,23 MB → 0,57 MB (persetujuan user), dengan `gltf-transform simplify --ratio 0.25 --error 0.0003` lalu `gltf-transform meshopt`.
+  - Tepi koin turun dari 68.968 ke 23.898 titik, dan kedua bagian logo dari ±20.000 ke ±7.000 titik.
+  - Tekstur tidak diubah.
+  - Dibandingkan di 1440 dengan layar 2× dan jam halaman dibekukan: tulisan di tepi, kilau, dan bentuk logo sama. SSIM area koin 0,991 terhadap aslinya.
+  - Coba juga error 0.0001 (0,64 MB) dan 0.001 (0,53 MB). Dipilih 0.0003 sebagai tengahnya.
+- Total koin dan cahaya: 2,59 MB → 0,92 MB per pengunjung desktop. Di HP dan tablet koin 3D memang tidak dimuat (`NO_COIN`, `coin-3d.js`), jadi tidak berubah.
+- Diuji: `coin:ready` terpicu di 1440, koin tampil di hero dan footer, tanpa error.

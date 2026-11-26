@@ -139,11 +139,12 @@ export function mountCoin(anchors, fallback) {
     // The preloader waits for it (src/js/preloader.js).
     document.dispatchEvent(new CustomEvent("coin:ready"));
   };
-  // On phones a half-size studio light (351 KB instead of 1.36 MB; the coin
-  // is small there): docs/implementation/32-responsive.md, step 7.
-  const phone = window.matchMedia("(max-width: 743.98px)").matches;
+  // The half-size studio light everywhere (351 KB; the 1k one, 1.36 MB, was
+  // for desktops): the coin's reflections were compared side by side at
+  // 1440 at 2x and read the same (26 Nov 2026; phones since
+  // docs/implementation/32-responsive.md, step 7).
   new RGBELoader().load(
-    phone ? "assets/models/white-studio-512.hdr" : "assets/models/white-studio-1k.hdr",
+    "assets/models/white-studio-512.hdr",
     (texture) => {
       texture.mapping = THREE.EquirectangularReflectionMapping;
       scene.environment = texture;
@@ -178,7 +179,9 @@ export function mountCoin(anchors, fallback) {
   let model = null;
   const initialQuat1 = new THREE.Quaternion();
   let readyAt = null;
-  // Compressed with gltf-transform (meshopt geometry, WebP textures at 1024).
+  // Compressed with gltf-transform (meshopt geometry, WebP textures at 1024),
+  // its shape simplified (simplify --ratio 0.25 --error 0.0003: 1.23 MB →
+  // 0.57 MB, the edge and logo compared at 2x and read the same; 26 Nov 2026).
   new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load(
     "assets/models/oww-pin.glb",
     (gltf) => {
