@@ -1,10 +1,12 @@
 // Privacy Policy (was src/pug/pages/privacy-policy.pug).
 // Figma: "Privacy and Policy" 1611:7774. Text exactly as in Figma (user
-// decision), including the repeated title of section 9.
+// decision), including the repeated title of section 9, except the title:
+// "Privacy Policy", as the page's name, the footer and the tab (user, 26 Nov
+// 2026; Figma reads "Privacy and Policy").
 // Each section is a list of groups (8px apart); the items of a group are 2px
 // apart. Item types: p (lines; "" = empty line), sub (bold subheading),
 // ul / ol (items of [bold label, text]), html (paragraph with inline markup).
-export const title = ["One Week Wonders -", "Privacy and Policy"];
+export const title = ["One Week Wonders -", "Privacy Policy"];
 
 export const meta = [
   ["Effective Date :", "October 26, 2026"],

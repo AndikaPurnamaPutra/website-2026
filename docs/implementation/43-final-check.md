@@ -28,4 +28,4 @@ Judul h1 terbaca utuh oleh pembaca layar, termasuk yang dianimasikan per huruf. 
    - "Schedule a call" (Contact): link kalender (mis. Calendly).
    - "See More" di kartu Services, "View Branding" dan kartu Our Work di homepage, serta galeri di Contact: menunggu halaman detail project (desain Figma belum ada).
 2. **Domain situs** (`src/data/site.js`, `siteUrl`): selama belum diisi, `og:image` (gambar saat link dibagikan), `canonical`, dan `og:url` sengaja tidak ditulis ([PageMeta.astro](../../src/components/PageMeta.astro)). Sitemap juga belum ada, dan sebaiknya dibuat setelah domainnya diketahui.
-3. **Teks:** judul Privacy Policy tertulis "Privacy and Policy". Perlu dicek apakah memang begitu di Figma.
+3. ~~**Teks:** judul Privacy Policy tertulis "Privacy and Policy".~~ Selesai (26 Nov 2026): di Figma memang tertulis "Privacy and Policy", tetapi user memilih "Privacy Policy" supaya sama dengan nama halaman, footer, dan tab (`src/data/privacy-policy.js`).
