@@ -29,7 +29,7 @@ import { socialLinks } from "../data/site-links.js";
               <div class="work-menu__featured">
                 <div class="work-menu__sets">
                   {workSets.map((set, k) => (
-                    <div class:list={["work-menu__set", k === 0 && "is-active"]} aria-hidden={k === 0 ? undefined : "true"}>{set.map((image) => (<a class="work-menu__card" href="/work" tabindex={k === 0 ? undefined : "-1"}><img src={`assets/images/${image}`} alt="" loading="lazy"><span class="work-menu__badge">New</span></a>))}
+                    <div class:list={["work-menu__set", k === 0 && "is-active"]} aria-hidden={k === 0 ? undefined : "true"}>{set.map((image) => (<a class="work-menu__card" href="/work" tabindex={k === 0 ? undefined : "-1"}><img src={`assets/images/${image.replace(/\.webp$/, "-800.webp")}`} srcset={`assets/images/${image.replace(/\.webp$/, "-800.webp")} 800w, assets/images/${image} 2000w`} sizes="15vw" alt="" loading="lazy"><span class="work-menu__badge">New</span></a>))}
                     </div>
                   ))}
                 </div>

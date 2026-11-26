@@ -38,7 +38,7 @@ import { photos, team } from "../data/about.js";
       <div class="container">
         <div class="about-gallery__photos">
           {photos.map(([file, [x, y, w, h], alt], i) => (
-            <figure class="about-gallery__photo" style={`--x: ${x}; --y: ${y}; --w: ${w}; --h: ${h}`}><img src={`assets/images/about/${file}`} width={w} height={h} alt={alt} loading="lazy">{i === 0 && <span class="about-gallery__play glass-button"><span class="text-14 text-medium">Play Video</span><img src="assets/icons/play.svg" width="16" height="16" alt=""></span>}
+            <figure class="about-gallery__photo" style={`--x: ${x}; --y: ${y}; --w: ${w}; --h: ${h}`}><img src={`assets/images/about/${file.replace(/\.webp$/, "-800.webp")}`} srcset={`assets/images/about/${file.replace(/\.webp$/, "-800.webp")} 800w, assets/images/about/${file.replace(/\.webp$/, "-1400.webp")} 1400w, assets/images/about/${file} 2000w`} sizes={`(max-width: 743.98px) 90vw, ${Math.round((w / 1440) * 100)}vw`} width={w} height={h} alt={alt} loading="lazy">{i === 0 && <span class="about-gallery__play glass-button"><span class="text-14 text-medium">Play Video</span><img src="assets/icons/play.svg" width="16" height="16" alt=""></span>}
             </figure>
           ))}
         </div>

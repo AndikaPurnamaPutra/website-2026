@@ -32,7 +32,7 @@ const { eyebrow, note, services } = servicesSection;
           <source src={`assets/images/${service.video}.mp4`} type="video/mp4">
         </video>
       ) : (
-        <img class="services__image" src={`assets/images/${service.image}.webp`} srcset={`assets/images/${service.image}-800.webp 800w, assets/images/${service.image}.webp 2000w`} sizes="(max-width: 1023.98px) 100vw, 65vw" alt={service.alt} style={service.focus && `object-position: ${service.focus}`} loading="lazy" decoding="async">
+        <img class="services__image" src={`assets/images/${service.image}.webp`} srcset={`assets/images/${service.image}-800.webp 800w, assets/images/${service.image}-1400.webp 1400w, assets/images/${service.image}.webp 2000w`} sizes="(max-width: 1023.98px) 92vw, 71vw" alt={service.alt} style={service.focus && `object-position: ${service.focus}`} loading="lazy" decoding="async">
       ))}<a class="services__link" href={services[0].href} aria-label={`View ${services[0].title}`} data-services-link={JSON.stringify(services.map((service) => [service.href, service.title]))}></a>
     </div>
     <p class="services__note text-14 text-muted">{note}</p>

@@ -17,10 +17,7 @@ const IMAGE_MAX = 2000;
 // shown much smaller on phones (Lighthouse, 12 Nov 2026).
 const IMAGE_WIDTHS = {
   "about/team.jpg": [800, 1400],
-  // Services pictures: full width on phones and tablets.
-  "services/illustration.jpg": [800],
-  "services/ui-ux.jpg": [800],
-  "services/ai-web.jpg": [800],
+  // Services pictures: below, with the CMS ones (imageWidths).
 };
 // Pictures that Figma stretches into a box of another shape (no
 // object-fit): written in that shape, so the browser has nothing to stretch
@@ -29,9 +26,19 @@ const IMAGE_WIDTHS = {
 // the Work page collage cards are at most ~630px wide (2560 screens), so
 // they use the 800 copy only; project covers get one too for the Work page's
 // smaller cards (srcset).
+// Lighthouse (26 Nov 2026) found pictures loaded far larger than shown:
+// Services (≈71% of a desktop screen) get a 1400 copy too; the About
+// gallery 800 and 1400; the Work menu's thumbnails (menu/, work/, ≈15%)
+// an 800.
 const imageWidths = (name) =>
   IMAGE_WIDTHS[name] ??
-  (/^cms\/(services\/[^/]+(?<!-poster)|work-page\/collage-\d+|work\/[^/]+)\.(jpe?g|png)$/i.test(name) ? [800] : []);
+  (/^(cms\/)?services\/[^/]+(?<!-poster)\.(jpe?g|png)$/i.test(name)
+    ? [800, 1400]
+    : /^about\/gallery-\d+\.(jpe?g|png)$/i.test(name)
+      ? [800, 1400]
+      : /^(cms\/(work-page\/collage-\d+|work\/[^/]+)|work\/[^/]+|menu\/[^/]+)\.(jpe?g|png)$/i.test(name)
+        ? [800]
+        : []);
 const IMAGE_STRETCH = { "hero/coin.png": [1024, 960] };
 
 const newer = async (from, to) => {

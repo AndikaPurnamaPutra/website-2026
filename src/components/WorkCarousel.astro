@@ -16,7 +16,7 @@ const { title, items } = Astro.props;
   <div class="work-carousel__viewport" data-work-viewport>
     <ul class="work-carousel__track">
       {items.map((item) => (
-        <li class="work-card"><a class="work-card__link" href="#"><span class="work-card__media"><img class="work-card__image" src={`assets/images/${item.image}.webp`} alt="" loading="lazy" decoding="async" style={item.focus && `object-position: ${item.focus}`}></span><span class="work-card__title text-13">{item.title}</span></a></li>
+        <li class="work-card"><a class="work-card__link" href="#"><span class="work-card__media"><img class="work-card__image" src={`assets/images/${item.image}-800.webp`} srcset={`assets/images/${item.image}-800.webp 800w, assets/images/${item.image}.webp 2000w`} sizes="(max-width: 743.98px) 72vw, (max-width: 1023.98px) 39vw, 23vw" alt="" loading="lazy" decoding="async" style={item.focus && `object-position: ${item.focus}`}></span><span class="work-card__title text-13">{item.title}</span></a></li>
       ))}
     </ul>
   </div>
